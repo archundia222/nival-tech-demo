@@ -22,6 +22,11 @@ function renderIntel(){
     <div class="metric"><span class="small muted">VIP</span><b>${counts.vip}</b></div>`;
   const risk=enriched.filter(c=>["En riesgo","Inactivo"].includes(c.status));
   const vip=enriched.filter(c=>c.status==="VIP");
+  const reactContext=`${risk.length} clientes están en riesgo o inactivos porque están tardando más de lo habitual en regresar.`;
+  const reactQuestion="Quiero ideas de estrategias de reactivación de clientes. ¿Qué me recomiendas hacer con este grupo?";
+  const vipContext=`${vip.length} clientes fueron identificados como VIP por su alta frecuencia de visitas.`;
+  const vipQuestion="Quiero ideas para fidelizar a estos clientes VIP y convertirlos en promotores del negocio. ¿Qué estrategias me recomiendas?";
+
   document.querySelector("#recommendations").innerHTML=`
     <div class="reco">
       <div class="kicker">Oportunidad detectada</div>
@@ -30,14 +35,15 @@ function renderIntel(){
       <div class="alert warn">
         <b>Acción sugerida:</b> revisar estos clientes y preparar una estrategia de reactivación.
       </div>
-      <button
-        class="btn btn-primary btn-block adviceBtn"
+      <a
+        class="btn btn-primary btn-block"
         style="margin-top:12px"
-        data-context="${escapeHtml(`${risk.length} clientes están en riesgo o inactivos porque están tardando más de lo habitual en regresar.`)}"
-        data-question="Quiero ideas de estrategias de reactivación de clientes. ¿Qué me recomiendas hacer con este grupo?"
+        href="${buildAdviceWhatsAppUrl(reactContext,reactQuestion)}"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         Quiero consejo por WhatsApp
-      </button>
+      </a>
     </div>
 
     <div class="reco">
@@ -47,21 +53,16 @@ function renderIntel(){
       <div class="alert success">
         <b>Acción sugerida:</b> reconocer su lealtad y pedir recomendación en el momento adecuado.
       </div>
-      <button
-        class="btn btn-primary btn-block adviceBtn"
+      <a
+        class="btn btn-primary btn-block"
         style="margin-top:12px"
-        data-context="${escapeHtml(`${vip.length} clientes fueron identificados como VIP por su alta frecuencia de visitas.`)}"
-        data-question="Quiero ideas para fidelizar a estos clientes VIP y convertirlos en promotores del negocio. ¿Qué estrategias me recomiendas?"
+        href="${buildAdviceWhatsAppUrl(vipContext,vipQuestion)}"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         Quiero consejo por WhatsApp
-      </button>
+      </a>
     </div>`;
-
-  document.querySelectorAll(".adviceBtn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      openAdviceWhatsApp(btn.dataset.context,btn.dataset.question);
-    });
-  });
 
   document.querySelector("#clientRows").innerHTML=enriched.map(c=>{
     const last=c.visits.length?[...c.visits].sort().at(-1):null;

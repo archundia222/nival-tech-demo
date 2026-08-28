@@ -1,5 +1,5 @@
 const NIVAL = (() => {
-  const KEY = "nival_tech_demo_v4";
+  const KEY = "nival_tech_demo_v6";
   const today = () => new Date().toISOString().slice(0,10);
   const nowIso = () => new Date().toISOString();
 
@@ -25,7 +25,7 @@ const NIVAL = (() => {
       {id:"emp-owner",name:"Gerente Demo",email:"owner@nival.demo",password:"nival2026",role:"Dueño"}
     ],
     clients: [
-      {id:"c1",name:"Carlos Martínez",phone:"5511111111",email:"carlos@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:"2026-05-01",visits:["2026-05-02","2026-05-23","2026-06-13"]},
+      {id:"c1",name:"Carlos Martínez",phone:"5511111111",email:"carlos@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:"2026-05-01",visits:["2026-05-02","2026-05-23","2026-06-13","2026-07-04"]},
       {id:"c2",name:"Miguel Herrera",phone:"5522222222",email:"miguel@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:"2026-03-15",visits:["2026-03-15","2026-04-05","2026-04-26","2026-05-18","2026-06-08","2026-07-01"]},
       {id:"c3",name:"Javier Ortega",phone:"5533333333",email:"javier@demo.mx",declaredType:"Ocasional",declaredFreq:"Cada mes",createdAt:"2026-01-10",visits:["2026-01-10","2026-02-16","2026-03-22","2026-05-01"]},
       {id:"c4",name:"Roberto Silva",phone:"5544444444",email:"roberto@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 2 semanas",createdAt:"2026-02-01",visits:["2026-02-01","2026-02-16","2026-03-02","2026-03-16","2026-03-30","2026-04-13","2026-04-27","2026-05-11","2026-05-25","2026-06-08","2026-06-22","2026-08-20"]}
@@ -133,10 +133,10 @@ function toast(msg){
   el.textContent=msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2600);
 }
 
-function openAdviceWhatsApp(context, question){
+function buildAdviceWhatsAppUrl(context, question){
   const state=NIVAL.load();
-  const phone=(state.business?.advisorWhatsapp||"").replace(/\D/g,"");
-  const business=state.business?.name||"el negocio";
+  const phone=(state.business?.advisorWhatsapp || "525539044788").replace(/\D/g,"");
+  const business=state.business?.name || "el negocio";
   const message=[
     "Hola, quiero consejo de NIVAL tech.",
     "",
@@ -145,9 +145,5 @@ function openAdviceWhatsApp(context, question){
     "",
     `Pregunta: ${question}`
   ].join("\n");
-  if(!phone){
-    toast("Falta configurar el WhatsApp del asesor en app.js → advisorWhatsapp.");
-    return;
-  }
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,"_blank","noopener,noreferrer");
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
