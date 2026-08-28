@@ -1,6 +1,6 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Club Norte · NIVAL tech</title><link rel="stylesheet" href="styles.css"></head>
 <body><main class="shell mobile-frame">
-  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">LOYALTY</span></div>
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">DEMO · LOYALTY</span></div>
 
   <section id="home" class="card pad">
     <div class="kicker">Club Barbería Norte</div><h1 style="font-size:44px">Haz que cada visita cuente.</h1>
@@ -82,9 +82,16 @@ function renderCard(){
   const shown=Math.max(5,Math.ceil((n+1)/5)*5);
   for(let i=0;i<shown;i++){ const el=document.createElement("div"); el.className="stamp"+(i<n?" filled":""); el.textContent=i<n?"✓":i+1; stamps.appendChild(el); }
   document.querySelector("#visitCount").textContent=`${n} visita${n===1?"":"s"}`;
-  document.querySelector("#nextMilestone").textContent=`Meta ${reward.milestone}`;
-  document.querySelector("#rewardTitle").textContent=`${reward.milestone} visitas · ${reward.title}`;
-  document.querySelector("#rewardDesc").textContent=reward.description;
+  const unlocked=s.rewards.find(r=>r.milestone===n);
+  if(unlocked){
+    document.querySelector("#nextMilestone").textContent="Premio desbloqueado";
+    document.querySelector("#rewardTitle").textContent=`🎉 ${unlocked.title}`;
+    document.querySelector("#rewardDesc").textContent=`${unlocked.description} · Solicita al personal el canje.`;
+  }else{
+    document.querySelector("#nextMilestone").textContent=`Meta ${reward.milestone}`;
+    document.querySelector("#rewardTitle").textContent=`${reward.milestone} visitas · ${reward.title}`;
+    document.querySelector("#rewardDesc").textContent=reward.description;
+  }
   const pending=s.requests.find(r=>r.clientId===c.id && r.status==="pending");
   const rs=document.querySelector("#requestState");
   rs.innerHTML=pending?'<div class="alert warn" style="margin-bottom:12px">Solicitud pendiente de aprobación por el personal.</div>':'';
@@ -95,4 +102,10 @@ document.querySelector("#requestVisit").addEventListener("click",()=>{
 });
 document.querySelector("#switchAccount").addEventListener("click",()=>show("login"));
 show("home");
+window.addEventListener("storage",()=>{
+  if(!document.querySelector("#cardView").classList.contains("hidden")) renderCard();
+});
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden && !document.querySelector("#cardView").classList.contains("hidden")) renderCard();
+});
 </script></body></html>

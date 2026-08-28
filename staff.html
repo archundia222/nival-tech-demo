@@ -1,6 +1,6 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personal autorizado · NIVAL tech</title><link rel="stylesheet" href="styles.css"></head>
 <body><main class="shell">
-  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">STAFF</span></div>
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">DEMO · STAFF</span></div>
   <section id="staffLogin" class="card pad mobile-frame">
     <div class="kicker">Personal autorizado</div><h1 style="font-size:42px">Validación de visitas.</h1>
     <form id="staffLoginForm" class="form">
@@ -37,4 +37,7 @@ function decide(id,d){ const r=NIVAL.decideRequest(id,d); if(!r.ok){toast(r.erro
 document.querySelector("#staffLoginForm").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget),r=NIVAL.staffLogin(f.get("email"),f.get("password"));if(!r.ok){toast(r.error);return;}render();});
 document.querySelector("#logout").addEventListener("click",()=>{NIVAL.staffLogout();render();});
 render();
+window.addEventListener("storage",render);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) render(); });
+setInterval(()=>{ if(NIVAL.loggedStaff()) render(); },1500);
 </script></body></html>
