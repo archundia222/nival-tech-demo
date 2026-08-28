@@ -56,3 +56,31 @@ Una vez publicada:
 El panel:
 - `staff.html`
 - `intelligence.html`
+
+## Configurar botón “Quiero consejo”
+En `app.js`, busca:
+
+```js
+advisorWhatsapp:""
+```
+
+y escribe el número del asesor con código de país y solo dígitos, por ejemplo:
+
+```js
+advisorWhatsapp:"5215512345678"
+```
+
+Cada recomendación de `NIVAL Intelligence` tendrá un botón **Quiero consejo por WhatsApp** que abre una conversación con un mensaje prellenado incluyendo el negocio, contexto detectado y una pregunta específica.
+
+## Contacto configurado en esta demo
+- WhatsApp asesor: `+52 55 3904 4788`
+- Instagram: `@archundia_222`
+
+## Datos bancarios
+La landing incluye campos separados para:
+- Nombre de la cuenta / titular
+- Alias o concepto
+- Número de cuenta
+- CLABE
+
+Cada campo tiene botón **Copiar**. Los valores actuales son de demostración; reemplázalos por los datos reales del negocio antes de usarlo con clientes.

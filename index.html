@@ -1,4 +1,12 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barbería Norte · NIVAL tech Demo</title><link rel="stylesheet" href="styles.css"></head>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barbería Norte · NIVAL tech Demo</title><link rel="stylesheet" href="styles.css">
+<style>
+.bank-grid{display:grid;gap:10px}
+.bank-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 15px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.bank-row>div{display:grid;gap:4px;min-width:0}
+.bank-row strong{overflow-wrap:anywhere}
+.bank-label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+@media(max-width:520px){.bank-row{align-items:flex-start;flex-direction:column}.copyBank{width:100%}}
+</style></head>
 <body><main class="shell">
   <div class="topbar"><div class="brand"><span class="brandmark">N</span>NIVAL tech</div><span class="demo-badge">DEMO COMERCIAL</span></div>
   <section class="grid">
@@ -10,15 +18,60 @@
     <div class="card pad">
       <h2>Información del negocio</h2><p class="muted">Ejemplo de landing vinculada a la NFC de información.</p>
       <div class="link-list">
-        <a class="link-row" href="https://wa.me/" target="_blank"><span>WhatsApp / Reservar</span><b>↗</b></a>
-        <a class="link-row" href="#"><span>Instagram · @barberianorte_demo</span><b>↗</b></a>
+        <a class="link-row" href="https://wa.me/5215539044788" target="_blank" rel="noopener"><span>WhatsApp · 55 3904 4788</span><b>↗</b></a>
+        <a class="link-row" href="https://www.instagram.com/archundia_222/" target="_blank" rel="noopener"><span>Instagram · @archundia_222</span><b>↗</b></a>
         <a class="link-row" href="#"><span>Ubicación · Ciudad de México</span><b>↗</b></a>
         <button class="link-row" id="bankBtn"><span>Datos para transferencia</span><b>+</b></button>
       </div>
-      <div id="bank" class="notice hidden" style="margin-top:12px">Banco Demo · CLABE 000000000000000000</div>
+      <div id="bank" class="hidden" style="margin-top:12px">
+        <div class="notice" style="margin-bottom:10px"><b>Datos bancarios de demostración.</b> Sustituye estos valores por los datos reales del negocio antes de usarlo con clientes.</div>
+
+        <div class="bank-grid">
+          <div class="bank-row">
+            <div><span class="bank-label">Nombre de la cuenta / titular</span><strong id="bankHolder">NOMBRE DEL TITULAR · DEMO</strong></div>
+            <button class="btn copyBank" type="button" data-copy="bankHolder">Copiar</button>
+          </div>
+          <div class="bank-row">
+            <div><span class="bank-label">Alias o concepto</span><strong id="bankAlias">BARBERIA NORTE · DEMO</strong></div>
+            <button class="btn copyBank" type="button" data-copy="bankAlias">Copiar</button>
+          </div>
+          <div class="bank-row">
+            <div><span class="bank-label">Número de cuenta</span><strong id="bankAccount">0000000000</strong></div>
+            <button class="btn copyBank" type="button" data-copy="bankAccount">Copiar</button>
+          </div>
+          <div class="bank-row">
+            <div><span class="bank-label">CLABE</span><strong id="bankClabe">000000000000000000</strong></div>
+            <button class="btn copyBank" type="button" data-copy="bankClabe">Copiar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   <p class="footer-note">Barbería y datos ficticios para demostración. Powered by NIVAL tech.</p>
 </main><script src="app.js"></script><script>
 document.querySelector("#bankBtn").addEventListener("click",()=>document.querySelector("#bank").classList.toggle("hidden"));
+
+document.querySelectorAll(".copyBank").forEach(btn=>{
+  btn.addEventListener("click",async()=>{
+    const target=document.getElementById(btn.dataset.copy);
+    const value=target?.textContent?.trim() || "";
+    if(!value) return;
+    try{
+      await navigator.clipboard.writeText(value);
+      const old=btn.textContent;
+      btn.textContent="Copiado ✓";
+      setTimeout(()=>btn.textContent=old,1200);
+    }catch{
+      const temp=document.createElement("textarea");
+      temp.value=value;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      temp.remove();
+      const old=btn.textContent;
+      btn.textContent="Copiado ✓";
+      setTimeout(()=>btn.textContent=old,1200);
+    }
+  });
+});
 </script></body></html>

@@ -1,5 +1,5 @@
 const NIVAL = (() => {
-  const KEY = "nival_tech_demo_v1";
+  const KEY = "nival_tech_demo_v4";
   const today = () => new Date().toISOString().slice(0,10);
   const nowIso = () => new Date().toISOString();
 
@@ -7,11 +7,18 @@ const NIVAL = (() => {
     business: {
       id:"barberia-norte",
       name:"Barbería Norte",
-      whatsapp:"+52 55 0000 0000",
-      instagram:"@barberianorte_demo",
+      whatsapp:"+52 55 3904 4788",
+      instagram:"@archundia_222",
       location:"Ciudad de México · Demo",
       hours:"Lun–Sáb · 10:00–20:00",
-      bank:"Banco Demo · CLABE 000000000000000000"
+      bank:{
+        holder:"NOMBRE DEL TITULAR · DEMO",
+        alias:"BARBERIA NORTE · DEMO",
+        account:"0000000000",
+        clabe:"000000000000000000"
+      },
+      advisorWhatsapp:"525539044788",
+      advisorInstagram:"@archundia_222"
     },
     staff: [
       {id:"emp-diego",name:"Diego",email:"staff@nival.demo",password:"demo1234",role:"Barbero"},
@@ -124,4 +131,23 @@ function escapeHtml(s){ return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;"
 function toast(msg){
   let el=qs("#toast"); if(!el){ el=document.createElement("div"); el.id="toast"; el.className="toast"; document.body.appendChild(el); }
   el.textContent=msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2600);
+}
+
+function openAdviceWhatsApp(context, question){
+  const state=NIVAL.load();
+  const phone=(state.business?.advisorWhatsapp||"").replace(/\D/g,"");
+  const business=state.business?.name||"el negocio";
+  const message=[
+    "Hola, quiero consejo de NIVAL tech.",
+    "",
+    `Negocio: ${business}`,
+    `Contexto: ${context}`,
+    "",
+    `Pregunta: ${question}`
+  ].join("\n");
+  if(!phone){
+    toast("Falta configurar el WhatsApp del asesor en app.js → advisorWhatsapp.");
+    return;
+  }
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,"_blank","noopener,noreferrer");
 }
