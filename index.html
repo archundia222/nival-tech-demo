@@ -1,0 +1,24 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Barbería Norte · NIVAL tech Demo</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="shell">
+  <div class="topbar"><div class="brand"><span class="brandmark">N</span>NIVAL tech</div><span class="demo-badge">DEMO COMERCIAL</span></div>
+  <section class="grid">
+    <div class="card hero">
+      <div class="kicker">Barbería Norte</div><h1>Tu barbería, en un toque.</h1>
+      <p class="muted">Accede a reservas, redes, ubicación, pagos y beneficios desde un solo lugar.</p>
+      <div class="actions"><a class="btn btn-primary" href="loyalty.html">Únete al Club Norte</a><a class="btn" href="reviews.html">Dejar reseña</a></div>
+    </div>
+    <div class="card pad">
+      <h2>Información del negocio</h2><p class="muted">Ejemplo de landing vinculada a la NFC de información.</p>
+      <div class="link-list">
+        <a class="link-row" href="https://wa.me/" target="_blank"><span>WhatsApp / Reservar</span><b>↗</b></a>
+        <a class="link-row" href="#"><span>Instagram · @barberianorte_demo</span><b>↗</b></a>
+        <a class="link-row" href="#"><span>Ubicación · Ciudad de México</span><b>↗</b></a>
+        <button class="link-row" id="bankBtn"><span>Datos para transferencia</span><b>+</b></button>
+      </div>
+      <div id="bank" class="notice hidden" style="margin-top:12px">Banco Demo · CLABE 000000000000000000</div>
+    </div>
+  </section>
+  <p class="footer-note">Barbería y datos ficticios para demostración. Powered by NIVAL tech.</p>
+</main><script src="app.js"></script><script>
+document.querySelector("#bankBtn").addEventListener("click",()=>document.querySelector("#bank").classList.toggle("hidden"));
+</script></body></html>

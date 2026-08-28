@@ -1,0 +1,98 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Club Norte · NIVAL tech</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="shell mobile-frame">
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">LOYALTY</span></div>
+
+  <section id="home" class="card pad">
+    <div class="kicker">Club Barbería Norte</div><h1 style="font-size:44px">Haz que cada visita cuente.</h1>
+    <p class="muted">Acumula visitas, desbloquea recompensas y mantén tu progreso en un solo lugar.</p>
+    <div id="recognized" class="alert success hidden" style="margin:14px 0"></div>
+    <div class="segment">
+      <button class="btn btn-primary" id="newBtn">Soy nuevo</button>
+      <button class="btn" id="existingBtn">Ya tengo cuenta</button>
+    </div>
+    <hr><a class="small muted" href="staff.html">Acceso para personal autorizado →</a>
+  </section>
+
+  <section id="register" class="card pad hidden">
+    <h2>Crear mi cuenta</h2><p class="muted">Solo pedimos los datos necesarios para tu programa de lealtad.</p>
+    <form id="registerForm" class="form">
+      <div class="field"><label>Nombre completo *</label><input name="name" required autocomplete="name"></div>
+      <div class="field"><label>Teléfono</label><input name="phone" inputmode="tel" autocomplete="tel"></div>
+      <div class="field"><label>Correo</label><input name="email" type="email" autocomplete="email"></div>
+      <div class="field"><label>¿Cómo nos visitas? *</label><select name="declaredType" required><option value="">Selecciona</option><option>Primera vez</option><option>Ocasional</option><option>Recurrente</option></select></div>
+      <div class="field"><label>¿Cada cuánto te cortas el cabello? *</label><select name="declaredFreq" required><option value="">Selecciona</option><option>Cada semana</option><option>Cada 2 semanas</option><option>Cada 3 semanas</option><option>Cada mes</option><option>Más de un mes</option></select></div>
+      <label class="check"><input name="privacy" type="checkbox" required><span class="small">Acepto el aviso de privacidad de demostración.</span></label>
+      <div class="notice">Debes proporcionar al menos teléfono o correo para identificar tu cuenta.</div>
+      <button class="btn btn-primary btn-block">Crear cuenta</button><button class="btn btn-block" type="button" data-back>Volver</button>
+    </form>
+  </section>
+
+  <section id="login" class="card pad hidden">
+    <h2>Ya tengo cuenta</h2><p class="muted">Ingresa tu teléfono o correo.</p>
+    <form id="loginForm" class="form">
+      <div class="field"><label>Teléfono o correo</label><input name="identifier" required></div>
+      <button class="btn btn-primary btn-block">Entrar</button><button class="btn btn-block" type="button" data-back>Volver</button>
+    </form>
+    <div class="notice" style="margin-top:14px">Demo rápida: usa <b>5511111111</b> para entrar como Carlos.</div>
+  </section>
+
+  <section id="cardView" class="hidden">
+    <div class="loyalty-card">
+      <div class="loyalty-top"><div><div class="small" style="opacity:.65">CLUB NORTE</div><h2 id="clientName" style="color:white;margin-top:5px"></h2></div><div class="brandmark" style="background:white;color:#111318">N</div></div>
+      <div class="stamps" id="stamps"></div>
+      <div class="progress-meta"><span id="visitCount"></span><span id="nextMilestone"></span></div>
+      <div class="reward"><div class="small" style="opacity:.65">PRÓXIMA RECOMPENSA</div><h3 id="rewardTitle" style="color:white;margin-top:6px"></h3><div class="small" id="rewardDesc" style="opacity:.75"></div></div>
+    </div>
+    <div class="card pad" style="margin-top:14px">
+      <div id="requestState"></div>
+      <button class="btn btn-accent btn-block" id="requestVisit">Solicitar registrar visita</button>
+      <a class="btn btn-block" style="margin-top:10px" href="staff.html">Abrir panel de empleado (demo)</a>
+      <button class="btn btn-block" style="margin-top:10px" id="switchAccount">Cambiar de cuenta</button>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script><script>
+const views=["home","register","login","cardView"];
+function show(id){ views.forEach(v=>document.querySelector("#"+v).classList.toggle("hidden",v!==id)); if(id==="cardView") renderCard(); }
+const state=NIVAL.load(), recognized=NIVAL.currentClient(state);
+if(recognized){
+  const box=document.querySelector("#recognized"); box.classList.remove("hidden");
+  box.innerHTML=`Te reconocimos como <b>${escapeHtml(recognized.name)}</b>. <button id="continueBtn" class="btn" style="margin-left:8px;min-height:34px">Continuar</button>`;
+  setTimeout(()=>document.querySelector("#continueBtn")?.addEventListener("click",()=>show("cardView")),0);
+}
+document.querySelector("#newBtn").addEventListener("click",()=>show("register"));
+document.querySelector("#existingBtn").addEventListener("click",()=>show("login"));
+document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",()=>show("home")));
+document.querySelector("#registerForm").addEventListener("submit",e=>{
+  e.preventDefault(); const f=new FormData(e.currentTarget);
+  const phone=(f.get("phone")||"").trim(), email=(f.get("email")||"").trim();
+  if(!phone && !email){ toast("Ingresa al menos teléfono o correo."); return; }
+  const r=NIVAL.addClient({name:f.get("name").trim(),phone,email,declaredType:f.get("declaredType"),declaredFreq:f.get("declaredFreq")});
+  if(!r.ok){ toast(r.error); return; } show("cardView");
+});
+document.querySelector("#loginForm").addEventListener("submit",e=>{
+  e.preventDefault(); const f=new FormData(e.currentTarget), r=NIVAL.loginClient(f.get("identifier"));
+  if(!r.ok){ toast(r.error); return; } show("cardView");
+});
+function renderCard(){
+  const s=NIVAL.load(), c=NIVAL.currentClient(s); if(!c){show("home");return;}
+  const n=c.visits.length, reward=NIVAL.nextReward(c,s);
+  document.querySelector("#clientName").textContent=c.name;
+  const stamps=document.querySelector("#stamps"); stamps.innerHTML="";
+  const shown=Math.max(5,Math.ceil((n+1)/5)*5);
+  for(let i=0;i<shown;i++){ const el=document.createElement("div"); el.className="stamp"+(i<n?" filled":""); el.textContent=i<n?"✓":i+1; stamps.appendChild(el); }
+  document.querySelector("#visitCount").textContent=`${n} visita${n===1?"":"s"}`;
+  document.querySelector("#nextMilestone").textContent=`Meta ${reward.milestone}`;
+  document.querySelector("#rewardTitle").textContent=`${reward.milestone} visitas · ${reward.title}`;
+  document.querySelector("#rewardDesc").textContent=reward.description;
+  const pending=s.requests.find(r=>r.clientId===c.id && r.status==="pending");
+  const rs=document.querySelector("#requestState");
+  rs.innerHTML=pending?'<div class="alert warn" style="margin-bottom:12px">Solicitud pendiente de aprobación por el personal.</div>':'';
+  document.querySelector("#requestVisit").disabled=!!pending;
+}
+document.querySelector("#requestVisit").addEventListener("click",()=>{
+  const r=NIVAL.requestVisit(); if(!r.ok){toast(r.error);return;} toast("Solicitud enviada al personal."); renderCard();
+});
+document.querySelector("#switchAccount").addEventListener("click",()=>show("login"));
+show("home");
+</script></body></html>

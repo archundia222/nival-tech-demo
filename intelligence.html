@@ -1,0 +1,35 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NIVAL Intelligence · Demo</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="shell">
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">INTELLIGENCE</span></div>
+  <div class="toolbar"><div><div class="kicker">Barbería Norte</div><h1 style="font-size:42px;margin-bottom:6px">NIVAL Intelligence</h1><p class="muted" style="margin:0">Datos de demostración · recomendaciones ilustrativas.</p></div><div class="actions"><a class="btn" href="staff.html">Panel empleado</a><button class="btn" id="resetDemo">Reiniciar demo</button></div></div>
+  <section class="metric-grid" id="metrics"></section>
+  <section class="reco-grid" id="recommendations"></section>
+  <section class="card pad" style="margin-top:16px">
+    <h2>Clientes</h2><p class="muted">La clasificación se calcula a partir del historial de visitas.</p>
+    <div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Visitas</th><th>Última visita</th><th>Frecuencia real</th><th>Estado</th></tr></thead><tbody id="clientRows"></tbody></table></div>
+  </section>
+  <p class="footer-note">Esta demo usa una lógica simplificada. No representa todavía un motor predictivo ni resultados garantizados.</p>
+</main><script src="app.js"></script><script>
+function fmtDate(v){ if(!v)return"—"; return new Intl.DateTimeFormat("es-MX",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(v+"T12:00:00")); }
+function renderIntel(){
+  const s=NIVAL.load();
+  const enriched=s.clients.map(c=>({...c,status:NIVAL.statusFor(c),avg:NIVAL.avgInterval(c),days:NIVAL.daysSinceLast(c)}));
+  const counts={total:enriched.length,risk:enriched.filter(c=>c.status==="En riesgo").length,inactive:enriched.filter(c=>c.status==="Inactivo").length,vip:enriched.filter(c=>c.status==="VIP").length};
+  document.querySelector("#metrics").innerHTML=`
+    <div class="metric"><span class="small muted">Clientes</span><b>${counts.total}</b></div>
+    <div class="metric"><span class="small muted">En riesgo</span><b>${counts.risk}</b></div>
+    <div class="metric"><span class="small muted">Inactivos</span><b>${counts.inactive}</b></div>
+    <div class="metric"><span class="small muted">VIP</span><b>${counts.vip}</b></div>`;
+  const risk=enriched.filter(c=>["En riesgo","Inactivo"].includes(c.status));
+  const vip=enriched.filter(c=>c.status==="VIP");
+  document.querySelector("#recommendations").innerHTML=`
+    <div class="reco"><div class="kicker">Oportunidad detectada</div><h2>${risk.length} clientes requieren atención</h2><p class="muted">Están tardando más de lo habitual en regresar.</p><div class="alert warn"><b>Acción sugerida:</b> revisar estos clientes y preparar una estrategia de reactivación.</div></div>
+    <div class="reco"><div class="kicker">Fidelización</div><h2>${vip.length} clientes VIP</h2><p class="muted">Clientes de alta frecuencia pueden ser candidatos para referidos, recompensas o solicitud de reseña.</p><div class="alert success"><b>Acción sugerida:</b> reconocer su lealtad y pedir recomendación en el momento adecuado.</div></div>`;
+  document.querySelector("#clientRows").innerHTML=enriched.map(c=>{
+    const last=c.visits.length?[...c.visits].sort().at(-1):null;
+    return `<tr><td><b>${escapeHtml(c.name)}</b><div class="small muted">${escapeHtml(c.phone||c.email)}</div></td><td>${c.visits.length}</td><td>${fmtDate(last)}${c.days!==null?`<div class="small muted">hace ${c.days} días</div>`:""}</td><td>${c.avg?`${Math.round(c.avg)} días`:"Sin historial suficiente"}</td><td><span class="status">${c.status}</span></td></tr>`;
+  }).join("");
+}
+document.querySelector("#resetDemo").addEventListener("click",()=>{NIVAL.reset();toast("Demo reiniciada.");renderIntel();});
+renderIntel();
+</script></body></html>

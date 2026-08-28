@@ -1,0 +1,40 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Personal autorizado · NIVAL tech</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="shell">
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">STAFF</span></div>
+  <section id="staffLogin" class="card pad mobile-frame">
+    <div class="kicker">Personal autorizado</div><h1 style="font-size:42px">Validación de visitas.</h1>
+    <form id="staffLoginForm" class="form">
+      <div class="field"><label>Correo</label><input name="email" type="email" value="staff@nival.demo" required></div>
+      <div class="field"><label>Contraseña</label><input name="password" type="password" value="demo1234" required></div>
+      <button class="btn btn-primary btn-block">Entrar</button>
+    </form>
+    <div class="notice" style="margin-top:14px">Credenciales precargadas solo para la demostración.</div>
+  </section>
+  <section id="staffPanel" class="hidden">
+    <div class="toolbar"><div><div class="kicker">Panel del empleado</div><h2 id="staffName"></h2></div><div class="actions"><a class="btn" href="loyalty.html">Vista cliente</a><a class="btn" href="intelligence.html">NIVAL Intelligence</a><button class="btn" id="logout">Salir</button></div></div>
+    <div class="card pad">
+      <h2>Solicitudes pendientes</h2><p class="muted">Cada aprobación queda asociada al empleado que la valida.</p>
+      <div id="requests"></div>
+    </div>
+  </section>
+</main><script src="app.js"></script><script>
+function render(){
+  const s=NIVAL.load(), staff=NIVAL.loggedStaff(s);
+  document.querySelector("#staffLogin").classList.toggle("hidden",!!staff);
+  document.querySelector("#staffPanel").classList.toggle("hidden",!staff);
+  if(!staff)return;
+  document.querySelector("#staffName").textContent=`${staff.name} · ${staff.role}`;
+  const pending=s.requests.filter(r=>r.status==="pending"), box=document.querySelector("#requests");
+  if(!pending.length){ box.innerHTML='<div class="notice">No hay solicitudes pendientes. Ve a la vista cliente y solicita una visita para probar el flujo.</div>'; return; }
+  box.innerHTML=pending.map(r=>{
+    const c=s.clients.find(x=>x.id===r.clientId); const t=new Date(r.createdAt).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
+    return `<div class="reco" style="margin-top:12px"><div class="toolbar" style="margin:0"><div><b>${escapeHtml(c?.name||"Cliente")}</b><div class="small muted">Solicita registrar visita · ${t}</div></div><div class="actions"><button class="btn btn-primary approve" data-id="${r.id}">Aprobar</button><button class="btn btn-danger reject" data-id="${r.id}">Rechazar</button></div></div></div>`;
+  }).join("");
+  document.querySelectorAll(".approve").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.id,"approved")));
+  document.querySelectorAll(".reject").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.id,"rejected")));
+}
+function decide(id,d){ const r=NIVAL.decideRequest(id,d); if(!r.ok){toast(r.error);return;} toast(d==="approved"?"Visita aprobada.":"Solicitud rechazada."); render(); }
+document.querySelector("#staffLoginForm").addEventListener("submit",e=>{e.preventDefault();const f=new FormData(e.currentTarget),r=NIVAL.staffLogin(f.get("email"),f.get("password"));if(!r.ok){toast(r.error);return;}render();});
+document.querySelector("#logout").addEventListener("click",()=>{NIVAL.staffLogout();render();});
+render();
+</script></body></html>

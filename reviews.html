@@ -1,0 +1,12 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reseñas · NIVAL tech Demo</title><link rel="stylesheet" href="styles.css"></head>
+<body><main class="shell mobile-frame">
+  <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">NFC RESEÑAS</span></div>
+  <section class="card pad">
+    <div class="kicker">Barbería Norte</div><h1 style="font-size:44px">¿Cómo fue tu visita?</h1>
+    <p class="muted">En una instalación real, esta NFC puede abrir directamente la ficha de Google Reviews del negocio.</p>
+    <div class="notice">Para la demo usamos una barbería ficticia, por eso no enviamos una reseña real.</div>
+    <div class="actions"><button class="btn btn-primary btn-block" id="demoReview">Simular apertura de Google Reviews</button><a class="btn btn-block" href="index.html">Volver</a></div>
+  </section>
+</main><script src="app.js"></script><script>
+document.querySelector("#demoReview").addEventListener("click",()=>toast("Demo: aquí abriría Google Reviews del negocio."));
+</script></body></html>
