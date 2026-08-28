@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Diagnóstico NIVAL · Oportunidad de crecimiento</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .diag-wrap{display:grid;grid-template-columns:.95fr 1.05fr;gap:20px}
+    .diag-form{display:grid;gap:15px}
+    .option-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .radio-card{display:block;position:relative}
+    .radio-card input{position:absolute;opacity:0;pointer-events:none}
+    .radio-card span{display:flex;min-height:48px;align-items:center;justify-content:center;text-align:center;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;font-size:13px;font-weight:750}
+    .radio-card input:checked+span{border-color:var(--text);background:var(--text);color:#fff}
+    .results{display:grid;gap:14px}
+    .big-number{font-size:46px;line-height:1;font-weight:900;letter-spacing:-.05em;margin:6px 0}
+    .scorebar{height:11px;background:var(--surface2);border-radius:999px;overflow:hidden;margin:12px 0 5px}
+    .scorebar>div{height:100%;background:var(--text);width:0;transition:width .35s ease}
+    .scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .scenario{padding:15px;border:1px solid var(--border);border-radius:15px;background:var(--surface)}
+    .scenario strong{display:block;font-size:24px;letter-spacing:-.04em;margin:5px 0}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+    .question-title{font-size:14px;font-weight:800;margin-bottom:8px}
+    .result-empty{min-height:440px;display:grid;place-items:center;text-align:center;padding:30px}
+    @media(max-width:820px){.diag-wrap{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr}.option-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="topbar">
+    <a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a>
+    <span class="demo-badge">DIAGNÓSTICO COMERCIAL</span>
+  </div>
+
+  <div class="toolbar">
+    <div>
+      <div class="kicker">Diagnóstico NIVAL</div>
+      <h1 style="font-size:46px;margin-bottom:8px">¿Cuánto valor estás dejando sobre la mesa?</h1>
+      <p class="muted" style="max-width:760px;margin:0">Usamos tus números para visualizar oportunidades de retención. Los escenarios no son una garantía de resultados.</p>
+    </div>
+  </div>
+
+  <div class="diag-wrap">
+    <section class="card pad">
+      <h2>Datos del negocio</h2>
+      <p class="muted">Toma 2–3 minutos. No necesitas cifras perfectas; una aproximación sirve para conversar.</p>
+
+      <form id="diagForm" class="diag-form">
+        <div class="field">
+          <label>¿Cuántos servicios/cortes realizan aproximadamente al mes? *</label>
+          <input name="monthlyClients" type="number" min="1" max="100000" step="1" placeholder="Ej. 300" required>
+        </div>
+
+        <div class="field">
+          <label>Ticket promedio por visita (MXN) *</label>
+          <input name="ticket" type="number" min="1" max="100000" step="1" placeholder="Ej. 300" required>
+        </div>
+
+        <div class="field">
+          <label>¿Cuántos clientes que antes iban consideras que hoy están inactivos? *</label>
+          <input name="inactive" type="number" min="0" max="100000" step="1" placeholder="Ej. 40" required>
+          <div class="small muted">Puede ser una estimación. Si no lo sabes con precisión, eso también es información útil.</div>
+        </div>
+
+        <div>
+          <div class="question-title">¿Cómo llevan el registro de clientes?</div>
+          <div class="option-grid">
+            <label class="radio-card"><input type="radio" name="database" value="20" required><span>De memoria / no llevamos</span></label>
+            <label class="radio-card"><input type="radio" name="database" value="10"><span>WhatsApp / Excel</span></label>
+            <label class="radio-card"><input type="radio" name="database" value="0"><span>Sistema organizado</span></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="question-title">¿Tienen programa de lealtad?</div>
+          <div class="option-grid">
+            <label class="radio-card"><input type="radio" name="loyalty" value="15" required><span>No</span></label>
+            <label class="radio-card"><input type="radio" name="loyalty" value="8"><span>Manual</span></label>
+            <label class="radio-card"><input type="radio" name="loyalty" value="0"><span>Digital / medible</span></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="question-title">¿Reactivan clientes que llevan tiempo sin ir?</div>
+          <div class="option-grid">
+            <label class="radio-card"><input type="radio" name="reactivation" value="25" required><span>Nunca</span></label>
+            <label class="radio-card"><input type="radio" name="reactivation" value="12"><span>A veces</span></label>
+            <label class="radio-card"><input type="radio" name="reactivation" value="0"><span>Sistemáticamente</span></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="question-title">¿Sabes cada cuánto regresa normalmente cada cliente?</div>
+          <div class="option-grid">
+            <label class="radio-card"><input type="radio" name="frequency" value="25" required><span>No</span></label>
+            <label class="radio-card"><input type="radio" name="frequency" value="12"><span>Aproximadamente</span></label>
+            <label class="radio-card"><input type="radio" name="frequency" value="0"><span>Sí, lo medimos</span></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="question-title">¿Piden reseñas de forma sistemática?</div>
+          <div class="option-grid">
+            <label class="radio-card"><input type="radio" name="reviews" value="15" required><span>No</span></label>
+            <label class="radio-card"><input type="radio" name="reviews" value="7"><span>A veces</span></label>
+            <label class="radio-card"><input type="radio" name="reviews" value="0"><span>Sí</span></label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit">Calcular oportunidad</button>
+      </form>
+    </section>
+
+    <section class="card pad">
+      <div id="emptyState" class="result-empty">
+        <div>
+          <div class="brandmark" style="margin:0 auto 14px">N</div>
+          <h2>Tu diagnóstico aparecerá aquí</h2>
+          <p class="muted">No mostramos un “crecimiento garantizado”. Calculamos escenarios transparentes a partir de los datos que ingreses.</p>
+        </div>
+      </div>
+
+      <div id="results" class="results hidden" aria-live="polite">
+        <div>
+          <div class="kicker">Oportunidad operativa</div>
+          <div class="big-number" id="scoreText">0/100</div>
+          <div class="scorebar"><div id="scoreFill"></div></div>
+          <div id="scoreLabel" class="muted"></div>
+        </div>
+
+        <hr>
+
+        <div>
+          <div class="kicker">Facturación actual estimada</div>
+          <div class="big-number" id="monthlyRevenue">$0</div>
+          <div class="small muted">Servicios mensuales × ticket promedio.</div>
+        </div>
+
+        <div class="notice">
+          <b>¿Qué significan los escenarios?</b><br>
+          Simulan qué pasaría si lograras recuperar una parte de los clientes inactivos que tú mismo estimaste. No representan una promesa de lo que NIVAL conseguirá.
+        </div>
+
+        <div class="scenario-grid" id="scenarios"></div>
+
+        <div class="reco">
+          <div class="kicker">Lectura NIVAL</div>
+          <h2 id="diagnosisTitle"></h2>
+          <p class="muted" id="diagnosisText"></p>
+        </div>
+
+        <div class="alert success">
+          <b>Cómo usar esto en la conversación:</b> el porcentaje es un escenario de oportunidad, no una garantía. El siguiente paso es medir datos reales durante varias semanas y comparar.
+        </div>
+
+        <button class="btn btn-block" type="button" id="restart">Nuevo diagnóstico</button>
+      </div>
+    </section>
+  </div>
+
+  <p class="footer-note">Herramienta comercial de demostración. Los resultados son escenarios matemáticos, no garantías ni predicciones de desempeño.</p>
+</main>
+
+<script>
+const form=document.getElementById("diagForm");
+const money=new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
+
+function clamp(v,min,max){return Math.min(max,Math.max(min,v));}
+
+form.addEventListener("submit",e=>{
+  e.preventDefault();
+  const data=new FormData(form);
+  const monthlyClients=Number(data.get("monthlyClients"));
+  const ticket=Number(data.get("ticket"));
+  const inactive=Number(data.get("inactive"));
+
+  if(!Number.isFinite(monthlyClients)||monthlyClients<=0||!Number.isFinite(ticket)||ticket<=0||!Number.isFinite(inactive)||inactive<0){
+    return;
+  }
+
+  const rawGap=["database","loyalty","reactivation","frequency","reviews"]
+    .reduce((sum,key)=>sum+Number(data.get(key)||0),0);
+  const score=Math.round(clamp(rawGap,0,100));
+  const revenue=monthlyClients*ticket;
+
+  document.getElementById("emptyState").classList.add("hidden");
+  document.getElementById("results").classList.remove("hidden");
+  document.getElementById("scoreText").textContent=`${score}/100`;
+  document.getElementById("scoreFill").style.width=`${score}%`;
+  document.getElementById("monthlyRevenue").textContent=money.format(revenue);
+
+  let label,title,text;
+  if(score>=70){
+    label="Oportunidad alta: actualmente hay varios procesos de retención que no se están midiendo o ejecutando de forma sistemática.";
+    title="Hay espacio claro para ordenar y medir la retención.";
+    text="La prioridad no sería agregar más tecnología por agregarla, sino empezar a registrar visitas, identificar frecuencia real y crear un proceso repetible de reactivación.";
+  }else if(score>=40){
+    label="Oportunidad media: ya hacen algunas cosas bien, pero existen huecos en seguimiento y uso de datos.";
+    title="NIVAL tendría que demostrar que mejora lo que ya haces.";
+    text="Aquí la venta depende menos de instalar herramientas básicas y más de mostrar que el análisis y las recomendaciones producen acciones que hoy no ocurren.";
+  }else{
+    label="Oportunidad baja: el negocio ya tiene varios procesos organizados.";
+    title="No asumiríamos que NIVAL es necesario.";
+    text="Un negocio con buena medición, reactivación y lealtad puede requerir una propuesta más avanzada. Es mejor reconocerlo que forzar una venta.";
+  }
+  document.getElementById("scoreLabel").textContent=label;
+  document.getElementById("diagnosisTitle").textContent=title;
+  document.getElementById("diagnosisText").textContent=text;
+
+  const rates=[
+    {name:"Conservador",rate:.05},
+    {name:"Intermedio",rate:.10},
+    {name:"Ambicioso",rate:.20}
+  ];
+
+  document.getElementById("scenarios").innerHTML=rates.map(s=>{
+    const recovered=inactive*s.rate;
+    const extra=recovered*ticket;
+    const growth=revenue>0?(extra/revenue)*100:0;
+    return `
+      <div class="scenario">
+        <div class="small muted">${s.name}</div>
+        <strong>+${growth.toFixed(1)}%</strong>
+        <div class="small"><b>${recovered.toFixed(1)}</b> clientes reactivados/mes</div>
+        <div class="small muted">${money.format(extra)} de ingreso mensual adicional potencial</div>
+        <div class="formula" style="margin-top:10px">${Math.round(s.rate*100)}% de tus inactivos</div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("results").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+document.getElementById("restart").addEventListener("click",()=>{
+  form.reset();
+  document.getElementById("results").classList.add("hidden");
+  document.getElementById("emptyState").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+</script>
+</body>
+</html>

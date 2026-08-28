@@ -1,7 +1,7 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NIVAL Intelligence · Demo</title><link rel="stylesheet" href="styles.css"></head>
 <body><main class="shell">
   <div class="topbar"><a class="brand" href="index.html"><span class="brandmark">N</span>NIVAL tech</a><span class="demo-badge">INTELLIGENCE</span></div>
-  <div class="toolbar"><div><div class="kicker">Barbería Norte</div><h1 style="font-size:42px;margin-bottom:6px">NIVAL Intelligence</h1><p class="muted" style="margin:0">Datos de demostración · recomendaciones ilustrativas.</p></div><div class="actions"><a class="btn" href="staff.html">Panel empleado</a><button class="btn" id="resetDemo">Reiniciar demo</button></div></div>
+  <div class="toolbar"><div><div class="kicker">Barbería Norte</div><h1 style="font-size:42px;margin-bottom:6px">NIVAL Intelligence</h1><p class="muted" style="margin:0">Datos de demostración · recomendaciones ilustrativas.</p></div><div class="actions"><a class="btn" href="diagnostico.html">Diagnóstico NIVAL</a><a class="btn" href="staff.html">Panel empleado</a><button class="btn" id="resetDemo">Reiniciar demo</button></div></div>
   <section class="metric-grid" id="metrics"></section>
   <section class="reco-grid" id="recommendations"></section>
   <section class="card pad" style="margin-top:16px">
@@ -22,11 +22,6 @@ function renderIntel(){
     <div class="metric"><span class="small muted">VIP</span><b>${counts.vip}</b></div>`;
   const risk=enriched.filter(c=>["En riesgo","Inactivo"].includes(c.status));
   const vip=enriched.filter(c=>c.status==="VIP");
-  const reactContext=`${risk.length} clientes están en riesgo o inactivos porque están tardando más de lo habitual en regresar.`;
-  const reactQuestion="Quiero ideas de estrategias de reactivación de clientes. ¿Qué me recomiendas hacer con este grupo?";
-  const vipContext=`${vip.length} clientes fueron identificados como VIP por su alta frecuencia de visitas.`;
-  const vipQuestion="Quiero ideas para fidelizar a estos clientes VIP y convertirlos en promotores del negocio. ¿Qué estrategias me recomiendas?";
-
   document.querySelector("#recommendations").innerHTML=`
     <div class="reco">
       <div class="kicker">Oportunidad detectada</div>
@@ -38,9 +33,7 @@ function renderIntel(){
       <a
         class="btn btn-primary btn-block"
         style="margin-top:12px"
-        href="${buildAdviceWhatsAppUrl(reactContext,reactQuestion)}"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="https://api.whatsapp.com/send?phone=525539044788&text=Hola%2C%20quiero%20consejo%20de%20NIVAL%20tech.%0A%0ANegocio%3A%20Barber%C3%ADa%20Norte%0AContexto%3A%20NIVAL%20Intelligence%20detect%C3%B3%20clientes%20en%20riesgo%20o%20inactivos%20que%20est%C3%A1n%20tardando%20m%C3%A1s%20de%20lo%20habitual%20en%20regresar.%0A%0APregunta%3A%20Quiero%20ideas%20de%20estrategias%20de%20reactivaci%C3%B3n%20de%20clientes.%20%C2%BFQu%C3%A9%20me%20recomiendas%20hacer%20con%20este%20grupo%3F"
       >
         Quiero consejo por WhatsApp
       </a>
@@ -56,9 +49,7 @@ function renderIntel(){
       <a
         class="btn btn-primary btn-block"
         style="margin-top:12px"
-        href="${buildAdviceWhatsAppUrl(vipContext,vipQuestion)}"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="https://api.whatsapp.com/send?phone=525539044788&text=Hola%2C%20quiero%20consejo%20de%20NIVAL%20tech.%0A%0ANegocio%3A%20Barber%C3%ADa%20Norte%0AContexto%3A%20NIVAL%20Intelligence%20detect%C3%B3%20clientes%20VIP%20o%20de%20alta%20frecuencia.%0A%0APregunta%3A%20Quiero%20ideas%20para%20fidelizar%20a%20estos%20clientes%20y%20convertirlos%20en%20promotores%20del%20negocio.%20%C2%BFQu%C3%A9%20estrategias%20me%20recomiendas%3F"
       >
         Quiero consejo por WhatsApp
       </a>
