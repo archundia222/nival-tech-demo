@@ -99,7 +99,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .customerRow span { color: var(--muted); font-size: 13px; }
 .customerStats { display: grid; gap: 5px; text-align: right; }
 .visitButton { padding: 10px 13px; color: var(--accent); background: transparent; border: 1px solid rgba(185,255,116,.35); border-radius: 9px; font-weight: 800; cursor: pointer; }
-.visitButton:hover { color: #07100e; background: var(--accent); }
+.visitButton:hover { color: #07100e; background: var(--accent); }\n.customerActions { display: flex; align-items: center; gap: 10px; }\n.customerActions form { margin: 0; }
 @media (max-width: 850px) {
   .moduleGrid { grid-template-columns: repeat(2, 1fr); }
   .sectionHeading { align-items: start; flex-direction: column; }
