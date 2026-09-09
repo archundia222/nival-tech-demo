@@ -13,7 +13,7 @@
 function fmtDate(v){ if(!v)return"—"; return new Intl.DateTimeFormat("es-MX",{day:"2-digit",month:"short",year:"numeric"}).format(new Date(v+"T12:00:00")); }
 function renderIntel(){
   const s=NIVAL.load();
-  const enriched=s.clients.map(c=>({...c,status:NIVAL.statusFor(c),avg:NIVAL.avgInterval(c),days:NIVAL.daysSinceLast(c)}));
+  const enriched=NIVAL.businessClients(s).map(c=>({...c,status:NIVAL.statusFor(c),avg:NIVAL.avgInterval(c),days:NIVAL.daysSinceLast(c)}));
   const counts={total:enriched.length,risk:enriched.filter(c=>c.status==="En riesgo").length,inactive:enriched.filter(c=>c.status==="Inactivo").length,vip:enriched.filter(c=>c.status==="VIP").length};
   document.querySelector("#metrics").innerHTML=`
     <div class="metric"><span class="small muted">Clientes</span><b>${counts.total}</b></div>

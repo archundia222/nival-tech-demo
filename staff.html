@@ -24,10 +24,10 @@ function render(){
   document.querySelector("#staffPanel").classList.toggle("hidden",!staff);
   if(!staff)return;
   document.querySelector("#staffName").textContent=`${staff.name} · ${staff.role}`;
-  const pending=s.requests.filter(r=>r.status==="pending"), box=document.querySelector("#requests");
+  const clients=NIVAL.businessClients(s), pending=NIVAL.businessRequests(s).filter(r=>r.status==="pending"), box=document.querySelector("#requests");
   if(!pending.length){ box.innerHTML='<div class="notice">No hay solicitudes pendientes. Ve a la vista cliente y solicita una visita para probar el flujo.</div>'; return; }
   box.innerHTML=pending.map(r=>{
-    const c=s.clients.find(x=>x.id===r.clientId); const t=new Date(r.createdAt).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
+    const c=clients.find(x=>x.id===r.clientId); const t=new Date(r.createdAt).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
     return `<div class="reco" style="margin-top:12px"><div class="toolbar" style="margin:0"><div><b>${escapeHtml(c?.name||"Cliente")}</b><div class="small muted">Solicita registrar visita · ${t}</div></div><div class="actions"><button class="btn btn-primary approve" data-id="${r.id}">Aprobar</button><button class="btn btn-danger reject" data-id="${r.id}">Rechazar</button></div></div></div>`;
   }).join("");
   document.querySelectorAll(".approve").forEach(b=>b.addEventListener("click",()=>decide(b.dataset.id,"approved")));

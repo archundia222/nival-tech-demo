@@ -14,6 +14,8 @@ Demo estática para validar el producto inicial de NIVAL tech con barberías.
 - Historial/auditoría básica en `localStorage`
 - Dashboard NIVAL Intelligence con segmentación ilustrativa
 - Datos de ejemplo relativos a la fecha actual para que la segmentación siempre sea demostrable
+- Modelo multiempresa en la demo: clientes, empleados, solicitudes y auditoría quedan aislados por `businessId`
+- Migración automática de datos locales de la versión anterior al esquema multiempresa
 
 ## Credenciales demo
 **Cliente existente**
@@ -47,6 +49,8 @@ Esta versión usa `localStorage`. Es una demo de ventas, no producción:
 - no hay base de datos remota real.
 
 Después de validar la propuesta con negocios reales, el siguiente paso es migrar la persistencia y autenticación a un backend real (por ejemplo Supabase/PostgreSQL) y agregar aislamiento por negocio.
+
+La demo ya representa ese aislamiento en su modelo local. En producción deberá reforzarse en PostgreSQL con políticas de seguridad por fila; el filtrado del navegador por sí solo no constituye una barrera de seguridad.
 
 ## Rutas útiles para NFC
 Una vez publicada:
