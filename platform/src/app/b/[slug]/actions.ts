@@ -23,5 +23,5 @@ export async function enrollCustomer(formData: FormData) {
 
   const enrollment = data?.[0];
   if (!enrollment) redirect(`/b/${encodeURIComponent(slug)}?error=${encodeURIComponent("No pudimos crear la tarjeta.")}`);
-  redirect(`/b/${encodeURIComponent(slug)}?enrolled=1&card=${enrollment.account_token}`);
+  redirect(`/card/${enrollment.account_token}`);
 }

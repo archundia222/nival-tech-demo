@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
+import { recordVisit } from "./actions";
 
 interface DashboardPageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; message?: string }>;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -46,6 +47,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("business_id", businessId),
       ])
     : [{ count: 0 }, { count: 0 }, { count: 0 }];
+  const { data: customers } = businessId
+    ? await supabase
+        .from("customers")
+        .select("id, name, phone, email, created_at, loyalty_accounts(points_balance), visits(visited_at)")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+    : { data: [] };
   return (
     <main className="dashboardShell">
       <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
@@ -58,6 +66,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Visitas</span><strong>{visitCount ?? 0}</strong></article>
         <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
+      </section>
+      {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
+      {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
+      <section className="customerTableCard">
+        <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
+        {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
+          <div className="customerList">{customers.map((customer) => {
+            const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts;
+            const visits = customer.visits ?? [];
+            return <article key={customer.id} className="customerRow">
+              <div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email}</span></div>
+              <div className="customerStats"><span>{visits.length} visitas</span><b>{account?.points_balance ?? 0} puntos</b></div>
+              <form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form>
+            </article>;
+          })}</div>
+        )}
       </section>
     </main>
   );

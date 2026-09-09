@@ -80,6 +80,26 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .walletPreview { min-height: 190px; display: grid; align-content: space-between; margin-top: 26px; padding: 24px; color: #07100e; background: linear-gradient(135deg, var(--accent), #78dfe5); border-radius: 20px; box-shadow: 0 18px 60px rgba(0,0,0,.3); }
 .walletPreview strong { font-size: 36px; }
 .walletPreview small { opacity: .65; }
+.digitalCard { min-height: 430px; display: grid; align-content: space-between; margin-top: 52px; padding: clamp(26px, 6vw, 48px); color: #07100e; background: linear-gradient(145deg, var(--accent), #78dfe5); border-radius: 30px; box-shadow: 0 26px 90px rgba(0,0,0,.4); }
+.digitalCard .eyebrow { color: rgba(7,16,14,.62); }
+.digitalCard h1 { margin: 0; max-width: 560px; font-size: clamp(44px, 10vw, 76px); line-height: .95; letter-spacing: -.05em; }
+.cardBalance { display: flex; align-items: baseline; gap: 12px; }
+.cardBalance strong { font-size: clamp(72px, 18vw, 126px); line-height: .8; letter-spacing: -.07em; }
+.cardBalance span { font-weight: 800; }
+.cardFooter { display: flex; justify-content: space-between; gap: 20px; font-weight: 800; }
+.cardNotice { padding: 32px 4px; }
+.cardNotice h2 { margin-bottom: 8px; }
+.cardNotice p, .emptyState { color: var(--muted); line-height: 1.6; }
+.dashboardMessage { margin: 18px 0 0; }
+.customerTableCard { margin-top: 26px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.customerTableCard h2 { margin: 0; font-size: 30px; }
+.customerList { display: grid; gap: 1px; margin-top: 24px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.customerRow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 24px; padding: 18px; background: var(--surface-soft); }
+.customerRow > div:first-child { display: grid; gap: 5px; }
+.customerRow span { color: var(--muted); font-size: 13px; }
+.customerStats { display: grid; gap: 5px; text-align: right; }
+.visitButton { padding: 10px 13px; color: var(--accent); background: transparent; border: 1px solid rgba(185,255,116,.35); border-radius: 9px; font-weight: 800; cursor: pointer; }
+.visitButton:hover { color: #07100e; background: var(--accent); }
 @media (max-width: 850px) {
   .moduleGrid { grid-template-columns: repeat(2, 1fr); }
   .sectionHeading { align-items: start; flex-direction: column; }
@@ -91,4 +111,6 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .moduleGrid { grid-template-columns: 1fr; }
   .statusCard { align-items: start; flex-direction: column; }
   .metricGrid { grid-template-columns: repeat(2, 1fr); }
+  .customerRow { grid-template-columns: 1fr; gap: 14px; }
+  .customerStats { text-align: left; }
 }

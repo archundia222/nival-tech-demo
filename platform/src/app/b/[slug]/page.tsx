@@ -4,7 +4,7 @@ import { enrollCustomer } from "./actions";
 
 interface BusinessPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ enrolled?: string; card?: string; error?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }
 
 export default async function BusinessPage({ params, searchParams }: BusinessPageProps) {
@@ -24,16 +24,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
         <p>Registra tus visitas, acumula puntos y recibe beneficios del negocio.</p>
       </section>
 
-      {query.enrolled ? (
-        <section className="enrollmentSuccess">
-          <span className="successIcon">✓</span>
-          <p className="eyebrow">REGISTRO COMPLETADO</p>
-          <h2>Tu tarjeta ya fue creada</h2>
-          <p>Comienzas con 0 puntos. En el siguiente paso podrás guardarla en Apple Wallet o Google Wallet.</p>
-          <div className="walletPreview"><span>{business.business_name}</span><strong>0 puntos</strong><small>ID {query.card?.slice(0, 8).toUpperCase()}</small></div>
-        </section>
-      ) : (
-        <section className="customerFormCard">
+      <section className="customerFormCard">
           <h2>Obtén tu tarjeta de puntos</h2>
           <p>Completa tus datos una sola vez. No necesitas descargar una aplicación.</p>
           {query.error && <div className="formMessage errorMessage">{query.error}</div>}
@@ -46,8 +37,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta</button>
           </form>
-        </section>
-      )}
+      </section>
     </main>
   );
 }
