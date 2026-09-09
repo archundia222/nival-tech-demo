@@ -50,7 +50,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: customers } = businessId
     ? await supabase
         .from("customers")
-        .select("id, name, phone, email, created_at, loyalty_accounts(points_balance), visits(visited_at)")
+        .select("id, name, phone, email, created_at, loyalty_accounts(points_balance, public_token), visits(visited_at)")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
     : { data: [] };
@@ -78,7 +78,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             return <article key={customer.id} className="customerRow">
               <div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email}</span></div>
               <div className="customerStats"><span>{visits.length} visitas</span><b>{account?.points_balance ?? 0} puntos</b></div>
-              <form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form>
+              <div className="customerActions">{account?.public_token && <a className="visitButton" href={`/card/${account.public_token}`}>Ver tarjeta</a>}<form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form></div>
             </article>;
           })}</div>
         )}
