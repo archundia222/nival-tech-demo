@@ -22,7 +22,15 @@ export default async function CardPage({ params }: CardPageProps) {
         <div className="cardBalance"><strong>{card.points_balance}</strong><span>puntos</span></div>
         <div className="cardFooter"><span>{card.customer_name}</span><span>{card.visit_count} visitas</span></div>
       </section>
-      <section className="cardNotice"><h2>Tu saldo está actualizado</h2><p>Esta dirección identifica tu cuenta de lealtad. Próximamente podrás guardarla directamente en Apple Wallet o Google Wallet.</p></section>
+      <section className="cardNotice">
+        <h2>Tu saldo está actualizado</h2>
+        <p>Esta dirección identifica tu cuenta de lealtad. Guarda tu tarjeta para tenerla siempre disponible.</p>
+        <div className="walletActions">
+          <a className="primaryButton" href={`/api/wallet/google/${encodeURIComponent(token)}`}>
+            Agregar a Google Wallet
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
