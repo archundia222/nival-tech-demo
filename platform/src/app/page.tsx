@@ -8,7 +8,10 @@ export default function Home() {
           <span className="brandmark">N</span>
           NIVAL tech
         </a>
-        <span className="badge">PLATAFORMA · EN CONSTRUCCIÓN</span>
+        <div className="navActions">
+          <a className="healthLink" href="/api/health">Estado del sistema</a>
+          <span className="badge">PLATAFORMA · EN CONSTRUCCIÓN</span>
+        </div>
       </nav>
 
       <section className="hero" id="inicio">
