@@ -188,3 +188,9 @@ create policy "members read recommendations" on public.intelligence_recommendati
   to authenticated using (public.is_business_member(business_id));
 create policy "members read subscriptions" on public.subscriptions for select
   to authenticated using (public.is_business_member(business_id));
+
+-- Data API privileges are explicit because automatic table exposure is disabled.
+-- RLS policies above remain the final authorization boundary for every row.
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant usage, select on all sequences in schema public to authenticated;
