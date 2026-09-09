@@ -10,6 +10,7 @@ export default function Home() {
         </a>
         <div className="navActions">
           <a className="healthLink" href="/api/health">Estado del sistema</a>
+          <a className="loginLink" href="/auth">Ingresar</a>
           <span className="badge">PLATAFORMA · EN CONSTRUCCIÓN</span>
         </div>
       </nav>
