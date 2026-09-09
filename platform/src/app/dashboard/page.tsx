@@ -38,6 +38,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   }
 
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const businessId = business?.id;
+  const [{ count: customerCount }, { count: visitCount }, { count: campaignCount }] = businessId
+    ? await Promise.all([
+        supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
+        supabase.from("visits").select("id", { count: "exact", head: true }).eq("business_id", businessId),
+        supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("business_id", businessId),
+      ])
+    : [{ count: 0 }, { count: 0 }, { count: 0 }];
   return (
     <main className="dashboardShell">
       <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
@@ -46,9 +54,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <span className="ready">{business?.subscription_status ?? "trial"}</span>
       </section>
       <section className="metricGrid">
-        <article><span>Clientes</span><strong>0</strong></article>
-        <article><span>Visitas</span><strong>0</strong></article>
-        <article><span>Campañas</span><strong>0</strong></article>
+        <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>
+        <article><span>Visitas</span><strong>{visitCount ?? 0}</strong></article>
+        <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
     </main>

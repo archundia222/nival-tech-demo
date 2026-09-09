@@ -67,6 +67,19 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .metricGrid article { display: grid; gap: 28px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .metricGrid span { color: var(--muted); font-size: 13px; }
 .metricGrid strong { font-size: 30px; }
+.customerShell { width: min(720px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 70px; }
+.customerBrand { display: flex; align-items: center; gap: 12px; padding-bottom: 24px; color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--line); }
+.customerHero { padding: 64px 0 32px; }
+.customerHero h1 { margin: 0; font-size: clamp(46px, 10vw, 78px); line-height: 1; letter-spacing: -.05em; }
+.customerHero > p:last-child, .customerFormCard > p, .enrollmentSuccess > p { color: var(--muted); line-height: 1.6; }
+.customerFormCard, .enrollmentSuccess { padding: 30px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; }
+.customerFormCard h2, .enrollmentSuccess h2 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.checkLabel { display: grid !important; grid-template-columns: 18px 1fr; align-items: start; gap: 10px !important; font-weight: 400 !important; line-height: 1.45; }
+.checkLabel input { width: 16px; margin-top: 2px; padding: 0; accent-color: var(--accent); }
+.successIcon { width: 46px; height: 46px; display: grid; place-items: center; margin-bottom: 24px; color: #07100e; background: var(--accent); border-radius: 50%; font-size: 24px; font-weight: 900; }
+.walletPreview { min-height: 190px; display: grid; align-content: space-between; margin-top: 26px; padding: 24px; color: #07100e; background: linear-gradient(135deg, var(--accent), #78dfe5); border-radius: 20px; box-shadow: 0 18px 60px rgba(0,0,0,.3); }
+.walletPreview strong { font-size: 36px; }
+.walletPreview small { opacity: .65; }
 @media (max-width: 850px) {
   .moduleGrid { grid-template-columns: repeat(2, 1fr); }
   .sectionHeading { align-items: start; flex-direction: column; }
