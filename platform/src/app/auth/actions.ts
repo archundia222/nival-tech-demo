@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 function value(formData: FormData, key: string) {
@@ -20,12 +21,15 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
   const email = value(formData, "email");
   const { data, error } = await supabase.auth.signUp({
     email,
     password: value(formData, "password"),
     options: {
       data: { full_name: value(formData, "fullName") },
+      emailRedirectTo: `${origin}/auth/confirm`,
     },
   });
 
