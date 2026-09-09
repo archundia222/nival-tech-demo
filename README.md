@@ -13,6 +13,7 @@ Demo estática para validar el producto inicial de NIVAL tech con barberías.
 - Regla de 1 visita por cliente por día
 - Historial/auditoría básica en `localStorage`
 - Dashboard NIVAL Intelligence con segmentación ilustrativa
+- Datos de ejemplo relativos a la fecha actual para que la segmentación siempre sea demostrable
 
 ## Credenciales demo
 **Cliente existente**

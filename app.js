@@ -1,6 +1,22 @@
 const NIVAL = (() => {
-  const KEY = "nival_tech_demo_v6";
-  const today = () => new Date().toISOString().slice(0,10);
+  const KEY = "nival_tech_demo_v7";
+  const MS_PER_DAY = 1000*60*60*24;
+  const formatLocalDate = date => {
+    const year=date.getFullYear();
+    const month=String(date.getMonth()+1).padStart(2,"0");
+    const day=String(date.getDate()).padStart(2,"0");
+    return `${year}-${month}-${day}`;
+  };
+  const parseLocalDate = value => {
+    const [year,month,day]=String(value).split("-").map(Number);
+    return new Date(year,month-1,day);
+  };
+  const today = () => formatLocalDate(new Date());
+  const daysAgo = days => {
+    const date=parseLocalDate(today());
+    date.setDate(date.getDate()-days);
+    return formatLocalDate(date);
+  };
   const nowIso = () => new Date().toISOString();
 
   const seed = {
@@ -25,10 +41,10 @@ const NIVAL = (() => {
       {id:"emp-owner",name:"Gerente Demo",email:"owner@nival.demo",password:"nival2026",role:"Dueño"}
     ],
     clients: [
-      {id:"c1",name:"Carlos Martínez",phone:"5511111111",email:"carlos@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:"2026-05-01",visits:["2026-05-02","2026-05-23","2026-06-13","2026-07-04"]},
-      {id:"c2",name:"Miguel Herrera",phone:"5522222222",email:"miguel@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:"2026-03-15",visits:["2026-03-15","2026-04-05","2026-04-26","2026-05-18","2026-06-08","2026-07-01"]},
-      {id:"c3",name:"Javier Ortega",phone:"5533333333",email:"javier@demo.mx",declaredType:"Ocasional",declaredFreq:"Cada mes",createdAt:"2026-01-10",visits:["2026-01-10","2026-02-16","2026-03-22","2026-05-01"]},
-      {id:"c4",name:"Roberto Silva",phone:"5544444444",email:"roberto@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 2 semanas",createdAt:"2026-02-01",visits:["2026-02-01","2026-02-16","2026-03-02","2026-03-16","2026-03-30","2026-04-13","2026-04-27","2026-05-11","2026-05-25","2026-06-08","2026-06-22","2026-08-20"]}
+      {id:"c1",name:"Carlos Martínez",phone:"5511111111",email:"carlos@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 3 semanas",createdAt:daysAgo(75),visits:[63,42,21,12].map(daysAgo)},
+      {id:"c2",name:"Miguel Herrera",phone:"5522222222",email:"miguel@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 2 semanas",createdAt:daysAgo(150),visits:[134,120,106,92,78,64,50,36,22,8].map(daysAgo)},
+      {id:"c3",name:"Javier Ortega",phone:"5533333333",email:"javier@demo.mx",declaredType:"Ocasional",declaredFreq:"Cada mes",createdAt:daysAgo(145),visits:[135,105,75,45].map(daysAgo)},
+      {id:"c4",name:"Roberto Silva",phone:"5544444444",email:"roberto@demo.mx",declaredType:"Recurrente",declaredFreq:"Cada 2 semanas",createdAt:daysAgo(220),visits:[206,192,178,164,150,136,122,108,94,80].map(daysAgo)}
     ],
     requests: [],
     rewards: [
@@ -100,14 +116,14 @@ const NIVAL = (() => {
   }
   function avgInterval(client){
     if(!client || client.visits.length<2) return null;
-    const d=[...client.visits].sort().map(x=>new Date(x+"T12:00:00"));
-    const gaps=[]; for(let i=1;i<d.length;i++) gaps.push((d[i]-d[i-1])/(1000*60*60*24));
+    const d=[...client.visits].sort().map(parseLocalDate);
+    const gaps=[]; for(let i=1;i<d.length;i++) gaps.push((d[i]-d[i-1])/MS_PER_DAY);
     return gaps.reduce((a,b)=>a+b,0)/gaps.length;
   }
   function daysSinceLast(client){
     if(!client || !client.visits.length) return null;
     const last=[...client.visits].sort().at(-1);
-    return Math.floor((new Date()-new Date(last+"T12:00:00"))/(1000*60*60*24));
+    return Math.round((parseLocalDate(today())-parseLocalDate(last))/MS_PER_DAY);
   }
   function statusFor(client){
     const n=client.visits.length, avg=avgInterval(client), days=daysSinceLast(client);
