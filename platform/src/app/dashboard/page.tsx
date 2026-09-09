@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
 import { recordVisit } from "./actions";
+import { BusinessQr } from "./business-qr";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -67,6 +68,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
+      {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
       {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
       <section className="customerTableCard">
