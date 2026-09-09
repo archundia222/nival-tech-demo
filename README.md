@@ -2,6 +2,10 @@
 
 Demo estática para validar el producto inicial de NIVAL tech con barberías.
 
+## Plataforma comercial
+
+La migración al producto SaaS vive en `platform/`, dentro de este mismo repositorio. Incluye el núcleo Next.js + TypeScript y el primer esquema PostgreSQL multiempresa. La demo de la raíz seguirá disponible mientras la plataforma alcanza paridad funcional.
+
 ## Qué incluye
 - Landing de negocio
 - Página de reseñas demo
