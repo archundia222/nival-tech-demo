@@ -46,11 +46,15 @@ begin
     raise exception 'Solo el propietario o un gerente puede cambiar el programa';
   end if;
 
-  if length(normalized_name) < 2 or length(normalized_name) > 80 then
+  if normalized_name is null
+     or length(normalized_name) < 2
+     or length(normalized_name) > 80 then
     raise exception 'El nombre debe tener entre 2 y 80 caracteres';
   end if;
 
-  if awarded_points < 1 or awarded_points > 100 then
+  if awarded_points is null
+     or awarded_points < 1
+     or awarded_points > 100 then
     raise exception 'Los puntos por visita deben estar entre 1 y 100';
   end if;
 
