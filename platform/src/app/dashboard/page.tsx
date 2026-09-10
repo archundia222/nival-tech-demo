@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { recordVisit } from "./actions";
+import { recordVisit, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 
 interface DashboardPageProps {
@@ -48,6 +48,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("business_id", businessId),
       ])
     : [{ count: 0 }, { count: 0 }, { count: 0 }];
+  const { data: loyaltyPrograms } = businessId
+    ? await supabase
+        .from("loyalty_programs")
+        .select("id, name, points_per_visit")
+        .eq("business_id", businessId)
+        .eq("active", true)
+        .limit(1)
+    : { data: [] };
+  const loyaltyProgram = loyaltyPrograms?.[0];
   const { data: customers } = businessId
     ? await supabase
         .from("customers")
@@ -55,6 +64,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
     : { data: [] };
+  const canManageProgram = membership.role === "owner" || membership.role === "manager";
+
   return (
     <main className="dashboardShell">
       <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
@@ -69,6 +80,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
       {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
+      {canManageProgram && loyaltyProgram && (
+        <section className="settingsCard">
+          <div className="settingsIntro">
+            <p className="eyebrow">PROGRAMA DE LEALTAD</p>
+            <h2>Configura cómo ganas clientes frecuentes</h2>
+            <p>Los cambios se aplican a las próximas visitas. Los puntos que tus clientes ya acumularon no se modifican.</p>
+          </div>
+          <form action={updateLoyaltyProgram} className="settingsForm">
+            <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue={loyaltyProgram.name} /></label>
+            <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={loyaltyProgram.points_per_visit} /></label>
+            <button className="primaryButton" type="submit">Guardar configuración</button>
+          </form>
+        </section>
+      )}
       {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
       <section className="customerTableCard">

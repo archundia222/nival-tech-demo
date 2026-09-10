@@ -128,6 +128,14 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .siteFooter a:hover { color: var(--accent); }
 
 .businessQrCard { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 32px; margin-top: 26px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.settingsCard { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, .8fr); gap: 42px; margin-top: 26px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.settingsIntro h2 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.settingsIntro > p:last-child { max-width: 540px; color: var(--muted); line-height: 1.6; }
+.settingsForm { display: grid; gap: 16px; }
+.settingsForm label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
+.settingsForm input { width: 100%; padding: 14px; color: var(--text); background: #09120f; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
+.settingsForm input:focus { outline: 2px solid rgba(185,255,116,.35); border-color: var(--accent); }
+.settingsForm .primaryButton { justify-self: start; }
 .businessQrCard h2 { margin: 0; font-size: 30px; }
 .businessQrCard p:not(.eyebrow) { max-width: 580px; color: var(--muted); line-height: 1.6; }
 .businessQrCard .primaryButton { display: block; margin-top: 20px; }
@@ -136,4 +144,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 @media (max-width: 680px) {
   .businessQrCard { grid-template-columns: 1fr; }
   .qrCanvas { width: fit-content; }
+}
+@media (max-width: 760px) {
+  .settingsCard { grid-template-columns: 1fr; gap: 24px; }
 }
