@@ -133,8 +133,9 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .settingsIntro > p:last-child { max-width: 540px; color: var(--muted); line-height: 1.6; }
 .settingsForm { display: grid; gap: 16px; }
 .settingsForm label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
-.settingsForm input { width: 100%; padding: 14px; color: var(--text); background: #09120f; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
-.settingsForm input:focus { outline: 2px solid rgba(185,255,116,.35); border-color: var(--accent); }
+.settingsForm input, .settingsForm textarea { width: 100%; padding: 14px; color: var(--text); background: #09120f; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
+.settingsForm textarea { min-height: 90px; resize: vertical; }
+.settingsForm input:focus, .settingsForm textarea:focus { outline: 2px solid rgba(185,255,116,.35); border-color: var(--accent); }
 .settingsForm .primaryButton { justify-self: start; }
 .businessQrCard h2 { margin: 0; font-size: 30px; }
 .businessQrCard p:not(.eyebrow) { max-width: 580px; color: var(--muted); line-height: 1.6; }
@@ -147,4 +148,15 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 }
 @media (max-width: 760px) {
   .settingsCard { grid-template-columns: 1fr; gap: 24px; }
+}
+
+.rewardProgress { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 22px; padding: 22px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.rewardProgress > div { display: grid; gap: 7px; }
+.rewardProgress span { color: var(--muted); font-size: 13px; }
+.rewardProgress strong { font-size: 20px; }
+.rewardProgress b { color: var(--accent); }
+.redeemButton { padding: 10px 13px; color: #07100e; background: var(--accent); border: 1px solid var(--accent); border-radius: 9px; font-weight: 800; cursor: pointer; }
+.redeemButton:hover { filter: brightness(1.08); }
+@media (max-width: 560px) {
+  .rewardProgress { align-items: start; flex-direction: column; }
 }

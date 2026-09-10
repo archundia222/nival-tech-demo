@@ -8,6 +8,8 @@ import { syncGoogleWalletObject } from "@/lib/google-wallet";
 export async function updateLoyaltyProgram(formData: FormData) {
   const programName = String(formData.get("programName") ?? "").trim();
   const pointsPerVisit = Number(formData.get("pointsPerVisit"));
+  const rewardThreshold = Number(formData.get("rewardThreshold"));
+  const rewardDescription = String(formData.get("rewardDescription") ?? "").trim();
 
   if (programName.length < 2 || programName.length > 80) {
     redirect(`/dashboard?error=${encodeURIComponent("El nombre debe tener entre 2 y 80 caracteres.")}`);
@@ -17,10 +19,20 @@ export async function updateLoyaltyProgram(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("Los puntos por visita deben estar entre 1 y 100.")}`);
   }
 
+  if (!Number.isInteger(rewardThreshold) || rewardThreshold < 1 || rewardThreshold > 1000) {
+    redirect(`/dashboard?error=${encodeURIComponent("La meta debe estar entre 1 y 1000 puntos.")}`);
+  }
+
+  if (rewardDescription.length < 2 || rewardDescription.length > 160) {
+    redirect(`/dashboard?error=${encodeURIComponent("La recompensa debe tener entre 2 y 160 caracteres.")}`);
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase.rpc("update_current_loyalty_program", {
+  const { error } = await supabase.rpc("update_current_loyalty_program_v2", {
     program_name: programName,
     awarded_points: pointsPerVisit,
+    target_reward_threshold: rewardThreshold,
+    target_reward_description: rewardDescription,
   });
 
   if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
@@ -69,4 +81,49 @@ export async function recordVisit(formData: FormData) {
 
   revalidatePath("/dashboard");
   redirect("/dashboard?message=Visita registrada y puntos actualizados.");
+}
+
+
+export async function redeemReward(formData: FormData) {
+  const customerId = String(formData.get("customerId") ?? "");
+  const supabase = await createClient();
+  const { data: redemption, error } = await supabase.rpc("redeem_customer_reward", {
+    target_customer_id: customerId,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("name, businesses(name), loyalty_accounts(points_balance, public_token), visits(id)")
+    .eq("id", customerId)
+    .single();
+
+  if (customer) {
+    const account = Array.isArray(customer.loyalty_accounts)
+      ? customer.loyalty_accounts[0]
+      : customer.loyalty_accounts;
+    const business = Array.isArray(customer.businesses)
+      ? customer.businesses[0]
+      : customer.businesses;
+
+    if (account?.public_token) {
+      try {
+        await syncGoogleWalletObject({
+          token: account.public_token,
+          businessName: business?.name ?? "Nival Tech",
+          customerName: customer.name,
+          points: Number(account.points_balance),
+          visits: customer.visits?.length ?? 0,
+        });
+      } catch (walletError) {
+        console.error("Google Wallet sync error after redemption", walletError);
+      }
+    }
+  }
+
+  const result = redemption?.[0];
+  const reward = result?.redeemed_reward ?? "Recompensa";
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent(`${reward} canjeada correctamente.`)}`);
 }

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { recordVisit, updateLoyaltyProgram } from "./actions";
+import { recordVisit, redeemReward, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 
 interface DashboardPageProps {
@@ -51,7 +51,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: loyaltyPrograms } = businessId
     ? await supabase
         .from("loyalty_programs")
-        .select("id, name, points_per_visit")
+        .select("id, name, points_per_visit, reward_threshold, reward_description")
         .eq("business_id", businessId)
         .eq("active", true)
         .limit(1)
@@ -90,6 +90,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <form action={updateLoyaltyProgram} className="settingsForm">
             <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue={loyaltyProgram.name} /></label>
             <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={loyaltyProgram.points_per_visit} /></label>
+            <label>Meta de puntos<input name="rewardThreshold" type="number" required min={1} max={1000} step={1} defaultValue={loyaltyProgram.reward_threshold} /></label>
+            <label>Recompensa<textarea name="rewardDescription" required minLength={2} maxLength={160} defaultValue={loyaltyProgram.reward_description} /></label>
             <button className="primaryButton" type="submit">Guardar configuración</button>
           </form>
         </section>
@@ -104,8 +106,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             const visits = customer.visits ?? [];
             return <article key={customer.id} className="customerRow">
               <div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email}</span></div>
-              <div className="customerStats"><span>{visits.length} visitas</span><b>{account?.points_balance ?? 0} puntos</b></div>
-              <div className="customerActions">{account?.public_token && <a className="visitButton" href={`/card/${account.public_token}`}>Ver tarjeta</a>}<form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form></div>
+              <div className="customerStats"><span>{visits.length} visitas</span><b>{account?.points_balance ?? 0} / {loyaltyProgram?.reward_threshold ?? "—"} puntos</b></div>
+              <div className="customerActions">
+                {account?.public_token && <a className="visitButton" href={`/card/${account.public_token}`}>Ver tarjeta</a>}
+                <form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form>
+                {loyaltyProgram && Number(account?.points_balance ?? 0) >= loyaltyProgram.reward_threshold && (
+                  <form action={redeemReward}><input type="hidden" name="customerId" value={customer.id} /><button className="redeemButton">Canjear premio</button></form>
+                )}
+              </div>
             </article>;
           })}</div>
         )}
