@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
@@ -145,6 +146,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>El espacio privado ya está conectado a Supabase.</p></div>
         <span className="ready">{business?.subscription_status ?? "trial"}</span>
       </section>
+      {canManageProgram && businessId && <section className="assistantEntry"><div><h2>Asistente Nival</h2><p>Pregunta sobre tu negocio y retoma tus conversaciones.</p></div><Link className="primaryButton" href={`/dashboard/assistant?business=${businessId}`}>Abrir asistente</Link></section>}
       <section className="metricGrid">
         <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>
         <article><span>Visitas</span><strong>{visitCount ?? 0}</strong></article>
