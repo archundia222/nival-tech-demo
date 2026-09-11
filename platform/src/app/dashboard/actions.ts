@@ -34,6 +34,33 @@ export async function createSmartLink(formData: FormData) {
   redirect(`/dashboard?message=${encodeURIComponent("Enlace inteligente creado.")}`);
 }
 
+export async function updateSmartLink(formData: FormData) {
+  const linkId = String(formData.get("linkId") ?? "");
+  const name = String(formData.get("linkName") ?? "").trim();
+  const targetUrl = String(formData.get("targetUrl") ?? "").trim();
+  const active = formData.get("active") === "on";
+
+  if (name.length < 2 || name.length > 80) {
+    redirect(`/dashboard?error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
+  }
+
+  if (!targetUrl.startsWith("https://")) {
+    redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_smart_link", {
+    link_id: linkId,
+    link_name: name,
+    destination_url: targetUrl,
+    enabled: active,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Enlace inteligente actualizado.")}`);
+}
+
 export async function updateBusinessProfile(formData: FormData) {
   const name = String(formData.get("businessName") ?? "").trim();
   const phone = String(formData.get("businessPhone") ?? "").trim();

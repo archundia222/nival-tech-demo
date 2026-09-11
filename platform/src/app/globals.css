@@ -181,7 +181,18 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .smartLinkInfo { min-width: 0; display: grid; gap: 8px; }
 .smartLinkInfo > span { color: var(--accent); font-size: 13px; font-weight: 800; }
 .smartLinkInfo > a { overflow-wrap: anywhere; color: var(--muted); font-size: 13px; }
+.smartLinkHeading { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.linkStatus { padding: 4px 7px; color: #ffaaa2; background: rgba(255,83,73,.1); border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.linkStatus.active { color: var(--accent); background: rgba(185,255,116,.08); }
 .smartLinkActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.smartLinkEditor { margin-top: 10px; }
+.smartLinkEditor summary { width: fit-content; color: var(--muted); font-size: 13px; cursor: pointer; }
+.compactForm { display: grid; gap: 12px; margin-top: 14px; padding: 16px; background: #09120f; border: 1px solid var(--line); border-radius: 12px; }
+.compactForm label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+.compactForm input { width: 100%; padding: 11px; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.compactForm .checkLabel { grid-template-columns: 18px 1fr; }
+.compactForm .checkLabel input { width: 16px; }
+.compactForm .primaryButton { justify-self: start; }
 .miniQr { flex: 0 0 auto; padding: 8px; background: #fff; border-radius: 12px; line-height: 0; }
 @media (max-width: 560px) {
   .rewardProgress { align-items: start; flex-direction: column; }

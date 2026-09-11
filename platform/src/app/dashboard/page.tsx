@@ -76,7 +76,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: smartLinks } = businessId
     ? await supabase
         .from("smart_links")
-        .select("id, name, kind, public_token, click_count, active")
+        .select("id, name, kind, target_url, public_token, click_count, active")
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
     : { data: [] };
@@ -117,8 +117,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           key={link.id}
           id={link.id}
           name={link.name}
+          kind={link.kind}
+          targetUrl={link.target_url}
           url={`https://nival-tech-platform.vercel.app/go/${link.public_token}`}
           clicks={Number(link.click_count)}
+          active={link.active}
+          editable={canManageProgram}
         />)}</div>
       </section>}
       {canManageProgram && business && (
