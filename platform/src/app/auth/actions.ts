@@ -8,18 +8,25 @@ function value(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
 }
 
+function safeNext(formData: FormData) {
+  const next = value(formData, "next");
+  return next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+}
+
 export async function signIn(formData: FormData) {
+  const next = safeNext(formData);
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email: value(formData, "email"),
     password: value(formData, "password"),
   });
 
-  if (error) redirect(`/auth?error=${encodeURIComponent("Correo o contraseña incorrectos.")}`);
-  redirect("/dashboard");
+  if (error) redirect(`/auth?error=${encodeURIComponent("Correo o contraseña incorrectos.")}&next=${encodeURIComponent(next)}`);
+  redirect(next);
 }
 
 export async function signUp(formData: FormData) {
+  const next = safeNext(formData);
   const supabase = await createClient();
   const requestHeaders = await headers();
   const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
@@ -29,13 +36,13 @@ export async function signUp(formData: FormData) {
     password: value(formData, "password"),
     options: {
       data: { full_name: value(formData, "fullName") },
-      emailRedirectTo: `${origin}/auth/confirm`,
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
     },
   });
 
-  if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}`);
-  if (data.session) redirect("/dashboard");
-  redirect(`/auth?message=${encodeURIComponent(`Enviamos un enlace de confirmación a ${email}.`)}`);
+  if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`);
+  if (data.session) redirect(next);
+  redirect(`/auth?message=${encodeURIComponent(`Enviamos un enlace de confirmación a ${email}. Después vuelve a abrir tu invitación.`)}&next=${encodeURIComponent(next)}`);
 }
 
 export async function signOut() {

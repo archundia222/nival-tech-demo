@@ -219,6 +219,15 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .profileLinks span { font-size: 22px; }
 .profileFooter { margin-top: 36px; color: var(--muted); font-size: 13px; text-align: center; }
 .profileFooter b { color: var(--text); }
+.teamCard { grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); }
+.teamList { display: grid; gap: 8px; margin-top: 22px; }
+.teamMember { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 14px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 12px; }
+.teamMember > div { min-width: 0; display: grid; gap: 4px; }
+.teamMember strong, .teamMember span { overflow-wrap: anywhere; }
+.teamMember span { color: var(--muted); font-size: 12px; }
+.teamMember b { flex: 0 0 auto; color: var(--accent); font-size: 12px; }
+.inviteActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.inviteActions .primaryButton, .inviteActions .visitButton { display: inline-flex; align-items: center; }
 @media (max-width: 560px) {
   .rewardProgress { align-items: start; flex-direction: column; }
   .customerActions { align-items: stretch; flex-direction: column; }
@@ -227,4 +236,5 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .redemptionRow > div:last-child { text-align: left; }
   .smartLinkRow { align-items: start; flex-direction: column; }
   .paymentQrPanel { align-items: start; flex-direction: column; }
+  .teamMember { align-items: start; flex-direction: column; }
 }

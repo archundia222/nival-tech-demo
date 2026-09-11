@@ -1,13 +1,21 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { createSmartLink, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
+import { createSmartLink, createTeamInvitation, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
+import { InvitationLink } from "./invitation-link";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string }>;
+}
+
+interface TeamMember {
+  member_email: string;
+  member_name: string | null;
+  member_role: "owner" | "manager" | "staff";
+  joined_at: string;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -90,6 +98,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
+  const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
+    ? await Promise.all([
+        supabase.rpc("get_current_business_team"),
+        supabase
+          .from("business_invitations")
+          .select("id, email, role, token, expires_at")
+          .eq("business_id", businessId)
+          .eq("status", "pending")
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false }),
+      ])
+    : [{ data: [] }, { data: [] }];
 
   return (
     <main className="dashboardShell">
@@ -158,6 +178,33 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <button className="primaryButton" type="submit">Guardar datos bancarios</button>
         </form>
       </section>}
+      {canManageProgram && business && (
+        <section className="settingsCard teamCard">
+          <div className="settingsIntro">
+            <p className="eyebrow">EQUIPO</p>
+            <h2>Invita a quienes atienden tu negocio</h2>
+            <p>Cada persona entra con su propia cuenta. Los administradores configuran el programa; el personal registra visitas y canjes.</p>
+            <div className="teamList">
+              {(teamMembers as TeamMember[] | null)?.map((member) => <div className="teamMember" key={member.member_email}>
+                <div><strong>{member.member_name || member.member_email}</strong><span>{member.member_name ? member.member_email : "Cuenta activa"}</span></div>
+                <b>{member.member_role === "owner" ? "Propietario" : member.member_role === "manager" ? "Administrador" : "Personal"}</b>
+              </div>)}
+              {pendingInvitations?.map((invitation) => <div className="teamMember" key={invitation.id}>
+                <div><strong>{invitation.email}</strong><span>Invitación pendiente · vence {new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(new Date(invitation.expires_at))}</span></div>
+                <InvitationLink url={`https://nival-tech-platform.vercel.app/invite/${invitation.token}`} />
+              </div>)}
+            </div>
+          </div>
+          <form action={createTeamInvitation} className="settingsForm">
+            <label>Correo de la persona<input name="inviteEmail" type="email" required autoComplete="email" placeholder="persona@negocio.com" /></label>
+            <label>Rol<select name="inviteRole" defaultValue="staff">
+              {membership.role === "owner" && <option value="manager">Administrador</option>}
+              <option value="staff">Personal</option>
+            </select></label>
+            <button className="primaryButton" type="submit">Crear invitación</button>
+          </form>
+        </section>
+      )}
       {canManageProgram && business && (
         <section className="settingsCard">
           <div className="settingsIntro">

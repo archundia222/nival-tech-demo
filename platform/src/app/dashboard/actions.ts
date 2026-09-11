@@ -5,6 +5,41 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 
+export async function createTeamInvitation(formData: FormData) {
+  const email = String(formData.get("inviteEmail") ?? "").trim().toLowerCase();
+  const role = String(formData.get("inviteRole") ?? "staff");
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    redirect(`/dashboard?error=${encodeURIComponent("Ingresa un correo válido.")}`);
+  }
+
+  if (!['manager', 'staff'].includes(role)) {
+    redirect(`/dashboard?error=${encodeURIComponent("Selecciona un rol válido.")}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("create_business_invitation", {
+    invitee_email: email,
+    invited_role: role,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Invitación creada. Copia el enlace y compártelo con la persona.")}`);
+}
+
+export async function acceptTeamInvitation(formData: FormData) {
+  const token = String(formData.get("invitationToken") ?? "");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("accept_business_invitation", {
+    invitation_token: token,
+  });
+
+  if (error) redirect(`/invite/${token}?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Te uniste al equipo correctamente.")}`);
+}
+
 export async function updatePaymentProfile(formData: FormData) {
   const holder = String(formData.get("accountHolder") ?? "").trim();
   const bank = String(formData.get("bankName") ?? "").trim();
