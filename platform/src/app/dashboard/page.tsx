@@ -110,6 +110,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           .order("created_at", { ascending: false }),
       ])
     : [{ data: [] }, { data: [] }];
+  const { data: segmentRows } = businessId
+    ? await supabase.rpc("get_current_business_segments")
+    : { data: [] };
+  const segments = segmentRows?.[0];
+  const recentVisits = Number(segments?.visits_last_30_days ?? 0);
+  const previousVisits = Number(segments?.visits_previous_30_days ?? 0);
+  const visitTrend = previousVisits === 0
+    ? (recentVisits > 0 ? 100 : 0)
+    : Math.round(((recentVisits - previousVisits) / previousVisits) * 100);
 
   return (
     <main className="dashboardShell">
@@ -123,6 +132,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Visitas</span><strong>{visitCount ?? 0}</strong></article>
         <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
+      </section>
+      <section className="intelligenceCard">
+        <div className="intelligenceHeading">
+          <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h2>Segmentos automáticos</h2></div>
+          <span className={`trendBadge ${visitTrend < 0 ? "negative" : ""}`}>{visitTrend >= 0 ? "+" : ""}{visitTrend}% visitas</span>
+        </div>
+        <p className="intelligenceIntro">Comparación de los últimos 30 días contra los 30 anteriores. Un cliente puede aparecer en más de un segmento.</p>
+        <div className="segmentGrid">
+          <article><span>Nuevos</span><strong>{Number(segments?.new_customers ?? 0)}</strong><p>Registrados en los últimos 30 días.</p></article>
+          <article><span>Frecuentes</span><strong>{Number(segments?.frequent_customers ?? 0)}</strong><p>Con 3 o más visitas en 60 días.</p></article>
+          <article><span>En riesgo</span><strong>{Number(segments?.at_risk_customers ?? 0)}</strong><p>Sin regresar durante más de 30 días.</p></article>
+          <article><span>Premio disponible</span><strong>{Number(segments?.reward_ready_customers ?? 0)}</strong><p>Ya alcanzaron la meta de puntos.</p></article>
+        </div>
+        {Number(segments?.at_risk_customers ?? 0) > 0 && <div className="recommendation"><b>Acción recomendada</b><span>Prepara una campaña de regreso para los clientes en riesgo.</span></div>}
       </section>
       {business?.slug && <BusinessQr
         businessName={business.name}

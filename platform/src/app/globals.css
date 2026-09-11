@@ -67,6 +67,20 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .metricGrid article { display: grid; gap: 28px; padding: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .metricGrid span { color: var(--muted); font-size: 13px; }
 .metricGrid strong { font-size: 30px; }
+.intelligenceCard { margin-top: 26px; padding: 28px; background: linear-gradient(145deg, rgba(185,255,116,.07), var(--surface)); border: 1px solid rgba(185,255,116,.2); border-radius: 20px; }
+.intelligenceHeading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.intelligenceHeading h2 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.intelligenceIntro { max-width: 720px; color: var(--muted); line-height: 1.6; }
+.trendBadge { padding: 8px 11px; color: var(--accent); background: rgba(185,255,116,.08); border-radius: 999px; font-size: 12px; font-weight: 800; }
+.trendBadge.negative { color: #ffaaa2; background: rgba(255,83,73,.1); }
+.segmentGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 22px; }
+.segmentGrid article { display: grid; gap: 8px; padding: 18px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; }
+.segmentGrid span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.segmentGrid strong { color: var(--accent); font-size: 34px; }
+.segmentGrid p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.recommendation { display: flex; gap: 10px; margin-top: 14px; padding: 14px 16px; background: #09120f; border-radius: 12px; font-size: 13px; }
+.recommendation b { color: var(--accent); }
+.recommendation span { color: var(--muted); }
 .customerShell { width: min(720px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 70px; }
 .customerBrand { display: flex; align-items: center; gap: 12px; padding-bottom: 24px; color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--line); }
 .customerHero { padding: 64px 0 32px; }
@@ -105,6 +119,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 @media (max-width: 850px) {
   .moduleGrid { grid-template-columns: repeat(2, 1fr); }
   .sectionHeading { align-items: start; flex-direction: column; }
+  .segmentGrid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 560px) {
   .shell { width: min(100% - 24px, 1160px); }
@@ -113,6 +128,8 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .moduleGrid { grid-template-columns: 1fr; }
   .statusCard { align-items: start; flex-direction: column; }
   .metricGrid { grid-template-columns: repeat(2, 1fr); }
+  .intelligenceHeading, .recommendation { align-items: start; flex-direction: column; }
+  .segmentGrid { grid-template-columns: 1fr; }
   .customerRow { grid-template-columns: 1fr; gap: 14px; }
   .customerStats { text-align: left; }
 }
