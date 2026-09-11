@@ -30,7 +30,7 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
     <section className="profileLinks">
       {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio<span>→</span></a>}
       {business.website_url && <a href={business.website_url} target="_blank" rel="noreferrer">Visitar sitio web<span>→</span></a>}
-      {links?.map((link) => <a key={link.public_token} href={`/go/${link.public_token}`} target="_blank" rel="noreferrer">
+      {links?.map((link: { link_name: string; public_token: string }) => <a key={link.public_token} href={`/go/${link.public_token}`} target="_blank" rel="noreferrer">
         {link.link_name}<span>→</span>
       </a>)}
       {payment && <a href={`/pay/${payment.public_token}`}>Datos para transferencia<span>→</span></a>}
