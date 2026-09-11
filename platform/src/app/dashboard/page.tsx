@@ -104,6 +104,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
+      {business?.slug && <BusinessQr
+        businessName={business.name}
+        url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
+        qrId="business-digital-profile-qr"
+        eyebrow="LANDING PAGE"
+        title="Perfil digital del negocio"
+        description="Comparte todos tus enlaces, contacto, reseñas, pagos y programa de lealtad desde una sola página."
+        fileSuffix="perfil-digital"
+      />}
       {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
       {canManageProgram && (
         <section className="settingsCard">

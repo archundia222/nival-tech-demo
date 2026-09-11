@@ -207,6 +207,18 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .paymentField strong { overflow-wrap: anywhere; font-size: clamp(20px, 5vw, 30px); }
 .paymentField small { justify-self: end; font-size: 11px; }
 .securityNotice { padding: 18px 4px; font-size: 13px; }
+.profileShell { width: min(620px, calc(100% - 28px)); margin: 0 auto; padding: 54px 0 42px; }
+.profileHeader { text-align: center; }
+.profileLogo, .profileFallback { width: 92px; height: 92px; display: grid; place-items: center; margin: 0 auto 24px; background: #fff; border-radius: 26px; object-fit: contain; }
+.profileFallback { color: #07100e; background: var(--accent); font-size: 42px; font-weight: 900; }
+.profileHeader h1 { max-width: none; font-size: clamp(42px, 11vw, 68px); }
+.profileHeader > p:last-child { max-width: 520px; margin: 20px auto 0; color: var(--muted); line-height: 1.6; }
+.profileLinks { display: grid; gap: 12px; margin-top: 38px; }
+.profileLinks a { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 19px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; font-weight: 800; }
+.profileLinks a:hover { color: #07100e; background: var(--accent); border-color: var(--accent); }
+.profileLinks span { font-size: 22px; }
+.profileFooter { margin-top: 36px; color: var(--muted); font-size: 13px; text-align: center; }
+.profileFooter b { color: var(--text); }
 @media (max-width: 560px) {
   .rewardProgress { align-items: start; flex-direction: column; }
   .customerActions { align-items: stretch; flex-direction: column; }
