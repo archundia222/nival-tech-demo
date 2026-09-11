@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { recordVisit, redeemReward, updateLoyaltyProgram } from "./actions";
+import { recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 
 interface DashboardPageProps {
@@ -16,7 +16,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { data: memberships } = await supabase
     .from("business_members")
-    .select("role, businesses(id, name, slug, subscription_status)")
+    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status)")
     .eq("user_id", user.id);
   const membership = memberships?.[0];
 
@@ -88,6 +88,24 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
       {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
+      {canManageProgram && business && (
+        <section className="settingsCard">
+          <div className="settingsIntro">
+            <p className="eyebrow">PERFIL PÚBLICO</p>
+            <h2>Personaliza la experiencia de tu negocio</h2>
+            <p>Estos datos aparecerán en la página que tus clientes abren mediante el QR o la tarjeta NFC.</p>
+          </div>
+          <form action={updateBusinessProfile} className="settingsForm">
+            <label>Nombre comercial<input name="businessName" required minLength={2} maxLength={100} defaultValue={business.name} /></label>
+            <label>Descripción<textarea name="businessDescription" minLength={2} maxLength={240} defaultValue={business.description ?? ""} placeholder="Explica brevemente qué ofrece tu negocio." /></label>
+            <label>Teléfono<input name="businessPhone" type="tel" minLength={10} maxLength={18} defaultValue={business.phone ?? ""} /></label>
+            <label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ""} placeholder="https://..." /></label>
+            <label>URL del logo<input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
+            <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b9ff74"} /><code>{business.brand_color ?? "#b9ff74"}</code></span></label>
+            <button className="primaryButton" type="submit">Guardar perfil</button>
+          </form>
+        </section>
+      )}
       {canManageProgram && loyaltyProgram && (
         <section className="settingsCard">
           <div className="settingsIntro">

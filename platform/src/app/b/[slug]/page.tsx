@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { CSSProperties } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { enrollCustomer } from "./actions";
 
@@ -11,17 +12,20 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
   const { slug } = await params;
   const query = await searchParams;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_public_business", { business_slug: slug });
+  const { data, error } = await supabase.rpc("get_public_business_v2", { business_slug: slug });
   if (error || !data?.[0]) notFound();
   const business = data[0];
 
   return (
-    <main className="customerShell">
-      <header className="customerBrand"><span className="brandmark">N</span><span>Programa impulsado por <b>NIVAL tech</b></span></header>
+    <main className="customerShell brandedCustomerShell" style={{ "--business-accent": business.brand_color } as CSSProperties}>
+      <header className="customerBrand">
+        {business.logo_url ? <img className="businessLogo" src={business.logo_url} alt={`Logo de ${business.business_name}`} /> : <span className="brandmark">N</span>}
+        <span>Programa impulsado por <b>NIVAL tech</b></span>
+      </header>
       <section className="customerHero">
         <p className="eyebrow">PROGRAMA DE LEALTAD</p>
         <h1>{business.business_name}</h1>
-        <p>Registra tus visitas, acumula puntos y recibe beneficios del negocio.</p>
+        <p>{business.description ?? "Registra tus visitas, acumula puntos y recibe beneficios del negocio."}</p>
       </section>
 
       <section className="customerFormCard">
@@ -38,6 +42,10 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <button className="primaryButton" type="submit">Crear mi tarjeta</button>
           </form>
       </section>
+      {(business.phone || business.website_url) && <footer className="businessContact">
+        {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
+        {business.website_url && <a href={business.website_url} target="_blank" rel="noreferrer">Visitar sitio web</a>}
+      </footer>}
     </main>
   );
 }

@@ -5,6 +5,44 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 
+export async function updateBusinessProfile(formData: FormData) {
+  const name = String(formData.get("businessName") ?? "").trim();
+  const phone = String(formData.get("businessPhone") ?? "").trim();
+  const description = String(formData.get("businessDescription") ?? "").trim();
+  const logoUrl = String(formData.get("businessLogoUrl") ?? "").trim();
+  const brandColor = String(formData.get("businessBrandColor") ?? "").trim();
+  const websiteUrl = String(formData.get("businessWebsiteUrl") ?? "").trim();
+
+  if (name.length < 2 || name.length > 100) {
+    redirect(`/dashboard?error=${encodeURIComponent("El nombre debe tener entre 2 y 100 caracteres.")}`);
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(brandColor)) {
+    redirect(`/dashboard?error=${encodeURIComponent("Selecciona un color válido.")}`);
+  }
+
+  for (const url of [logoUrl, websiteUrl]) {
+    if (url && !url.startsWith("https://")) {
+      redirect(`/dashboard?error=${encodeURIComponent("Las direcciones del logo y sitio web deben comenzar con https://")}`);
+    }
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("update_current_business_profile", {
+    business_name: name,
+    business_phone: phone,
+    business_description: description,
+    business_logo_url: logoUrl,
+    business_brand_color: brandColor,
+    business_website_url: websiteUrl,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  revalidatePath("/b/[slug]", "page");
+  redirect(`/dashboard?message=${encodeURIComponent("Perfil público actualizado.")}`);
+}
+
 export async function updateLoyaltyProgram(formData: FormData) {
   const programName = String(formData.get("programName") ?? "").trim();
   const pointsPerVisit = Number(formData.get("pointsPerVisit"));
