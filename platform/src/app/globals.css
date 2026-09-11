@@ -194,6 +194,19 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .compactForm .checkLabel input { width: 16px; }
 .compactForm .primaryButton { justify-self: start; }
 .miniQr { flex: 0 0 auto; padding: 8px; background: #fff; border-radius: 12px; line-height: 0; }
+.paymentQrPanel { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 22px; padding: 16px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; }
+.paymentQrPanel > div:first-child { min-width: 0; display: grid; gap: 7px; }
+.paymentQrPanel span { color: var(--accent); font-size: 13px; font-weight: 800; }
+.paymentQrPanel a { overflow-wrap: anywhere; color: var(--muted); font-size: 12px; }
+.paymentHero { padding: 64px 0 28px; }
+.paymentHero h1 { font-size: clamp(44px, 10vw, 72px); }
+.paymentHero > p:last-child, .securityNotice { color: var(--muted); line-height: 1.6; }
+.paymentCard { display: grid; gap: 10px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; }
+.paymentField { display: grid; gap: 7px; padding: 20px; color: var(--text); text-align: left; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+.paymentField span, .paymentField small { color: var(--muted); }
+.paymentField strong { overflow-wrap: anywhere; font-size: clamp(20px, 5vw, 30px); }
+.paymentField small { justify-self: end; font-size: 11px; }
+.securityNotice { padding: 18px 4px; font-size: 13px; }
 @media (max-width: 560px) {
   .rewardProgress { align-items: start; flex-direction: column; }
   .customerActions { align-items: stretch; flex-direction: column; }
@@ -201,4 +214,5 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .redemptionRow { align-items: start; flex-direction: column; }
   .redemptionRow > div:last-child { text-align: left; }
   .smartLinkRow { align-items: start; flex-direction: column; }
+  .paymentQrPanel { align-items: start; flex-direction: column; }
 }

@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { createSmartLink, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
+import { createSmartLink, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
+import { PaymentProfileQr } from "./payment-profile-qr";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -80,6 +81,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
     : { data: [] };
+  const { data: paymentProfiles } = businessId
+    ? await supabase
+        .from("payment_profiles")
+        .select("account_holder, bank_name, clabe, public_token, active, view_count")
+        .eq("business_id", businessId)
+        .limit(1)
+    : { data: [] };
+  const paymentProfile = paymentProfiles?.[0];
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
 
   return (
@@ -124,6 +133,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           active={link.active}
           editable={canManageProgram}
         />)}</div>
+      </section>}
+      {canManageProgram && business && <section className="settingsCard">
+        <div className="settingsIntro">
+          <p className="eyebrow">NFC PARA COBROS</p>
+          <h2>Comparte datos para transferencias</h2>
+          <p>El cliente podrá copiar el titular, banco y CLABE desde una página segura. No guardes NIP, CVV, contraseñas ni códigos.</p>
+          {paymentProfile && <PaymentProfileQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/pay/${paymentProfile.public_token}`} views={Number(paymentProfile.view_count)} />}
+        </div>
+        <form action={updatePaymentProfile} className="settingsForm">
+          <label>Titular de la cuenta<input name="accountHolder" required minLength={2} maxLength={120} defaultValue={paymentProfile?.account_holder ?? ""} /></label>
+          <label>Banco<input name="bankName" required minLength={2} maxLength={80} defaultValue={paymentProfile?.bank_name ?? ""} /></label>
+          <label>CLABE<input name="clabe" required inputMode="numeric" pattern="[0-9 ]{18,23}" defaultValue={paymentProfile?.clabe ?? ""} placeholder="18 dígitos" /></label>
+          <label className="checkLabel"><input name="active" type="checkbox" defaultChecked={paymentProfile?.active ?? true} /> Página disponible</label>
+          <button className="primaryButton" type="submit">Guardar datos bancarios</button>
+        </form>
       </section>}
       {canManageProgram && business && (
         <section className="settingsCard">

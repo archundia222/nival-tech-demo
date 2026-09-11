@@ -5,6 +5,37 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 
+export async function updatePaymentProfile(formData: FormData) {
+  const holder = String(formData.get("accountHolder") ?? "").trim();
+  const bank = String(formData.get("bankName") ?? "").trim();
+  const clabe = String(formData.get("clabe") ?? "").replace(/\D/g, "");
+  const active = formData.get("active") === "on";
+
+  if (holder.length < 2 || holder.length > 120) {
+    redirect(`/dashboard?error=${encodeURIComponent("Ingresa el nombre completo del titular.")}`);
+  }
+
+  if (bank.length < 2 || bank.length > 80) {
+    redirect(`/dashboard?error=${encodeURIComponent("Ingresa el nombre del banco.")}`);
+  }
+
+  if (!/^\d{18}$/.test(clabe)) {
+    redirect(`/dashboard?error=${encodeURIComponent("La CLABE debe contener exactamente 18 dígitos.")}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("upsert_current_payment_profile", {
+    holder_name: holder,
+    financial_institution: bank,
+    clabe_number: clabe,
+    enabled: active,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Datos para transferencias actualizados.")}`);
+}
+
 export async function createSmartLink(formData: FormData) {
   const name = String(formData.get("linkName") ?? "").trim();
   const kind = String(formData.get("linkKind") ?? "").trim();
