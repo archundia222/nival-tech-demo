@@ -64,6 +64,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .eq("business_id", businessId)
         .order("created_at", { ascending: false })
     : { data: [] };
+  const { data: redemptions } = businessId
+    ? await supabase
+        .from("reward_redemptions")
+        .select("id, reward_description, points_spent, redeemed_at, customers(name)")
+        .eq("business_id", businessId)
+        .order("redeemed_at", { ascending: false })
+        .limit(10)
+    : { data: [] };
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
 
   return (
@@ -114,6 +122,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                   <form action={redeemReward}><input type="hidden" name="customerId" value={customer.id} /><button className="redeemButton">Canjear premio</button></form>
                 )}
               </div>
+            </article>;
+          })}</div>
+        )}
+      </section>
+      <section className="redemptionHistoryCard">
+        <div>
+          <p className="eyebrow">HISTORIAL DE CANJES</p>
+          <h2>Premios entregados</h2>
+        </div>
+        {!redemptions?.length ? <p className="emptyState">Aún no se ha canjeado ningún premio.</p> : (
+          <div className="redemptionList">{redemptions.map((redemption) => {
+            const customer = Array.isArray(redemption.customers) ? redemption.customers[0] : redemption.customers;
+            return <article key={redemption.id} className="redemptionRow">
+              <div><strong>{customer?.name ?? "Cliente"}</strong><span>{redemption.reward_description}</span></div>
+              <div><b>{redemption.points_spent} puntos</b><time dateTime={redemption.redeemed_at}>{new Intl.DateTimeFormat("es-MX", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Mexico_City" }).format(new Date(redemption.redeemed_at))}</time></div>
             </article>;
           })}</div>
         )}
