@@ -81,6 +81,13 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .recommendation { display: flex; gap: 10px; margin-top: 14px; padding: 14px 16px; background: #09120f; border-radius: 12px; font-size: 13px; }
 .recommendation b { color: var(--accent); }
 .recommendation span { color: var(--muted); }
+.recommendationsCard { margin-top: 26px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.recommendationsCard h2 { margin: 0; font-size: 30px; letter-spacing: -.03em; }
+.recommendationsList { display: grid; gap: 10px; margin-top: 22px; }
+.recommendationItem { display: flex; align-items: start; justify-content: space-between; gap: 22px; padding: 18px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 14px; }
+.recommendationItem > div { display: grid; gap: 8px; }
+.recommendationItem p { max-width: 720px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.recommendationItem span { width: fit-content; padding: 6px 9px; color: var(--accent); background: rgba(185,255,116,.08); border-radius: 8px; font-size: 11px; font-weight: 800; }
 .customerShell { width: min(720px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 70px; }
 .customerBrand { display: flex; align-items: center; gap: 12px; padding-bottom: 24px; color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--line); }
 .customerHero { padding: 64px 0 32px; }
@@ -129,6 +136,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .statusCard { align-items: start; flex-direction: column; }
   .metricGrid { grid-template-columns: repeat(2, 1fr); }
   .intelligenceHeading, .recommendation { align-items: start; flex-direction: column; }
+  .recommendationItem { flex-direction: column; }
   .segmentGrid { grid-template-columns: 1fr; }
   .customerRow { grid-template-columns: 1fr; gap: 14px; }
   .customerStats { text-align: left; }

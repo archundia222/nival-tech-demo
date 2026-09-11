@@ -5,6 +5,27 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 
+export async function refreshRecommendations() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("refresh_current_business_recommendations");
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent(`${Number(data ?? 0)} recomendaciones actualizadas.`)}`);
+}
+
+export async function dismissRecommendation(formData: FormData) {
+  const recommendationId = String(formData.get("recommendationId") ?? "");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("dismiss_current_recommendation", {
+    recommendation_id: recommendationId,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Recomendación descartada.")}`);
+}
+
 export async function createTeamInvitation(formData: FormData) {
   const email = String(formData.get("inviteEmail") ?? "").trim().toLowerCase();
   const role = String(formData.get("inviteRole") ?? "staff");

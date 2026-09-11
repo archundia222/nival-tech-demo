@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { createSmartLink, createTeamInvitation, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
+import { createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
@@ -16,6 +16,15 @@ interface TeamMember {
   member_name: string | null;
   member_role: "owner" | "manager" | "staff";
   joined_at: string;
+}
+
+interface IntelligenceRecommendation {
+  id: string;
+  title: string;
+  explanation: string;
+  evidence: Record<string, number>;
+  suggested_action: { label?: string };
+  created_at: string;
 }
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
@@ -119,6 +128,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const visitTrend = previousVisits === 0
     ? (recentVisits > 0 ? 100 : 0)
     : Math.round(((recentVisits - previousVisits) / previousVisits) * 100);
+  const { data: recommendationRows } = businessId
+    ? await supabase
+        .from("intelligence_recommendations")
+        .select("id, title, explanation, evidence, suggested_action, created_at")
+        .eq("business_id", businessId)
+        .is("dismissed_at", null)
+        .order("created_at", { ascending: false })
+    : { data: [] };
+  const recommendations = recommendationRows as IntelligenceRecommendation[] | null;
 
   return (
     <main className="dashboardShell">
@@ -146,6 +164,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <article><span>Premio disponible</span><strong>{Number(segments?.reward_ready_customers ?? 0)}</strong><p>Ya alcanzaron la meta de puntos.</p></article>
         </div>
         {Number(segments?.at_risk_customers ?? 0) > 0 && <div className="recommendation"><b>Acción recomendada</b><span>Prepara una campaña de regreso para los clientes en riesgo.</span></div>}
+      </section>
+      <section className="recommendationsCard">
+        <div className="intelligenceHeading">
+          <div><p className="eyebrow">ACCIONES SUGERIDAS</p><h2>Recomendaciones para hoy</h2></div>
+          {canManageProgram && <form action={refreshRecommendations}><button className="visitButton">Actualizar análisis</button></form>}
+        </div>
+        {!recommendations?.length ? <p className="emptyState">Actualiza el análisis para generar recomendaciones con la actividad actual.</p> : (
+          <div className="recommendationsList">{recommendations.map((item) => <article key={item.id} className="recommendationItem">
+            <div><strong>{item.title}</strong><p>{item.explanation}</p><span>{item.suggested_action?.label ?? "Revisar actividad"}</span></div>
+            {canManageProgram && <form action={dismissRecommendation}><input type="hidden" name="recommendationId" value={item.id} /><button className="textButton">Descartar</button></form>}
+          </article>)}</div>
+        )}
       </section>
       {business?.slug && <BusinessQr
         businessName={business.name}
