@@ -5,6 +5,35 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 
+export async function createSmartLink(formData: FormData) {
+  const name = String(formData.get("linkName") ?? "").trim();
+  const kind = String(formData.get("linkKind") ?? "").trim();
+  const targetUrl = String(formData.get("targetUrl") ?? "").trim();
+
+  if (name.length < 2 || name.length > 80) {
+    redirect(`/dashboard?error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
+  }
+
+  if (!["google_review", "website", "custom"].includes(kind)) {
+    redirect(`/dashboard?error=${encodeURIComponent("Selecciona un tipo de enlace válido.")}`);
+  }
+
+  if (!targetUrl.startsWith("https://")) {
+    redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("create_smart_link", {
+    link_name: name,
+    link_kind: kind,
+    destination_url: targetUrl,
+  });
+
+  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?message=${encodeURIComponent("Enlace inteligente creado.")}`);
+}
+
 export async function updateBusinessProfile(formData: FormData) {
   const name = String(formData.get("businessName") ?? "").trim();
   const phone = String(formData.get("businessPhone") ?? "").trim();

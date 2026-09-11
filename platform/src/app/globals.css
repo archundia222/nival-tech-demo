@@ -135,9 +135,9 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .settingsIntro > p:last-child { max-width: 540px; color: var(--muted); line-height: 1.6; }
 .settingsForm { display: grid; gap: 16px; }
 .settingsForm label { display: grid; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
-.settingsForm input, .settingsForm textarea { width: 100%; padding: 14px; color: var(--text); background: #09120f; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
+.settingsForm input, .settingsForm textarea, .settingsForm select { width: 100%; padding: 14px; color: var(--text); background: #09120f; border: 1px solid var(--line); border-radius: 10px; font: inherit; }
 .settingsForm textarea { min-height: 90px; resize: vertical; }
-.settingsForm input:focus, .settingsForm textarea:focus { outline: 2px solid rgba(185,255,116,.35); border-color: var(--accent); }
+.settingsForm input:focus, .settingsForm textarea:focus, .settingsForm select:focus { outline: 2px solid rgba(185,255,116,.35); border-color: var(--accent); }
 .settingsForm .primaryButton { justify-self: start; }
 .colorField { display: flex; align-items: center; gap: 12px; }
 .colorField input[type="color"] { width: 52px; height: 42px; padding: 4px; cursor: pointer; }
@@ -174,10 +174,20 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .businessLogo { width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 12px; }
 .businessContact { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; padding-top: 24px; border-top: 1px solid var(--line); }
 .businessContact a { padding: 11px 15px; color: #07100e; background: var(--accent); border-radius: 10px; font-weight: 800; }
+.smartLinksCard { margin-top: 26px; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+.smartLinksCard h2 { margin: 0; font-size: 30px; }
+.smartLinksList { display: grid; gap: 12px; margin-top: 24px; }
+.smartLinkRow { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 20px; background: var(--surface-soft); border: 1px solid var(--line); border-radius: 16px; }
+.smartLinkInfo { min-width: 0; display: grid; gap: 8px; }
+.smartLinkInfo > span { color: var(--accent); font-size: 13px; font-weight: 800; }
+.smartLinkInfo > a { overflow-wrap: anywhere; color: var(--muted); font-size: 13px; }
+.smartLinkActions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.miniQr { flex: 0 0 auto; padding: 8px; background: #fff; border-radius: 12px; line-height: 0; }
 @media (max-width: 560px) {
   .rewardProgress { align-items: start; flex-direction: column; }
   .customerActions { align-items: stretch; flex-direction: column; }
   .customerActions .visitButton, .customerActions .redeemButton { display: block; width: 100%; text-align: center; }
   .redemptionRow { align-items: start; flex-direction: column; }
   .redemptionRow > div:last-child { text-align: left; }
+  .smartLinkRow { align-items: start; flex-direction: column; }
 }

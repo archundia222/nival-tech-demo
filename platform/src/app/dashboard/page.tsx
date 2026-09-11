@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
+import { createSmartLink, recordVisit, redeemReward, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
+import { SmartLinkQr } from "./smart-link-qr";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string }>;
@@ -72,6 +73,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .order("redeemed_at", { ascending: false })
         .limit(10)
     : { data: [] };
+  const { data: smartLinks } = businessId
+    ? await supabase
+        .from("smart_links")
+        .select("id, name, kind, public_token, click_count, active")
+        .eq("business_id", businessId)
+        .order("created_at", { ascending: false })
+    : { data: [] };
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
 
   return (
@@ -88,6 +96,31 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
       {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
+      {canManageProgram && (
+        <section className="settingsCard">
+          <div className="settingsIntro">
+            <p className="eyebrow">NFC Y RESEÑAS</p>
+            <h2>Crea un enlace inteligente</h2>
+            <p>Programa este enlace de Nival Tech en una tarjeta NFC. Podrás medir sus aperturas y conservar la misma tarjeta física.</p>
+          </div>
+          <form action={createSmartLink} className="settingsForm">
+            <label>Nombre<input name="linkName" required minLength={2} maxLength={80} placeholder="Ej. Reseñas de Google" /></label>
+            <label>Tipo<select name="linkKind" defaultValue="google_review"><option value="google_review">Reseña de Google</option><option value="website">Sitio web</option><option value="custom">Otro enlace</option></select></label>
+            <label>Enlace de destino<input name="targetUrl" type="url" required placeholder="https://..." /></label>
+            <button className="primaryButton" type="submit">Crear enlace NFC</button>
+          </form>
+        </section>
+      )}
+      {!!smartLinks?.length && <section className="smartLinksCard">
+        <div><p className="eyebrow">ENLACES ACTIVOS</p><h2>Tarjetas y códigos QR</h2></div>
+        <div className="smartLinksList">{smartLinks.map((link) => <SmartLinkQr
+          key={link.id}
+          id={link.id}
+          name={link.name}
+          url={`https://nival-tech-platform.vercel.app/go/${link.public_token}`}
+          clicks={Number(link.click_count)}
+        />)}</div>
+      </section>}
       {canManageProgram && business && (
         <section className="settingsCard">
           <div className="settingsIntro">
