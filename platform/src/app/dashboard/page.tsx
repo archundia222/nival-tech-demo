@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createBusiness, signOut } from "@/app/auth/actions";
-import { createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram, updatePaymentProfile } from "./actions";
+import { createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
 import { InvitationLink } from "./invitation-link";
 
 interface DashboardPageProps {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; next?: string }>;
 }
 
 interface TeamMember {
@@ -46,9 +46,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <section className="onboardingCard">
           <p className="eyebrow">CONFIGURACIÓN INICIAL</p>
           <h1>Crea tu primer negocio</h1>
-          <p>Este nombre identificará el espacio privado donde vivirán tus clientes, puntos y campañas.</p>
+          <p>Este nombre aparecerá en las páginas y productos que configures para tu negocio.</p>
           {params.error && <div className="formMessage errorMessage">{params.error}</div>}
           <form action={createBusiness} className="authForm">
+            <input type="hidden" name="next" value={params.next === "/dashboard/pay" ? params.next : "/products"} />
             <label>Nombre del negocio<input name="businessName" required minLength={2} maxLength={100} placeholder="Ej. Barbería Norte" /></label>
             <label>Dirección web<input name="businessSlug" required minLength={2} maxLength={60} placeholder="barberia-norte" pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ -]+" /></label>
             <button className="primaryButton" type="submit">Crear negocio</button>
@@ -142,7 +143,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     <main className="dashboardShell">
       <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
       <section className="dashboardHero">
-        <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>El espacio privado ya está conectado a Supabase.</p></div>
+        <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Administra los productos y servicios de tu negocio.</p><a className="loginLink" href="/products">Mis productos</a></div>
         <span className="ready">{business?.subscription_status ?? "trial"}</span>
       </section>
       <section className="metricGrid">
@@ -190,7 +191,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {canManageProgram && (
         <section className="settingsCard">
           <div className="settingsIntro">
-            <p className="eyebrow">NFC Y RESEÑAS</p>
+            <p className="eyebrow" id="nival-card">NIVAL CARD · NFC Y RESEÑAS</p>
             <h2>Crea un enlace inteligente</h2>
             <p>Programa este enlace de Nival Tech en una tarjeta NFC. Podrás medir sus aperturas y conservar la misma tarjeta física.</p>
           </div>
@@ -223,13 +224,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p>El cliente podrá copiar el titular, banco y CLABE desde una página segura. No guardes NIP, CVV, contraseñas ni códigos.</p>
           {paymentProfile && <PaymentProfileQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/pay/${paymentProfile.public_token}`} views={Number(paymentProfile.view_count)} />}
         </div>
-        <form action={updatePaymentProfile} className="settingsForm">
-          <label>Titular de la cuenta<input name="accountHolder" required minLength={2} maxLength={120} defaultValue={paymentProfile?.account_holder ?? ""} /></label>
-          <label>Banco<input name="bankName" required minLength={2} maxLength={80} defaultValue={paymentProfile?.bank_name ?? ""} /></label>
-          <label>CLABE<input name="clabe" required inputMode="numeric" pattern="[0-9 ]{18,23}" defaultValue={paymentProfile?.clabe ?? ""} placeholder="18 dígitos" /></label>
-          <label className="checkLabel"><input name="active" type="checkbox" defaultChecked={paymentProfile?.active ?? true} /> Página disponible</label>
-          <button className="primaryButton" type="submit">Guardar datos bancarios</button>
-        </form>
+        <a className="primaryButton" href="/dashboard/pay">Configurar mi página Nival Pay</a>
       </section>}
       {canManageProgram && business && (
         <section className="settingsCard teamCard">

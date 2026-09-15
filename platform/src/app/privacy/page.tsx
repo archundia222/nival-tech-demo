@@ -1,3 +1,4 @@
+import Link from "next/link";
 export const metadata = {
   title: "Privacidad | Nival Tech",
   description: "Aviso de privacidad de la plataforma Nival Tech.",
@@ -6,7 +7,7 @@ export const metadata = {
 export default function PrivacyPage() {
   return (
     <main className="legalShell">
-      <a className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</a>
+      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 9 DE SEPTIEMBRE DE 2026</p>
         <h1>Aviso de privacidad</h1>

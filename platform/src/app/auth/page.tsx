@@ -20,7 +20,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <p className="authIntro">
           {signup
             ? "Primero crearemos tu usuario; después configurarás tu negocio."
-            : "Ingresa al panel de Nival Intelligence."}
+            : "Ingresa a tu cuenta de Nival Tech."}
         </p>
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}

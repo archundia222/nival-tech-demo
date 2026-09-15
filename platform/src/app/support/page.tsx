@@ -1,3 +1,4 @@
+import Link from "next/link";
 export const metadata = {
   title: "Soporte | Nival Tech",
   description: "Ayuda y contacto para usuarios de Nival Tech.",
@@ -6,7 +7,7 @@ export const metadata = {
 export default function SupportPage() {
   return (
     <main className="legalShell">
-      <a className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</a>
+      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
       <section className="legalCard">
         <p className="eyebrow">CENTRO DE AYUDA</p>
         <h1>Soporte de Nival Tech</h1>

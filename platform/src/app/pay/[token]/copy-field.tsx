@@ -8,10 +8,12 @@ interface CopyFieldProps {
 }
 
 export function CopyField({ label, value }: CopyFieldProps) {
+  const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
 
   async function copy() {
-    await navigator.clipboard.writeText(value);
+    try { await navigator.clipboard.writeText(value); setError(false); }
+    catch { setError(true); return; }
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1600);
   }
@@ -19,6 +21,6 @@ export function CopyField({ label, value }: CopyFieldProps) {
   return <button className="paymentField" type="button" onClick={copy}>
     <span>{label}</span>
     <strong>{value}</strong>
-    <small>{copied ? "Copiado" : "Toca para copiar"}</small>
+    <small>{error ? "Selecciona el dato para copiarlo manualmente" : copied ? "Copiado" : "Toca para copiar"}</small>
   </button>;
 }
