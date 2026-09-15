@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 interface PaymentProfileQrProps {
@@ -9,6 +10,7 @@ interface PaymentProfileQrProps {
 }
 
 export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrProps) {
+  const [notice, setNotice] = useState("");
   function downloadQr() {
     const svg = document.getElementById("payment-profile-qr");
     if (!svg) return;
@@ -23,7 +25,10 @@ export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrP
   }
 
   async function copyUrl() {
-    await navigator.clipboard.writeText(url);
+    try {
+      await navigator.clipboard.writeText(url);
+      setNotice("Enlace copiado.");
+    } catch { setNotice("No se pudo copiar. Selecciona y copia el enlace que aparece arriba."); }
   }
 
   return <div className="paymentQrPanel">
@@ -31,6 +36,7 @@ export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrP
       <strong>Enlace para tarjeta NFC</strong>
       <span>{views} aperturas</span>
       <a href={url} target="_blank" rel="noreferrer">{url}</a>
+      <p role="status">{notice}</p>
       <div className="smartLinkActions">
         <button className="visitButton" type="button" onClick={copyUrl}>Copiar enlace NFC</button>
         <button className="visitButton" type="button" onClick={downloadQr}>Descargar QR</button>

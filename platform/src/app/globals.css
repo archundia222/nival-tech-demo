@@ -263,3 +263,45 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .paymentQrPanel { align-items: start; flex-direction: column; }
   .teamMember { align-items: start; flex-direction: column; }
 }
+
+/* Nival Pay: a focused, monochrome workspace. */
+.payWorkspace { --accent: #b59a61; --muted: #666; --line: #ddd; --text: #151515; width: 100%; min-height: 100vh; background: #f7f7f5; color: #151515; padding: 0 max(24px, calc((100vw - 1120px)/2)) 72px; }
+.payNav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:28px 0; border-bottom:1px solid #ddd; font-size:14px; }
+.payNav a:hover { text-decoration:underline; }
+.payHeading { padding:56px 0 36px; }
+.payHeading h1 { font-size:clamp(36px,6vw,68px); max-width:860px; line-height:1.06; }
+.payHeading > p:last-child { color:#666; font-size:18px; line-height:1.6; max-width:660px; }
+.payWorkspace .eyebrow { color:#756033; font-size:13px; }
+.payEditorGrid { display:grid; grid-template-columns:1.1fr 1fr; gap:40px; align-items:start; }
+.payForm { background:white; border:1px solid #ddd; border-radius:20px; padding:30px; display:grid; gap:20px; }
+.payForm h2, .payShare h2 { margin:0 0 8px; font-size:26px; letter-spacing:-.03em; }
+.payForm label { display:grid; gap:8px; font-size:14px; font-weight:600; }
+.payForm input:not([type=checkbox]) { width:100%; min-width:0; padding:13px; border:1px solid #ccc; border-radius:9px; background:#fff; color:#151515; font:inherit; font-size:16px; }
+.payForm input:focus-visible, .payWorkspace button:focus-visible, .payWorkspace a:focus-visible { outline:3px solid #b59a61; outline-offset:3px; }
+.payForm small, .payOptional, .payHelp { color:#666; font-size:14px; font-weight:400; line-height:1.6; }
+.payForm input[type=file] { font-size:14px; }
+.payButton { display:inline-flex; justify-content:center; align-items:center; text-align:center; padding:15px 22px; border:0; border-radius:999px; background:#171717; color:white; font:inherit; font-size:16px; font-weight:600; cursor:pointer; }
+.payButton:disabled { opacity:.6; cursor:wait; }
+.payPreview { position:sticky; top:24px; text-align:center; padding:24px 12px; }
+.payPreviewCard { max-width:370px; margin:auto; padding:32px; border-radius:28px; border:1px solid #ddd; background:white; box-shadow:0 16px 50px #00000008; }
+.payPreviewCard img { border-radius:22px; object-fit:cover; }
+.payMonogram { margin:auto; width:88px; height:88px; border-radius:22px; background:#171717; color:white; display:grid; place-items:center; font-size:36px; }
+.payPreviewCard h2 { font-size:28px; overflow-wrap:anywhere; }
+.payPreviewCard > p { color:#666; }
+.payPreviewCard dl { text-align:left; background:#f7f7f5; border-radius:14px; padding:20px; }
+.payPreviewCard dt { font-size:14px; color:#666; margin-bottom:7px; }
+.payPreviewCard dd { margin:0 0 20px; font-size:17px; overflow-wrap:anywhere; }
+.payPreviewCard dd:last-child { margin-bottom:0; font-variant-numeric:tabular-nums; }
+.previewPaymentButton { display:block; cursor:default; }
+.payError { color:#a72121; line-height:1.5; }
+.paySuccess { color:#216339; line-height:1.5; }
+.payShare { padding:28px; margin-top:32px; border:1px solid #ddd; border-radius:20px; background:white; }
+.payWorkspace .paymentQrPanel { background:#f7f7f5; color:#151515; }
+.payWorkspace .paymentQrPanel a { color:#333; overflow-wrap:anywhere; }
+.payWorkspace .visitButton { color:#151515; border-color:#bbb; background:white; }
+.payProductGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.payProduct { display:flex; flex-direction:column; align-items:start; padding:28px; background:white; border:1px solid #ddd; border-radius:20px; }
+.payProduct h2 { font-size:28px; margin:12px 0; }
+.payProduct > p:not(.eyebrow) { color:#666; line-height:1.7; margin-bottom:28px; }
+.payProduct .payButton { margin-top:auto; }
+@media(max-width:760px) { .payEditorGrid,.payProductGrid { grid-template-columns:1fr; } .payPreview { position:static; } .payForm { padding:22px; } .payWorkspace { padding-left:20px; padding-right:20px; } .payHeading { padding-top:36px; } .payShare { padding:20px; } }

@@ -42,7 +42,7 @@ export async function signUp(formData: FormData) {
 
   if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`);
   if (data.session) redirect(next);
-  redirect(`/auth?message=${encodeURIComponent(`Enviamos un enlace de confirmación a ${email}. Después vuelve a abrir tu invitación.`)}&next=${encodeURIComponent(next)}`);
+  redirect(`/auth?message=${encodeURIComponent(`Enviamos un enlace de confirmación a ${email}. Abre el enlace para continuar con tu cuenta.`)}&next=${encodeURIComponent(next)}`);
 }
 
 export async function signOut() {
@@ -67,5 +67,5 @@ export async function createBusiness(formData: FormData) {
   });
 
   if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
-  redirect("/dashboard");
+  redirect(safeNext(formData));
 }
