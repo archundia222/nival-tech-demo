@@ -40,9 +40,17 @@ export async function signUp(formData: FormData) {
     },
   });
 
+  // Confirmed duplicate signups may return an obfuscated user instead of an error.
+  // Use only the signup response; do not query the private user directory.
+  const alreadyRegistered = error?.code === "user_already_exists"
+    || error?.code === "email_exists"
+    || (!error && !data.session && data.user?.identities?.length === 0);
+  if (alreadyRegistered) {
+    redirect(`/auth?message=${encodeURIComponent("Ya tenemos una cuenta registrada con este correo. Inicia sesión con tu contraseña; no necesitas registrarte de nuevo.")}&next=${encodeURIComponent(next)}`);
+  }
   if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`);
   if (data.session) redirect(next);
-  redirect(`/auth?message=${encodeURIComponent(`Enviamos un enlace de confirmación a ${email}. Abre el enlace para continuar con tu cuenta.`)}&next=${encodeURIComponent(next)}`);
+  redirect(`/auth?message=${encodeURIComponent(`Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Si ya te habías registrado, inicia sesión con tu contraseña.`)}&next=${encodeURIComponent(next)}`);
 }
 
 export async function signOut() {
