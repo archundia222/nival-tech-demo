@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nival Tech Platform",
-  description: "Lealtad digital e inteligencia comercial para negocios.",
+  title: "Nival Tech | Cobra con un toque",
+  description: "Nival Pay convierte una tarjeta NFC en la página de pago de tu negocio. Tarjeta y página configurada por $199 MXN, sin mensualidad.",
+  icons: { icon: "/wallet/nival-logo.png", apple: "/wallet/nival-logo.png" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
