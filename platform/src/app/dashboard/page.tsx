@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createBusiness, signOut } from "@/app/auth/actions";
+import { signOut } from "@/app/auth/actions";
 import { createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
 import { InvitationLink } from "./invitation-link";
+import { BusinessOnboardingForm } from "./business-onboarding-form";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string }>;
@@ -48,12 +49,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <h1>Crea tu primer negocio</h1>
           <p>Este nombre aparecerá en las páginas y productos que configures para tu negocio.</p>
           {params.error && <div className="formMessage errorMessage">{params.error}</div>}
-          <form action={createBusiness} className="authForm">
-            <input type="hidden" name="next" value={params.next === "/dashboard/pay" ? params.next : "/products"} />
-            <label>Nombre del negocio<input name="businessName" required minLength={2} maxLength={100} placeholder="Ej. Barbería Norte" /></label>
-            <label>Dirección web<input name="businessSlug" required minLength={2} maxLength={60} placeholder="barberia-norte" pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ -]+" /></label>
-            <button className="primaryButton" type="submit">Crear negocio</button>
-          </form>
+          <BusinessOnboardingForm next={params.next === "/dashboard/pay" ? params.next : "/products"} />
         </section>
       </main>
     );
