@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PayDemo } from "./pay-demo";
 
-const signupUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
+const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
 
 export default function Home() {
   return (

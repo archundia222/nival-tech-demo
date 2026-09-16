@@ -592,3 +592,54 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .landing { scroll-behavior: auto; }
   .landingPrimary { transition: none; }
 }
+
+/* Commerce: checkout and sales administration */
+.checkoutShell, .adminSales { min-height: 100vh; background: #f6f5f1; color: #101312; padding: 0 max(24px, calc((100vw - 1180px) / 2)) 80px; }
+.checkoutShell .payNav, .adminSales .payNav { padding: 24px 0; border-bottom: 1px solid #d8d8d2; }
+.checkoutHeader { max-width: 760px; padding: 74px 0 42px; }
+.checkoutHeader h1, .adminSales h1 { margin: 8px 0 14px; font-size: clamp(42px, 6vw, 76px); line-height: .96; letter-spacing: -.055em; }
+.checkoutHeader > p:last-child, .adminSales header > p:last-child { color: #5b625f; font-size: 18px; }
+.checkoutGrid { display: grid; grid-template-columns: .82fr 1.18fr; gap: 24px; align-items: stretch; }
+.checkoutSummary { display: flex; flex-direction: column; min-height: 520px; padding: 38px; border-radius: 28px; background: #101312; color: white; box-shadow: 10px 10px 0 #c9a85c; }
+.checkoutSummary > p { color: #d4b76e; font-size: 13px; font-weight: 800; letter-spacing: .16em; }
+.checkoutSummary h2 { margin: 20px 0 28px; font-size: 35px; line-height: 1.05; }
+.checkoutSummary ul { display: grid; gap: 15px; padding: 0; list-style: none; color: #d8dcda; }
+.checkoutSummary li::before { content: '✓'; margin-right: 10px; color: #d4b76e; }
+.checkoutSummary > strong { margin-top: auto; font-size: 46px; letter-spacing: -.04em; }
+.checkoutSummary > small { color: #aeb3b0; }
+.paymentChoices { display: grid; gap: 18px; }
+.paymentChoices article { display: flex; justify-content: space-between; gap: 28px; align-items: end; padding: 32px; border: 1px solid #d8d8d2; border-radius: 24px; background: white; }
+.paymentChoices h2 { margin: 14px 0 8px; font-size: 27px; }
+.paymentChoices p { max-width: 500px; color: #5b625f; line-height: 1.6; }
+.paymentChoices form { flex: 0 0 auto; }
+.paymentIcon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; background: #129ddb; color: white; font-size: 13px; font-weight: 900; }
+.paymentIcon.cash { background: #d4b76e; color: #101312; font-size: 23px; }
+.checkoutSecondary { border: 1px solid #101312; background: transparent; color: #101312; white-space: nowrap; }
+.checkoutNotice { margin: 0 0 24px; padding: 16px 18px; border-left: 4px solid #c9a85c; background: white; }
+.checkoutSuccess { max-width: 660px; padding: 54px; border-radius: 28px; background: white; border: 1px solid #d8d8d2; text-align: center; }
+.checkoutSuccess > span { display: grid; place-items: center; width: 54px; height: 54px; margin: auto; border-radius: 50%; background: #101312; color: #d4b76e; font-size: 26px; }
+.checkoutSuccess h2 { font-size: 34px; margin-bottom: 10px; }
+.checkoutSuccess p { margin-bottom: 28px; color: #5b625f; }
+.orderHistory { margin-top: 38px; padding: 28px; border-radius: 22px; background: white; border: 1px solid #d8d8d2; }
+.orderHistory h2 { margin-top: 0; }
+.orderHistory div { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; padding: 16px 0; border-top: 1px solid #e4e4df; }
+.orderHistory time { color: #68706c; }
+.adminSales header { padding: 58px 0 34px; }
+.salesTable { overflow: hidden; border: 1px solid #d8d8d2; border-radius: 22px; background: white; }
+.salesHead, .salesTable article { display: grid; grid-template-columns: 1.35fr .85fr .7fr .9fr 1fr; gap: 16px; align-items: center; padding: 18px 22px; }
+.salesHead { background: #101312; color: white; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.salesTable article + article { border-top: 1px solid #e4e4df; }
+.salesTable article > span:first-child { display: grid; gap: 4px; }
+.salesTable small { color: #68706c; }
+
+@media (max-width: 800px) {
+  .checkoutShell, .adminSales { padding-inline: 18px; }
+  .checkoutHeader { padding-top: 50px; }
+  .checkoutGrid { grid-template-columns: 1fr; }
+  .checkoutSummary { min-height: 430px; }
+  .paymentChoices article { align-items: stretch; flex-direction: column; }
+  .paymentChoices form button { width: 100%; }
+  .orderHistory div { grid-template-columns: 1fr; gap: 5px; }
+  .salesTable { overflow-x: auto; }
+  .salesHead, .salesTable article { min-width: 850px; }
+}
