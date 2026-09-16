@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { signIn, signUp } from "./actions";
+import { resendConfirmation, signIn, signUp } from "./actions";
 
 interface AuthPageProps {
   searchParams: Promise<{ mode?: string; error?: string; message?: string; next?: string }>;
@@ -8,6 +8,7 @@ interface AuthPageProps {
 export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const signup = params.mode === "signup";
+  const next = params.next ?? "/dashboard";
 
   return (
     <main className="authShell">
@@ -25,7 +26,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}
         <form action={signup ? signUp : signIn} className="authForm">
-          <input type="hidden" name="next" value={params.next ?? "/dashboard"} />
+          <input type="hidden" name="next" value={next} />
           {signup && (
             <label>Nombre completo<input name="fullName" required minLength={2} autoComplete="name" /></label>
           )}
@@ -33,9 +34,21 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
           <button className="primaryButton" type="submit">{signup ? "Crear cuenta" : "Iniciar sesión"}</button>
         </form>
+
+        {!signup && (
+          <form action={resendConfirmation} className="authForm">
+            <input type="hidden" name="next" value={next} />
+            <label>
+              ¿No pudiste confirmar tu correo?
+              <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
+            </label>
+            <button className="primaryButton" type="submit">Reenviar confirmación</button>
+          </form>
+        )}
+
         <p className="authSwitch">
           {signup ? "¿Ya tienes cuenta?" : "¿Aún no tienes cuenta?"}{" "}
-          <Link href={signup ? `/auth?next=${encodeURIComponent(params.next ?? "/dashboard")}` : `/auth?mode=signup&next=${encodeURIComponent(params.next ?? "/dashboard")}`}>{signup ? "Inicia sesión" : "Regístrate"}</Link>
+          <Link href={signup ? `/auth?next=${encodeURIComponent(next)}` : `/auth?mode=signup&next=${encodeURIComponent(next)}`}>{signup ? "Inicia sesión" : "Regístrate"}</Link>
         </p>
       </section>
     </main>
