@@ -13,6 +13,10 @@ function safeNext(formData: FormData) {
   return next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
 }
 
+function isEmailNotConfirmed(error: { code?: string; message?: string } | null) {
+  return error?.code === "email_not_confirmed" || /email not confirmed/i.test(error?.message ?? "");
+}
+
 export async function signIn(formData: FormData) {
   const next = safeNext(formData);
   const supabase = await createClient();
@@ -21,7 +25,12 @@ export async function signIn(formData: FormData) {
     password: value(formData, "password"),
   });
 
-  if (error) redirect(`/auth?error=${encodeURIComponent("Correo o contraseña incorrectos.")}&next=${encodeURIComponent(next)}`);
+  if (error) {
+    const message = isEmailNotConfirmed(error)
+      ? "Tu correo todavía no está confirmado. Reenvía el correo de confirmación y abre el enlace nuevo."
+      : "Correo o contraseña incorrectos.";
+    redirect(`/auth?error=${encodeURIComponent(message)}&next=${encodeURIComponent(next)}`);
+  }
   redirect(next);
 }
 
@@ -50,7 +59,32 @@ export async function signUp(formData: FormData) {
   }
   if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`);
   if (data.session) redirect(next);
-  redirect(`/auth?message=${encodeURIComponent(`Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Si ya te habías registrado, inicia sesión con tu contraseña.`)}&next=${encodeURIComponent(next)}`);
+  redirect(`/auth?message=${encodeURIComponent(`Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Si el enlace falla, usa “Reenviar confirmación” en esta pantalla.`)}&next=${encodeURIComponent(next)}`);
+}
+
+export async function resendConfirmation(formData: FormData) {
+  const next = safeNext(formData);
+  const email = value(formData, "email");
+  if (!email) {
+    redirect(`/auth?error=${encodeURIComponent("Escribe tu correo para reenviar la confirmación.")}&next=${encodeURIComponent(next)}`);
+  }
+
+  const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: {
+      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+    },
+  });
+
+  if (error) {
+    redirect(`/auth?error=${encodeURIComponent("No se pudo reenviar la confirmación todavía. Espera un minuto e inténtalo de nuevo.")}&next=${encodeURIComponent(next)}`);
+  }
+
+  redirect(`/auth?message=${encodeURIComponent("Te enviamos un nuevo correo de confirmación. Usa únicamente el enlace más reciente.")}&next=${encodeURIComponent(next)}`);
 }
 
 export async function signOut() {
