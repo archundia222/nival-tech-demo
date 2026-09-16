@@ -47,24 +47,28 @@ export async function POST(request: NextRequest) {
     && payment.currency_id === order.currency
     && Math.round(Number(payment.transaction_amount) * 100) === order.amount_cents
     && order.amount_cents === NIVAL_PAY_PRICE_CENTS;
-  if (!approved || order.status === 'paid') return NextResponse.json({ received: true });
+  if (!approved) return NextResponse.json({ received: true });
   if (order.provider_payment_id && order.provider_payment_id !== paymentId) {
     console.error('Nival Pay order already references a different Mercado Pago payment', { orderId });
     return NextResponse.json({ error: 'Payment mismatch' }, { status: 409 });
   }
 
   const now = new Date().toISOString();
-  const { data: paidOrder, error: paymentUpdateError } = await admin.from('product_orders')
-    .update({ status: 'paid', provider_payment_id: paymentId, paid_at: now, updated_at: now })
-    .eq('id', orderId).neq('status', 'paid').select('business_id').maybeSingle();
-  if (paymentUpdateError) {
-    console.error('Nival Pay order activation failed', paymentUpdateError);
-    return NextResponse.json({ error: 'Order activation failed' }, { status: 500 });
+  if (order.status !== 'paid') {
+    const { error: paymentUpdateError } = await admin.from('product_orders')
+      .update({ status: 'paid', provider_payment_id: paymentId, paid_at: now, updated_at: now })
+      .eq('id', orderId)
+      .neq('status', 'paid');
+    if (paymentUpdateError) {
+      console.error('Nival Pay order activation failed', paymentUpdateError);
+      return NextResponse.json({ error: 'Order activation failed' }, { status: 500 });
+    }
   }
-  if (!paidOrder) return NextResponse.json({ received: true });
 
   const { error: businessUpdateError } = await admin.from('businesses')
-    .update({ subscription_status: 'active', updated_at: now }).eq('id', paidOrder.business_id);
+    .update({ subscription_status: 'active', updated_at: now })
+    .eq('id', order.business_id)
+    .neq('subscription_status', 'active');
   if (businessUpdateError) {
     console.error('Nival Pay business activation failed', businessUpdateError);
     return NextResponse.json({ error: 'Business activation failed' }, { status: 500 });
