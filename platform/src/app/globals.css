@@ -539,9 +539,10 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .landingNavLinks { display: none; }
   .landingHero { grid-template-columns: 1fr; gap: 20px; padding-top: 72px; }
   .landingHeroCopy { max-width: 760px; }
-  .landingProductVisual { width: min(100%, 620px); min-height: 600px; margin: 0 auto; }
+  .landingProductVisual { width: min(100%, 620px); min-height: 0; margin: 0 auto; padding: 24px 12px 30px; }
   .nfcCardMockup { left: 8%; }
-  .phoneMockup { right: 8%; }
+  /* Let the preview reserve its full height, including wrapped mobile text. */
+  .phoneMockup { position: relative; right: auto; bottom: auto; justify-self: end; margin: 40px 6% 20px 0; }
   .landingSectionHeading { grid-template-columns: 150px 1fr; }
   .landingDemoSection { grid-template-columns: 1fr 1fr; gap: 50px; }
   .landingIncludes { gap: 50px; }
@@ -560,9 +561,9 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .landingHeroActions { align-items: stretch; flex-direction: column; }
   .landingPrimary, .landingSecondary { width: 100%; }
   .landingPriceLine { align-items: start; flex-direction: column; }
-  .landingProductVisual { min-height: 520px; margin-top: 30px; }
+  .landingProductVisual { min-height: 0; margin-top: 12px; }
   .nfcCardMockup { top: 35px; left: 0; width: min(78vw, 310px); }
-  .phoneMockup { right: 0; width: min(68vw, 270px); min-height: 500px; }
+  .phoneMockup { right: auto; width: min(68vw, 270px); min-height: 500px; margin-right: 0; }
   .phoneScreen { min-height: 480px; }
   .landingVisualNote { display: none; }
   .landingProof { grid-template-columns: 1fr; }
