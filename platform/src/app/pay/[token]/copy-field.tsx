@@ -5,9 +5,10 @@ import { useState } from "react";
 interface CopyFieldProps {
   label: string;
   value: string;
+  prominent?: boolean;
 }
 
-export function CopyField({ label, value }: CopyFieldProps) {
+export function CopyField({ label, value, prominent = false }: CopyFieldProps) {
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -18,7 +19,7 @@ export function CopyField({ label, value }: CopyFieldProps) {
     window.setTimeout(() => setCopied(false), 1600);
   }
 
-  return <button className="paymentField" type="button" onClick={copy}>
+  return <button className={`paymentField${prominent ? " paymentFieldProminent" : ""}`} type="button" onClick={copy}>
     <span>{label}</span>
     <strong>{value}</strong>
     <small>{error ? "Selecciona el dato para copiarlo manualmente" : copied ? "Copiado" : "Toca para copiar"}</small>

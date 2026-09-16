@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { CSSProperties } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { isHttpsUrl } from "@/lib/payment-profile";
 import { CopyField } from "./copy-field";
@@ -18,22 +18,34 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
   if (error || !data?.[0]) notFound();
   const profile = data[0];
 
-  return <main className="customerShell brandedCustomerShell" style={{ "--business-accent": profile.brand_color } as CSSProperties}>
-    <header className="customerBrand">
-      {profile.logo_url ? <img className="businessLogo" src={profile.logo_url} alt={`Logo de ${profile.business_name}`} /> : <span className="brandmark">N</span>}
-      <span>Página de <b>NIVAL tech</b></span>
-    </header>
-    <section className="paymentHero">
-      <p className="eyebrow">DATOS PARA TRANSFERENCIA</p>
-      <h1>{profile.business_name}</h1>
-      <p>Verifica el nombre del titular antes de confirmar tu transferencia.</p>
+  const paymentUrl = profile.payment_url && isHttpsUrl(profile.payment_url) ? profile.payment_url : null;
+  const initials = profile.business_name.split(/\s+/).slice(0, 2).map((word: string) => word[0]).join("").toUpperCase();
+
+  return <main className="paymentPage">
+    <section className="paymentPageCard">
+      <header className="paymentPageBrand">
+        {profile.logo_url
+          ? <Image className="paymentPageImage" src={profile.logo_url} alt={`Imagen de ${profile.business_name}`} width={148} height={148} unoptimized priority />
+          : <span className="paymentPageImage paymentPageMonogram">{initials || "N"}</span>}
+        <h1>{profile.business_name}</h1>
+        <p>Elige cómo quieres pagar</p>
+      </header>
+
+      {paymentUrl && <a className="paymentDirectButton" href={paymentUrl} target="_blank" rel="noopener noreferrer">Pagar ahora <span aria-hidden="true">↗</span></a>}
+      {paymentUrl && <div className="paymentDivider"><span>o transferencia bancaria</span></div>}
+
+      <section className="paymentTransferSection">
+        <h2>Datos para transferencia</h2>
+        <div className="paymentCard">
+          <CopyField label="Banco" value={profile.bank_name} />
+          <CopyField label="Beneficiario" value={profile.account_holder} />
+          <CopyField label="CLABE interbancaria" value={profile.clabe} prominent />
+          {profile.concept && <CopyField label="Concepto" value={profile.concept} prominent />}
+        </div>
+      </section>
+
+      <p className="securityNotice">Verifica los datos del beneficiario antes de realizar la transferencia. Nival Tech nunca solicitará NIP, CVV, contraseña ni códigos de seguridad.</p>
+      <footer className="paymentPoweredBy">Powered by <strong>NIVAL TECH</strong></footer>
     </section>
-    <section className="paymentCard">
-      <CopyField label="Titular" value={profile.account_holder} />
-      <CopyField label="Banco" value={profile.bank_name} />
-      <CopyField label="CLABE" value={profile.clabe} />
-    </section>
-    {profile.payment_url && isHttpsUrl(profile.payment_url) && <a className="primaryButton" href={profile.payment_url} target="_blank" rel="noopener noreferrer">Abrir enlace de pago</a>}
-    <p className="securityNotice">Nival Tech nunca solicitará NIP, CVV, contraseña ni códigos de seguridad.</p>
   </main>;
 }

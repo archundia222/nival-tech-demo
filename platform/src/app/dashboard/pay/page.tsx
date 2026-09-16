@@ -15,7 +15,7 @@ export default async function PaySettings() {
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const { data: profile, error: profileError } = await supabase.from('payment_profiles')
-    .select('account_holder, bank_name, clabe, payment_url, image_url, public_token, active, view_count')
+    .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count')
     .eq('business_id', membership.business_id).maybeSingle();
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
   return <main className="payWorkspace">

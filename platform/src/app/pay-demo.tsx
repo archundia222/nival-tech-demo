@@ -6,6 +6,7 @@ const demoFields = [
   { label: "Titular", value: "Café Nival Demo" },
   { label: "Banco", value: "Banco Ejemplo" },
   { label: "CLABE", value: "000 000 000000000 000" },
+  { label: "Concepto", value: "Pago de consumo" },
 ];
 
 export function PayDemo() {

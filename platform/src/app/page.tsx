@@ -9,7 +9,7 @@ export default function Home() {
     <main className="landing" id="inicio">
       <nav className="landingNav" aria-label="Navegación principal">
         <Link className="landingBrand" href="#inicio" aria-label="Nival Tech, inicio">
-          <Image src="/wallet/nival-logo.png" alt="" width={38} height={38} priority />
+          <Image src="/wallet/nival-logo.svg" alt="" width={38} height={38} priority />
           <span>Nival Tech</span>
         </Link>
         <div className="landingNavLinks">
@@ -58,6 +58,7 @@ export default function Home() {
               <div className="phoneField"><span>Titular</span><b>Café Nival Demo</b></div>
               <div className="phoneField"><span>Banco</span><b>Banco Ejemplo</b></div>
               <div className="phoneField"><span>CLABE</span><b>•••• •••• •••• ••1234</b></div>
+              <div className="phoneField"><span>Concepto</span><b>Pago de consumo</b></div>
               <div className="phoneCopy">Copiar CLABE</div>
             </div>
           </div>
@@ -80,7 +81,7 @@ export default function Home() {
           <article>
             <span>01</span>
             <h3>Configura tu página</h3>
-            <p>Agrega el nombre de tu negocio, banco, titular, CLABE, logo y un enlace de pago opcional.</p>
+            <p>Agrega el nombre de tu negocio, banco, titular, CLABE, concepto, imagen y un enlace de pago opcional.</p>
           </article>
           <article>
             <span>02</span>
@@ -186,7 +187,7 @@ export default function Home() {
 
       <footer className="landingFooter">
         <Link className="landingBrand" href="#inicio">
-          <Image src="/wallet/nival-logo.png" alt="" width={34} height={34} />
+          <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
           <span>Nival Tech</span>
         </Link>
         <p>Productos digitales simples para negocios locales.</p>

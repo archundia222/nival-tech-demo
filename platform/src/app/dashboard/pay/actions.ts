@@ -18,10 +18,12 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\s/g, '');
+  const concept = String(form.get('concept') ?? '').trim();
   const paymentUrl = String(form.get('paymentUrl') ?? '').trim();
   if (holder.length < 2 || holder.length > 120) return { error: 'El titular debe tener entre 2 y 120 caracteres.' };
   if (bank.length < 2 || bank.length > 80) return { error: 'El banco debe tener entre 2 y 80 caracteres.' };
   if (!isValidClabe(clabe)) return { error: 'Revisa la CLABE: debe tener 18 dígitos y un dígito de verificación válido.' };
+  if (concept.length > 120) return { error: 'El concepto debe tener como máximo 120 caracteres.' };
   if (paymentUrl && !isHttpsUrl(paymentUrl)) return { error: 'El enlace de pago debe ser una dirección HTTPS válida.' };
 
   const { data: existing, error: readError } = await supabase.from('payment_profiles').select('image_url')
@@ -45,7 +47,8 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   }
   const { data, error } = await supabase.from('payment_profiles').upsert({
     business_id: businessId, account_holder: holder, bank_name: bank, clabe,
-    payment_url: paymentUrl || null, image_url: imageUrl, active: form.get('active') === 'on', updated_at: new Date().toISOString(),
+    concept: concept || null, payment_url: paymentUrl || null, image_url: imageUrl,
+    active: form.get('active') === 'on', updated_at: new Date().toISOString(),
   }, { onConflict: 'business_id' }).select('public_token').single();
   if (error) {
     if (uploadedPath) await supabase.storage.from('payment-images').remove([uploadedPath]);
