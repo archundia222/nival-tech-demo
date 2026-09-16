@@ -12,7 +12,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
   const { data: membership } = await supabase.from('business_members')
     .select('business_id, businesses(name)').eq('user_id', user.id).limit(1).maybeSingle();
-  if (!membership) redirect('/dashboard?next=%2Fcheckout');
+  // Route first-time customers through business onboarding, then /dashboard/pay sends them back here until paid.
+  if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const { data: orders } = await supabase.from('product_orders')
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
@@ -37,4 +38,3 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     {!!orders?.length && !paid && <section className="orderHistory"><h2>Estado de tus órdenes</h2>{orders.map((order) => <div key={order.id}><span>{order.payment_method === 'cash' ? 'Efectivo' : 'Mercado Pago'}</span><b>{order.status === 'pending_cash_confirmation' ? 'Esperando confirmación' : order.status === 'pending' ? 'Pendiente' : order.status === 'cancelled' ? 'No completada' : order.status}</b><time>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeZone: 'America/Mexico_City' }).format(new Date(order.created_at))}</time></div>)}</section>}
   </main>;
 }
-
