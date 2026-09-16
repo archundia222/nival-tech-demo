@@ -13,7 +13,8 @@ async function currentPurchaseContext() {
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
   const { data: membership } = await supabase.from('business_members')
     .select('business_id, businesses(name)').eq('user_id', user.id).limit(1).maybeSingle();
-  if (!membership) redirect('/dashboard?next=%2Fcheckout');
+  // /dashboard/pay is an allowed onboarding destination and redirects unpaid customers back to checkout.
+  if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   return { user, businessId: membership.business_id, businessName: business?.name ?? 'Mi negocio' };
 }
@@ -77,4 +78,3 @@ export async function requestCashPayment() {
   if (error) redirect('/checkout?error=No+se+pudo+registrar+el+pago+en+efectivo.');
   redirect('/checkout?result=cash');
 }
-
