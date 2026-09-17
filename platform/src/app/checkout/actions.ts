@@ -29,7 +29,27 @@ type MercadoPagoOrderCreateResponse = {
 };
 
 function shortText(value: unknown) {
-  return typeof value === 'string' ? value.slice(0, 300) : null;
+  return typeof value === 'string'
+    ? value.slice(0, 300).replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, '[redacted-email]')
+    : null;
+}
+
+function safeValidationMetadata(value: unknown, depth = 0): unknown {
+  if (depth > 2) return '[max-depth]';
+  if (typeof value === 'string') return shortText(value);
+  if (typeof value === 'number' || typeof value === 'boolean' || value === null) return value;
+  if (Array.isArray(value)) {
+    return value.slice(0, 10).map((item) => safeValidationMetadata(item, depth + 1));
+  }
+  if (!value || typeof value !== 'object') return null;
+
+  const blockedKey = /(authorization|token|password|secret|email|payer|card|clabe|value|input|request)/i;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([key]) => !blockedKey.test(key))
+      .slice(0, 15)
+      .map(([key, item]) => [key, safeValidationMetadata(item, depth + 1)]),
+  );
 }
 
 function summarizeValidationEntries(value: unknown) {
@@ -39,11 +59,15 @@ function summarizeValidationEntries(value: unknown) {
     if (!entry || typeof entry !== 'object') return { value: shortText(entry) };
     const item = entry as Record<string, unknown>;
     return {
+      keys: Object.keys(item).slice(0, 20),
       code: shortText(item.code),
       message: shortText(item.message),
       field: shortText(item.field),
       path: shortText(item.path),
-      details: shortText(item.details),
+      details: safeValidationMetadata(item.details),
+      unsupportedProperties: safeValidationMetadata(
+        item.unsupported_properties ?? item.unsupportedProperties ?? item.properties,
+      ),
     };
   });
 }
