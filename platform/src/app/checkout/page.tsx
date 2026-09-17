@@ -1,10 +1,70 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 import { signOut } from '@/app/auth/actions';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
+
+type MercadoPagoOrder = {
+  id?: string;
+  external_reference?: string;
+  currency_id?: string;
+  status?: string;
+  status_detail?: string;
+  total_amount?: string | number;
+  total_paid_amount?: string | number;
+  transactions?: { payments?: Array<{ id?: string; status?: string; status_detail?: string }> };
+};
+
+async function reconcileLatestOrder(businessId: string) {
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!accessToken) return;
+  const admin = createAdminClient();
+  const { data: order } = await admin.from('product_orders')
+    .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
+    .eq('business_id', businessId)
+    .eq('product_code', 'nival_pay')
+    .eq('payment_method', 'mercado_pago')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!order?.provider_preference_id || order.status === 'paid') return;
+
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
+    { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
+  );
+  if (!response.ok) return;
+  const payload = await response.json() as MercadoPagoOrder;
+  const payment = payload.transactions?.payments?.find((candidate) =>
+    candidate.status === 'processed' && candidate.status_detail === 'accredited'
+  );
+  const paymentId = payment?.id ? String(payment.id) : null;
+  const approved = payload.id === order.provider_preference_id
+    && payload.external_reference === order.id
+    && payload.status === 'processed'
+    && payload.status_detail === 'accredited'
+    && payload.currency_id === order.currency
+    && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
+    && Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents
+    && order.amount_cents === NIVAL_PAY_PRICE_CENTS
+    && Boolean(paymentId)
+    && (!order.provider_payment_id || order.provider_payment_id === paymentId);
+  if (!approved || !paymentId) return;
+
+  const now = new Date().toISOString();
+  const { error: paymentError } = await admin.from('product_orders')
+    .update({ status: 'paid', provider_payment_id: paymentId, paid_at: now, updated_at: now })
+    .eq('id', order.id)
+    .neq('status', 'paid');
+  if (paymentError) return;
+  await admin.from('businesses')
+    .update({ subscription_status: 'active', updated_at: now })
+    .eq('id', businessId)
+    .neq('subscription_status', 'active');
+}
 
 export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ result?: string; error?: string }> }) {
   const params = await searchParams;
@@ -15,6 +75,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     .select('business_id, businesses(name, subscription_status)').eq('user_id', user.id).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  if (params.result === 'success') await reconcileLatestOrder(membership.business_id);
   const { data: orders } = await supabase.from('product_orders')
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
     .eq('product_code', 'nival_pay').order('created_at', { ascending: false }).limit(5);
