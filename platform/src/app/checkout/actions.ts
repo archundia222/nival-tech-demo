@@ -134,7 +134,7 @@ export async function startMercadoPagoCheckout() {
 
     result = await response.json().catch(() => ({})) as MercadoPagoOrderCreateResponse;
     if (!response.ok || !result.id || !result.checkout_url) {
-      console.error('[checkout] Mercado Pago order create rejected', {
+      const validationSummary = {
         status: response.status,
         error: result.error ?? null,
         message: result.message ?? null,
@@ -143,7 +143,11 @@ export async function startMercadoPagoCheckout() {
         code: shortText(result.code),
         errors: summarizeValidationEntries(result.errors),
         details: summarizeValidationEntries(result.details),
-      });
+      };
+      console.error(
+        '[checkout] Mercado Pago order create rejected',
+        JSON.stringify(validationSummary),
+      );
       throw new Error(`Mercado Pago order create failed with status ${response.status}`);
     }
   } catch (checkoutError) {
