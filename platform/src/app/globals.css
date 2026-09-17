@@ -752,3 +752,67 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .orderHistory div span,.orderHistory div b { color:#343a37; }
 .orderHistory time { color:#5b625f; }
 @media(max-width:850px){.dashboardApp{display:block}.dashboardSidebar{display:none}.dashboardMobileMenu{display:block;position:sticky;z-index:20;top:0;background:#0b0b0b;border-bottom:1px solid var(--line)}.dashboardMobileMenu summary{padding:20px}.dashboardMobileMenu nav{display:grid;padding:0 20px 18px}.dashboardMobileMenu nav a{padding:12px 0;border-bottom:1px solid var(--line)}.dashboardContent{padding:22px 20px 64px}.dashboardContentTopbar{display:none}.checkoutGrid{grid-template-columns:1fr}.paymentChoices article{align-items:stretch;flex-direction:column}.paymentChoices form button{width:100%}.orderHistory div{grid-template-columns:1fr;gap:5px}}
+
+/* Mobile polish for the sign-up -> Nival Pay checkout journey */
+@media (max-width: 850px) {
+  .dashboardMobileMenu summary {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 64px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .dashboardMobileMenu summary::-webkit-details-marker { display: none; }
+  .dashboardMobileMenu summary strong {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 13px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dashboardMobileMenu nav a[aria-current="page"] { color: var(--accent); }
+  .dashboardPayContent { overflow: hidden; }
+  .dashboardPayContent .checkoutHeader { padding: 42px 0 30px; }
+  .dashboardPayContent .checkoutHeader h1 {
+    margin-top: 10px;
+    font-size: clamp(38px, 12vw, 58px);
+    line-height: .98;
+    overflow-wrap: anywhere;
+  }
+  .dashboardPayContent .checkoutHeader > p:last-child { font-size: 16px; }
+  .checkoutGrid { gap: 22px; }
+  .checkoutSummary {
+    min-height: 0;
+    padding: 28px 24px;
+    border-radius: 22px;
+    box-shadow: 7px 7px 0 #c9a85c;
+  }
+  .checkoutSummary h2 { margin: 16px 0 22px; font-size: 29px; }
+  .checkoutSummary ul { gap: 12px; margin-bottom: 30px; }
+  .checkoutSummary > strong { font-size: 40px; }
+  .paymentChoices { gap: 14px; }
+  .paymentChoices article { gap: 22px; padding: 25px 22px; border-radius: 20px; }
+  .paymentChoices h2 { font-size: 24px; }
+  .paymentChoices p { font-size: 15px; line-height: 1.55; }
+  .paymentChoices form,
+  .paymentChoices form button,
+  .checkoutSecondary { width: 100%; white-space: normal; }
+  .orderHistory { margin-top: 28px; padding: 22px; border-radius: 20px; }
+  .orderHistory h2 { font-size: 23px; }
+}
+
+@media (max-width: 520px) {
+  .authShell { width: min(100% - 28px, 1040px); padding: 24px 0 48px; }
+  .authShell > .brand { margin-bottom: 26px; }
+  .authCard { padding: 27px 21px; border-radius: 20px; }
+  .authCard h1 { font-size: clamp(38px, 13vw, 52px); overflow-wrap: anywhere; }
+  .authForm { gap: 16px; margin-top: 24px; }
+  .authForm input { min-height: 48px; font-size: 16px; }
+  .authForm .primaryButton { width: 100%; min-height: 48px; }
+  .dashboardContent { padding: 18px 14px 48px; }
+  .dashboardPayContent .checkoutHeader { padding-top: 34px; }
+  .checkoutNotice { font-size: 14px; line-height: 1.5; }
+}
