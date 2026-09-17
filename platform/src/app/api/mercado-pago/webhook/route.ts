@@ -7,17 +7,25 @@ type MercadoPagoOrderWebhook = {
   type?: string;
   action?: string;
   live_mode?: boolean;
-  data?: {
-    id?: string;
-    external_reference?: string;
-    currency_id?: string;
-    status?: string;
-    status_detail?: string;
-    total_amount?: string | number;
-    total_paid_amount?: string | number;
-    transactions?: {
-      payments?: Array<{ id?: string }>;
-    };
+  data?: { id?: string };
+};
+
+type MercadoPagoOrder = {
+  id?: string;
+  external_reference?: string;
+  currency_id?: string;
+  status?: string;
+  status_detail?: string;
+  total_amount?: string | number;
+  total_paid_amount?: string | number;
+  transactions?: {
+    payments?: Array<{
+      id?: string;
+      status?: string;
+      status_detail?: string;
+      amount?: string | number;
+      paid_amount?: string | number;
+    }>;
   };
 };
 
@@ -25,7 +33,10 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export async function POST(request: NextRequest) {
   const webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
-  if (!webhookSecret) return NextResponse.json({ error: 'Not configured' }, { status: 503 });
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!webhookSecret || !accessToken) {
+    return NextResponse.json({ error: 'Not configured' }, { status: 503 });
+  }
 
   const body = await request.json().catch(() => null) as MercadoPagoOrderWebhook | null;
   const queryDataId = request.nextUrl.searchParams.get('data.id');
@@ -55,15 +66,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
-  const payload = body?.data;
-  const orderId = payload?.external_reference;
-  if (!payload || !orderId || !UUID_PATTERN.test(orderId)) {
-    return NextResponse.json({ received: true });
+  const providerResponse = await fetch(`https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: 'no-store',
+  });
+
+  if (!providerResponse.ok) {
+    console.error('Mercado Pago order verification failed', {
+      providerOrderId: dataId,
+      status: providerResponse.status,
+    });
+    return NextResponse.json({ error: 'Provider verification failed' }, { status: 502 });
   }
+
+  const payload = await providerResponse.json() as MercadoPagoOrder;
+  if (payload.id && String(payload.id) !== dataId) {
+    console.error('Mercado Pago returned a different order', { providerOrderId: dataId });
+    return NextResponse.json({ error: 'Provider order mismatch' }, { status: 409 });
+  }
+
+  const orderId = payload.external_reference;
+  if (!orderId || !UUID_PATTERN.test(orderId)) return NextResponse.json({ received: true });
 
   const admin = createAdminClient();
   const { data: order, error: orderError } = await admin.from('product_orders')
-    .select('business_id, amount_cents, currency, status, provider_payment_id')
+    .select('business_id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
     .eq('id', orderId).eq('payment_method', 'mercado_pago').maybeSingle();
   if (orderError) {
     console.error('Nival Pay order lookup failed', orderError);
@@ -71,17 +99,26 @@ export async function POST(request: NextRequest) {
   }
   if (!order) return NextResponse.json({ received: true });
 
+  if (order.provider_preference_id && order.provider_preference_id !== dataId) {
+    console.error('Nival Pay provider order mismatch', { orderId });
+    return NextResponse.json({ error: 'Order mismatch' }, { status: 409 });
+  }
+
+  const payment = payload.transactions?.payments?.find((candidate) =>
+    candidate.status === 'processed' && candidate.status_detail === 'accredited'
+  );
   const amountCents = Math.round(Number(payload.total_amount) * 100);
   const paidAmountCents = Math.round(Number(payload.total_paid_amount) * 100);
-  const paymentId = String(payload.transactions?.payments?.[0]?.id ?? dataId);
+  const paymentId = payment?.id ? String(payment.id) : null;
   const approved = payload.status === 'processed'
     && payload.status_detail === 'accredited'
     && payload.currency_id === order.currency
     && amountCents === order.amount_cents
     && paidAmountCents === order.amount_cents
-    && order.amount_cents === NIVAL_PAY_PRICE_CENTS;
+    && order.amount_cents === NIVAL_PAY_PRICE_CENTS
+    && Boolean(paymentId);
 
-  if (!approved) return NextResponse.json({ received: true });
+  if (!approved || !paymentId) return NextResponse.json({ received: true });
   if (order.provider_payment_id && order.provider_payment_id !== paymentId) {
     console.error('Nival Pay order already references a different Mercado Pago payment', { orderId });
     return NextResponse.json({ error: 'Payment mismatch' }, { status: 409 });
