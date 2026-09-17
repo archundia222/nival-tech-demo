@@ -20,6 +20,8 @@ type MercadoPagoOrderWebhook = {
   };
 };
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function POST(request: NextRequest) {
   const webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
   if (!webhookSecret) return NextResponse.json({ error: 'Not configured' }, { status: 503 });
@@ -42,7 +44,9 @@ export async function POST(request: NextRequest) {
 
   const payload = body?.data;
   const orderId = payload?.external_reference;
-  if (!payload || !orderId) return NextResponse.json({ received: true });
+  if (!payload || !orderId || !UUID_PATTERN.test(orderId)) {
+    return NextResponse.json({ received: true });
+  }
 
   const admin = createAdminClient();
   const { data: order, error: orderError } = await admin.from('product_orders')
