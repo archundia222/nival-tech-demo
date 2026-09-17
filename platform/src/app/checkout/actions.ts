@@ -75,7 +75,7 @@ function summarizeValidationEntries(value: unknown) {
 export async function startMercadoPagoCheckout() {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect('/checkout?error=Mercado+Pago+aún+no+está+configurado.');
-  const { user, businessId } = await currentPurchaseContext();
+  const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: order, error } = await admin.from('product_orders').insert({
     business_id: businessId,
@@ -111,7 +111,9 @@ export async function startMercadoPagoCheckout() {
         total_amount: amount,
         external_reference: order.id,
         description: 'Nival Pay · tarjeta NFC + página',
-        ...(user.email ? { payer: { email: user.email } } : {}),
+        // Mercado Pago requires the test-buyer email while validating a test order.
+        // Replace this with the authenticated customer's email when switching the integration to production credentials.
+        payer: { email: 'test@testuser.com' },
         items: [{
           external_code: NIVAL_PAY_PRODUCT,
           title: 'Nival Pay · tarjeta NFC + página',
