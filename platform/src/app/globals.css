@@ -1,1 +1,66 @@
-PLACEHOLDER
+:root {
+  --background: #0b0b0b;
+  --surface: #151515;
+  --surface-soft: #1d1d1d;
+  --line: rgba(247, 246, 242, 0.14);
+  --text: #f7f6f2;
+  --muted: #a8a59e;
+  --accent: #b59a61;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin:0; color:var(--text); background:radial-gradient(circle at 80% 0%,rgba(181,154,97,.14),transparent 34rem),var(--background); font-family:Arial,Helvetica,sans-serif; }
+a { color:inherit; text-decoration:none; }
+/* Restored core application styles */
+.dashboardApp { min-height:100vh; display:grid; grid-template-columns:264px minmax(0,1fr); }
+.dashboardSidebar { position:sticky; top:0; height:100vh; display:flex; flex-direction:column; padding:30px 22px 24px; background:rgba(11,11,11,.92); border-right:1px solid var(--line); }
+.brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.04em; }
+.brandmark { width:38px;height:38px;display:grid;place-items:center;color:#0b0b0b;background:var(--accent);border-radius:12px; }
+.dashboardBrand { margin-bottom:38px; }
+.sidebarBusiness { display:grid;gap:8px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px; }
+.sidebarBusiness span { color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.13em; }
+.sidebarBusiness strong { font-size:14px; }
+.sidebarNav { display:grid;gap:6px;margin-top:30px; }
+.sidebarNav a { display:flex;align-items:center;gap:13px;padding:12px 14px;color:var(--muted);border:1px solid transparent;border-radius:10px;font-size:14px;font-weight:700; }
+.sidebarNav a span { color:var(--accent);font-size:10px; }
+.sidebarNav a:hover,.sidebarNav a.active { color:var(--text);background:var(--surface);border-color:var(--line); }
+.sidebarNav a.active { box-shadow:inset 3px 0 0 var(--accent); }
+.sidebarFooter { display:grid;gap:8px;margin-top:auto;padding-top:24px;border-top:1px solid var(--line); }
+.sidebarFooter a,.sidebarFooter .textButton { width:100%;padding:10px 8px;color:var(--muted);font-size:13px;text-align:left; }
+.textButton { padding:8px;color:var(--muted);background:none;border:0;cursor:pointer; }
+.dashboardContent { min-width:0;width:100%;max-width:1220px;margin:0 auto;padding:28px 42px 80px; }
+.dashboardContentTopbar { display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:24px;border-bottom:1px solid var(--line); }
+.dashboardContentTopbar>div { display:grid;gap:5px; }
+.dashboardContentTopbar span:not(.ready) { color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase; }
+.dashboardContentTopbar b { font-size:14px;text-transform:capitalize; }
+.ready { padding:9px 12px;color:var(--accent);border:1px solid rgba(181,154,97,.35);border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.1em; }
+.dashboardMobileMenu { display:none; }
+.checkoutHeader { max-width:760px;padding:74px 0 42px; }
+.checkoutHeader h1 { margin:8px 0 14px;font-size:clamp(42px,6vw,76px);line-height:.96;letter-spacing:-.055em; }
+.checkoutHeader>p:last-child { color:#8f938f;font-size:18px; }
+.landingEyebrow { margin:0;color:#d4b76e;font-size:12px;font-weight:900;letter-spacing:.16em; }
+.checkoutGrid { display:grid;grid-template-columns:.82fr 1.18fr;gap:24px;align-items:stretch; }
+.checkoutSummary { display:flex;flex-direction:column;min-height:520px;padding:38px;border-radius:28px;background:#101312;color:#fff;box-shadow:10px 10px 0 #c9a85c; }
+.checkoutSummary>p { color:#d4b76e;font-size:13px;font-weight:800;letter-spacing:.16em; }
+.checkoutSummary h2 { margin:20px 0 28px;font-size:35px;line-height:1.05; }
+.checkoutSummary ul { display:grid;gap:15px;padding:0;list-style:none;color:#d8dcda; }
+.checkoutSummary li::before { content:'✓';margin-right:10px;color:#d4b76e; }
+.checkoutSummary>strong { margin-top:auto;font-size:46px;letter-spacing:-.04em; }
+.checkoutSummary>small { color:#aeb3b0; }
+.paymentChoices { display:grid;gap:18px; }
+.paymentChoices article { display:flex;justify-content:space-between;gap:28px;align-items:end;padding:32px;border:1px solid #d8d8d2;border-radius:24px;background:#fff;color:#101312; }
+.paymentChoices h2 { margin:14px 0 8px;color:#101312;font-size:27px; }
+.paymentChoices p { max-width:500px;color:#4f5753;line-height:1.6; }
+.paymentChoices form { flex:0 0 auto; }
+.paymentIcon { display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:#129ddb;color:#fff;font-size:13px;font-weight:900; }
+.paymentIcon.cash { background:#d4b76e;color:#101312;font-size:23px; }
+.landingPrimary.dark { display:inline-flex;min-height:52px;align-items:center;justify-content:center;padding:14px 22px;color:#fff;background:#0b0b0b;border:1px solid #0b0b0b;border-radius:999px;font-size:15px;font-weight:800; }
+.checkoutSecondary { min-height:52px;padding:14px 18px;border:1px solid #101312;background:transparent;color:#101312;white-space:nowrap;font-weight:700; }
+.checkoutNotice { margin:0 0 24px;padding:16px 18px;border-left:4px solid #c9a85c;background:#fff;color:#101312; }
+.orderHistory { margin-top:38px;padding:28px;border-radius:22px;background:#fff;border:1px solid #d8d8d2;color:#101312; }
+.orderHistory h2 { margin-top:0;color:#101312; }
+.orderHistory div { display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:16px 0;border-top:1px solid #e4e4df;color:#343a37; }
+.orderHistory div span,.orderHistory div b { color:#343a37; }
+.orderHistory time { color:#5b625f; }
+@media(max-width:850px){.dashboardApp{display:block}.dashboardSidebar{display:none}.dashboardMobileMenu{display:block;position:sticky;z-index:20;top:0;background:#0b0b0b;border-bottom:1px solid var(--line)}.dashboardMobileMenu summary{padding:20px}.dashboardMobileMenu nav{display:grid;padding:0 20px 18px}.dashboardMobileMenu nav a{padding:12px 0;border-bottom:1px solid var(--line)}.dashboardContent{padding:22px 20px 64px}.dashboardContentTopbar{display:none}.checkoutGrid{grid-template-columns:1fr}.paymentChoices article{align-items:stretch;flex-direction:column}.paymentChoices form button{width:100%}.orderHistory div{grid-template-columns:1fr;gap:5px}}
