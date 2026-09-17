@@ -113,7 +113,7 @@ export async function startMercadoPagoCheckout() {
         description: 'Nival Pay · tarjeta NFC + página',
         // The payer must match the Mercado Pago buyer test user. A generic test email
         // lets the order open, but Mercado Pago can leave every payment method disabled.
-        payer: { email: 'TESTUSER1348852238063419528@testuser.com' },
+        payer: { email: 'test_user_1348852238063419528@testuser.com' },
         items: [{
           external_code: NIVAL_PAY_PRODUCT,
           title: 'Nival Pay · tarjeta NFC + página',
