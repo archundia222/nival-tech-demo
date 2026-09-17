@@ -23,7 +23,30 @@ type MercadoPagoOrderCreateResponse = {
   message?: string;
   error?: string;
   cause?: Array<{ code?: string; description?: string }>;
+  code?: unknown;
+  errors?: unknown;
+  details?: unknown;
 };
+
+function shortText(value: unknown) {
+  return typeof value === 'string' ? value.slice(0, 300) : null;
+}
+
+function summarizeValidationEntries(value: unknown) {
+  if (!Array.isArray(value)) return [];
+
+  return value.slice(0, 5).map((entry) => {
+    if (!entry || typeof entry !== 'object') return { value: shortText(entry) };
+    const item = entry as Record<string, unknown>;
+    return {
+      code: shortText(item.code),
+      message: shortText(item.message),
+      field: shortText(item.field),
+      path: shortText(item.path),
+      details: shortText(item.details),
+    };
+  });
+}
 
 export async function startMercadoPagoCheckout() {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
@@ -92,6 +115,10 @@ export async function startMercadoPagoCheckout() {
         error: result.error ?? null,
         message: result.message ?? null,
         cause: Array.isArray(result.cause) ? result.cause.slice(0, 5) : [],
+        responseKeys: Object.keys(result).slice(0, 20),
+        code: shortText(result.code),
+        errors: summarizeValidationEntries(result.errors),
+        details: summarizeValidationEntries(result.details),
       });
       throw new Error(`Mercado Pago order create failed with status ${response.status}`);
     }
