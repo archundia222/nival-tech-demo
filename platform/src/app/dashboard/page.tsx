@@ -368,7 +368,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         )}
       </section>
       </>}
-      <section className="redemptionHistoryCard">
+      {currentSection === "clientes" && <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>
           <h2>Premios entregados</h2>
@@ -382,7 +382,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </article>;
           })}</div>
         )}
-      </section>
+      </section>}
       </div>
     </main>
   );

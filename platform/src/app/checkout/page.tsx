@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 import { signOut } from '@/app/auth/actions';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
+import { CheckoutSubmitButton } from './submit-button';
 
 export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ result?: string; error?: string }> }) {
   const params = await searchParams;
@@ -50,8 +51,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       {paid ? <section className="checkoutSuccess"><span>✓</span><h2>Pago confirmado</h2><p>Ya puedes configurar tus datos bancarios, imagen, concepto, enlace y código QR.</p><Link className="landingPrimary dark" href="/dashboard/pay">Configurar Nival Pay</Link></section> : <div className="checkoutGrid">
         <article className="checkoutSummary"><p>NIVAL PAY</p><h2>Tarjeta NFC + página de pago</h2><ul><li>Tarjeta física programada</li><li>Página personalizada</li><li>Enlace y QR permanentes</li><li>Sin mensualidad</li></ul><strong>{money(NIVAL_PAY_PRICE_CENTS)}</strong><small>Pago único</small></article>
         <section className="paymentChoices">
-          <article><div><span className="paymentIcon">MP</span><h2>Mercado Pago</h2><p>Paga en línea desde el checkout seguro de Mercado Pago. La activación es automática cuando se aprueba.</p></div><form action={startMercadoPagoCheckout}><button className="landingPrimary dark">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</button></form></article>
-          <article><div><span className="paymentIcon cash">$</span><h2>Efectivo</h2><p>Úsalo cuando compres Nival Pay directamente con un vendedor. La entrega del dinero se confirma manualmente.</p></div><form action={requestCashPayment}><button className="landingSecondary checkoutSecondary">Registrar pago en efectivo</button></form></article>
+          <article><div><span className="paymentIcon">MP</span><h2>Mercado Pago</h2><p>Paga en línea desde el checkout seguro de Mercado Pago. La activación es automática cuando se aprueba.</p></div><form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="landingPrimary dark" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form></article>
+          <article><div><span className="paymentIcon cash">$</span><h2>Efectivo</h2><p>Úsalo cuando compres Nival Pay directamente con un vendedor. La entrega del dinero se confirma manualmente.</p></div><form action={requestCashPayment}><CheckoutSubmitButton className="landingSecondary checkoutSecondary" pendingLabel="Registrando…">Registrar pago en efectivo</CheckoutSubmitButton></form></article>
         </section>
       </div>}
       {!!orders?.length && !paid && <section className="orderHistory"><h2>Estado de tus órdenes</h2>{orders.map((order) => <div key={order.id}><span>{order.payment_method === 'cash' ? 'Efectivo' : 'Mercado Pago'}</span><b>{order.status === 'pending_cash_confirmation' ? 'Esperando confirmación' : order.status === 'pending' ? 'Pendiente' : order.status === 'cancelled' ? 'No completada' : order.status}</b><time>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeZone: 'America/Mexico_City' }).format(new Date(order.created_at))}</time></div>)}</section>}
