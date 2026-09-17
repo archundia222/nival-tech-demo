@@ -34,7 +34,13 @@ export async function startMercadoPagoCheckout() {
     payment_method: 'mercado_pago',
     status: 'pending',
   }).select('id').single();
-  if (error || !order) redirect('/checkout?error=No+se+pudo+crear+la+orden.');
+  if (error || !order) {
+    console.error('[checkout] product order insert failed', {
+      code: error?.code ?? 'missing_order',
+      message: error?.message ?? 'Insert returned no order',
+    });
+    redirect('/checkout?error=No+se+pudo+crear+la+orden.');
+  }
 
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
