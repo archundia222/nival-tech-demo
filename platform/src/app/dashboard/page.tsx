@@ -134,13 +134,40 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .order("created_at", { ascending: false })
     : { data: [] };
   const recommendations = recommendationRows as IntelligenceRecommendation[] | null;
+  const segmentMetrics = [
+    { label: "Nuevos", value: Number(segments?.new_customers ?? 0) },
+    { label: "Frecuentes", value: Number(segments?.frequent_customers ?? 0) },
+    { label: "En riesgo", value: Number(segments?.at_risk_customers ?? 0) },
+    { label: "Con premio", value: Number(segments?.reward_ready_customers ?? 0) },
+  ];
+  const maxSegmentValue = Math.max(...segmentMetrics.map((segment) => segment.value), 1);
+  const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
 
   return (
-    <main className="dashboardShell">
-      <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
-      <section className="dashboardHero">
+    <main className="dashboardApp">
+      <aside className="dashboardSidebar">
+        <a className="brand dashboardBrand" href="/dashboard"><span className="brandmark">N</span>NIVAL tech</a>
+        <div className="sidebarBusiness"><span>ESPACIO DE TRABAJO</span><strong>{business?.name ?? "Tu negocio"}</strong></div>
+        <nav className="sidebarNav" aria-label="Navegación del panel">
+          <a href="#resumen"><span>01</span>Resumen</a>
+          <a href="#inteligencia"><span>02</span>Inteligencia</a>
+          <a href="#clientes"><span>03</span>Clientes</a>
+          <a href="#nival-card"><span>04</span>Nival Card</a>
+          <a href="/dashboard/pay"><span>05</span>Nival Pay</a>
+          <a href="#configuracion"><span>06</span>Configuración</a>
+        </nav>
+        <div className="sidebarFooter"><a href="/products">Mis productos</a><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
+      </aside>
+      <details className="dashboardMobileMenu">
+        <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>Menú</span><strong>{business?.name ?? "Tu negocio"}</strong></summary>
+        <nav aria-label="Navegación móvil del panel">
+          <a href="#resumen">Resumen</a><a href="#inteligencia">Inteligencia</a><a href="#clientes">Clientes</a><a href="#nival-card">Nival Card</a><a href="/dashboard/pay">Nival Pay</a><a href="#configuracion">Configuración</a>
+        </nav>
+      </details>
+      <div className="dashboardContent">
+      <header className="dashboardContentTopbar"><div><span>Panel general</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status ?? "trial"}</span></header>
+      <section className="dashboardHero" id="resumen">
         <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Administra los productos y servicios de tu negocio.</p><a className="loginLink" href="/products">Mis productos</a></div>
-        <span className="ready">{business?.subscription_status ?? "trial"}</span>
       </section>
       <section className="metricGrid">
         <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>
@@ -148,7 +175,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
         <article><span>Estado</span><strong>Inicial</strong></article>
       </section>
-      <section className="intelligenceCard">
+      <section className="analyticsGrid" aria-label="Resumen de actividad">
+        <article className="chartCard">
+          <div className="chartHeading"><div><span>VISITAS</span><h2>Actividad reciente</h2></div><b>{visitTrend >= 0 ? "+" : ""}{visitTrend}%</b></div>
+          <div className="comparisonChart">
+            <div><span style={{ height: `${Math.max((previousVisits / maxVisitValue) * 100, 4)}%` }} /><b>{previousVisits}</b><small>30 días anteriores</small></div>
+            <div><span className="current" style={{ height: `${Math.max((recentVisits / maxVisitValue) * 100, 4)}%` }} /><b>{recentVisits}</b><small>Últimos 30 días</small></div>
+          </div>
+        </article>
+        <article className="chartCard">
+          <div className="chartHeading"><div><span>CLIENTES</span><h2>Distribución</h2></div><b>{customerCount ?? 0} total</b></div>
+          <div className="distributionChart">{segmentMetrics.map((segment) => <div key={segment.label}><span>{segment.label}</span><i><b style={{ width: `${Math.max((segment.value / maxSegmentValue) * 100, segment.value ? 8 : 0)}%` }} /></i><strong>{segment.value}</strong></div>)}</div>
+        </article>
+      </section>
+      <section className="intelligenceCard" id="inteligencia">
         <div className="intelligenceHeading">
           <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h2>Segmentos automáticos</h2></div>
           <span className={`trendBadge ${visitTrend < 0 ? "negative" : ""}`}>{visitTrend >= 0 ? "+" : ""}{visitTrend}% visitas</span>
@@ -185,9 +225,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       />}
       {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
       {canManageProgram && (
-        <section className="settingsCard">
+        <section className="settingsCard" id="nival-card">
           <div className="settingsIntro">
-            <p className="eyebrow" id="nival-card">NIVAL CARD · NFC Y RESEÑAS</p>
+            <p className="eyebrow">NIVAL CARD · NFC Y RESEÑAS</p>
             <h2>Crea un enlace inteligente</h2>
             <p>Programa este enlace de Nival Tech en una tarjeta NFC. Podrás medir sus aperturas y conservar la misma tarjeta física.</p>
           </div>
@@ -250,7 +290,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </section>
       )}
       {canManageProgram && business && (
-        <section className="settingsCard">
+        <section className="settingsCard" id="configuracion">
           <div className="settingsIntro">
             <p className="eyebrow">PERFIL PÚBLICO</p>
             <h2>Personaliza la experiencia de tu negocio</h2>
@@ -285,7 +325,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       )}
       {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
-      <section className="customerTableCard">
+      <section className="customerTableCard" id="clientes">
         <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
         {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
           <div className="customerList">{customers.map((customer) => {
@@ -320,6 +360,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           })}</div>
         )}
       </section>
+      </div>
     </main>
   );
 }
