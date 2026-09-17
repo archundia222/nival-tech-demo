@@ -49,7 +49,9 @@ export async function POST(request: NextRequest) {
     WebhookSignatureValidator.validate({
       xSignature: request.headers.get('x-signature') ?? '',
       xRequestId: request.headers.get('x-request-id') ?? '',
-      dataId,
+      // Mercado Pago signs alphanumeric Orders API IDs in lowercase.
+      // Keep the original value for the provider lookup below.
+      dataId: dataId.toLowerCase(),
       secret: webhookSecret,
     });
   } catch (error) {
