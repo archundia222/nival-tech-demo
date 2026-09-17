@@ -22,8 +22,7 @@ export default async function PaySettings() {
       .eq('business_id', membership.business_id).maybeSingle(),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
-  // Profiles created before commerce launched keep access as legacy customers.
-  if (!paidOrder && !profile) redirect('/checkout');
+  if (!paidOrder) redirect('/checkout');
   return <main className="dashboardApp">
     <aside className="dashboardSidebar">
       <a className="brand dashboardBrand" href="/dashboard"><span className="brandmark">N</span>NIVAL tech</a>
