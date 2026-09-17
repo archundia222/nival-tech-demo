@@ -73,7 +73,8 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .sidebarNav { display: grid; gap: 6px; margin-top: 30px; }
 .sidebarNav a { display: flex; align-items: center; gap: 13px; padding: 12px 14px; color: var(--muted); border: 1px solid transparent; border-radius: 10px; font-size: 14px; font-weight: 700; transition: .2s ease; }
 .sidebarNav a span { color: var(--accent); font-size: 10px; letter-spacing: .08em; }
-.sidebarNav a:hover, .sidebarNav a:focus-visible { color: var(--text); background: var(--surface); border-color: var(--line); outline: none; }
+.sidebarNav a:hover, .sidebarNav a:focus-visible, .sidebarNav a.active { color: var(--text); background: var(--surface); border-color: var(--line); outline: none; }
+.sidebarNav a.active { box-shadow: inset 3px 0 0 var(--accent); }
 .sidebarFooter { display: grid; gap: 8px; margin-top: auto; padding-top: 24px; border-top: 1px solid var(--line); }
 .sidebarFooter a, .sidebarFooter .textButton { width: 100%; padding: 10px 8px; color: var(--muted); font-size: 13px; text-align: left; }
 .sidebarFooter a:hover, .sidebarFooter .textButton:hover { color: var(--text); }
@@ -181,6 +182,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .dashboardMobileMenu nav { display: grid; padding: 4px 20px 18px; }
   .dashboardMobileMenu nav a { padding: 12px 0; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 14px; }
   .dashboardMobileMenu nav a:hover { color: var(--text); }
+  .dashboardMobileMenu nav a[aria-current="page"] { color: var(--text); }
   .dashboardContent { padding: 22px 20px 64px; }
   .dashboardContentTopbar { display: none; }
 }
