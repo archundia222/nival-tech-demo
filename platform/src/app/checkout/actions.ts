@@ -111,9 +111,9 @@ export async function startMercadoPagoCheckout() {
         total_amount: amount,
         external_reference: order.id,
         description: 'Nival Pay · tarjeta NFC + página',
-        // Mercado Pago requires the test-buyer email while validating a test order.
-        // Replace this with the authenticated customer's email when switching the integration to production credentials.
-        payer: { email: 'test@testuser.com' },
+        // The payer must match the Mercado Pago buyer test user. A generic test email
+        // lets the order open, but Mercado Pago can leave every payment method disabled.
+        payer: { email: 'TESTUSER1348852238063419528@testuser.com' },
         items: [{
           external_code: NIVAL_PAY_PRODUCT,
           title: 'Nival Pay · tarjeta NFC + página',
