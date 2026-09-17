@@ -9,8 +9,10 @@ import { InvitationLink } from "./invitation-link";
 import { BusinessOnboardingForm } from "./business-onboarding-form";
 
 interface DashboardPageProps {
-  searchParams: Promise<{ error?: string; message?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
 }
+
+type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "configuracion";
 
 interface TeamMember {
   member_email: string;
@@ -30,6 +32,17 @@ interface IntelligenceRecommendation {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
+  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "configuracion"];
+  const currentSection: DashboardSection = dashboardSections.includes(params.section as DashboardSection)
+    ? params.section as DashboardSection
+    : "resumen";
+  const sectionTitles: Record<DashboardSection, string> = {
+    resumen: "Resumen general",
+    inteligencia: "Nival Intelligence",
+    clientes: "Clientes",
+    "nival-card": "Nival Card",
+    configuracion: "Configuración",
+  };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
@@ -149,23 +162,24 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <a className="brand dashboardBrand" href="/dashboard"><span className="brandmark">N</span>NIVAL tech</a>
         <div className="sidebarBusiness"><span>ESPACIO DE TRABAJO</span><strong>{business?.name ?? "Tu negocio"}</strong></div>
         <nav className="sidebarNav" aria-label="Navegación del panel">
-          <a href="#resumen"><span>01</span>Resumen</a>
-          <a href="#inteligencia"><span>02</span>Inteligencia</a>
-          <a href="#clientes"><span>03</span>Clientes</a>
-          <a href="#nival-card"><span>04</span>Nival Card</a>
+          <a className={currentSection === "resumen" ? "active" : undefined} aria-current={currentSection === "resumen" ? "page" : undefined} href="/dashboard?section=resumen"><span>01</span>Resumen</a>
+          <a className={currentSection === "inteligencia" ? "active" : undefined} aria-current={currentSection === "inteligencia" ? "page" : undefined} href="/dashboard?section=inteligencia"><span>02</span>Inteligencia</a>
+          <a className={currentSection === "clientes" ? "active" : undefined} aria-current={currentSection === "clientes" ? "page" : undefined} href="/dashboard?section=clientes"><span>03</span>Clientes</a>
+          <a className={currentSection === "nival-card" ? "active" : undefined} aria-current={currentSection === "nival-card" ? "page" : undefined} href="/dashboard?section=nival-card"><span>04</span>Nival Card</a>
           <a href="/dashboard/pay"><span>05</span>Nival Pay</a>
-          <a href="#configuracion"><span>06</span>Configuración</a>
+          <a className={currentSection === "configuracion" ? "active" : undefined} aria-current={currentSection === "configuracion" ? "page" : undefined} href="/dashboard?section=configuracion"><span>06</span>Configuración</a>
         </nav>
         <div className="sidebarFooter"><a href="/products">Mis productos</a><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
       </aside>
       <details className="dashboardMobileMenu">
         <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>Menú</span><strong>{business?.name ?? "Tu negocio"}</strong></summary>
         <nav aria-label="Navegación móvil del panel">
-          <a href="#resumen">Resumen</a><a href="#inteligencia">Inteligencia</a><a href="#clientes">Clientes</a><a href="#nival-card">Nival Card</a><a href="/dashboard/pay">Nival Pay</a><a href="#configuracion">Configuración</a>
+          <a aria-current={currentSection === "resumen" ? "page" : undefined} href="/dashboard?section=resumen">Resumen</a><a aria-current={currentSection === "inteligencia" ? "page" : undefined} href="/dashboard?section=inteligencia">Inteligencia</a><a aria-current={currentSection === "clientes" ? "page" : undefined} href="/dashboard?section=clientes">Clientes</a><a aria-current={currentSection === "nival-card" ? "page" : undefined} href="/dashboard?section=nival-card">Nival Card</a><a href="/dashboard/pay">Nival Pay</a><a aria-current={currentSection === "configuracion" ? "page" : undefined} href="/dashboard?section=configuracion">Configuración</a>
         </nav>
       </details>
       <div className="dashboardContent">
-      <header className="dashboardContentTopbar"><div><span>Panel general</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status ?? "trial"}</span></header>
+      <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status ?? "trial"}</span></header>
+      {currentSection === "resumen" && <>
       <section className="dashboardHero" id="resumen">
         <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Administra los productos y servicios de tu negocio.</p><a className="loginLink" href="/products">Mis productos</a></div>
       </section>
@@ -188,6 +202,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div className="distributionChart">{segmentMetrics.map((segment) => <div key={segment.label}><span>{segment.label}</span><i><b style={{ width: `${Math.max((segment.value / maxSegmentValue) * 100, segment.value ? 8 : 0)}%` }} /></i><strong>{segment.value}</strong></div>)}</div>
         </article>
       </section>
+      </>}
+      {currentSection === "inteligencia" && <>
       <section className="intelligenceCard" id="inteligencia">
         <div className="intelligenceHeading">
           <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h2>Segmentos automáticos</h2></div>
@@ -214,6 +230,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </article>)}</div>
         )}
       </section>
+      </>}
+      {currentSection === "nival-card" && <>
       {business?.slug && <BusinessQr
         businessName={business.name}
         url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
@@ -253,6 +271,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           editable={canManageProgram}
         />)}</div>
       </section>}
+      </>}
+      {currentSection === "configuracion" && <>
       {canManageProgram && business && <section className="settingsCard">
         <div className="settingsIntro">
           <p className="eyebrow">NFC PARA COBROS</p>
@@ -323,8 +343,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </form>
         </section>
       )}
+      </>}
       {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
+      {currentSection === "clientes" && <>
       <section className="customerTableCard" id="clientes">
         <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
         {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
@@ -345,6 +367,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           })}</div>
         )}
       </section>
+      </>}
       <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>
