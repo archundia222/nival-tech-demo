@@ -116,9 +116,7 @@ export async function startMercadoPagoCheckout() {
           external_code: NIVAL_PAY_PRODUCT,
           title: 'Nival Pay · tarjeta NFC + página',
           quantity: 1,
-          unit_measure: 'unit',
           unit_price: amount,
-          total_amount: amount,
         }],
         config: {
           online: {
