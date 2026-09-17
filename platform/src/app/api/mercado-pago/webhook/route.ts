@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { WebhookSignatureValidator } from 'mercadopago';
+import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 
@@ -41,8 +41,9 @@ export async function POST(request: NextRequest) {
       dataId,
       secret: webhookSecret,
     });
-  } catch {
+  } catch (error) {
     console.warn('Mercado Pago webhook signature rejected', {
+      reason: error instanceof InvalidWebhookSignatureError ? error.reason : 'Unknown',
       dataIdSource: queryDataId ? 'query' : 'body',
       queryBodyDataIdMatch: queryDataId && bodyDataId ? queryDataId === bodyDataId : null,
       hasXSignature: Boolean(request.headers.get('x-signature')),
