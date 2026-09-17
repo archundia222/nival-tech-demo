@@ -15,7 +15,13 @@ type MercadoPagoOrder = {
   status_detail?: string;
   total_amount?: string | number;
   total_paid_amount?: string | number;
-  transactions?: { payments?: Array<{ id?: string; status?: string; status_detail?: string }> };
+  transactions?: { payments?: Array<{
+    id?: string;
+    status?: string;
+    status_detail?: string;
+    amount?: string | number;
+    paid_amount?: string | number;
+  }> };
 };
 
 async function reconcileLatestOrder(businessId: string) {
@@ -36,22 +42,48 @@ async function reconcileLatestOrder(businessId: string) {
     `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
     { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
   );
-  if (!response.ok) return;
+  if (!response.ok) {
+    console.warn('Mercado Pago reconciliation request failed', {
+      providerOrderId: order.provider_preference_id,
+      httpStatus: response.status,
+    });
+    return;
+  }
   const payload = await response.json() as MercadoPagoOrder;
   const payment = payload.transactions?.payments?.find((candidate) =>
     candidate.status === 'processed' && candidate.status_detail === 'accredited'
   );
   const paymentId = payment?.id ? String(payment.id) : null;
-  const approved = payload.id === order.provider_preference_id
-    && payload.external_reference === order.id
-    && payload.status === 'processed'
-    && payload.status_detail === 'accredited'
-    && payload.currency_id === order.currency
-    && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
-    && Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents
-    && order.amount_cents === NIVAL_PAY_PRICE_CENTS
-    && Boolean(paymentId)
-    && (!order.provider_payment_id || order.provider_payment_id === paymentId);
+  const checks = {
+    orderId: payload.id === order.provider_preference_id,
+    externalReference: payload.external_reference === order.id,
+    orderStatus: payload.status === 'processed',
+    orderStatusDetail: payload.status_detail === 'accredited',
+    currency: payload.currency_id === order.currency,
+    totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
+    totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
+    catalogAmount: order.amount_cents === NIVAL_PAY_PRICE_CENTS,
+    paymentId: Boolean(paymentId),
+    storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
+  };
+  console.info('Mercado Pago reconciliation result', {
+    providerOrderId: order.provider_preference_id,
+    payloadOrderId: payload.id,
+    status: payload.status,
+    statusDetail: payload.status_detail,
+    currency: payload.currency_id,
+    totalAmount: payload.total_amount,
+    totalPaidAmount: payload.total_paid_amount,
+    payments: payload.transactions?.payments?.map((candidate) => ({
+      hasId: Boolean(candidate.id),
+      status: candidate.status,
+      statusDetail: candidate.status_detail,
+      amount: candidate.amount,
+      paidAmount: candidate.paid_amount,
+    })) ?? [],
+    checks,
+  });
+  const approved = Object.values(checks).every(Boolean);
   if (!approved || !paymentId) return;
 
   const now = new Date().toISOString();
