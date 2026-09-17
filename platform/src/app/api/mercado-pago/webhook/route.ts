@@ -6,6 +6,7 @@ import { NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 type MercadoPagoOrderWebhook = {
   type?: string;
   action?: string;
+  live_mode?: boolean;
   data?: {
     id?: string;
     external_reference?: string;
@@ -27,7 +28,9 @@ export async function POST(request: NextRequest) {
   if (!webhookSecret) return NextResponse.json({ error: 'Not configured' }, { status: 503 });
 
   const body = await request.json().catch(() => null) as MercadoPagoOrderWebhook | null;
-  const dataId = request.nextUrl.searchParams.get('data.id') ?? body?.data?.id?.toString();
+  const queryDataId = request.nextUrl.searchParams.get('data.id');
+  const bodyDataId = body?.data?.id?.toString();
+  const dataId = queryDataId ?? bodyDataId;
   const eventType = request.nextUrl.searchParams.get('type') ?? body?.type;
   if (!dataId || eventType !== 'order') return NextResponse.json({ received: true });
 
@@ -39,6 +42,15 @@ export async function POST(request: NextRequest) {
       secret: webhookSecret,
     });
   } catch {
+    console.warn('Mercado Pago webhook signature rejected', {
+      dataIdSource: queryDataId ? 'query' : 'body',
+      queryBodyDataIdMatch: queryDataId && bodyDataId ? queryDataId === bodyDataId : null,
+      hasXSignature: Boolean(request.headers.get('x-signature')),
+      hasXRequestId: Boolean(request.headers.get('x-request-id')),
+      eventType,
+      action: body?.action ?? null,
+      liveMode: body?.live_mode ?? null,
+    });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
