@@ -17,6 +17,13 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const [preview, setPreview] = useState<string | null>(null);
   const [removeImage, setRemoveImage] = useState(false);
   const [active, setActive] = useState(profile?.active ?? true);
+  const [fieldVisibility, setFieldVisibility] = useState({ holder: true, bank: true, clabe: true, concept: true, paymentUrl: true });
+  const toggleDefaultField = (field: keyof typeof fieldVisibility, label: string) => {
+    setFieldVisibility(current => {
+      if (current[field] && !window.confirm(`¿En verdad quieres ocultar ${label}? Tus clientes dejarán de verlo en tu página.`)) return current;
+      return { ...current, [field]: !current[field] };
+    });
+  };
   const [sections, setSections] = useState<Array<{ id: string; title: string; content: string; public: boolean }>>([]);
   const addSection = () => {
     setSections(current => [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }]);
@@ -40,9 +47,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
       <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div></div>
       <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
-        <button type="button" className={active ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>setActive(v=>!v)} aria-pressed={active} title="Cambiar visibilidad de la página" style={{position:"absolute",top:"1rem",right:"1rem",zIndex:20,minWidth:"auto",padding:"0.55rem 0.9rem",fontSize:"0.78rem",lineHeight:1,background:"#f7edd5",boxShadow:"0 0 0 8px #fffdf9"}}>{active ? "Visible · cambiar" : "Oculta · cambiar"}</button>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
-        <div className="nivalClientProfile">
+        <div className="nivalClientProfile" style={{position:"relative"}}><button type="button" className={fieldVisibility.holder ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("holder","el titular")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.holder ? "Visible" : "Oculto"}</button>
           <label className="editableLogo" title="Cambiar foto o logo">
             {image ? <Image src={image} width={104} height={104} unoptimized alt={`Imagen de ${businessName}`} /> : <div className="nivalClientMonogram">{businessName.slice(0,2).toUpperCase()}</div>}
             <input name="image" type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const selected=e.target.files?.[0];setPreview(selected?URL.createObjectURL(selected):null);setRemoveImage(false)}} />
@@ -52,17 +58,17 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           <input className="inlinePayInput holderInput" aria-label="Titular de la cuenta" name="accountHolder" value={holder} onChange={e=>setHolder(e.target.value)} required minLength={2} maxLength={120} />
         </div>
         <div className="nivalClientDetails editableDetails">
-          <label><span>Banco · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
-          <label><span>CLABE interbancaria · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
-          <label><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
+          <label style={{position:"relative"}}><button type="button" className={fieldVisibility.bank ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("bank","Banco")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.bank ? "Visible" : "Oculto"}</button><span>Banco · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
+          <label style={{position:"relative"}}><button type="button" className={fieldVisibility.clabe ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("clabe","la CLABE")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.clabe ? "Visible" : "Oculto"}</button><span>CLABE interbancaria · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
+          <label style={{position:"relative"}}><button type="button" className={fieldVisibility.concept ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("concept","Concepto")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.concept ? "Visible" : "Oculto"}</button><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
           {sections.map((section, index) => <div className="customPaySection" key={section.id} style={{position:"relative",paddingTop:"3.2rem"}}>
-            <button type="button" className={section.public ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>updateSection(section.id,{public:!section.public})} aria-pressed={section.public} title="Cambiar visibilidad" style={{position:"absolute",top:"0.75rem",right:"0.75rem",minWidth:"auto",padding:"0.45rem 0.75rem",fontSize:"0.78rem",lineHeight:1}}>{section.public ? "Pública" : "Oculta"}</button>
+            <button type="button" className={section.public ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>updateSection(section.id,{public:!section.public})} aria-pressed={section.public} title="Cambiar visibilidad" style={{position:"absolute",top:"0.75rem",right:"0.75rem",minWidth:"auto",padding:"0.45rem 0.75rem",fontSize:"0.78rem",lineHeight:1}}>{section.public ? "Visible" : "Oculto"}</button>
             <label><span>Apartado {index + 1} · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"title",section.title)}>Editar</button></span><input className="inlinePayInput" value={section.title} onChange={e=>updateSection(section.id,{title:e.target.value})} maxLength={80} placeholder="Título del apartado" /></label>
             <label><span>Link o información · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"content",section.content)}>Editar</button></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="https://... o escribe información" /></label>
           </div>)}
         </div>
         <div className="inlinePageControls">
-          <label className="inlineOptionalLink"><span>Enlace de pago <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
+          <label className="inlineOptionalLink" style={{position:"relative"}}><button type="button" className={fieldVisibility.paymentUrl ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("paymentUrl","el Enlace de pago")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.paymentUrl ? "Visible" : "Oculto"}</button><span>Enlace de pago <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
