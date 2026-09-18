@@ -22,23 +22,19 @@ export default function Home() {
 
       <section className="landingHero">
         <div className="landingHeroCopy">
-          <p className="landingKicker"><span /> Nival Pay ya está disponible</p>
-          <h1>Cobra sin volver a dictar tu CLABE.</h1>
-          <p className="landingHeroLead">
-            Una tarjeta NFC abre la página de pago de tu negocio. Tu cliente acerca su celular,
-            copia tus datos y te transfiere.
-          </p>
-          <div className="landingHeroActions">
-            <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay</Link>
-            <a className="landingSecondary" href="#demostracion">Ver cómo se usa <span>↓</span></a>
-          </div>
-          <div className="landingPriceLine">
+          <p className="landingKicker heroReveal heroReveal1"><span /> Nival Pay ya está disponible</p>
+          <h1 className="heroReveal heroReveal2">Cobra sin volver a dictar tu CLABE.</h1>
+          <p className="landingHeroLead heroReveal heroReveal3">Acerca el celular a tu tarjeta NFC, abre tus datos de pago y copia la CLABE.</p>
+          <div className="landingPriceLine heroReveal heroReveal4">
             <strong>$199 MXN</strong>
-            <span>un solo pago · tarjeta NFC + página configurada</span>
+            <span>pago único · tarjeta NFC + página configurada</span>
+          </div>
+          <div className="landingHeroActions heroReveal heroReveal5">
+            <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay</Link>
           </div>
         </div>
 
-        <div className="landingProductVisual" aria-label="Vista previa de Nival Pay">
+        <div className="landingProductVisual heroVisualReveal" aria-label="Vista previa de Nival Pay">
           <div className="nfcCardMockup">
             <div className="nfcCardTop">
               <span className="nfcMonogram">N</span>
