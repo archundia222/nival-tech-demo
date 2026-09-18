@@ -18,7 +18,7 @@ export default async function PaySettings() {
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles')
-      .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count')
+      .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count')
       .eq('business_id', membership.business_id).maybeSingle(),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
@@ -45,7 +45,16 @@ export default async function PaySettings() {
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">Activo</span></header>
-      <header className="payHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tus datos. Un solo enlace.</h1><p>Configura tu página para compartirla con QR o tarjeta NFC.</p></header>
+      <header className="payHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tus puntos de cobro.</h1><p>Administra tu página, QR y tarjeta NFC desde un solo lugar.</p></header>
+      <section className="metricGrid payMetrics">
+        <article><span>Vistas de tu página</span><strong>{Number(profile?.view_count ?? 0)}</strong></article>
+        <article><span>Copias de CLABE</span><strong>{Number(profile?.clabe_copy_count ?? 0)}</strong></article>
+        <article><span>Link principal</span><strong>{profile?.active ? "Activo" : "Pausado"}</strong></article>
+      </section>
+      <section className="payGrowthCard">
+        <div><p className="eyebrow">AMPLÍA NIVAL PAY</p><h2>Más puntos para cobrar</h2><p>Tu cuenta puede crecer con links + QR adicionales por $10 MXN y tarjetas NFC físicas adicionales por $99 MXN.</p></div>
+        <div><span><b>$10</b> link + QR</span><span><b>$99</b> tarjeta NFC adicional</span></div>
+      </section>
       {!['trial','active'].includes(business?.subscription_status ?? '') && <p role="status" className="formMessage">Tu servicio está suspendido. Puedes editar los datos, pero la página pública no estará disponible hasta reactivar el servicio.</p>}
       {['owner','manager'].includes(membership.role)
         ? <PaymentEditor businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} />
