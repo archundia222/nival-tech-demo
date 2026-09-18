@@ -21,35 +21,38 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const token = state.token || profile?.public_token;
   return <>
-    <div className="payEditorGrid">
-      <form action={action} className="payForm">
-        <input type="hidden" name="businessId" value={businessId} />
-        <h2>Configura tu página</h2>
-        <label>Titular de la cuenta<input name="accountHolder" value={holder} onChange={e => setHolder(e.target.value)} required minLength={2} maxLength={120} autoComplete="name" /></label>
-        <label>Banco<input name="bankName" value={bank} onChange={e => setBank(e.target.value)} required minLength={2} maxLength={80} placeholder="Nombre del banco" /></label>
-        <label>CLABE interbancaria<input name="clabe" value={clabe} onChange={e => setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} placeholder="18 dígitos" /><small>Comprueba que corresponda al titular y al banco.</small></label>
-        <label>Concepto de transferencia <span className="payOptional">Opcional</span><input name="concept" value={concept} onChange={e => setConcept(e.target.value)} maxLength={120} placeholder="Ej. Pago de consumo" /><small>Tu cliente podrá copiarlo junto con los datos bancarios.</small></label>
-        <label>Enlace de pago <span className="payOptional">Opcional</span><input name="paymentUrl" value={paymentUrl} onChange={e => setPaymentUrl(e.target.value)} type="url" maxLength={2048} placeholder="https://..." /></label>
-        <label>Foto o logo <span className="payOptional">Opcional</span><input name="image" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => { const selected = e.target.files?.[0]; setPreview(selected ? URL.createObjectURL(selected) : null); setRemoveImage(false); }} /><small>JPG, PNG o WebP. Máximo 2 MB. La imagen será pública.</small></label>
-        {profile?.image_url && <label className="checkLabel"><input type="checkbox" name="removeImage" checked={removeImage} onChange={e => { setRemoveImage(e.target.checked); setPreview(null); const input = e.currentTarget.form?.elements.namedItem("image"); if (input instanceof HTMLInputElement) input.value = ""; }} /> Usar el logo del negocio en lugar de esta foto</label>}
-        <label className="checkLabel"><input name="active" type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} /> Página pública disponible</label>
-        <p className="payHelp">Al publicarla, cualquier persona con el enlace podrá consultar estos datos.</p>
-        {state.error && <p role="alert" className="payError">{state.error}</p>}
-        {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu enlace y QR siguen siendo los mismos.</p>}
-        <button className="payButton" disabled={pending}>{pending ? 'Guardando…' : profile || state.token ? 'Guardar cambios' : 'Crear mi página'}</button>
-      </form>
-      <aside className="payPreview nivalPayPreview"><p className="eyebrow">ASÍ LO VE TU CLIENTE</p>
-        <div className="nivalClientPreview">
-          <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
-          <div className="nivalClientProfile">
+    <form action={action} className="visualPayEditor">
+      <input type="hidden" name="businessId" value={businessId} />
+      <input type="hidden" name="paymentUrl" value={paymentUrl} />
+      <input type="hidden" name="active" value={active ? "on" : ""} />
+      <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
+      <div className="nivalClientPreview editableClientPreview">
+        <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
+        <div className="nivalClientProfile">
+          <label className="editableLogo" title="Cambiar foto o logo">
             {image ? <Image src={image} width={104} height={104} unoptimized alt={`Imagen de ${businessName}`} /> : <div className="nivalClientMonogram">{businessName.slice(0,2).toUpperCase()}</div>}
-            <p>Realiza tu transferencia a</p><h2>{holder || 'Nombre del titular'}</h2>
-          </div>
-          <dl className="nivalClientDetails"><div><dt>Banco</dt><dd>{bank || 'Tu banco'}</dd></div><div><dt>CLABE interbancaria</dt><dd>{clabe || '18 dígitos completos'}</dd></div>{concept && <div><dt>Concepto</dt><dd>{concept}</dd></div>}</dl>
-          <div className="nivalClientCopy">Copiar CLABE</div>
+            <input name="image" type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const selected=e.target.files?.[0];setPreview(selected?URL.createObjectURL(selected):null);setRemoveImage(false)}} />
+            <span>Cambiar logo</span>
+          </label>
+          <p>Realiza tu transferencia a</p>
+          <input className="inlinePayInput holderInput" aria-label="Titular de la cuenta" name="accountHolder" value={holder} onChange={e=>setHolder(e.target.value)} required minLength={2} maxLength={120} />
         </div>
-        <p className="payHelp">Vista previa fiel a la página que abre tu QR o tarjeta NFC.</p>
-      </aside>    </div>
+        <div className="nivalClientDetails editableDetails">
+          <label><span>Banco</span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
+          <label><span>CLABE interbancaria</span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
+          <label><span>Concepto <small>Opcional</small></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
+        </div>
+        <div className="nivalClientCopy">Copiar CLABE</div>
+      </div>
+      <details className="payAdvancedSettings"><summary>Opciones de la página</summary><div>
+        <label>Enlace de pago opcional<input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
+        <label className="checkLabel"><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)} /> Página pública disponible</label>
+        {profile?.image_url && <button type="button" className="textButton" onClick={()=>{setRemoveImage(true);setPreview(null)}}>Usar logo del negocio</button>}
+      </div></details>
+      {state.error && <p role="alert" className="payError">{state.error}</p>}
+      {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
+    </form>
     {token && <section className="payShare"><h2>Comparte tu página</h2><PaymentProfileQr businessName={businessName} url={`${siteUrl}/pay/${token}`} views={Number(profile?.view_count ?? 0)} /></section>}
   </>;
 }
