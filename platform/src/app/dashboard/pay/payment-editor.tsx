@@ -27,7 +27,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   };
   const [sections, setSections] = useState<Section[]>(Array.isArray(profile?.custom_sections) ? profile.custom_sections : []);
   const addSection = () => {
-    setSections(current => [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }]);
+    setSections(current => current.length < 3 ? [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }] : current);
   };
   const updateSection = (id: string, patch: Partial<{ title: string; content: string; public: boolean }>) => {
     setSections(current => current.map(section => section.id === id ? { ...section, ...patch } : section));
@@ -72,9 +72,9 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           </div>)}
         </div>
         <div className="inlineApartados">
-          <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          <button type="button" className="apartadoRowAdd" onClick={addSection} disabled={sections.length >= 5}><span><b>+</b></span><div><strong>{sections.length >= 5 ? "5 apartados incluidos" : "Agregar apartado"}</strong><small>{sections.length >= 5 ? "Los siguientes apartados tendrán un costo de $10 MXN" : `Se añadirá debajo de Concepto · ${sections.length}/5 usados`}</small></div></button>
-          <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. A partir del sexto, cada apartado adicional cuesta $10 MXN.</p>
+          <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
+          <button type="button" className="apartadoRowAdd" onClick={addSection} disabled={sections.length >= 3}><span><b>+</b></span><div><strong>{sections.length >= 3 ? "3 apartados incluidos" : "Agregar apartado"}</strong><small>{sections.length >= 3 ? "El cuarto apartado y los siguientes cuestan $10 MXN" : `Se añadirá debajo de Concepto · ${sections.length}/3 usados`}</small></div></button>
+          <p className="apartadoFootnote">Los primeros 3 apartados adicionales están incluidos. A partir del cuarto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
       </div>
