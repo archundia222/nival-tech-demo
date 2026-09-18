@@ -17,6 +17,13 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const [preview, setPreview] = useState<string | null>(null);
   const [removeImage, setRemoveImage] = useState(false);
   const [active, setActive] = useState(profile?.active ?? true);
+  const [sections, setSections] = useState<Array<{ id: string; title: string; content: string; public: boolean }>>([]);
+  const addSection = () => {
+    setSections(current => [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }]);
+  };
+  const updateSection = (id: string, patch: Partial<{ title: string; content: string; public: boolean }>) => {
+    setSections(current => current.map(section => section.id === id ? { ...section, ...patch } : section));
+  };
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const token = state.token || profile?.public_token;
@@ -42,6 +49,11 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           <label><span>Banco · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
           <label><span>CLABE interbancaria · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
           <label><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
+          {sections.map((section, index) => <div className="customPaySection" key={section.id}>
+            <label><span>Apartado {index + 1} · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" value={section.title} onChange={e=>updateSection(section.id,{title:e.target.value})} maxLength={80} placeholder="Título del apartado" /></label>
+            <label><span>Información · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="Escribe la información" /></label>
+            <div className="visibilityControl"><div><strong>Visibilidad</strong><small>{section.public ? "Visible para tus clientes" : "Oculto para tus clientes"}</small></div><button type="button" className={section.public ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>updateSection(section.id,{public:!section.public})}>{section.public ? "Pública" : "Oculta"}</button></div>
+          </div>)}
         </div>
         <div className="nivalClientCopy">Copiar CLABE</div>
         <div className="inlinePageControls">
@@ -50,7 +62,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          <button type="button" className="apartadoRowAdd"><span><b>+</b></span><div><strong>Agregar apartado</strong><small>Se añadirá debajo de Concepto</small></div></button>
+          <button type="button" className="apartadoRowAdd" onClick={addSection} disabled={sections.length >= 5}><span><b>+</b></span><div><strong>{sections.length >= 5 ? "5 apartados incluidos" : "Agregar apartado"}</strong><small>{sections.length >= 5 ? "Los siguientes apartados tendrán un costo de $10 MXN" : `Se añadirá debajo de Concepto · ${sections.length}/5 usados`}</small></div></button>
           <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. A partir del sexto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
