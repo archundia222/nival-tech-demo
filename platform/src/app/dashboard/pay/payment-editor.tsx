@@ -53,7 +53,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
-    {token && <section className="payExtraLinks"><div><p className="eyebrow">MÁS PUNTOS DE COBRO</p><h2>Agrega hasta 5 links más</h2><p>Tu Nival Pay incluye este link principal. Puedes agregar hasta 5 links adicionales, cada uno con su propio QR, por <strong>$10 MXN</strong> cada uno.</p></div><div className="extraLinkOffer"><span>Hasta 5 adicionales</span><strong>$10 <small>MXN / link</small></strong><p>Al agregar uno, también podrás elegir una tarjeta NFC física para ese link por +$99 MXN.</p></div></section>}
+    {token && <section className="payExtraLinks"><div><p className="eyebrow">MÁS PUNTOS DE COBRO</p><h2>Agrega hasta 5 apartados más</h2><p>Tu Nival Pay incluye este link principal. Puedes agregar hasta 5 apartados adicionales, cada uno con su propia página, enlace y QR, por <strong>$10 MXN</strong> cada uno.</p></div><div className="extraLinkOffer"><span>Hasta 5 adicionales</span><strong>$10 <small>MXN / apartado</small></strong><p>Al agregar uno, también podrás elegir una tarjeta NFC física para ese apartado por +$99 MXN.</p></div></section>}
     {token && <section className="payShare"><h2>Comparte tu página</h2><PaymentProfileQr businessName={businessName} url={`${siteUrl}/pay/${token}`} views={Number(profile?.view_count ?? 0)} /></section>}
   </>;
 }
