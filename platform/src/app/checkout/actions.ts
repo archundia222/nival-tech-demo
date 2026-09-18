@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 
 async function currentPurchaseContext() {
@@ -225,4 +225,36 @@ export async function completeCheckoutBankProfile(
 
   if (error || !data) return { error: 'No pudimos guardar los datos. Intenta nuevamente.' };
   return { saved: true, token: data.public_token };
+}
+
+export async function startExtraSectionCheckout() {
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!token) redirect('/dashboard/pay?error=Mercado+Pago+aún+no+está+configurado.');
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: order, error } = await admin.from('product_orders').insert({
+    business_id: businessId, product_code: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
+    amount_cents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, payment_method: 'mercado_pago', status: 'pending',
+  }).select('id').single();
+  if (error || !order) redirect('/dashboard/pay?error=No+se+pudo+crear+la+orden.');
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
+  const amount = (NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS / 100).toFixed(2);
+  const response = await fetch('https://api.mercadopago.com/v1/orders', {
+    method:'POST', headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json','X-Idempotency-Key':order.id},
+    body:JSON.stringify({
+      type:'online', processing_mode:'manual', total_amount:amount, external_reference:order.id,
+      description:'Nival Pay · apartado adicional',
+      payer:{email:'test_user_1348852238063419528@testuser.com'},
+      items:[{external_code:NIVAL_PAY_EXTRA_SECTION_PRODUCT,title:'Nival Pay · apartado adicional',quantity:1,unit_price:amount}],
+      config:{online:{success_url:`${origin}/dashboard/pay?purchase=success`,pending_url:`${origin}/dashboard/pay?purchase=pending`,failure_url:`${origin}/dashboard/pay?purchase=failure`,auto_return:'approved'}}
+    }), cache:'no-store'
+  });
+  const result = await response.json().catch(()=>({})) as MercadoPagoOrderCreateResponse;
+  if (!response.ok || !result.id || !result.checkout_url) {
+    await admin.from('product_orders').update({status:'cancelled',updated_at:new Date().toISOString()}).eq('id',order.id);
+    redirect('/dashboard/pay?error=No+se+pudo+abrir+Mercado+Pago.');
+  }
+  await admin.from('product_orders').update({provider_preference_id:result.id,updated_at:new Date().toISOString()}).eq('id',order.id);
+  redirect(result.checkout_url);
 }
