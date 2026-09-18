@@ -2,10 +2,11 @@
 import { useActionState, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
+import { startExtraSectionCheckout } from '../../checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 
 type Section = { id: string; title: string; content: string; public: boolean };
-type Profile = { account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[] };
+type Profile = { account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
@@ -27,7 +28,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   };
   const [sections, setSections] = useState<Section[]>(Array.isArray(profile?.custom_sections) ? profile.custom_sections : []);
   const addSection = () => {
-    setSections(current => current.length < 3 ? [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }] : current);
+    setSections(current => current.length < 3 + (profile?.extra_sections_purchased ?? 0) ? [...current, { id: crypto.randomUUID(), title: '', content: '', public: true }] : current);
   };
   const updateSection = (id: string, patch: Partial<{ title: string; content: string; public: boolean }>) => {
     setSections(current => current.map(section => section.id === id ? { ...section, ...patch } : section));
@@ -73,8 +74,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < 3 ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{`Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis`}</small></div></button>
-          : <button type="button" className="apartadoRowAdd paidApartadoButton" onClick={()=>window.alert("Este apartado cuesta $10 MXN. El flujo de pago se habilitará aquí.")}><span><b>$</b></span><div><strong>Agregar otro apartado · $10 MXN</strong><small>Ya utilizaste tus 3 apartados gratis · Toca para comprar uno adicional</small></div></button>}
+          {sections.length < 3 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 3 ? `Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis` : `Tienes ${3 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado adicional disponible`}</small></div></button>
+          : <button type="submit" formAction={startExtraSectionCheckout} className="apartadoRowAdd paidApartadoButton"><span><b>$</b></span><div><strong>Comprar otro apartado · $10 MXN</strong><small>Ya utilizaste los incluidos · Paga con Mercado Pago para desbloquear 1 apartado</small></div></button>}
           <p className="apartadoFootnote">Los primeros 3 apartados adicionales están incluidos. A partir del cuarto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
