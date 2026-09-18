@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PayDemo } from "./pay-demo";
+import { IntelligenceWaitlist } from "./intelligence-waitlist";
 
 const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
 
@@ -139,19 +140,14 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="intelligenceTeaser" id="intelligence">
+      <section className="intelligenceTeaser intelligenceSecondary" id="intelligence">
         <div>
-          <p className="landingEyebrow">LO QUE SIGUE</p>
-          <h2>Nival Intelligence</h2>
-          <p>
-            Próximamente, una herramienta para que barberías y cafeterías conviertan sus datos
-            reales en mejores decisiones y puedan medir qué acciones sí funcionan.
-          </p>
+          <strong className="comingSoon">PRÓXIMAMENTE</strong>
+          <p className="landingEyebrow">NIVAL INTELLIGENCE</p>
+          <h2>Nival Intelligence — Administra clientes, visitas y lealtad</h2>
+          <p>Centraliza la relación con tus clientes y convierte visitas y lealtad en información útil para tu negocio.</p>
+          <IntelligenceWaitlist />
         </div>
-        <div className="intelligenceLoop" aria-label="Ciclo de Nival Intelligence">
-          <span>Datos</span><i>→</i><span>Análisis</span><i>→</i><span>Acción</span><i>→</i><span>Resultado</span>
-        </div>
-        <strong className="comingSoon">PRÓXIMAMENTE</strong>
       </section>
 
       <section className="landingFaq">
