@@ -78,6 +78,7 @@ type CheckoutProduct = {
   amountCents: number;
   description: string;
   returnPath: string;
+  paymentProfileId?: string;
 };
 
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
@@ -91,6 +92,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     amount_cents: product.amountCents,
     payment_method: 'mercado_pago',
     status: 'pending',
+    payment_profile_id: product.paymentProfileId ?? null,
   }).select('id').single();
   if (error || !order) redirect(`${product.returnPath}?error=No+se+pudo+crear+la+orden.`);
 
@@ -232,11 +234,14 @@ export async function completeCheckoutBankProfile(
   return { saved: true, token: data.public_token };
 }
 
-export async function startExtraSectionCheckout() {
+export async function startExtraSectionCheckout(formData?: FormData) {
+  const paymentProfileId = formData instanceof FormData ? String(formData.get('profileId') ?? '') : '';
+  if (!paymentProfileId) redirect('/dashboard/pay?error=Selecciona+la+Nival+Pay+para+el+apartado.');
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
     amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
     description: 'Nival Pay · página de cobro adicional',
-    returnPath: '/dashboard/pay',
+    returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}`,
+    paymentProfileId,
   });
 }
