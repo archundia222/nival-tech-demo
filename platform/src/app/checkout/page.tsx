@@ -59,30 +59,13 @@ async function reconcileLatestOrder(businessId: string) {
     externalReference: payload.external_reference === order.id,
     orderStatus: payload.status === 'processed',
     orderStatusDetail: payload.status_detail === 'accredited',
-    currency: payload.currency_id === order.currency,
+    currency: !payload.currency_id || payload.currency_id === order.currency,
     totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
     totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
     catalogAmount: order.amount_cents === NIVAL_PAY_PRICE_CENTS,
     paymentId: Boolean(paymentId),
     storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
   };
-  console.info('Mercado Pago reconciliation result', {
-    providerOrderId: order.provider_preference_id,
-    payloadOrderId: payload.id,
-    status: payload.status,
-    statusDetail: payload.status_detail,
-    currency: payload.currency_id,
-    totalAmount: payload.total_amount,
-    totalPaidAmount: payload.total_paid_amount,
-    payments: payload.transactions?.payments?.map((candidate) => ({
-      hasId: Boolean(candidate.id),
-      status: candidate.status,
-      statusDetail: candidate.status_detail,
-      amount: candidate.amount,
-      paidAmount: candidate.paid_amount,
-    })) ?? [],
-    checks,
-  });
   const approved = Object.values(checks).every(Boolean);
   if (!approved || !paymentId) return;
 
