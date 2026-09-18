@@ -73,29 +73,30 @@ function summarizeValidationEntries(value: unknown) {
   });
 }
 
-export async function startMercadoPagoCheckout() {
+type CheckoutProduct = {
+  productCode: string;
+  amountCents: number;
+  description: string;
+  returnPath: string;
+};
+
+async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!token) redirect('/checkout?error=Mercado+Pago+aún+no+está+configurado.');
+  if (!token) redirect(`${product.returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: order, error } = await admin.from('product_orders').insert({
     business_id: businessId,
-    product_code: NIVAL_PAY_PRODUCT,
-    amount_cents: NIVAL_PAY_PRICE_CENTS,
+    product_code: product.productCode,
+    amount_cents: product.amountCents,
     payment_method: 'mercado_pago',
     status: 'pending',
   }).select('id').single();
-  if (error || !order) {
-    console.error('[checkout] product order insert failed', {
-      code: error?.code ?? 'missing_order',
-      message: error?.message ?? 'Insert returned no order',
-    });
-    redirect('/checkout?error=No+se+pudo+crear+la+orden.');
-  }
+  if (error || !order) redirect(`${product.returnPath}?error=No+se+pudo+crear+la+orden.`);
 
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
-  const amount = (NIVAL_PAY_PRICE_CENTS / 100).toFixed(2);
+  const amount = (product.amountCents / 100).toFixed(2);
   let result: MercadoPagoOrderCreateResponse = {};
 
   try {
@@ -111,31 +112,28 @@ export async function startMercadoPagoCheckout() {
         processing_mode: 'manual',
         total_amount: amount,
         external_reference: order.id,
-        description: 'Nival Pay · tarjeta NFC + página',
-        // The payer must match the Mercado Pago buyer test user. A generic test email
-        // lets the order open, but Mercado Pago can leave every payment method disabled.
+        description: product.description,
         payer: { email: 'test_user_1348852238063419528@testuser.com' },
         items: [{
-          external_code: NIVAL_PAY_PRODUCT,
-          title: 'Nival Pay · tarjeta NFC + página',
+          external_code: product.productCode,
+          title: product.description,
           quantity: 1,
           unit_price: amount,
         }],
         config: {
           online: {
-            success_url: `${origin}/checkout?result=success`,
-            pending_url: `${origin}/checkout?result=pending`,
-            failure_url: `${origin}/checkout?result=failure`,
+            success_url: `${origin}${product.returnPath}?result=success`,
+            pending_url: `${origin}${product.returnPath}?result=pending`,
+            failure_url: `${origin}${product.returnPath}?result=failure`,
             auto_return: 'approved',
           },
         },
       }),
       cache: 'no-store',
     });
-
     result = await response.json().catch(() => ({})) as MercadoPagoOrderCreateResponse;
     if (!response.ok || !result.id || !result.checkout_url) {
-      const validationSummary = {
+      console.error('[checkout] Mercado Pago order create rejected', JSON.stringify({
         status: response.status,
         error: result.error ?? null,
         message: result.message ?? null,
@@ -144,24 +142,30 @@ export async function startMercadoPagoCheckout() {
         code: shortText(result.code),
         errors: summarizeValidationEntries(result.errors),
         details: summarizeValidationEntries(result.details),
-      };
-      console.error(
-        '[checkout] Mercado Pago order create rejected',
-        JSON.stringify(validationSummary),
-      );
+      }));
       throw new Error(`Mercado Pago order create failed with status ${response.status}`);
     }
   } catch (checkoutError) {
     console.error('Mercado Pago order error', checkoutError);
     await admin.from('product_orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', order.id);
-    redirect('/checkout?error=No+se+pudo+abrir+Mercado+Pago.+Intenta+de+nuevo.');
+    redirect(`${product.returnPath}?error=No+se+pudo+abrir+Mercado+Pago.+Intenta+de+nuevo.`);
   }
 
-  // Reuse this provider field for the external Mercado Pago order id until the schema is renamed.
-  await admin.from('product_orders').update({ provider_preference_id: result.id, updated_at: new Date().toISOString() }).eq('id', order.id);
+  await admin.from('product_orders').update({
+    provider_preference_id: result.id,
+    updated_at: new Date().toISOString(),
+  }).eq('id', order.id);
   redirect(result.checkout_url!);
 }
 
+export async function startMercadoPagoCheckout() {
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_PAY_PRODUCT,
+    amountCents: NIVAL_PAY_PRICE_CENTS,
+    description: 'Nival Pay · tarjeta NFC + página',
+    returnPath: '/checkout',
+  });
+}
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
@@ -228,33 +232,10 @@ export async function completeCheckoutBankProfile(
 }
 
 export async function startExtraSectionCheckout() {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!token) redirect('/dashboard/pay?error=Mercado+Pago+aún+no+está+configurado.');
-  const { businessId } = await currentPurchaseContext();
-  const admin = createAdminClient();
-  const { data: order, error } = await admin.from('product_orders').insert({
-    business_id: businessId, product_code: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
-    amount_cents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, payment_method: 'mercado_pago', status: 'pending',
-  }).select('id').single();
-  if (error || !order) redirect('/dashboard/pay?error=No+se+pudo+crear+la+orden.');
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
-  const amount = (NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS / 100).toFixed(2);
-  const response = await fetch('https://api.mercadopago.com/v1/orders', {
-    method:'POST', headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json','X-Idempotency-Key':order.id},
-    body:JSON.stringify({
-      type:'online', processing_mode:'manual', total_amount:amount, external_reference:order.id,
-      description:'Nival Pay · apartado adicional',
-      payer:{email:'test@testuser.com'},
-      items:[{external_code:NIVAL_PAY_EXTRA_SECTION_PRODUCT,title:'Nival Pay · apartado adicional',quantity:1,unit_price:amount}],
-      config:{online:{success_url:`${origin}/dashboard/pay?purchase=success`,pending_url:`${origin}/dashboard/pay?purchase=pending`,failure_url:`${origin}/dashboard/pay?purchase=failure`,auto_return:'approved'}}
-    }), cache:'no-store'
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
+    amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
+    description: 'Nival Pay · apartado adicional',
+    returnPath: '/dashboard/pay',
   });
-  const result = await response.json().catch(()=>({})) as MercadoPagoOrderCreateResponse;
-  if (!response.ok || !result.id || !result.checkout_url) {
-    await admin.from('product_orders').update({status:'cancelled',updated_at:new Date().toISOString()}).eq('id',order.id);
-    redirect('/dashboard/pay?error=No+se+pudo+abrir+Mercado+Pago.');
-  }
-  await admin.from('product_orders').update({provider_preference_id:result.id,updated_at:new Date().toISOString()}).eq('id',order.id);
-  redirect(result.checkout_url);
 }
