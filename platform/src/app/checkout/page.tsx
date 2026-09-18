@@ -3,9 +3,10 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
-import { signOut } from '@/app/auth/actions';
+import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
+import { ActiveCard, BankSetupForm } from './bank-setup-form';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -104,43 +105,44 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
     .eq('product_code', 'nival_pay').order('created_at', { ascending: false }).limit(5);
   const paid = orders?.find((order) => order.status === 'paid');
+  const { data: paymentProfile } = paid
+    ? await supabase.from('payment_profiles').select('public_token, account_holder, bank_name, clabe')
+      .eq('business_id', membership.business_id).maybeSingle()
+    : { data: null };
+  const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
+  const siteUrl = publicSiteUrl();
 
-  return <main className="dashboardApp">
-    <aside className="dashboardSidebar">
-      <Link className="brand dashboardBrand" href="/dashboard"><span className="brandmark">N</span>NIVAL tech</Link>
-      <div className="sidebarBusiness"><span>ESPACIO DE TRABAJO</span><strong>{business?.name ?? 'Mi negocio'}</strong></div>
-      <nav className="sidebarNav" aria-label="Navegación del panel">
-        <Link href="/dashboard?section=resumen"><span>01</span>Resumen</Link>
-        <Link href="/dashboard?section=inteligencia"><span>02</span>Inteligencia</Link>
-        <Link href="/dashboard?section=clientes"><span>03</span>Clientes</Link>
-        <Link href="/dashboard?section=nival-card"><span>04</span>Nival Card</Link>
-        <Link className="active" aria-current="page" href="/dashboard/pay"><span>05</span>Nival Pay</Link>
-        <Link href="/dashboard?section=configuracion"><span>06</span>Configuración</Link>
-      </nav>
-      <div className="sidebarFooter"><Link href="/products">Mis productos</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
-    </aside>
-    <details className="dashboardMobileMenu">
-      <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>Menú</span><strong>{business?.name ?? 'Mi negocio'}</strong></summary>
-      <nav aria-label="Navegación móvil del panel">
-        <Link href="/dashboard?section=resumen">Resumen</Link><Link href="/dashboard?section=inteligencia">Inteligencia</Link><Link href="/dashboard?section=clientes">Clientes</Link><Link href="/dashboard?section=nival-card">Nival Card</Link><Link aria-current="page" href="/dashboard/pay">Nival Pay</Link><Link href="/dashboard?section=configuracion">Configuración</Link>
-      </nav>
-    </details>
-    <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">{paid ? 'active' : (business?.subscription_status ?? 'trial')}</span></header>
-      <section className="checkoutHeader"><p className="landingEyebrow">ACTIVACIÓN DE NIVAL PAY</p><h1>{paid ? 'Tu Nival Pay está activo.' : 'Elige cómo quieres pagar.'}</h1><p>{business?.name} · Un solo pago, sin mensualidad.</p></section>
-      {params.error && <p className="checkoutNotice errorMessage" role="alert">{params.error}</p>}
-      {params.result === 'success' && !paid && <p className="checkoutNotice">Recibimos el regreso de Mercado Pago. Estamos confirmando el pago de forma segura.</p>}
-      {params.result === 'pending' && <p className="checkoutNotice">Tu pago sigue pendiente en Mercado Pago. La activación será automática cuando se apruebe.</p>}
-      {params.result === 'failure' && <p className="checkoutNotice errorMessage">El pago no se completó. Puedes intentarlo nuevamente.</p>}
-      {params.result === 'cash' && <p className="checkoutNotice">Venta en efectivo registrada. Nival Tech se activará cuando el vendedor confirme que recibió el pago.</p>}
-      {paid ? <section className="checkoutSuccess"><span>✓</span><h2>Pago confirmado</h2><p>Ya puedes configurar tus datos bancarios, imagen, concepto, enlace y código QR.</p><Link className="landingPrimary dark" href="/dashboard/pay">Configurar Nival Pay</Link></section> : <div className="checkoutGrid">
-        <article className="checkoutSummary"><p>NIVAL PAY</p><h2>Tarjeta NFC + página de pago</h2><ul><li>Tarjeta física programada</li><li>Página personalizada</li><li>Enlace y QR permanentes</li><li>Sin mensualidad</li></ul><strong>{money(NIVAL_PAY_PRICE_CENTS)}</strong><small>Pago único</small></article>
-        <section className="paymentChoices">
-          <article><div><span className="paymentIcon">MP</span><h2>Mercado Pago</h2><p>Paga en línea desde el checkout seguro de Mercado Pago. La activación es automática cuando se aprueba.</p></div><form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="landingPrimary dark" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form></article>
-          <article><div><span className="paymentIcon cash">$</span><h2>Efectivo</h2><p>Úsalo cuando compres Nival Pay directamente con un vendedor. La entrega del dinero se confirma manualmente.</p></div><form action={requestCashPayment}><CheckoutSubmitButton className="landingSecondary checkoutSecondary" pendingLabel="Registrando…">Registrar pago en efectivo</CheckoutSubmitButton></form></article>
-        </section>
-      </div>}
-      {!!orders?.length && !paid && <section className="orderHistory"><h2>Estado de tus órdenes</h2>{orders.map((order) => <div key={order.id}><span>{order.payment_method === 'cash' ? 'Efectivo' : 'Mercado Pago'}</span><b>{order.status === 'pending_cash_confirmation' ? 'Esperando confirmación' : order.status === 'pending' ? 'Pendiente' : order.status === 'cancelled' ? 'No completada' : order.status}</b><time>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeZone: 'America/Mexico_City' }).format(new Date(order.created_at))}</time></div>)}</section>}
+  return <main className="checkoutExperience">
+    <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Compra segura</small></header>
+    <div className="checkoutFrame">
+      {params.error && <p className="checkoutStatus errorMessage" role="alert">{params.error}</p>}
+      {params.result === 'success' && !paid && <p className="checkoutStatus">Estamos confirmando tu pago. Actualiza esta página en unos segundos.</p>}
+      {params.result === 'pending' && <p className="checkoutStatus">Tu pago está pendiente. La activación será automática cuando Mercado Pago lo apruebe.</p>}
+      {params.result === 'failure' && <p className="checkoutStatus errorMessage">El pago no se completó. Puedes intentarlo nuevamente.</p>}
+      {params.result === 'cash' && <p className="checkoutStatus">Pago en efectivo registrado. Se activará cuando el vendedor confirme la recepción.</p>}
+
+      {paid
+        ? hasBankProfile && paymentProfile
+          ? <ActiveCard businessName={business?.name ?? 'Tu negocio'} url={`${siteUrl}/pay/${paymentProfile.public_token}`} />
+          : <BankSetupForm businessName={business?.name ?? 'Tu negocio'} siteUrl={siteUrl} />
+        : <>
+          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY</p><h1>Activa tu página de cobro</h1><p>Recibe transferencias con un enlace y QR propios. Incluye tu tarjeta NFC lista para usar.</p></section>
+          <div className="checkoutCommerce">
+            <article className="checkoutProduct">
+              <div><span>Pago único</span><strong>{money(NIVAL_PAY_PRICE_CENTS)}</strong><small>MXN · Sin mensualidad</small></div>
+              <ul><li>Tarjeta NFC programada</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li></ul>
+            </article>
+            <section className="checkoutMethods" aria-label="Métodos de pago">
+              <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>
+                <form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="checkoutPrimaryButton" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form>
+              </article>
+              <article className="checkoutMethodCash"><div><h2>Pago en efectivo</h2><p>Para ventas presenciales. Requiere confirmación manual del vendedor.</p></div>
+                <form action={requestCashPayment}><CheckoutSubmitButton className="checkoutCashButton" pendingLabel="Registrando…">Registrar efectivo</CheckoutSubmitButton></form>
+              </article>
+            </section>
+          </div>
+          <footer className="checkoutTrust"><span>Pago procesado de forma segura</span><span>Activación vinculada a tu cuenta</span></footer>
+        </>}
     </div>
   </main>;
 }
