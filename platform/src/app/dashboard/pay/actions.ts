@@ -36,7 +36,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   if (concept.length > 120) return { error: 'El concepto debe tener como máximo 120 caracteres.' };
   if (paymentUrl && !isHttpsUrl(paymentUrl)) return { error: 'El enlace de pago debe ser una dirección HTTPS válida.' };
 
-  const { data: existing, error: readError } = await supabase.from('payment_profiles').select('image_url')
+  const { data: existing, error: readError } = await supabase.from('payment_profiles').select('image_url, extra_sections_purchased')
     .eq('business_id', businessId).maybeSingle();
   if (readError) return { error: 'No pudimos leer tu configuración. Intenta de nuevo.' };
   customSections = customSections.slice(0, 3 + Number(existing?.extra_sections_purchased ?? 0));

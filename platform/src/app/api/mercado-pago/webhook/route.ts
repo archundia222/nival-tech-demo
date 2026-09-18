@@ -127,29 +127,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Payment mismatch' }, { status: 409 });
   }
 
-  const now = new Date().toISOString();
-  if (order.status !== 'paid') {
-    const { error: paymentUpdateError } = await admin.from('product_orders')
-      .update({ status: 'paid', provider_payment_id: paymentId, paid_at: now, updated_at: now })
-      .eq('id', orderId)
-      .neq('status', 'paid');
-    if (paymentUpdateError) {
-      console.error('Nival Pay order activation failed', paymentUpdateError);
-      return NextResponse.json({ error: 'Order activation failed' }, { status: 500 });
-    }
-  }
-
-  if (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT) {
-    const { data: profile } = await admin.from('payment_profiles').select('extra_sections_purchased').eq('business_id', order.business_id).single();
-    const { error: creditError } = await admin.from('payment_profiles')
-      .update({ extra_sections_purchased: Number(profile?.extra_sections_purchased ?? 0) + 1, updated_at: now })
-      .eq('business_id', order.business_id);
-    if (creditError) return NextResponse.json({ error: 'Extra section activation failed' }, { status: 500 });
-  } else {
-    const { error: businessUpdateError } = await admin.from('businesses')
-      .update({ subscription_status: 'active', updated_at: now })
-      .eq('id', order.business_id).neq('subscription_status', 'active');
-    if (businessUpdateError) return NextResponse.json({ error: 'Business activation failed' }, { status: 500 });
+  const { error: finalizeError } = await admin.rpc('finalize_nival_pay_order', {
+    p_order_id: orderId,
+    p_provider_payment_id: paymentId,
+  });
+  if (finalizeError) {
+    console.error('Nival Pay order finalization failed', { orderId, code: finalizeError.code });
+    return NextResponse.json({ error: 'Order finalization failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

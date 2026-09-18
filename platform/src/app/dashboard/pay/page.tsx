@@ -3,6 +3,71 @@ import { createClient } from '@/lib/supabase/server';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+
+type MercadoPagoOrder = {
+  id?: string;
+  external_reference?: string;
+  currency_id?: string;
+  status?: string;
+  status_detail?: string;
+  total_amount?: string | number;
+  total_paid_amount?: string | number;
+  transactions?: { payments?: Array<{ id?: string; status?: string; status_detail?: string }> };
+};
+
+async function reconcileLatestExtraSectionOrder(businessId: string) {
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!accessToken) return;
+
+  const admin = createAdminClient();
+  const { data: order } = await admin.from('product_orders')
+    .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
+    .eq('business_id', businessId)
+    .eq('product_code', NIVAL_PAY_EXTRA_SECTION_PRODUCT)
+    .eq('payment_method', 'mercado_pago')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!order?.provider_preference_id) return;
+
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
+    { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
+  );
+  if (!response.ok) {
+    console.warn('Extra section reconciliation request failed', {
+      providerOrderId: order.provider_preference_id,
+      httpStatus: response.status,
+    });
+    return;
+  }
+
+  const payload = await response.json() as MercadoPagoOrder;
+  const payment = payload.transactions?.payments?.find((candidate) =>
+    candidate.status === 'processed' && candidate.status_detail === 'accredited'
+  );
+  const paymentId = payment?.id ? String(payment.id) : null;
+  const approved = payload.id === order.provider_preference_id
+    && payload.external_reference === order.id
+    && payload.status === 'processed'
+    && payload.status_detail === 'accredited'
+    && payload.currency_id === order.currency
+    && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
+    && Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents
+    && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS
+    && Boolean(paymentId)
+    && (!order.provider_payment_id || order.provider_payment_id === paymentId);
+  if (!approved || !paymentId) return;
+
+  const { error } = await admin.rpc('finalize_nival_pay_order', {
+    p_order_id: order.id,
+    p_provider_payment_id: paymentId,
+  });
+  if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
+}
 
 export default async function PaySettings() {
   const supabase = await createClient();
@@ -14,6 +79,7 @@ export default async function PaySettings() {
   if (error) throw new Error('No se pudo cargar el negocio.');
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  await reconcileLatestExtraSectionOrder(membership.business_id);
   const [{ data: paidOrder }, { data: profile, error: profileError }] = await Promise.all([
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
