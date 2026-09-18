@@ -3,7 +3,16 @@ import { useState } from "react";
 import styles from "./payment-page.module.css";
 
 const CopyIcon=()=> <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>;
-async function write(value:string){ await navigator.clipboard.writeText(value); }
+async function write(value:string){
+  try { await navigator.clipboard.writeText(value); }
+  catch {
+    const field=document.createElement("textarea");
+    field.value=value; field.setAttribute("readonly","");
+    field.style.position="fixed"; field.style.opacity="0";
+    document.body.appendChild(field); field.select();
+    document.execCommand("copy"); field.remove();
+  }
+}
 
 export function CopyField({label,value,variant="detail"}:{label:string;value:string;variant?:"name"|"bank"|"clabe"|"detail"}){
  const [copied,setCopied]=useState(false);
