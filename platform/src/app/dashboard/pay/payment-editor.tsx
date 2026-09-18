@@ -39,7 +39,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
       <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div></div>
-      <div className="nivalClientPreview editableClientPreview">
+      <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
+        <button type="button" className={active ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>setActive(v=>!v)} aria-pressed={active} title="Cambiar visibilidad de la página" style={{position:"absolute",top:"1rem",right:"1rem",zIndex:5,minWidth:"auto",padding:"0.5rem 0.8rem",fontSize:"0.78rem",lineHeight:1}}>{active ? "Visible · cambiar" : "Oculta · cambiar"}</button>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile">
           <label className="editableLogo" title="Cambiar foto o logo">
@@ -60,8 +61,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
             <label><span>Link o información · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"content",section.content)}>Editar</button></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="https://... o escribe información" /></label>
           </div>)}
         </div>
-        <div className="inlinePageControls" style={{position:"relative",paddingTop:"2.5rem"}}>
-          <button type="button" className={active ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>setActive(v=>!v)} aria-pressed={active} title="Cambiar visibilidad de la página" style={{position:"absolute",top:"0",right:"0",minWidth:"auto",padding:"0.45rem 0.75rem",fontSize:"0.78rem",lineHeight:1}}>{active ? "Pública" : "Oculta"}</button>
+        <div className="inlinePageControls">
           <label className="inlineOptionalLink"><span>Enlace de pago <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
         </div>
         <div className="inlineApartados">
