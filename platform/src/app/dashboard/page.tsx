@@ -116,6 +116,17 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .limit(1)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
+  const { data: paidNivalPayOrder } = businessId
+    ? await supabase
+        .from("product_orders")
+        .select("id")
+        .eq("business_id", businessId)
+        .eq("product_code", "nival_pay")
+        .eq("status", "paid")
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  const hasNivalPay = Boolean(paidNivalPayOrder);
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -278,9 +289,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p className="eyebrow">NFC PARA COBROS</p>
           <h2>Comparte datos para transferencias</h2>
           <p>El cliente podrá copiar el titular, banco y CLABE desde una página segura. No guardes NIP, CVV, contraseñas ni códigos.</p>
-          {paymentProfile && <PaymentProfileQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/pay/${paymentProfile.public_token}`} views={Number(paymentProfile.view_count)} />}
+          {hasNivalPay && paymentProfile && <PaymentProfileQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/pay/${paymentProfile.public_token}`} views={Number(paymentProfile.view_count)} />}
         </div>
-        <a className="primaryButton" href="/dashboard/pay">Configurar mi página Nival Pay</a>
+        <a className="primaryButton" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Configurar mi página Nival Pay" : "Activar Nival Pay"}</a>
       </section>}
       {canManageProgram && business && (
         <section className="settingsCard teamCard">
