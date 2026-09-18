@@ -1,6 +1,7 @@
 'use server';
 
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -237,6 +238,26 @@ export async function completeCheckoutBankProfile(
 export async function startExtraSectionCheckout(formData?: FormData) {
   const paymentProfileId = formData instanceof FormData ? String(formData.get('profileId') ?? '') : '';
   if (!paymentProfileId) redirect('/dashboard/pay?error=Selecciona+la+Nival+Pay+para+el+apartado.');
+
+  // Mercado Pago can redirect back before its webhook finishes, leaving the
+  // browser with the pre-payment React state. Re-check the entitlement on the
+  // server so a stale purchase button cannot open a second checkout.
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: profile } = await admin.from('payment_profiles')
+    .select('id, custom_sections, extra_sections_purchased')
+    .eq('id', paymentProfileId)
+    .eq('business_id', businessId)
+    .maybeSingle();
+  if (!profile) redirect('/dashboard/pay?error=No+encontramos+esa+Nival+Pay.');
+
+  const savedSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.length : 0;
+  const sectionLimit = 3 + Number(profile.extra_sections_purchased ?? 0);
+  if (savedSections < sectionLimit) {
+    revalidatePath('/dashboard/pay');
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}&unlocked=1`);
+  }
+
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
     amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
