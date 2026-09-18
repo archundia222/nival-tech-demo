@@ -45,8 +45,12 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="nivalClientCopy">Copiar CLABE</div>
         <div className="inlineApartados">
-          <div><span>APARTADOS ADICIONALES</span><strong>Agrega hasta 5</strong><p>Cada apartado incluye su propia página, enlace y QR por $10 MXN.</p></div>
-          <div className="inlineApartadoPrice"><b>$10</b><small>MXN / apartado</small><em>Tarjeta NFC física opcional · +$99</em></div>
+          <div><span>APARTADOS ADICIONALES</span><strong>Hasta 5 incluidos gratis</strong><p>Cada apartado puede tener su propia información, página, enlace y QR.</p></div>
+          <div className="apartadoSlots" aria-label="Apartados adicionales">
+            {[1,2,3,4,5].map((slot)=><button key={slot} type="button" className="apartadoAdd" aria-label={`Agregar apartado ${slot}`}><b>+</b><small>Agregar</small></button>)}
+            <button type="button" className="apartadoLocked" aria-label="Apartado adicional de pago"><span aria-hidden="true">▣</span><b>$10</b><small>adicional</small></button>
+          </div>
+          <p className="apartadoFootnote">Después de tus 5 apartados incluidos, cada apartado extra cuesta $10 MXN. Puedes pedir una tarjeta NFC física para cualquiera por +$99 MXN.</p>
         </div>
       </div>
       <details className="payAdvancedSettings"><summary>Opciones de la página</summary><div>
