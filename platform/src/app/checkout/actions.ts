@@ -245,7 +245,7 @@ export async function startExtraSectionCheckout() {
     body:JSON.stringify({
       type:'online', processing_mode:'manual', total_amount:amount, external_reference:order.id,
       description:'Nival Pay · apartado adicional',
-      payer:{email:'test_user_1348852238063419528@testuser.com'},
+      payer:{email:'test@testuser.com'},
       items:[{external_code:NIVAL_PAY_EXTRA_SECTION_PRODUCT,title:'Nival Pay · apartado adicional',quantity:1,unit_price:amount}],
       config:{online:{success_url:`${origin}/dashboard/pay?purchase=success`,pending_url:`${origin}/dashboard/pay?purchase=pending`,failure_url:`${origin}/dashboard/pay?purchase=failure`,auto_return:'approved'}}
     }), cache:'no-store'
