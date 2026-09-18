@@ -25,7 +25,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   try {
     visibility = { ...visibility, ...JSON.parse(String(form.get('fieldVisibility') ?? '{}')) };
     const parsed = JSON.parse(String(form.get('customSections') ?? '[]'));
-    if (Array.isArray(parsed)) customSections = parsed.slice(0, 5).map((s) => ({
+    if (Array.isArray(parsed)) customSections = parsed.slice(0, 3).map((s) => ({
       id: String(s.id ?? crypto.randomUUID()), title: String(s.title ?? '').trim().slice(0,80),
       content: String(s.content ?? '').trim().slice(0,200), public: s.public !== false,
     }));
