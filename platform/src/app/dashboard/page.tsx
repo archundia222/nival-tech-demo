@@ -199,7 +199,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </article>
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Administra los enlaces y códigos QR asociados a tus tarjetas NFC desde una sola sección.</p>
+          <p>Tu Nival Pay principal queda protegido aquí. Agrega nuevos links con QR por $10 MXN y, cuando necesites presencia física, añade una tarjeta NFC por $99 MXN.</p>
           <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
@@ -235,6 +235,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       </>}
       {currentSection === "nival-card" && <>
+      <section className="nivalAssetsIntro">
+        <div><p className="eyebrow">TARJETAS Y LINKS</p><h1>Tus puntos de cobro</h1><p>Administra lo que ya tienes y amplía Nival Pay cuando lo necesites.</p></div>
+        <div className="assetOfferGrid">
+          <article className="assetPrimary"><span className="assetLock" aria-label="Producto principal protegido">⌑</span><small>INCLUIDO CON NIVAL PAY</small><h2>Nival Pay · Principal</h2><p>Página de cobro + QR + primera tarjeta NFC.</p><strong>{hasNivalPay ? "Activo" : "Actívalo por $199"}</strong></article>
+          <article><small>NUEVO PUNTO DE COBRO</small><h2>Link + QR</h2><p>Crea otro punto de cobro con enlace y código QR propios.</p><strong>$10 MXN</strong><span className="assetUpsell">¿Quieres tarjeta física también? +$99 MXN</span></article>
+        </div>
+      </section>
       {business?.slug && <BusinessQr
         businessName={business.name}
         url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
