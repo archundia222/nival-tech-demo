@@ -20,6 +20,16 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   const clabe = String(form.get('clabe') ?? '').replace(/\s/g, '');
   const concept = String(form.get('concept') ?? '').trim();
   const paymentUrl = String(form.get('paymentUrl') ?? '').trim();
+  let visibility = { holder: true, bank: true, clabe: true, concept: true, paymentUrl: true };
+  let customSections: Array<{ id: string; title: string; content: string; public: boolean }> = [];
+  try {
+    visibility = { ...visibility, ...JSON.parse(String(form.get('fieldVisibility') ?? '{}')) };
+    const parsed = JSON.parse(String(form.get('customSections') ?? '[]'));
+    if (Array.isArray(parsed)) customSections = parsed.slice(0, 5).map((s) => ({
+      id: String(s.id ?? crypto.randomUUID()), title: String(s.title ?? '').trim().slice(0,80),
+      content: String(s.content ?? '').trim().slice(0,200), public: s.public !== false,
+    }));
+  } catch { return { error: 'No pudimos leer los apartados. Recarga e intenta de nuevo.' }; }
   if (holder.length < 2 || holder.length > 120) return { error: 'El titular debe tener entre 2 y 120 caracteres.' };
   if (bank.length < 2 || bank.length > 80) return { error: 'El banco debe tener entre 2 y 80 caracteres.' };
   if (!isValidClabe(clabe)) return { error: 'Revisa la CLABE: debe tener 18 dígitos y un dígito de verificación válido.' };
@@ -48,7 +58,9 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   const { data, error } = await supabase.from('payment_profiles').upsert({
     business_id: businessId, account_holder: holder, bank_name: bank, clabe,
     concept: concept || null, payment_url: paymentUrl || null, image_url: imageUrl,
-    active: form.get('active') === 'on', updated_at: new Date().toISOString(),
+    holder_visible: !!visibility.holder, bank_visible: !!visibility.bank, clabe_visible: !!visibility.clabe,
+    concept_visible: !!visibility.concept, payment_url_visible: !!visibility.paymentUrl,
+    custom_sections: customSections, active: form.get('active') === 'on', updated_at: new Date().toISOString(),
   }, { onConflict: 'business_id' }).select('public_token').single();
   if (error) {
     if (uploadedPath) await supabase.storage.from('payment-images').remove([uploadedPath]);
