@@ -51,6 +51,9 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   }, [newSectionId, sections.length]);
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const token = state.token || profile?.public_token;
+  const freeSectionLimit = 3;
+  const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
+  const totalSectionLimit = freeSectionLimit + purchasedSectionLimit;
   return <>
     <form action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
@@ -85,10 +88,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < 3 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 3 ? `Te quedan ${3-sections.length} gratis` : `${3 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado comprado disponible`}</small></div></button>
-          : sections.some(section => !section.title.trim() && !section.content.trim())
-            ? <div className="apartadoRowAdd" role="status"><span><b>✓</b></span><div><strong>Tu nuevo apartado está listo arriba</strong><small>Escribe su título o información y guarda los cambios.</small></div></div>
-            : null}
+          {sections.length < totalSectionLimit ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < freeSectionLimit ? `Te quedan ${freeSectionLimit-sections.length} gratis` : `${totalSectionLimit-sections.length} apartado comprado disponible`}</small></div></button> : <a className="apartadoRowAdd apartadoRowLocked" href={`/checkout?product=nival_pay_extra_section&profile=${profile?.id ?? ''}`}><span><b>🔒</b></span><div><strong>Agregar apartado · $10 MXN</strong><small>Ya usaste tus 3 apartados gratis. Compra uno adicional para desbloquearlo.</small></div></a>}
           <p className="apartadoFootnote">Los primeros 3 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
