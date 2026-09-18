@@ -110,15 +110,18 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       body: JSON.stringify({
         type: 'online',
         processing_mode: 'manual',
+        capture_mode: 'automatic_async',
         total_amount: amount,
         external_reference: order.id,
         description: product.description,
-        payer: { email: 'test_user_1348852238063419528@testuser.com' },
+        payer: { email: 'TESTUSER1348852238063419528@testuser.com' },
         items: [{
           external_code: product.productCode,
           title: product.description,
           quantity: 1,
+          unit_measure: 'unit',
           unit_price: amount,
+          total_amount: amount,
         }],
         config: {
           online: {
