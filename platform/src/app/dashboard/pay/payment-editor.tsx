@@ -26,7 +26,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="paymentUrl" value={paymentUrl} />
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
-      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div></div>
       <div className="nivalClientPreview editableClientPreview">
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile">
@@ -44,11 +44,16 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           <label><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
         </div>
         <div className="nivalClientCopy">Copiar CLABE</div>
+        <div className="inlinePageControls">
+          <div className="visibilityControl"><div><strong>Visibilidad</strong><small>{active ? 'Tu página está visible para tus clientes' : 'Tu página está oculta para tus clientes'}</small></div><button type="button" className={active ? 'visibilityToggle public' : 'visibilityToggle hidden'} onClick={()=>setActive(v=>!v)} aria-pressed={active}>{active ? 'Pública' : 'Oculta'}</button></div>
+          <label className="inlineOptionalLink"><span>Enlace de pago <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
+        </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
           <button type="button" className="apartadoRowAdd"><span><b>+</b></span><div><strong>Agregar apartado</strong><small>Se añadirá debajo de Concepto</small></div></button>
           <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. A partir del sexto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
+        <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
       </div>
 
       {state.error && <p role="alert" className="payError">{state.error}</p>}
