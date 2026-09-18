@@ -50,17 +50,28 @@ async function reconcileLatestExtraSectionOrder(businessId: string) {
     candidate.status === 'processed' && candidate.status_detail === 'accredited'
   );
   const paymentId = payment?.id ? String(payment.id) : null;
-  const approved = payload.id === order.provider_preference_id
-    && payload.external_reference === order.id
-    && payload.status === 'processed'
-    && payload.status_detail === 'accredited'
-    && payload.currency_id === order.currency
-    && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
-    && Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents
-    && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS
-    && Boolean(paymentId)
-    && (!order.provider_payment_id || order.provider_payment_id === paymentId);
-  if (!approved || !paymentId) return;
+  const checks = {
+    orderId: payload.id === order.provider_preference_id,
+    externalReference: payload.external_reference === order.id,
+    orderStatus: payload.status === 'processed',
+    orderStatusDetail: payload.status_detail === 'accredited',
+    currency: !payload.currency_id || payload.currency_id === order.currency,
+    totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
+    totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
+    catalogAmount: order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
+    paymentId: Boolean(paymentId),
+    storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
+  };
+  const approved = Object.values(checks).every(Boolean);
+  if (!approved || !paymentId) {
+    console.warn('Extra section reconciliation verification failed', {
+      orderId: order.id,
+      failedChecks: Object.entries(checks).filter(([, passed]) => !passed).map(([name]) => name),
+      providerStatus: payload.status ?? null,
+      providerStatusDetail: payload.status_detail ?? null,
+    });
+    return;
+  }
 
   const { error } = await admin.rpc('finalize_nival_pay_order', {
     p_order_id: order.id,

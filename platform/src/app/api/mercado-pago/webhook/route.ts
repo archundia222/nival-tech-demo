@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
   const paymentId = payment?.id ? String(payment.id) : null;
   const approved = payload.status === 'processed'
     && payload.status_detail === 'accredited'
-    && payload.currency_id === order.currency
+    && (!payload.currency_id || payload.currency_id === order.currency)
     && amountCents === order.amount_cents
     && paidAmountCents === order.amount_cents
     && ((order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_PRICE_CENTS)
