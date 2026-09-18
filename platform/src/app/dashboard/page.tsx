@@ -50,7 +50,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { data: memberships } = await supabase
     .from("business_members")
-    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status)")
+    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level)")
     .eq("user_id", user.id);
   const membership = memberships?.[0];
 
@@ -71,6 +71,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const businessId = business?.id;
+  const productLevel: 'pay' | 'intelligence' = business?.product_level === 'intelligence' ? 'intelligence' : 'pay';
+  const hasIntelligence = productLevel === 'intelligence';
+  if (!hasIntelligence && (currentSection === 'clientes' || currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
   const [{ count: customerCount }, { count: visitCount }, { count: campaignCount }] = businessId
     ? await Promise.all([
         supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
@@ -170,7 +173,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <main className="dashboardApp">
-      <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} />
+      <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
       <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
@@ -184,7 +187,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       <section className="metricGrid">
         <article><span>Nival Pay</span><strong>{hasNivalPay ? "Activo" : "Sin activar"}</strong></article>
-        <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>
+        {hasIntelligence && <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>}
         <article><span>Vistas de cobro</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong></article>
         <article><span>Cuenta</span><strong>{business?.subscription_status === "active" ? "Activa" : "Configuración"}</strong></article>
       </section>
@@ -202,6 +205,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       </>}
       {currentSection === "inteligencia" && <>
+      {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
       <section className="intelligenceCard" id="inteligencia">
         <div className="intelligenceHeading">
           <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h2>Segmentos automáticos</h2></div>
@@ -229,6 +233,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         )}
       </section>
       </>}
+      </>}
       {currentSection === "nival-card" && <>
       {business?.slug && <BusinessQr
         businessName={business.name}
@@ -239,7 +244,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         description="Comparte todos tus enlaces, contacto, reseñas, pagos y programa de lealtad desde una sola página."
         fileSuffix="perfil-digital"
       />}
-      {business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
+      {hasIntelligence && business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
       {canManageProgram && (
         <section className="settingsCard" id="nival-card">
           <div className="settingsIntro">
@@ -325,7 +330,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </form>
         </section>
       )}
-      {canManageProgram && loyaltyProgram && (
+      {hasIntelligence && canManageProgram && loyaltyProgram && (
         <section className="settingsCard">
           <div className="settingsIntro">
             <p className="eyebrow">PROGRAMA DE LEALTAD</p>
@@ -345,7 +350,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
       {currentSection === "clientes" && <>
-      <section className="customerTableCard" id="clientes">
+      {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">CLIENTES</p><h1>Configura tu programa de lealtad</h1><p>Antes de registrar clientes, visitas y puntos, configura y activa el programa de lealtad de este workspace.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <section className="customerTableCard" id="clientes">
         <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
         {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
           <div className="customerList">{customers.map((customer) => {
@@ -364,9 +369,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </article>;
           })}</div>
         )}
-      </section>
+      </section>}
       </>}
-      {currentSection === "clientes" && <section className="redemptionHistoryCard">
+      {currentSection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>
           <h2>Premios entregados</h2>
