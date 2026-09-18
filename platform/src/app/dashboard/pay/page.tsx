@@ -22,7 +22,25 @@ export default async function PaySettings() {
       .eq('business_id', membership.business_id).maybeSingle(),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
-  if (!paidOrder) redirect('/checkout');
+  if (!paidOrder) return <main className="dashboardApp">
+    <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" />
+    <div className="dashboardContent dashboardPayContent">
+      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">Sin activar</span></header>
+      <section className="dashboardHero">
+        <div>
+          <p className="eyebrow">NIVAL PAY</p>
+          <h1>Convierte tu tarjeta NFC en una página de cobro.</h1>
+          <p>Recibe transferencias con un enlace y QR propios. La activación incluye tu tarjeta NFC y es un pago único de $199 MXN, sin mensualidad.</p>
+          <a className="loginLink" href="/checkout">Activar Nival Pay · $199 MXN</a>
+        </div>
+      </section>
+      <section className="analyticsGrid" aria-label="Qué incluye Nival Pay">
+        <article className="chartCard"><div className="chartHeading"><div><span>PÁGINA DE COBRO</span><h2>Lista para compartir</h2></div></div><p>Tu cliente abre una página simple con los datos necesarios para pagarte.</p></article>
+        <article className="chartCard"><div className="chartHeading"><div><span>NFC + QR</span><h2>Un mismo destino</h2></div></div><p>Comparte el mismo enlace desde tu tarjeta NFC o mediante código QR.</p></article>
+      </section>
+    </div>
+  </main>;
+
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" />
     <div className="dashboardContent dashboardPayContent">
