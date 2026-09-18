@@ -236,7 +236,7 @@ export async function startExtraSectionCheckout() {
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
     amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
-    description: 'Nival Pay · apartado adicional',
+    description: 'Nival Pay · página de cobro adicional',
     returnPath: '/dashboard/pay',
   });
 }

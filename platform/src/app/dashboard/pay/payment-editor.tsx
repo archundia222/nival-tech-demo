@@ -2,11 +2,10 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
-import { startExtraSectionCheckout } from '../../checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 
 type Section = { id: string; title: string; content: string; public: boolean };
-type Profile = { account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
+type Profile = { id: string; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[] };
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
@@ -31,7 +30,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const newSectionInput = useRef<HTMLInputElement | null>(null);
   const addSection = () => {
     setSections(current => {
-      if (current.length >= 3 + (profile?.extra_sections_purchased ?? 0)) return current;
+      if (current.length >= 3) return current;
       const id = crypto.randomUUID();
       setNewSectionId(id);
       return [...current, { id, title: '', content: '', public: true }];
@@ -56,6 +55,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   return <>
     <form action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
+      <input type="hidden" name="profileId" value={profile?.id ?? ''} />
       <input type="hidden" name="paymentUrl" value={paymentUrl} />
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="fieldVisibility" value={JSON.stringify(fieldVisibility)} />
@@ -86,10 +86,10 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < 3 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 3 ? `Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis` : `Tienes ${3 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado adicional disponible`}</small></div></button>
+          {sections.length < 3 ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{`Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis`}</small></div></button>
           : sections.some(section => !section.title.trim() && !section.content.trim())
             ? <div className="apartadoRowAdd" role="status"><span><b>✓</b></span><div><strong>Tu nuevo apartado está listo arriba</strong><small>Escribe su título o información y guarda los cambios.</small></div></div>
-            : <button type="submit" formAction={startExtraSectionCheckout} className="apartadoRowAdd paidApartadoButton"><span><b>$</b></span><div><strong>Comprar otro apartado · $10 MXN</strong><small>Ya utilizaste los incluidos · Paga con Mercado Pago para desbloquear 1 apartado</small></div></button>}
+            : null}
           <p className="apartadoFootnote">Los primeros 3 apartados adicionales están incluidos. A partir del cuarto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>

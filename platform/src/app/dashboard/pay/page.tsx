@@ -5,6 +5,8 @@ import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { createAdditionalPaymentProfile } from './actions';
+import { startExtraSectionCheckout } from '@/app/checkout/actions';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -80,7 +82,8 @@ async function reconcileLatestExtraSectionOrder(businessId: string) {
   if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
 }
 
-export default async function PaySettings() {
+export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string }> }) {
+  const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
@@ -91,14 +94,18 @@ export default async function PaySettings() {
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   await reconcileLatestExtraSectionOrder(membership.business_id);
-  const [{ data: paidOrder }, { data: profile, error: profileError }] = await Promise.all([
+  const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }] = await Promise.all([
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles')
-      .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count, holder_visible, bank_visible, clabe_visible, concept_visible, payment_url_visible, custom_sections, extra_sections_purchased')
-      .eq('business_id', membership.business_id).maybeSingle(),
+      .select('id, display_name, account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count, holder_visible, bank_visible, clabe_visible, concept_visible, payment_url_visible, custom_sections')
+      .eq('business_id', membership.business_id).order('created_at'),
+    supabase.from('product_orders').select('id', { count: 'exact', head: true })
+      .eq('business_id', membership.business_id).eq('product_code', NIVAL_PAY_EXTRA_SECTION_PRODUCT).eq('status', 'paid'),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
+  const profile = profiles?.find((item) => item.id === params.profile) ?? profiles?.[0] ?? null;
+  const canCreateAdditional = (profiles?.length ?? 0) < 1 + (paidExtras ?? 0);
   if (!paidOrder) return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
@@ -123,9 +130,20 @@ export default async function PaySettings() {
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Activo</span></header>
       <header className="payHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tus puntos de cobro.</h1><p>Administra tu página, QR y tarjeta NFC desde un solo lugar.</p></header>
+      {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
+      <section className="smartLinksCard">
+        <div><p className="eyebrow">TUS NIVAL PAY</p><h2>Elige una página de cobro</h2></div>
+        <div className="smartLinkActions">
+          {profiles?.map((item) => <a key={item.id} className={item.id === profile?.id ? 'primaryButton' : 'textButton'} href={`/dashboard/pay?profile=${item.id}`}>{item.display_name}</a>)}
+          {canCreateAdditional
+            ? <form action={createAdditionalPaymentProfile}><button className="primaryButton" type="submit">+ Crear Nival Pay disponible</button></form>
+            : <form action={startExtraSectionCheckout}><button className="primaryButton" type="submit">+ Agregar Nival Pay · $10 MXN</button></form>}
+        </div>
+        <p>Cada Nival Pay tiene su propio enlace, QR y datos. La tarjeta física NFC se compra por separado.</p>
+      </section>
       {!['trial','active'].includes(business?.subscription_status ?? '') && <p role="status" className="formMessage">Tu servicio está suspendido. Puedes editar los datos, pero la página pública no estará disponible hasta reactivar el servicio.</p>}
       {['owner','manager'].includes(membership.role)
-        ? <PaymentEditor businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} />
+        ? profile && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} />
         : <p>Solo el propietario o un administrador puede configurar Nival Pay.</p>}
     </div>
   </main>;
