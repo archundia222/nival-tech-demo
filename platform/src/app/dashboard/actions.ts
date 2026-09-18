@@ -186,6 +186,28 @@ export async function updateBusinessProfile(formData: FormData) {
   redirect(`/dashboard?message=${encodeURIComponent("Perfil público actualizado.")}`);
 }
 
+export async function createLoyaltyProgram(formData: FormData) {
+  const programName = String(formData.get("programName") ?? "").trim();
+  const pointsPerVisit = Number(formData.get("pointsPerVisit"));
+  const rewardThreshold = Number(formData.get("rewardThreshold"));
+  const rewardDescription = String(formData.get("rewardDescription") ?? "").trim();
+  if (programName.length < 2 || programName.length > 80 || !Number.isInteger(pointsPerVisit) || pointsPerVisit < 1 || pointsPerVisit > 100 || !Number.isInteger(rewardThreshold) || rewardThreshold < 1 || rewardThreshold > 1000 || rewardDescription.length < 2 || rewardDescription.length > 160) {
+    redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Revisa los datos del programa de lealtad.")}`);
+  }
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth");
+  const { data: membership } = await supabase.from("business_members").select("business_id, role, businesses(product_level)").eq("user_id", user.id).limit(1).maybeSingle();
+  const business = Array.isArray(membership?.businesses) ? membership.businesses[0] : membership?.businesses;
+  if (!membership || !["owner","manager"].includes(membership.role) || business?.product_level !== "intelligence") redirect("/dashboard?section=resumen");
+  const { data: existing } = await supabase.from("loyalty_programs").select("id").eq("business_id", membership.business_id).eq("active", true).limit(1).maybeSingle();
+  if (existing) redirect("/dashboard?section=configuracion");
+  const { error } = await supabase.from("loyalty_programs").insert({ business_id: membership.business_id, name: programName, points_per_visit: pointsPerVisit, reward_threshold: rewardThreshold, reward_description: rewardDescription, active: true });
+  if (error) redirect(`/dashboard?section=configuracion&error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/dashboard");
+  redirect(`/dashboard?section=configuracion&message=${encodeURIComponent("Programa de lealtad activado.")}`);
+}
+
 export async function updateLoyaltyProgram(formData: FormData) {
   const programName = String(formData.get("programName") ?? "").trim();
   const pointsPerVisit = Number(formData.get("pointsPerVisit"));
