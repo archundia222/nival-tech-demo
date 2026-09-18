@@ -40,7 +40,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
       <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div></div>
       <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
-        <button type="button" className={active ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>setActive(v=>!v)} aria-pressed={active} title="Cambiar visibilidad de la página" style={{position:"absolute",top:"1rem",right:"1rem",zIndex:5,minWidth:"auto",padding:"0.5rem 0.8rem",fontSize:"0.78rem",lineHeight:1}}>{active ? "Visible · cambiar" : "Oculta · cambiar"}</button>
+        <button type="button" className={active ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>setActive(v=>!v)} aria-pressed={active} title="Cambiar visibilidad de la página" style={{position:"absolute",top:"1rem",right:"1rem",zIndex:20,minWidth:"auto",padding:"0.55rem 0.9rem",fontSize:"0.78rem",lineHeight:1,background:"#f7edd5",boxShadow:"0 0 0 8px #fffdf9"}}>{active ? "Visible · cambiar" : "Oculta · cambiar"}</button>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile">
           <label className="editableLogo" title="Cambiar foto o logo">
