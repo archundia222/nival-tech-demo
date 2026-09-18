@@ -60,7 +60,6 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
             <label><span>Link o información · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"content",section.content)}>Editar</button></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="https://... o escribe información" /></label>
           </div>)}
         </div>
-        <div className="nivalClientCopy">Copiar CLABE</div>
         <div className="inlinePageControls">
           <div className="visibilityControl"><div><strong>Visibilidad</strong><small>{active ? 'Tu página está visible para tus clientes' : 'Tu página está oculta para tus clientes'}</small></div><button type="button" className={active ? 'visibilityToggle public' : 'visibilityToggle hidden'} onClick={()=>setActive(v=>!v)} aria-pressed={active}>{active ? 'Pública' : 'Oculta'}</button></div>
           <label className="inlineOptionalLink"><span>Enlace de pago <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
