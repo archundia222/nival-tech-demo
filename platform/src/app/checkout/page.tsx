@@ -36,7 +36,19 @@ async function reconcileLatestOrder(businessId: string) {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (!order?.provider_preference_id || order.status === 'paid') return;
+  if (!order?.provider_preference_id) return;
+
+  const activateBusiness = async () => {
+    const now = new Date().toISOString();
+    await admin.from('businesses')
+      .update({ subscription_status: 'active', updated_at: now })
+      .eq('id', businessId)
+      .neq('subscription_status', 'active');
+  };
+  if (order.status === 'paid' && order.provider_payment_id) {
+    await activateBusiness();
+    return;
+  }
 
   const response = await fetch(
     `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
@@ -75,10 +87,7 @@ async function reconcileLatestOrder(businessId: string) {
     .eq('id', order.id)
     .neq('status', 'paid');
   if (paymentError) return;
-  await admin.from('businesses')
-    .update({ subscription_status: 'active', updated_at: now })
-    .eq('id', businessId)
-    .neq('subscription_status', 'active');
+  await activateBusiness();
 }
 
 export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ result?: string; error?: string }> }) {
@@ -117,10 +126,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       </nav>
     </details>
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">{business?.subscription_status ?? 'trial'}</span></header>
+      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">{paid ? 'active' : (business?.subscription_status ?? 'trial')}</span></header>
       <section className="checkoutHeader"><p className="landingEyebrow">ACTIVACIÓN DE NIVAL PAY</p><h1>{paid ? 'Tu Nival Pay está activo.' : 'Elige cómo quieres pagar.'}</h1><p>{business?.name} · Un solo pago, sin mensualidad.</p></section>
       {params.error && <p className="checkoutNotice errorMessage" role="alert">{params.error}</p>}
-      {params.result === 'success' && <p className="checkoutNotice">Recibimos el regreso de Mercado Pago. Estamos confirmando el pago de forma segura.</p>}
+      {params.result === 'success' && !paid && <p className="checkoutNotice">Recibimos el regreso de Mercado Pago. Estamos confirmando el pago de forma segura.</p>}
       {params.result === 'pending' && <p className="checkoutNotice">Tu pago sigue pendiente en Mercado Pago. La activación será automática cuando se apruebe.</p>}
       {params.result === 'failure' && <p className="checkoutNotice errorMessage">El pago no se completó. Puedes intentarlo nuevamente.</p>}
       {params.result === 'cash' && <p className="checkoutNotice">Venta en efectivo registrada. Nival Tech se activará cuando el vendedor confirme que recibió el pago.</p>}
