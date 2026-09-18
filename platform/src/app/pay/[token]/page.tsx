@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { DM_Sans, Manrope } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
-import { isHttpsUrl } from "@/lib/payment-profile";
-import { CopyField } from "./copy-field";
+import { CopyField, CopyPrimaryButton } from "./copy-field";
+import styles from "./payment-page.module.css";
 
+const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-pay-body" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-pay-display" });
 export const metadata = { robots: { index: false, follow: false } };
 
-interface PaymentPageProps {
-  params: Promise<{ token: string }>;
-}
+interface PaymentPageProps { params: Promise<{ token: string }>; }
 
 export default async function PaymentPage({ params }: PaymentPageProps) {
   const { token } = await params;
@@ -17,35 +18,30 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
   const { data, error } = await supabase.rpc("get_public_payment_profile_v2", { profile_token: token });
   if (error || !data?.[0]) notFound();
   const profile = data[0];
+  const initials = profile.business_name.split(/\s+/).slice(0,2).map((word:string)=>word[0]).join("").toUpperCase();
 
-  const paymentUrl = profile.payment_url && isHttpsUrl(profile.payment_url) ? profile.payment_url : null;
-  const initials = profile.business_name.split(/\s+/).slice(0, 2).map((word: string) => word[0]).join("").toUpperCase();
-
-  return <main className="paymentPage">
-    <section className="paymentPageCard">
-      <header className="paymentPageBrand">
-        {profile.logo_url
-          ? <Image className="paymentPageImage" src={profile.logo_url} alt={`Imagen de ${profile.business_name}`} width={148} height={148} unoptimized priority />
-          : <span className="paymentPageImage paymentPageMonogram">{initials || "N"}</span>}
-        <h1>{profile.business_name}</h1>
-        <p>Elige cómo quieres pagar</p>
-      </header>
-
-      {paymentUrl && <a className="paymentDirectButton" href={paymentUrl} target="_blank" rel="noopener noreferrer">Pagar ahora <span aria-hidden="true">↗</span></a>}
-      {paymentUrl && <div className="paymentDivider"><span>o transferencia bancaria</span></div>}
-
-      <section className="paymentTransferSection">
-        <h2>Datos para transferencia</h2>
-        <div className="paymentCard">
-          <CopyField label="Banco" value={profile.bank_name} />
-          <CopyField label="Beneficiario" value={profile.account_holder} />
-          <CopyField label="CLABE interbancaria" value={profile.clabe} prominent />
-          {profile.concept && <CopyField label="Concepto" value={profile.concept} prominent />}
+  return <main className={`${styles.pageShell} ${dmSans.variable} ${manrope.variable}`}>
+    <section className={styles.payCard} aria-labelledby="payment-title">
+      <div className={styles.brandRow}>
+        <span className={styles.brandMark} aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M14 2.4 24 8.2v11.6L14 25.6 4 19.8V8.2L14 2.4Z"/><path d="m9.2 16.5 3.1 3.1 6.7-8"/></svg></span>
+        <span className={styles.brandName}>Nival <strong>Pay</strong></span>
+        <span className={styles.securePill}>Datos verificados</span>
+      </div>
+      <div className={styles.profile}>
+        <div className={styles.logoWrap}>
+          {profile.logo_url ? <Image src={profile.logo_url} alt={`Logotipo de ${profile.business_name}`} width={116} height={116} unoptimized priority /> : <span className={styles.monogram}>{initials || "N"}</span>}
         </div>
-      </section>
-
-      <p className="securityNotice">Verifica los datos del beneficiario antes de realizar la transferencia. Nival Tech nunca solicitará NIP, CVV, contraseña ni códigos de seguridad.</p>
-      <footer className="paymentPoweredBy">Powered by <strong>NIVAL TECH</strong></footer>
+        <p className={styles.eyebrow}>Realiza tu transferencia a</p>
+        <CopyField label="Beneficiario" value={profile.account_holder} variant="name" />
+      </div>
+      <div className={styles.details}>
+        <CopyField label="Banco" value={profile.bank_name} variant="bank" />
+        <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />
+        {profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
+      </div>
+      <CopyPrimaryButton value={profile.clabe} />
+      <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
     </section>
+    <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
   </main>;
 }
