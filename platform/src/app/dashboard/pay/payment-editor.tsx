@@ -26,7 +26,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="paymentUrl" value={paymentUrl} />
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
-      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><p className="visualEditHint">Haz clic sobre el nombre, banco, CLABE, concepto o logo para editarlos.</p></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
       <div className="nivalClientPreview editableClientPreview">
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile">
@@ -53,6 +53,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
+    {token && <section className="payExtraLinks"><div><p className="eyebrow">MÁS PUNTOS DE COBRO</p><h2>Agrega hasta 5 links más</h2><p>Tu Nival Pay incluye este link principal. Puedes agregar hasta 5 links adicionales, cada uno con su propio QR, por <strong>$10 MXN</strong> cada uno.</p></div><div className="extraLinkOffer"><span>Hasta 5 adicionales</span><strong>$10 <small>MXN / link</small></strong><p>Al agregar uno, también podrás elegir una tarjeta NFC física para ese link por +$99 MXN.</p></div></section>}
     {token && <section className="payShare"><h2>Comparte tu página</h2><PaymentProfileQr businessName={businessName} url={`${siteUrl}/pay/${token}`} views={Number(profile?.view_count ?? 0)} /></section>}
   </>;
 }
