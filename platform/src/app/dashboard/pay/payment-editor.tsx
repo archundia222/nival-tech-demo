@@ -55,6 +55,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const freeSectionLimit = 3;
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
   const totalSectionLimit = freeSectionLimit + purchasedSectionLimit;
+  const extraSectionCheckoutFormId = `extra-section-checkout-${profile?.id ?? 'new'}`;
   return <>
     <form action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
@@ -89,7 +90,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < totalSectionLimit ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < freeSectionLimit ? `Te quedan ${freeSectionLimit-sections.length} gratis` : `${totalSectionLimit-sections.length} apartado comprado disponible`}</small></div></button> : <button type="submit" className="apartadoRowAdd apartadoRowLocked" formAction={startExtraSectionCheckout}><input type="hidden" name="profileId" value={profile?.id ?? ""} /><span><b>🔒</b></span><div><strong>Agregar apartado · $10 MXN</strong><small>Ya usaste tus 3 apartados gratis. Compra uno adicional para desbloquearlo.</small></div></button>}
+          {sections.length < totalSectionLimit ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < freeSectionLimit ? `Te quedan ${freeSectionLimit-sections.length} gratis` : `${totalSectionLimit-sections.length} apartado comprado disponible`}</small></div></button> : <button type="submit" form={extraSectionCheckoutFormId} className="apartadoRowAdd apartadoRowLocked"><span><b>🔒</b></span><div><strong>Agregar apartado · $10 MXN</strong><small>Ya usaste tus 3 apartados gratis. Compra uno adicional para desbloquearlo.</small></div></button>}
           <p className="apartadoFootnote">Los primeros 3 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
@@ -97,6 +98,9 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
 
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
+    </form>
+    <form id={extraSectionCheckoutFormId} action={startExtraSectionCheckout}>
+      <input type="hidden" name="profileId" value={profile?.id ?? ''} />
     </form>
   </>;
 }
