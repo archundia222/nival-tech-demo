@@ -38,11 +38,11 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   if (concept.length > 120) return { error: 'El concepto debe tener como máximo 120 caracteres.' };
   if (paymentUrl && !isHttpsUrl(paymentUrl)) return { error: 'El enlace de pago debe ser una dirección HTTPS válida.' };
 
-  const { data: existing, error: readError } = await supabase.from('payment_profiles').select('id, image_url')
+  const { data: existing, error: readError } = await supabase.from('payment_profiles').select('id, image_url, extra_sections_purchased')
     .eq('id', profileId).eq('business_id', businessId).maybeSingle();
   if (readError) return { error: 'No pudimos leer tu configuración. Intenta de nuevo.' };
   if (!existing) return { error: 'No encontramos esta página Nival Pay.' };
-  customSections = customSections.slice(0, 3);
+  customSections = customSections.slice(0, 5 + Number(existing?.extra_sections_purchased ?? 0));
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
   let uploadedPath: string | null = null;
   const file = form.get('image');

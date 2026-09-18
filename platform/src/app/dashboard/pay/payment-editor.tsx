@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
 
 type Section = { id: string; title: string; content: string; public: boolean };
-type Profile = { id: string; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[] };
+type Profile = { id: string; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
@@ -29,7 +29,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const newSectionInput = useRef<HTMLInputElement | null>(null);
   const addSection = () => {
     setSections(current => {
-      if (current.length >= 3) return current;
+      if (current.length >= 5 + (profile?.extra_sections_purchased ?? 0)) return current;
       const id = crypto.randomUUID();
       setNewSectionId(id);
       return [...current, { id, title: '', content: '', public: true }];
@@ -84,12 +84,12 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           </div>)}
         </div>
         <div className="inlineApartados">
-          <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < 3 ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{`Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis`}</small></div></button>
+          <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
+          {sections.length < 5 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 5 ? `Te quedan ${5-sections.length} gratis` : `${5 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado comprado disponible`}</small></div></button>
           : sections.some(section => !section.title.trim() && !section.content.trim())
             ? <div className="apartadoRowAdd" role="status"><span><b>✓</b></span><div><strong>Tu nuevo apartado está listo arriba</strong><small>Escribe su título o información y guarda los cambios.</small></div></div>
             : null}
-          <p className="apartadoFootnote">Los primeros 3 apartados adicionales están incluidos. A partir del cuarto, cada apartado adicional cuesta $10 MXN.</p>
+          <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
       </div>

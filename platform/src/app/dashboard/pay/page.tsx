@@ -101,7 +101,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles')
-      .select('id, display_name, account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count, holder_visible, bank_visible, clabe_visible, concept_visible, payment_url_visible, custom_sections')
+      .select('id, display_name, account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count, holder_visible, bank_visible, clabe_visible, concept_visible, payment_url_visible, custom_sections, extra_sections_purchased')
       .eq('business_id', membership.business_id).order('created_at'),
     supabase.from('product_orders').select('id', { count: 'exact', head: true })
       .eq('business_id', membership.business_id).eq('product_code', NIVAL_PAY_EXTRA_SECTION_PRODUCT).eq('status', 'paid'),
