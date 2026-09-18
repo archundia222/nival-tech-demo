@@ -1113,17 +1113,19 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .productActive,.productInactive{padding:7px 10px;border-radius:999px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
 .productActive{color:#24583b;background:#d9eedf}
 .productInactive{color:#755022;background:#f1e0c4}
-.nivalCardPedestal{position:relative;display:grid;place-items:center;min-height:225px;margin-top:8px;perspective:900px}
-.nivalPhysicalCard{position:relative;z-index:2;width:min(86%,390px);aspect-ratio:1.586;padding:24px;color:#f8f5ee;background:linear-gradient(145deg,#0a0b0d 0%,#202228 58%,#0d0e11 100%);border:1px solid #464950;border-radius:20px;transform:rotateX(3deg) rotateZ(-2deg);box-shadow:0 28px 38px #11121452,inset 0 1px 0 #ffffff24;overflow:hidden}
+.nivalCardPedestal{position:relative;display:grid;place-items:center;min-height:225px;margin-top:8px;perspective:900px;border-radius:22px;cursor:pointer}
+.nivalCardPedestal:focus-visible{outline:3px solid #8b6a2f;outline-offset:3px}.nivalCardPedestal:hover .nivalPhysicalCard{transform:rotateX(1deg) rotateZ(-1deg) translateY(-5px);box-shadow:0 34px 45px #11121462,inset 0 1px 0 #ffffff24}
+.nivalPhysicalCard{position:relative;z-index:2;width:min(86%,390px);aspect-ratio:1.586;padding:24px;color:#f8f5ee;background:linear-gradient(145deg,#0a0b0d 0%,#202228 58%,#0d0e11 100%);border:1px solid #464950;border-radius:20px;transform:rotateX(3deg) rotateZ(-2deg);box-shadow:0 28px 38px #11121452,inset 0 1px 0 #ffffff24;overflow:hidden;transition:transform .22s ease,box-shadow .22s ease}
 .nivalPhysicalCard::after{content:"";position:absolute;width:230px;height:230px;right:-110px;top:-130px;border:1px solid #b79a61;border-radius:50%;box-shadow:0 0 80px #b79a6130}
 .nivalCardMark{width:42px;height:42px;display:grid;place-items:center;color:#111214;background:#c7a86a;border-radius:12px;font-size:22px;font-weight:950}
 .nivalCardCopy{position:absolute;left:24px;bottom:42px;display:flex;align-items:baseline;gap:7px}.nivalCardCopy strong{font-size:25px;letter-spacing:.12em}.nivalCardCopy span{color:#c7a86a;font-size:13px;font-weight:900;letter-spacing:.2em}
 .nivalPhysicalCard>small{position:absolute;left:24px;bottom:22px;color:#aeb0b5;font-size:8px;font-weight:800;letter-spacing:.16em}
 .nivalCardBase{position:absolute;z-index:1;width:min(90%,410px);height:34px;bottom:16px;background:linear-gradient(180deg,#d2cec3,#aaa59b);border-radius:50%;filter:drop-shadow(0 12px 10px #11121430)}
-.nivalProductItem>p{margin:3px 0 0;color:#62656b;font-size:13px;text-align:center}
+.nivalProductItem>p{margin:3px 0 0;color:#62656b;font-size:13px;text-align:center}.productManageLink{color:#453315;font-weight:900;text-decoration:underline;text-underline-offset:3px}
 .nivalAddProduct{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:32px;color:#f7f4ed;text-align:center;background:#15171b;border:1px solid #3b3e45;box-shadow:0 22px 60px #0004}
 .nivalAddIcon{width:84px;height:84px;display:grid;place-items:center;color:#111214;background:#c7a86a;border-radius:24px;font-size:58px;font-weight:300;line-height:1;box-shadow:0 14px 30px #0006}
 .nivalAddProduct h2{margin:0 0 7px;font-size:25px}.nivalAddProduct p{margin:0;color:#d0cfd0;font-size:13px}.nivalAddProduct strong{display:block;margin-top:5px;color:#fff;font-size:17px}
+.nivalProductAction{display:inline-flex;justify-content:center;min-width:132px;margin-top:12px;padding:10px 14px;color:#111214;background:#c7a86a;border:1px solid #c7a86a;border-radius:10px;font-size:12px;font-weight:900}.nivalProductAction:hover{filter:brightness(1.08)}.nivalProductAction.secondary{color:#f7f4ed;background:transparent;border-color:#555861}
 .nivalAddDivider{width:72px;height:1px;background:#3b3e45}
 @media(max-width:760px){.nivalProductShelf{grid-template-columns:1fr}.nivalProductItem,.nivalAddProduct{min-height:auto}.nivalAddProduct{padding:30px 24px}.nivalPhysicalCard{width:92%;padding:20px}.nivalCardCopy{left:20px}.nivalPhysicalCard>small{left:20px}}
 

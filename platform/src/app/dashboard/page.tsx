@@ -241,21 +241,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div className="nivalProductShelf">
           <article className="nivalProductItem">
             <div className="productItemHeading"><div><small>TU TARJETA</small><h2>Nival Pay</h2></div><span className={hasNivalPay ? "productActive" : "productInactive"}>{hasNivalPay ? "Activa" : "Sin activar"}</span></div>
-            <div className="nivalCardPedestal">
+            <a className="nivalCardPedestal" href={hasNivalPay ? "/dashboard/pay" : "/checkout"} aria-label={hasNivalPay ? "Administrar Nival Pay" : "Activar Nival Pay"}>
               <div className="nivalPhysicalCard" aria-label="Representación de tarjeta Nival Pay">
                 <div className="nivalCardMark">N</div>
                 <div className="nivalCardCopy"><strong>NIVAL</strong><span>PAY</span></div>
                 <small>NFC · PÁGINA DE COBRO</small>
               </div>
               <div className="nivalCardBase" aria-hidden="true" />
-            </div>
-            <p>Página de cobro, QR y tarjeta NFC principal.</p>
+            </a>
+            <p>Página de cobro, QR y tarjeta NFC principal. <a className="productManageLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar" : "Activar"} →</a></p>
           </article>
           <article className="nivalAddProduct">
             <span className="nivalAddIcon" aria-hidden="true">+</span>
-            <div><h2>Agregar otro</h2><p>Nuevo link de cobro</p><strong>$10 MXN</strong></div>
+            <div><h2>Agregar otro</h2><p>Nuevo link de cobro</p><strong>$10 MXN</strong><a className="nivalProductAction" href="#nival-card">Agregar link</a></div>
             <div className="nivalAddDivider" />
-            <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong></div>
+            <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/products">Ver tarjetas</a></div>
           </article>
         </div>
       </section>
