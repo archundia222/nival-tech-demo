@@ -285,7 +285,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </div>
         <a className="primaryButton" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Configurar mi página Nival Pay" : "Activar Nival Pay"}</a>
       </section>}
-      {canManageProgram && business && (
+      {hasIntelligence && canManageProgram && business && (
         <section className="settingsCard teamCard">
           <div className="settingsIntro">
             <p className="eyebrow">EQUIPO</p>
