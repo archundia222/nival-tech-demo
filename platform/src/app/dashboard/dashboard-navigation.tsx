@@ -16,19 +16,20 @@ function NavIcon({ children }: { children: React.ReactNode }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>;
 }
 
-export function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem }) {
+export function DashboardNavigation({ businessName, active, productLevel = 'pay' }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
+  const visibleItems = items.filter((item) => productLevel === 'intelligence' || !['clientes', 'inteligencia'].includes(item.id));
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
       <button className="workspaceSwitcher" type="button"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></button>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
-        {items.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
+        {visibleItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}{item.soon && productLevel !== 'intelligence' ? <small>Próximamente</small> : null}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/products">Todos los productos</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
-      <nav aria-label="Navegación móvil del panel">{items.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</nav>
+      <nav aria-label="Navegación móvil del panel">{visibleItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</nav>
     </details>
   </>;
 }
