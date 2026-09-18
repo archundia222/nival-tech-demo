@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'clientes' | 'nival-card' | 'nival-pay' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'clientes' | 'nival-card' | 'nival-pay' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'nival-pay', label: 'Nival Pay', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
   { id: 'nival-card', label: 'Tarjetas y links', href: '/dashboard?section=nival-card', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18M7 15h3" /></> },
+  { id: 'perfil-digital', label: 'Perfil digital', href: '/dashboard?section=perfil-digital', icon: <><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></> },
 ];
 
 const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [

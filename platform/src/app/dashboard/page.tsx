@@ -13,7 +13,7 @@ interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
 }
 
-type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "configuracion";
+type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "configuracion";
 
 interface TeamMember {
   member_email: string;
@@ -33,7 +33,7 @@ interface IntelligenceRecommendation {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
-  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "configuracion"];
+  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "configuracion"];
   const currentSection: DashboardSection = dashboardSections.includes(params.section as DashboardSection)
     ? params.section as DashboardSection
     : "resumen";
@@ -42,6 +42,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     inteligencia: "Nival Intelligence",
     clientes: "Clientes",
     "nival-card": "Nival Card",
+    "perfil-digital": "Perfil digital",
     configuracion: "Configuración",
   };
   const supabase = await createClient();
@@ -258,16 +259,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </article>
         </div>
       </section>
-      {business?.slug && <BusinessQr
-        businessName={business.name}
-        url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
-        qrId="business-digital-profile-qr"
-        eyebrow="LANDING PAGE"
-        title="Perfil digital del negocio"
-        description="Comparte todos tus enlaces, contacto, reseñas, pagos y programa de lealtad desde una sola página."
-        fileSuffix="perfil-digital"
-      />}
-      {hasIntelligence && business?.slug && <BusinessQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/b/${business.slug}`} />}
       {canManageProgram && (
         <section className="settingsCard" id="nival-card">
           <div className="settingsIntro">
@@ -297,6 +288,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           editable={canManageProgram}
         />)}</div>
       </section>}
+      </>}
+      {currentSection === "perfil-digital" && business?.slug && <>
+        <section className="nivalAssetsIntro profileDigitalIntro">
+          <div className="assetsHeading"><p className="eyebrow">PERFIL DIGITAL</p><h1>Todo tu negocio en un enlace</h1><p>Comparte contacto, reseñas, pagos y enlaces desde una sola página.</p></div>
+        </section>
+        <BusinessQr
+          businessName={business.name}
+          url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
+          qrId="business-digital-profile-qr"
+          eyebrow="TU ENLACE PÚBLICO"
+          title="Perfil digital del negocio"
+          description="Comparte este enlace o descarga el QR para mostrar toda la información pública de tu negocio."
+          fileSuffix="perfil-digital"
+        />
       </>}
       {currentSection === "configuracion" && <>
       {canManageProgram && business && <section className="settingsCard">
