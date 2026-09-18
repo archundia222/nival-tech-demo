@@ -236,10 +236,26 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "nival-card" && <>
       <section className="nivalAssetsIntro">
-        <div><p className="eyebrow">TARJETAS Y LINKS</p><h1>Tus puntos de cobro</h1><p>Administra lo que ya tienes y amplía Nival Pay cuando lo necesites.</p></div>
-        <div className="assetOfferGrid">
-          <article className="assetPrimary"><span className="assetLock" aria-label="Producto principal protegido">⌑</span><small>INCLUIDO CON NIVAL PAY</small><h2>Nival Pay · Principal</h2><p>Página de cobro + QR + primera tarjeta NFC.</p><strong>{hasNivalPay ? "Activo" : "Actívalo por $199"}</strong></article>
-          <article><small>NUEVO PUNTO DE COBRO</small><h2>Link + QR</h2><p>Crea otro punto de cobro con enlace y código QR propios.</p><strong>$10 MXN</strong><span className="assetUpsell">¿Quieres tarjeta física también? +$99 MXN</span></article>
+        <div className="assetsHeading"><p className="eyebrow">TARJETAS Y LINKS</p><h1>Tus puntos de cobro</h1><p>Tu Nival Pay principal y todo lo que puedes agregar, presentado como productos reales.</p></div>
+        <div className="nivalProductShelf">
+          <article className="nivalProductItem">
+            <div className="productItemHeading"><div><small>TU TARJETA</small><h2>Nival Pay</h2></div><span className={hasNivalPay ? "productActive" : "productInactive"}>{hasNivalPay ? "Activa" : "Sin activar"}</span></div>
+            <div className="nivalCardPedestal">
+              <div className="nivalPhysicalCard" aria-label="Representación de tarjeta Nival Pay">
+                <div className="nivalCardMark">N</div>
+                <div className="nivalCardCopy"><strong>NIVAL</strong><span>PAY</span></div>
+                <small>NFC · PÁGINA DE COBRO</small>
+              </div>
+              <div className="nivalCardBase" aria-hidden="true" />
+            </div>
+            <p>Página de cobro, QR y tarjeta NFC principal.</p>
+          </article>
+          <article className="nivalAddProduct">
+            <span className="nivalAddIcon" aria-hidden="true">+</span>
+            <div><h2>Agregar otro</h2><p>Nuevo link de cobro</p><strong>$10 MXN</strong></div>
+            <div className="nivalAddDivider" />
+            <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong></div>
+          </article>
         </div>
       </section>
       {business?.slug && <BusinessQr
