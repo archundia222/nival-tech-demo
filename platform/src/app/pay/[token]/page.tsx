@@ -32,14 +32,18 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
           {profile.logo_url ? <Image src={profile.logo_url} alt={`Logotipo de ${profile.business_name}`} width={116} height={116} unoptimized priority /> : <span className={styles.monogram}>{initials || "N"}</span>}
         </div>
         <p className={styles.eyebrow}>Realiza tu transferencia a</p>
-        <CopyField label="Beneficiario" value={profile.account_holder} variant="name" />
+        {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="name" />}
       </div>
       <div className={styles.details}>
-        <CopyField label="Banco" value={profile.bank_name} variant="bank" />
-        <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />
-        {profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
+        {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
+        {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />}
+        {profile.concept_visible && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
+        {profile.payment_url_visible && profile.payment_url && <CopyField label="Enlace de pago" value={profile.payment_url} variant="detail" />}
+        {Array.isArray(profile.custom_sections) && profile.custom_sections.filter((s:{public?:boolean})=>s.public !== false).map((s:{id:string;title:string;content:string}) =>
+          s.title || s.content ? <CopyField key={s.id} label={s.title || "Información"} value={s.content || "—"} variant="detail" /> : null
+        )}
       </div>
-      <CopyPrimaryButton value={profile.clabe} />
+      {profile.clabe_visible && <CopyPrimaryButton value={profile.clabe} />}
       <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
     </section>
     <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
