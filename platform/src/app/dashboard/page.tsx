@@ -175,25 +175,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
       <section className="dashboardHero" id="resumen">
-        <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Administra los productos y servicios de tu negocio.</p><a className="loginLink" href="/products">Mis productos</a></div>
+        <div>
+          <p className="eyebrow">OPERACIÓN NIVAL TECH</p>
+          <h1>{business?.name ?? "Tu negocio"}</h1>
+          <p>Consulta lo esencial de tu cuenta y entra directamente a los productos que ya utilizas.</p>
+          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Abrir Nival Pay" : "Activar Nival Pay"}</a>
+        </div>
       </section>
       <section className="metricGrid">
+        <article><span>Nival Pay</span><strong>{hasNivalPay ? "Activo" : "Sin activar"}</strong></article>
         <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>
-        <article><span>Visitas</span><strong>{visitCount ?? 0}</strong></article>
-        <article><span>Campañas</span><strong>{campaignCount ?? 0}</strong></article>
-        <article><span>Estado</span><strong>Inicial</strong></article>
+        <article><span>Vistas de cobro</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong></article>
+        <article><span>Cuenta</span><strong>{business?.subscription_status === "active" ? "Activa" : "Configuración"}</strong></article>
       </section>
-      <section className="analyticsGrid" aria-label="Resumen de actividad">
+      <section className="analyticsGrid" aria-label="Accesos rápidos">
         <article className="chartCard">
-          <div className="chartHeading"><div><span>VISITAS</span><h2>Actividad reciente</h2></div><b>{visitTrend >= 0 ? "+" : ""}{visitTrend}%</b></div>
-          <div className="comparisonChart">
-            <div><span style={{ height: `${Math.max((previousVisits / maxVisitValue) * 100, 4)}%` }} /><b>{previousVisits}</b><small>30 días anteriores</small></div>
-            <div><span className="current" style={{ height: `${Math.max((recentVisits / maxVisitValue) * 100, 4)}%` }} /><b>{recentVisits}</b><small>Últimos 30 días</small></div>
-          </div>
+          <div className="chartHeading"><div><span>NIVAL PAY</span><h2>Página de cobro</h2></div></div>
+          <p>{hasNivalPay ? "Tu producto está activado. Desde aquí puedes revisar y actualizar los datos que verá el cliente al acercar la tarjeta." : "Activa Nival Pay para preparar la página de cobro que abrirá tu tarjeta NFC."}</p>
+          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $199 MXN"}</a>
         </article>
         <article className="chartCard">
-          <div className="chartHeading"><div><span>CLIENTES</span><h2>Distribución</h2></div><b>{customerCount ?? 0} total</b></div>
-          <div className="distributionChart">{segmentMetrics.map((segment) => <div key={segment.label}><span>{segment.label}</span><i><b style={{ width: `${Math.max((segment.value / maxSegmentValue) * 100, segment.value ? 8 : 0)}%` }} /></i><strong>{segment.value}</strong></div>)}</div>
+          <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
+          <p>Administra los enlaces y códigos QR asociados a tus tarjetas NFC desde una sola sección.</p>
+          <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
       </>}
