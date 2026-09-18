@@ -16,7 +16,6 @@ export default function Home() {
         <div className="landingNavLinks">
           <a href="#como-funciona">Cómo funciona</a>
           <a href="#precio">Precio</a>
-          <a href="#intelligence">Intelligence</a>
         </div>
         <Link className="landingLogin" href="/auth">Mi cuenta</Link>
       </nav>
@@ -58,7 +57,7 @@ export default function Home() {
               <h2>Café Nival</h2>
               <div className="phoneField"><span>Titular</span><b>Café Nival Demo</b></div>
               <div className="phoneField"><span>Banco</span><b>Banco Ejemplo</b></div>
-              <div className="phoneField"><span>CLABE</span><b>•••• •••• •••• ••1234</b></div>
+              <div className="phoneField"><span>CLABE</span><b>012 180 015022688507</b></div>
               <div className="phoneField"><span>Concepto</span><b>Pago de consumo</b></div>
               <div className="phoneCopy">Copiar CLABE</div>
             </div>
