@@ -26,7 +26,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="paymentUrl" value={paymentUrl} />
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
-      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><p className="visualEditHint">Haz clic sobre el nombre, banco, CLABE, concepto o logo para editarlos.</p></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div><button className="payButton" disabled={pending}>{pending ? 'Guardando…' : 'Guardar cambios'}</button></div>
       <div className="nivalClientPreview editableClientPreview">
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile">
@@ -35,15 +35,19 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
             <input name="image" type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const selected=e.target.files?.[0];setPreview(selected?URL.createObjectURL(selected):null);setRemoveImage(false)}} />
             <span>Cambiar logo</span>
           </label>
-          <p>Realiza tu transferencia a</p>
+          <p>Realiza tu transferencia a · <b className="fieldEditHint">Editar</b></p>
           <input className="inlinePayInput holderInput" aria-label="Titular de la cuenta" name="accountHolder" value={holder} onChange={e=>setHolder(e.target.value)} required minLength={2} maxLength={120} />
         </div>
         <div className="nivalClientDetails editableDetails">
-          <label><span>Banco</span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
-          <label><span>CLABE interbancaria</span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
-          <label><span>Concepto <small>Opcional</small></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
+          <label><span>Banco · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>setBank(e.target.value)} required minLength={2} maxLength={80} /></label>
+          <label><span>CLABE interbancaria · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
+          <label><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
         </div>
         <div className="nivalClientCopy">Copiar CLABE</div>
+        <div className="inlineApartados">
+          <div><span>APARTADOS ADICIONALES</span><strong>Agrega hasta 5</strong><p>Cada apartado incluye su propia página, enlace y QR por $10 MXN.</p></div>
+          <div className="inlineApartadoPrice"><b>$10</b><small>MXN / apartado</small><em>Tarjeta NFC física opcional · +$99</em></div>
+        </div>
       </div>
       <details className="payAdvancedSettings"><summary>Opciones de la página</summary><div>
         <label>Enlace de pago opcional<input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
@@ -53,7 +57,6 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
-    {token && <section className="payExtraLinks"><div><p className="eyebrow">MÁS PUNTOS DE COBRO</p><h2>Agrega hasta 5 apartados más</h2><p>Tu Nival Pay incluye este link principal. Puedes agregar hasta 5 apartados adicionales, cada uno con su propia página, enlace y QR, por <strong>$10 MXN</strong> cada uno.</p></div><div className="extraLinkOffer"><span>Hasta 5 adicionales</span><strong>$10 <small>MXN / apartado</small></strong><p>Al agregar uno, también podrás elegir una tarjeta NFC física para ese apartado por +$99 MXN.</p></div></section>}
     {token && <section className="payShare"><h2>Comparte tu página</h2><PaymentProfileQr businessName={businessName} url={`${siteUrl}/pay/${token}`} views={Number(profile?.view_count ?? 0)} /></section>}
   </>;
 }
