@@ -119,9 +119,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
           external_code: product.productCode,
           title: product.description,
           quantity: 1,
-          unit_measure: 'unit',
           unit_price: amount,
-          total_amount: amount,
         }],
         config: {
           online: {
