@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
   type?: string;
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient();
   const { data: order, error: orderError } = await admin.from('product_orders')
-    .select('business_id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
+    .select('business_id, product_code, amount_cents, currency, status, provider_preference_id, provider_payment_id')
     .eq('id', orderId).eq('payment_method', 'mercado_pago').maybeSingle();
   if (orderError) {
     console.error('Nival Pay order lookup failed', orderError);
@@ -117,7 +117,8 @@ export async function POST(request: NextRequest) {
     && payload.currency_id === order.currency
     && amountCents === order.amount_cents
     && paidAmountCents === order.amount_cents
-    && order.amount_cents === NIVAL_PAY_PRICE_CENTS
+    && ((order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_PRICE_CENTS)
+      || (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS))
     && Boolean(paymentId);
 
   if (!approved || !paymentId) return NextResponse.json({ received: true });
@@ -138,13 +139,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { error: businessUpdateError } = await admin.from('businesses')
-    .update({ subscription_status: 'active', updated_at: now })
-    .eq('id', order.business_id)
-    .neq('subscription_status', 'active');
-  if (businessUpdateError) {
-    console.error('Nival Pay business activation failed', businessUpdateError);
-    return NextResponse.json({ error: 'Business activation failed' }, { status: 500 });
+  if (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT) {
+    const { data: profile } = await admin.from('payment_profiles').select('extra_sections_purchased').eq('business_id', order.business_id).single();
+    const { error: creditError } = await admin.from('payment_profiles')
+      .update({ extra_sections_purchased: Number(profile?.extra_sections_purchased ?? 0) + 1, updated_at: now })
+      .eq('business_id', order.business_id);
+    if (creditError) return NextResponse.json({ error: 'Extra section activation failed' }, { status: 500 });
+  } else {
+    const { error: businessUpdateError } = await admin.from('businesses')
+      .update({ subscription_status: 'active', updated_at: now })
+      .eq('id', order.business_id).neq('subscription_status', 'active');
+    if (businessUpdateError) return NextResponse.json({ error: 'Business activation failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
