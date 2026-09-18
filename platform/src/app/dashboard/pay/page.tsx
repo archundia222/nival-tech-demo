@@ -18,7 +18,7 @@ export default async function PaySettings() {
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles')
-      .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count')
+      .select('account_holder, bank_name, clabe, concept, payment_url, image_url, public_token, active, view_count, clabe_copy_count, holder_visible, bank_visible, clabe_visible, concept_visible, payment_url_visible, custom_sections')
       .eq('business_id', membership.business_id).maybeSingle(),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
