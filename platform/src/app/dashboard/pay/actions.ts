@@ -25,7 +25,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   try {
     visibility = { ...visibility, ...JSON.parse(String(form.get('fieldVisibility') ?? '{}')) };
     const parsed = JSON.parse(String(form.get('customSections') ?? '[]'));
-    if (Array.isArray(parsed)) customSections = parsed.slice(0, 3).map((s) => ({
+    if (Array.isArray(parsed)) customSections = parsed.map((s) => ({
       id: String(s.id ?? crypto.randomUUID()), title: String(s.title ?? '').trim().slice(0,80),
       content: String(s.content ?? '').trim().slice(0,200), public: s.public !== false,
     }));
@@ -39,6 +39,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   const { data: existing, error: readError } = await supabase.from('payment_profiles').select('image_url')
     .eq('business_id', businessId).maybeSingle();
   if (readError) return { error: 'No pudimos leer tu configuración. Intenta de nuevo.' };
+  customSections = customSections.slice(0, 3 + Number(existing?.extra_sections_purchased ?? 0));
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
   let uploadedPath: string | null = null;
   const file = form.get('image');
