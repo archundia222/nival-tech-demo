@@ -2,12 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { PayDemo } from "./pay-demo";
 import { IntelligenceWaitlist } from "./intelligence-waitlist";
+import { LandingReveal } from "./landing-reveal";
 
 const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
 
 export default function Home() {
   return (
     <main className="landing" id="inicio">
+      <LandingReveal />
       <nav className="landingNav" aria-label="Navegación principal">
         <Link className="landingBrand" href="#inicio" aria-label="Nival Tech, inicio">
           <Image src="/wallet/nival-logo.svg" alt="" width={38} height={38} priority />
@@ -62,13 +64,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="landingProof" aria-label="Beneficios principales">
+      <section className="landingProof scrollReveal" aria-label="Beneficios principales">
         <p><strong>Un toque</strong><span>para abrir tus datos</span></p>
         <p><strong>Un enlace</strong><span>para NFC y QR</span></p>
         <p><strong>Sin mensualidad</strong><span>pagas una sola vez</span></p>
       </section>
 
-      <section className="landingSection landingProblem" id="como-funciona">
+      <section className="landingSection landingProblem scrollReveal" id="como-funciona">
         <div className="landingSectionHeading">
           <p className="landingEyebrow">LO SIMPLE FUNCIONA</p>
           <h2>Del “te dicto mi CLABE” a cobrar con un toque.</h2>
@@ -92,7 +94,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="landingDemoSection" id="demostracion">
+      <section className="landingDemoSection scrollReveal" id="demostracion">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">PRUÉBALO</p>
           <h2>Así lo verá tu cliente.</h2>
@@ -101,7 +103,7 @@ export default function Home() {
         <PayDemo />
       </section>
 
-      <section className="landingSection landingIncludes">
+      <section className="landingSection landingIncludes scrollReveal">
         <div className="landingSectionHeading">
           <p className="landingEyebrow">TODO LO NECESARIO</p>
           <h2>Una sola tarjeta.<br />Una página que sí puedes actualizar.</h2>
@@ -114,7 +116,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="landingPriceSection" id="precio">
+      <section className="landingPriceSection scrollReveal" id="precio">
         <div className="pricePitch">
           <p className="landingEyebrow">PRECIO DE LANZAMIENTO</p>
           <h2>Más fácil de pagar.<br />Más fácil de vender.</h2>
@@ -135,7 +137,19 @@ export default function Home() {
         </article>
       </section>
 
-      <section className="intelligenceTeaser intelligenceSecondary" id="intelligence">
+      <section className="payExpansion scrollReveal" aria-labelledby="crece-con-pay">
+        <div className="payExpansionCopy">
+          <p className="landingEyebrow">CRECE CUANDO LO NECESITES</p>
+          <h2 id="crece-con-pay">Un Nival Pay. Más puntos para cobrar.</h2>
+          <p>Empieza con tu página, QR y tarjeta. Después agrega nuevos puntos de cobro sin cambiar de cuenta.</p>
+        </div>
+        <div className="payExpansionOptions">
+          <article><span>LINK + QR</span><strong>$10 MXN</strong><p>Un enlace adicional con su propio código QR.</p></article>
+          <article><span>TARJETA NFC ADICIONAL</span><strong>$99 MXN</strong><p>Una tarjeta física extra vinculada al punto de cobro que elijas.</p></article>
+        </div>
+      </section>
+
+      <section className="intelligenceTeaser intelligenceSecondary scrollReveal" id="intelligence">
         <div>
           <strong className="comingSoon">PRÓXIMAMENTE</strong>
           <p className="landingEyebrow">NIVAL INTELLIGENCE</p>
@@ -145,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="landingFaq">
+      <section className="landingFaq scrollReveal">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">PREGUNTAS FRECUENTES</p>
           <h2>Antes de empezar.</h2>
@@ -170,7 +184,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="landingFinalCta">
+      <section className="landingFinalCta scrollReveal">
         <p className="landingEyebrow">NIVAL PAY</p>
         <h2>Tu negocio ya acepta transferencias.<br />Ahora hazlo más fácil.</h2>
         <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay — $199</Link>
