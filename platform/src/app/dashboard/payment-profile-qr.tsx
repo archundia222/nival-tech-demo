@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 interface PaymentProfileQrProps {
@@ -11,8 +11,9 @@ interface PaymentProfileQrProps {
 
 export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrProps) {
   const [notice, setNotice] = useState("");
+  const qrId = `payment-profile-${useId().replace(/:/g, "")}`;
   function downloadQr() {
-    const svg = document.getElementById("payment-profile-qr");
+    const svg = document.getElementById(qrId);
     if (!svg) return;
     const source = new XMLSerializer().serializeToString(svg);
     const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
@@ -42,6 +43,6 @@ export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrP
         <button className="visitButton" type="button" onClick={downloadQr}>Descargar QR</button>
       </div>
     </div>
-    <div className="miniQr"><QRCodeSVG id="payment-profile-qr" value={url} size={132} level="H" marginSize={2} bgColor="#fff" fgColor="#07100e" title="QR de datos bancarios" /></div>
+    <div className="miniQr"><QRCodeSVG id={qrId} value={url} size={132} level="H" marginSize={2} bgColor="#fff" fgColor="#07100e" title="QR de datos bancarios" /></div>
   </div>;
 }

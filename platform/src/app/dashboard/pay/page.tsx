@@ -7,6 +7,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 import { createAdditionalPaymentProfile } from './actions';
 import { startExtraSectionCheckout } from '@/app/checkout/actions';
+import { PaymentProfileQr } from '../payment-profile-qr';
+import { SmartLinkQr } from '../smart-link-qr';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -82,8 +84,9 @@ async function reconcileLatestExtraSectionOrder(businessId: string) {
   if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
 }
 
-export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string }> }) {
+export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string }> }) {
   const params = await searchParams;
+  const currentView = params.view === 'add' ? 'add' : params.view === 'share' ? 'share' : 'manage';
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
@@ -94,7 +97,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   await reconcileLatestExtraSectionOrder(membership.business_id);
-  const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }] = await Promise.all([
+  const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }, { data: smartLinks }] = await Promise.all([
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles')
@@ -102,12 +105,14 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
       .eq('business_id', membership.business_id).order('created_at'),
     supabase.from('product_orders').select('id', { count: 'exact', head: true })
       .eq('business_id', membership.business_id).eq('product_code', NIVAL_PAY_EXTRA_SECTION_PRODUCT).eq('status', 'paid'),
+    supabase.from('smart_links').select('id, name, kind, target_url, public_token, click_count, active')
+      .eq('business_id', membership.business_id).order('created_at', { ascending: false }),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
   const profile = profiles?.find((item) => item.id === params.profile) ?? profiles?.[0] ?? null;
   const canCreateAdditional = (profiles?.length ?? 0) < 1 + (paidExtras ?? 0);
   if (!paidOrder) return <main className="dashboardApp">
-    <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
+    <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'add' ? 'agregar-tarjetas' : currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Sin activar</span></header>
       <section className="dashboardHero">
@@ -128,23 +133,12 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Activo</span></header>
-      <header className="payHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tus puntos de cobro.</h1><p>Administra tu página, QR y tarjeta NFC desde un solo lugar.</p></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>{currentView === 'add' ? 'Agregar tarjetas' : currentView === 'share' ? 'Comparte tus páginas' : 'Tus tarjetas'}</strong></div><span className="ready">Activo</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
-      <section className="smartLinksCard">
-        <div><p className="eyebrow">TUS NIVAL PAY</p><h2>Elige una página de cobro</h2></div>
-        <div className="smartLinkActions">
-          {profiles?.map((item) => <a key={item.id} className={item.id === profile?.id ? 'primaryButton' : 'textButton'} href={`/dashboard/pay?profile=${item.id}`}>{item.display_name}</a>)}
-          {canCreateAdditional
-            ? <form action={createAdditionalPaymentProfile}><button className="primaryButton" type="submit">+ Crear Nival Pay disponible</button></form>
-            : <form action={startExtraSectionCheckout}><button className="primaryButton" type="submit">+ Agregar Nival Pay · $10 MXN</button></form>}
-        </div>
-        <p>Cada Nival Pay tiene su propio enlace, QR y datos. La tarjeta física NFC se compra por separado.</p>
-      </section>
       {!['trial','active'].includes(business?.subscription_status ?? '') && <p role="status" className="formMessage">Tu servicio está suspendido. Puedes editar los datos, pero la página pública no estará disponible hasta reactivar el servicio.</p>}
-      {['owner','manager'].includes(membership.role)
-        ? profile && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} />
-        : <p>Solo el propietario o un administrador puede configurar Nival Pay.</p>}
+      {currentView === 'manage' && <><header className="payHeading"><p className="eyebrow">TUS TARJETAS</p><h1>Edita una tarjeta.</h1><p>Selecciona cuál Nival Pay quieres administrar.</p></header><form className="cardSelector" method="get"><label>Tarjeta seleccionada<select name="profile" defaultValue={profile?.id}>{profiles?.map(item => <option key={item.id} value={item.id}>{item.display_name}</option>)}</select></label><button className="primaryButton">Elegir</button></form>{['owner','manager'].includes(membership.role) ? profile && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} /> : <p>Solo el propietario o un administrador puede configurar Nival Pay.</p>}</>}
+      {currentView === 'add' && <><header className="payHeading"><p className="eyebrow">AGREGAR TARJETAS</p><h1>Tus tarjetas Nival Pay.</h1><p>Cada tarjeta representa una página de cobro independiente.</p></header><section className="nivalPayCatalog">{profiles?.map((item,index) => <article className="nivalPayCatalogCard" key={item.id}><div className="nivalPhysicalCard"><div className="nivalCardMark">N</div><div className="nivalCardCopy"><strong>NIVAL</strong><span>PAY {index+1}</span></div><small>NFC · PÁGINA DE COBRO</small></div><h2>{item.display_name}</h2><a href={`/dashboard/pay?profile=${item.id}`}>Editar tarjeta</a></article>)}<article className="nivalAddProduct"><span className="nivalAddIcon">+</span><div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$10 MXN</strong>{canCreateAdditional ? <form action={createAdditionalPaymentProfile}><button className="nivalProductAction">Crear disponible</button></form> : <form action={startExtraSectionCheckout}><button className="nivalProductAction">Comprar y crear</button></form>}</div><div className="nivalAddDivider"/><div><p>Plástico NFC opcional</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/products">Ver tarjetas físicas</a></div></article></section></>}
+      {currentView === 'share' && <><header className="payHeading"><p className="eyebrow">COMPARTE TUS PÁGINAS</p><h1>Todos tus enlaces y QR.</h1><p>Copia, abre o descarga cada página desde un solo lugar.</p></header><section className="sharePagesList">{profiles?.map(item => <article className="sharePageItem" key={item.id}><h2>{item.display_name}</h2><PaymentProfileQr businessName={`${business?.name ?? 'Nival Pay'}-${item.display_name}`} url={`${publicSiteUrl()}/pay/${item.public_token}`} views={Number(item.view_count)} /></article>)}{smartLinks?.map(link => <SmartLinkQr key={link.id} id={link.id} name={link.name} kind={link.kind} targetUrl={link.target_url} url={`${publicSiteUrl()}/go/${link.public_token}`} clicks={Number(link.click_count)} active={link.active} editable={false} />)}</section></>}
     </div>
   </main>;
 }
