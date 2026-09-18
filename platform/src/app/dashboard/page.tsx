@@ -7,6 +7,7 @@ import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
 import { InvitationLink } from "./invitation-link";
 import { BusinessOnboardingForm } from "./business-onboarding-form";
+import { DashboardNavigation } from "./dashboard-navigation";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
@@ -169,27 +170,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   return (
     <main className="dashboardApp">
-      <aside className="dashboardSidebar">
-        <a className="brand dashboardBrand" href="/dashboard"><span className="brandmark">N</span>NIVAL tech</a>
-        <div className="sidebarBusiness"><span>ESPACIO DE TRABAJO</span><strong>{business?.name ?? "Tu negocio"}</strong></div>
-        <nav className="sidebarNav" aria-label="Navegación del panel">
-          <a className={currentSection === "resumen" ? "active" : undefined} aria-current={currentSection === "resumen" ? "page" : undefined} href="/dashboard?section=resumen"><span>01</span>Resumen</a>
-          <a className={currentSection === "inteligencia" ? "active" : undefined} aria-current={currentSection === "inteligencia" ? "page" : undefined} href="/dashboard?section=inteligencia"><span>02</span>Inteligencia</a>
-          <a className={currentSection === "clientes" ? "active" : undefined} aria-current={currentSection === "clientes" ? "page" : undefined} href="/dashboard?section=clientes"><span>03</span>Clientes</a>
-          <a className={currentSection === "nival-card" ? "active" : undefined} aria-current={currentSection === "nival-card" ? "page" : undefined} href="/dashboard?section=nival-card"><span>04</span>Nival Card</a>
-          <a href="/dashboard/pay"><span>05</span>Nival Pay</a>
-          <a className={currentSection === "configuracion" ? "active" : undefined} aria-current={currentSection === "configuracion" ? "page" : undefined} href="/dashboard?section=configuracion"><span>06</span>Configuración</a>
-        </nav>
-        <div className="sidebarFooter"><a href="/products">Mis productos</a><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
-      </aside>
-      <details className="dashboardMobileMenu">
-        <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>Menú</span><strong>{business?.name ?? "Tu negocio"}</strong></summary>
-        <nav aria-label="Navegación móvil del panel">
-          <a aria-current={currentSection === "resumen" ? "page" : undefined} href="/dashboard?section=resumen">Resumen</a><a aria-current={currentSection === "inteligencia" ? "page" : undefined} href="/dashboard?section=inteligencia">Inteligencia</a><a aria-current={currentSection === "clientes" ? "page" : undefined} href="/dashboard?section=clientes">Clientes</a><a aria-current={currentSection === "nival-card" ? "page" : undefined} href="/dashboard?section=nival-card">Nival Card</a><a href="/dashboard/pay">Nival Pay</a><a aria-current={currentSection === "configuracion" ? "page" : undefined} href="/dashboard?section=configuracion">Configuración</a>
-        </nav>
-      </details>
+      <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} />
       <div className="dashboardContent">
-      <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status ?? "trial"}</span></header>
+      <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
       <section className="dashboardHero" id="resumen">
         <div><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Administra los productos y servicios de tu negocio.</p><a className="loginLink" href="/products">Mis productos</a></div>
