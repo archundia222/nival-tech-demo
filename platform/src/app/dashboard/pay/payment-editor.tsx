@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 
-type Profile = { account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number };
+type Profile = { account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number };
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
@@ -38,14 +38,18 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu enlace y QR siguen siendo los mismos.</p>}
         <button className="payButton" disabled={pending}>{pending ? 'Guardando…' : profile || state.token ? 'Guardar cambios' : 'Crear mi página'}</button>
       </form>
-      <aside className="payPreview"><p className="eyebrow">VISTA PREVIA</p><div className="payPreviewCard">
-        {image ? <Image src={image} width={136} height={136} unoptimized alt={`Imagen de ${businessName}`} /> : <div className="payMonogram">{businessName.slice(0,1)}</div>}
-        <h2>{businessName}</h2><p>Datos para transferencia</p>
-        <dl><dt>Titular</dt><dd>{holder || 'Nombre del titular'}</dd><dt>Banco</dt><dd>{bank || 'Tu banco'}</dd><dt>CLABE</dt><dd>{clabe || '•••• •••• •••• •••• ••'}</dd>{concept && <><dt>Concepto</dt><dd>{concept}</dd></>}</dl>
-        {paymentUrl && <span className="payButton previewPaymentButton">Abrir enlace de pago</span>}
-        {!active && <p>Página pausada</p>}
-      </div><p className="payHelp">Puedes cambiar los datos sin reprogramar la tarjeta NFC.</p></aside>
-    </div>
+      <aside className="payPreview nivalPayPreview"><p className="eyebrow">ASÍ LO VE TU CLIENTE</p>
+        <div className="nivalClientPreview">
+          <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
+          <div className="nivalClientProfile">
+            {image ? <Image src={image} width={104} height={104} unoptimized alt={`Imagen de ${businessName}`} /> : <div className="nivalClientMonogram">{businessName.slice(0,2).toUpperCase()}</div>}
+            <p>Realiza tu transferencia a</p><h2>{holder || 'Nombre del titular'}</h2>
+          </div>
+          <dl className="nivalClientDetails"><div><dt>Banco</dt><dd>{bank || 'Tu banco'}</dd></div><div><dt>CLABE interbancaria</dt><dd>{clabe || '18 dígitos completos'}</dd></div>{concept && <div><dt>Concepto</dt><dd>{concept}</dd></div>}</dl>
+          <div className="nivalClientCopy">Copiar CLABE</div>
+        </div>
+        <p className="payHelp">Vista previa fiel a la página que abre tu QR o tarjeta NFC.</p>
+      </aside>    </div>
     {token && <section className="payShare"><h2>Comparte tu página</h2><PaymentProfileQr businessName={businessName} url={`${siteUrl}/pay/${token}`} views={Number(profile?.view_count ?? 0)} /></section>}
   </>;
 }
