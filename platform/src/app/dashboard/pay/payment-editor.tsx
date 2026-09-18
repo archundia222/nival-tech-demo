@@ -29,7 +29,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const newSectionInput = useRef<HTMLInputElement | null>(null);
   const addSection = () => {
     setSections(current => {
-      if (current.length >= 5 + (profile?.extra_sections_purchased ?? 0)) return current;
+      if (current.length >= 3 + (profile?.extra_sections_purchased ?? 0)) return current;
       const id = crypto.randomUUID();
       setNewSectionId(id);
       return [...current, { id, title: '', content: '', public: true }];
@@ -84,12 +84,12 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           </div>)}
         </div>
         <div className="inlineApartados">
-          <p className="apartadoIntro">Puedes agregar <strong>hasta 5 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < 5 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 5 ? `Te quedan ${5-sections.length} gratis` : `${5 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado comprado disponible`}</small></div></button>
+          <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
+          {sections.length < 3 + (profile?.extra_sections_purchased ?? 0) ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < 3 ? `Te quedan ${3-sections.length} gratis` : `${3 + (profile?.extra_sections_purchased ?? 0) - sections.length} apartado comprado disponible`}</small></div></button>
           : sections.some(section => !section.title.trim() && !section.content.trim())
             ? <div className="apartadoRowAdd" role="status"><span><b>✓</b></span><div><strong>Tu nuevo apartado está listo arriba</strong><small>Escribe su título o información y guarda los cambios.</small></div></div>
             : null}
-          <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
+          <p className="apartadoFootnote">Los primeros 3 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
       </div>
