@@ -50,11 +50,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           <p className="apartadoFootnote">Los primeros 5 apartados están incluidos. A partir del sexto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
       </div>
-      <details className="payAdvancedSettings"><summary>Opciones de la página</summary><div>
-        <label>Enlace de pago opcional<input value={paymentUrl} onChange={e=>setPaymentUrl(e.target.value)} type="url" placeholder="https://..." /></label>
-        <label className="checkLabel"><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)} /> Página pública disponible</label>
-        {profile?.image_url && <button type="button" className="textButton" onClick={()=>{setRemoveImage(true);setPreview(null)}}>Usar logo del negocio</button>}
-      </div></details>
+
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
