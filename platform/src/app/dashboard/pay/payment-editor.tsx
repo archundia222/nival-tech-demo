@@ -73,7 +73,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          <button type="button" className="apartadoRowAdd" onClick={addSection} disabled={sections.length >= 3}><span><b>+</b></span><div><strong>{sections.length >= 3 ? "3 apartados incluidos" : "Agregar apartado"}</strong><small>{sections.length >= 3 ? "El cuarto apartado y los siguientes cuestan $10 MXN" : `Se añadirá debajo de Concepto · ${sections.length}/3 usados`}</small></div></button>
+          {sections.length < 3 ? <button type="button" className="apartadoRowAdd" onClick={addSection}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{`Te quedan ${3 - sections.length} apartado${3 - sections.length === 1 ? "" : "s"} gratis`}</small></div></button>
+          : <button type="button" className="apartadoRowAdd paidApartadoButton" onClick={()=>window.alert("Este apartado cuesta $10 MXN. El flujo de pago se habilitará aquí.")}><span><b>$</b></span><div><strong>Agregar otro apartado · $10 MXN</strong><small>Ya utilizaste tus 3 apartados gratis · Toca para comprar uno adicional</small></div></button>}
           <p className="apartadoFootnote">Los primeros 3 apartados adicionales están incluidos. A partir del cuarto, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
