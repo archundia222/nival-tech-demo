@@ -25,7 +25,7 @@ export default async function PaySettings() {
   if (!paidOrder) return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">Sin activar</span></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Sin activar</span></header>
       <section className="dashboardHero">
         <div>
           <p className="eyebrow">NIVAL PAY</p>
@@ -44,7 +44,7 @@ export default async function PaySettings() {
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active="nival-pay" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar"><div><span>Nival Pay</span><b>{new Intl.DateTimeFormat('es-MX', { dateStyle: 'long', timeZone: 'America/Mexico_City' }).format(new Date())}</b></div><span className="ready">Activo</span></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Activo</span></header>
       <header className="payHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tus puntos de cobro.</h1><p>Administra tu página, QR y tarjeta NFC desde un solo lugar.</p></header>
       <section className="metricGrid payMetrics">
         <article><span>Vistas de tu página</span><strong>{Number(profile?.view_count ?? 0)}</strong></article>
