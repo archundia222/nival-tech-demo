@@ -1038,3 +1038,21 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .dashboardPayContent .checkoutHeader { padding-top: 34px; }
   .checkoutNotice { font-size: 14px; line-height: 1.5; }
 }
+
+
+/* Accessibility + visual hierarchy refinements */
+.payForm { color:#171717; }
+.payForm h2 { color:#171717; }
+.payForm label { color:#292929; }
+.payForm small, .payForm .payOptional, .payForm .payHelp { color:#595959; }
+.payPreviewCard { color:#171717; }
+.payPreviewCard > p, .payPreviewCard dt { color:#595959; }
+.payPreviewCard dd { color:#171717; font-weight:700; }
+.payShare { color:#171717; }
+.metricGrid article { gap:12px; min-height:126px; align-content:space-between; }
+.metricGrid span { color:#8f8c85; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.metricGrid strong { font-size:clamp(34px,4vw,48px); line-height:.95; letter-spacing:-.045em; }
+.chartCard .chartHeading span { opacity:.82; }
+.chartCard .chartHeading h2 { font-size:clamp(25px,3vw,34px); line-height:1.05; }
+.businessQrCard h2 { font-size:clamp(30px,4vw,42px); line-height:1.05; }
+.businessQrCard p:not(.eyebrow) { font-size:13px; }
