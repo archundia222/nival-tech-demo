@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { isValidClabe } from '@/lib/payment-profile';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
@@ -173,4 +174,55 @@ export async function requestCashPayment() {
   });
   if (error) redirect('/checkout?error=No+se+pudo+registrar+el+pago+en+efectivo.');
   redirect('/checkout?result=cash');
+}
+
+export interface CheckoutBankState {
+  error?: string;
+  saved?: boolean;
+  token?: string;
+}
+
+export async function completeCheckoutBankProfile(
+  _state: CheckoutBankState,
+  form: FormData,
+): Promise<CheckoutBankState> {
+  const { businessId } = await currentPurchaseContext();
+  const supabase = await createClient();
+  const holder = String(form.get('accountHolder') ?? '').trim();
+  const bank = String(form.get('bankName') ?? '').trim();
+  const clabe = String(form.get('clabe') ?? '').replace(/\D/g, '');
+
+  if (holder.length < 2 || holder.length > 120) {
+    return { error: 'Escribe el nombre completo del titular.' };
+  }
+  if (bank.length < 2 || bank.length > 80) {
+    return { error: 'Selecciona un banco.' };
+  }
+  if (!/^\d{18}$/.test(clabe)) {
+    return { error: 'La CLABE debe contener exactamente 18 dígitos.' };
+  }
+  if (!isValidClabe(clabe)) {
+    return { error: 'La CLABE no es válida. Revisa los 18 dígitos.' };
+  }
+
+  const { data: paidOrder } = await supabase.from('product_orders')
+    .select('id')
+    .eq('business_id', businessId)
+    .eq('product_code', NIVAL_PAY_PRODUCT)
+    .eq('status', 'paid')
+    .limit(1)
+    .maybeSingle();
+  if (!paidOrder) return { error: 'Primero necesitamos confirmar tu pago.' };
+
+  const { data, error } = await supabase.from('payment_profiles').upsert({
+    business_id: businessId,
+    account_holder: holder,
+    bank_name: bank,
+    clabe,
+    active: true,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'business_id' }).select('public_token').single();
+
+  if (error || !data) return { error: 'No pudimos guardar los datos. Intenta nuevamente.' };
+  return { saved: true, token: data.public_token };
 }
