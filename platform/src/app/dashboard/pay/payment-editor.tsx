@@ -24,6 +24,11 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const updateSection = (id: string, patch: Partial<{ title: string; content: string; public: boolean }>) => {
     setSections(current => current.map(section => section.id === id ? { ...section, ...patch } : section));
   };
+  const editSectionField = (id: string, field: 'title' | 'content', currentValue: string) => {
+    const label = field === 'title' ? 'Nombre del apartado' : 'Link o información del apartado';
+    const nextValue = window.prompt(label, currentValue);
+    if (nextValue !== null) updateSection(id, { [field]: nextValue });
+  };
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const token = state.token || profile?.public_token;
@@ -50,8 +55,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           <label><span>CLABE interbancaria · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="clabe" value={clabe} onChange={e=>setClabe(e.target.value)} required inputMode="numeric" pattern="[0-9 ]{18,23}" maxLength={23} /></label>
           <label><span>Concepto <small>Opcional</small> · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="concept" value={concept} onChange={e=>setConcept(e.target.value)} maxLength={120} placeholder="Agregar concepto" /></label>
           {sections.map((section, index) => <div className="customPaySection" key={section.id}>
-            <label><span>Apartado {index + 1} · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" value={section.title} onChange={e=>updateSection(section.id,{title:e.target.value})} maxLength={80} placeholder="Título del apartado" /></label>
-            <label><span>Información · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="Escribe la información" /></label>
+            <label><span>Apartado {index + 1} · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"title",section.title)}>Editar</button></span><input className="inlinePayInput" value={section.title} onChange={e=>updateSection(section.id,{title:e.target.value})} maxLength={80} placeholder="Título del apartado" /></label>
+            <label><span>Link o información · <button type="button" className="fieldEditHint editHintButton" onClick={()=>editSectionField(section.id,"content",section.content)}>Editar</button></span><input className="inlinePayInput" value={section.content} onChange={e=>updateSection(section.id,{content:e.target.value})} maxLength={200} placeholder="https://... o escribe información" /></label>
             <div className="visibilityControl"><div><strong>Visibilidad</strong><small>{section.public ? "Visible para tus clientes" : "Oculto para tus clientes"}</small></div><button type="button" className={section.public ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>updateSection(section.id,{public:!section.public})}>{section.public ? "Pública" : "Oculta"}</button></div>
           </div>)}
         </div>
