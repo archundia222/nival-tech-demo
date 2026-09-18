@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
-import { createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
+import { createLoyaltyProgram, createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
 import { PaymentProfileQr } from "./payment-profile-qr";
@@ -327,6 +327,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <label>URL del logo<input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
             <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b59a61"} /><code>{business.brand_color ?? "#b59a61"}</code></span></label>
             <button className="primaryButton" type="submit">Guardar perfil</button>
+          </form>
+        </section>
+      )}
+      {hasIntelligence && canManageProgram && !loyaltyProgram && (
+        <section className="settingsCard">
+          <div className="settingsIntro"><p className="eyebrow">PROGRAMA DE LEALTAD</p><h2>Configura Intelligence para comenzar</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes. Hasta activarlo, Clientes e Inteligencia mostrarán esta configuración en lugar de métricas en cero.</p></div>
+          <form action={createLoyaltyProgram} className="settingsForm">
+            <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue="Programa de lealtad" /></label>
+            <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={1} /></label>
+            <label>Meta de puntos<input name="rewardThreshold" type="number" required min={1} max={1000} step={1} defaultValue={10} /></label>
+            <label>Recompensa<textarea name="rewardDescription" required minLength={2} maxLength={160} defaultValue="Recompensa disponible" /></label>
+            <button className="primaryButton" type="submit">Activar programa de lealtad</button>
           </form>
         </section>
       )}
