@@ -243,26 +243,29 @@ async function startExtraSectionCheckoutForId(paymentProfileId: string) {
   // server so a stale purchase button cannot open a second checkout.
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  const { data: profile } = await admin.from('payment_profiles')
+  const { data: availableProfiles } = await admin.from('payment_profiles')
     .select('id, custom_sections, extra_sections_purchased')
-    .eq('id', paymentProfileId)
     .eq('business_id', businessId)
-    .maybeSingle();
+    .order('created_at');
+  const profile = availableProfiles?.find((item) => item.id === paymentProfileId)
+    ?? (availableProfiles?.length === 1 ? availableProfiles[0] : null);
   if (!profile) redirect('/dashboard/pay?error=No+encontramos+esa+Nival+Pay.');
+
+  const resolvedProfileId = profile.id;
 
   const savedSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.length : 0;
   const sectionLimit = 3 + Number(profile.extra_sections_purchased ?? 0);
   if (savedSections < sectionLimit) {
     revalidatePath('/dashboard/pay');
-    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}&unlocked=1`);
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(resolvedProfileId)}&unlocked=1`);
   }
 
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
     amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
     description: 'Nival Pay · página de cobro adicional',
-    returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}`,
-    paymentProfileId,
+    returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(resolvedProfileId)}`,
+    paymentProfileId: resolvedProfileId,
   });
 }
 
