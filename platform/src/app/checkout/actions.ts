@@ -16,7 +16,7 @@ async function currentPurchaseContext() {
     .select('business_id').eq('user_id', user.id).limit(1).maybeSingle();
   // /dashboard/pay is an allowed onboarding destination and redirects unpaid customers back to checkout.
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
-  return { user, businessId: membership.business_id };
+  return { user, businessId: membership.business_id, supabase };
 }
 
 type MercadoPagoOrderCreateResponse = {
@@ -241,43 +241,35 @@ async function startExtraSectionCheckoutForId(paymentProfileId: string) {
   // Mercado Pago can redirect back before its webhook finishes, leaving the
   // browser with the pre-payment React state. Re-check the entitlement on the
   // server so a stale purchase button cannot open a second checkout.
-  const { businessId } = await currentPurchaseContext();
-  const admin = createAdminClient();
-  const { data: availableProfiles } = await admin.from('payment_profiles')
+  const { businessId, supabase } = await currentPurchaseContext();
+  const { data: profile, error: profileError } = await supabase.from('payment_profiles')
     .select('id, custom_sections, extra_sections_purchased')
+    .eq('id', paymentProfileId)
     .eq('business_id', businessId)
-    .order('created_at');
-  const requestHeaders = await headers();
-  let refererProfileId = '';
-  try {
-    const referer = requestHeaders.get('referer');
-    if (referer) refererProfileId = new URL(referer).searchParams.get('profile') ?? '';
-  } catch { /* Ignore malformed Referer values. */ }
-  const fullProfiles = (availableProfiles ?? []).filter((item) => {
-    const saved = Array.isArray(item.custom_sections) ? item.custom_sections.length : 0;
-    return saved >= 3 + Number(item.extra_sections_purchased ?? 0);
-  });
-  const profile = availableProfiles?.find((item) => item.id === paymentProfileId)
-    ?? availableProfiles?.find((item) => item.id === refererProfileId)
-    ?? (fullProfiles.length === 1 ? fullProfiles[0] : null)
-    ?? (availableProfiles?.length === 1 ? availableProfiles[0] : null);
-  if (!profile) redirect('/dashboard/pay?error=No+encontramos+esa+Nival+Pay.');
-
-  const resolvedProfileId = profile.id;
+    .maybeSingle();
+  if (profileError || !profile) {
+    console.error('[checkout] Payment profile lookup failed', {
+      businessId,
+      paymentProfileId,
+      code: profileError?.code ?? null,
+      message: profileError?.message ?? null,
+    });
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}&error=No+encontramos+esa+Nival+Pay.`);
+  }
 
   const savedSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.length : 0;
   const sectionLimit = 3 + Number(profile.extra_sections_purchased ?? 0);
   if (savedSections < sectionLimit) {
     revalidatePath('/dashboard/pay');
-    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(resolvedProfileId)}&unlocked=1`);
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(profile.id)}&unlocked=1`);
   }
 
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_EXTRA_SECTION_PRODUCT,
     amountCents: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
     description: 'Nival Pay · página de cobro adicional',
-    returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(resolvedProfileId)}`,
-    paymentProfileId: resolvedProfileId,
+    returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(profile.id)}`,
+    paymentProfileId: profile.id,
   });
 }
 
