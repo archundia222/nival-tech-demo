@@ -247,7 +247,19 @@ async function startExtraSectionCheckoutForId(paymentProfileId: string) {
     .select('id, custom_sections, extra_sections_purchased')
     .eq('business_id', businessId)
     .order('created_at');
+  const requestHeaders = await headers();
+  let refererProfileId = '';
+  try {
+    const referer = requestHeaders.get('referer');
+    if (referer) refererProfileId = new URL(referer).searchParams.get('profile') ?? '';
+  } catch { /* Ignore malformed Referer values. */ }
+  const fullProfiles = (availableProfiles ?? []).filter((item) => {
+    const saved = Array.isArray(item.custom_sections) ? item.custom_sections.length : 0;
+    return saved >= 3 + Number(item.extra_sections_purchased ?? 0);
+  });
   const profile = availableProfiles?.find((item) => item.id === paymentProfileId)
+    ?? availableProfiles?.find((item) => item.id === refererProfileId)
+    ?? (fullProfiles.length === 1 ? fullProfiles[0] : null)
     ?? (availableProfiles?.length === 1 ? availableProfiles[0] : null);
   if (!profile) redirect('/dashboard/pay?error=No+encontramos+esa+Nival+Pay.');
 
