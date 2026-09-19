@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 
 async function currentPurchaseContext() {
@@ -170,6 +170,15 @@ export async function startMercadoPagoCheckout() {
     returnPath: '/checkout',
   });
 }
+export async function startAdditionalNivalPayCheckout() {
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_PAY_ADDITIONAL_PRODUCT,
+    amountCents: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
+    description: 'Nival Pay · página de cobro adicional',
+    returnPath: '/dashboard/pay?view=add',
+  });
+}
+
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
