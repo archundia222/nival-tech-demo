@@ -8,3 +8,10 @@ export function money(amountCents: number) {
 
 export const NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS = 1000;
 export const NIVAL_PAY_EXTRA_SECTION_PRODUCT = 'nival_pay_extra_section';
+
+export const NIVAL_POINTS_PRODUCT = 'nival_points';
+export const NIVAL_INTELLIGENCE_PRODUCT = 'nival_intelligence';
+export const NIVAL_POINTS_INTELLIGENCE_PRODUCT = 'nival_points_intelligence';
+export const NIVAL_POINTS_PRICE_CENTS = 19900;
+export const NIVAL_INTELLIGENCE_PRICE_CENTS = 39900;
+export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = 44900;

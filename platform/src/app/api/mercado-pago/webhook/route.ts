@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   const bodyDataId = body?.data?.id?.toString();
   const dataId = queryDataId ?? bodyDataId;
   const eventType = request.nextUrl.searchParams.get('type') ?? body?.type;
-  if (!dataId || eventType !== 'order') return NextResponse.json({ received: true });
+  if (!dataId || !['order', 'subscription_preapproval', 'preapproval'].includes(eventType ?? '')) return NextResponse.json({ received: true });
 
   try {
     WebhookSignatureValidator.validate({
@@ -66,6 +66,40 @@ export async function POST(request: NextRequest) {
       liveMode: body?.live_mode ?? null,
     });
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+  }
+
+  if (eventType === 'subscription_preapproval' || eventType === 'preapproval') {
+    const subscriptionResponse = await fetch(`https://api.mercadopago.com/preapproval/${encodeURIComponent(dataId)}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: 'no-store',
+    });
+    if (!subscriptionResponse.ok) return NextResponse.json({ error: 'Subscription verification failed' }, { status: 502 });
+    const subscription = await subscriptionResponse.json() as {
+      id?: string;
+      external_reference?: string;
+      status?: string;
+      next_payment_date?: string;
+    };
+    const subscriptionId = subscription.external_reference;
+    if (!subscriptionId || !UUID_PATTERN.test(subscriptionId) || subscription.id !== dataId) {
+      return NextResponse.json({ error: 'Subscription mismatch' }, { status: 409 });
+    }
+    const mappedStatus = subscription.status === 'authorized' ? 'authorized'
+      : subscription.status === 'paused' ? 'paused'
+      : subscription.status === 'cancelled' ? 'cancelled'
+      : 'pending';
+    const admin = createAdminClient();
+    const { error } = await admin.rpc('sync_nival_product_subscription', {
+      p_subscription_id: subscriptionId,
+      p_provider_subscription_id: dataId,
+      p_status: mappedStatus,
+      p_current_period_end: subscription.next_payment_date ?? null,
+    });
+    if (error) {
+      console.error('Nival subscription sync failed', { subscriptionId, code: error.code });
+      return NextResponse.json({ error: 'Subscription sync failed' }, { status: 500 });
+    }
+    return NextResponse.json({ received: true });
   }
 
   const providerResponse = await fetch(`https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`, {

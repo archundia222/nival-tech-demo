@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 
 async function currentPurchaseContext() {
@@ -280,4 +280,75 @@ export async function startExtraSectionCheckout(formData?: FormData) {
 
 export async function startExtraSectionCheckoutForProfile(paymentProfileId: string) {
   return startExtraSectionCheckoutForId(paymentProfileId);
+}
+
+type SubscriptionProduct = {
+  productCode: typeof NIVAL_POINTS_PRODUCT | typeof NIVAL_INTELLIGENCE_PRODUCT | typeof NIVAL_POINTS_INTELLIGENCE_PRODUCT;
+  amountCents: number;
+  reason: string;
+};
+
+async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const { user, businessId } = await currentPurchaseContext();
+  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
+  if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
+  if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
+
+  const admin = createAdminClient();
+  const { data: subscription, error: insertError } = await admin.from('product_subscriptions').insert({
+    business_id: businessId,
+    product_code: product.productCode,
+    amount_cents: product.amountCents,
+    status: 'pending',
+  }).select('id').single();
+  if (insertError || !subscription) redirect(`${returnPath}?error=No+se+pudo+preparar+la+suscripción.`);
+
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
+  const response = await fetch('https://api.mercadopago.com/preapproval', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      reason: product.reason,
+      external_reference: subscription.id,
+      payer_email: user.email,
+      auto_recurring: {
+        frequency: 1,
+        frequency_type: 'months',
+        transaction_amount: product.amountCents / 100,
+        currency_id: 'MXN',
+      },
+      back_url: `${origin}${returnPath}?subscription=return`,
+      status: 'pending',
+    }),
+    cache: 'no-store',
+  });
+  const result = await response.json().catch(() => ({})) as { id?: string; init_point?: string; message?: string };
+  if (!response.ok || !result.id || !result.init_point) {
+    console.error('[subscriptions] Mercado Pago rejected subscription', { status: response.status, message: result.message ?? null });
+    await admin.from('product_subscriptions').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', subscription.id);
+    redirect(`${returnPath}?error=No+se+pudo+abrir+la+suscripción+de+Mercado+Pago.`);
+  }
+
+  await admin.from('product_subscriptions').update({
+    provider_subscription_id: result.id,
+    checkout_url: result.init_point,
+    updated_at: new Date().toISOString(),
+  }).eq('id', subscription.id);
+  redirect(result.init_point);
+}
+
+export async function startNivalPointsSubscription() {
+  return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
+}
+
+export async function startNivalIntelligenceSubscription() {
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: points } = await admin.from('business_product_entitlements').select('business_id')
+    .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).eq('status', 'active').maybeSingle();
+  return startMercadoPagoSubscription(points
+    ? { productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Puntos + Intelligence · plan mensual' }
+    : { productCode: NIVAL_INTELLIGENCE_PRODUCT, amountCents: NIVAL_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Intelligence · plan mensual' });
 }

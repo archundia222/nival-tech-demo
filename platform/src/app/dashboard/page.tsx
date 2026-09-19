@@ -73,8 +73,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const businessId = business?.id;
   const productLevel: 'pay' | 'intelligence' = business?.product_level === 'intelligence' ? 'intelligence' : 'pay';
-  const hasIntelligence = productLevel === 'intelligence';
-  if (!hasIntelligence && (currentSection === 'clientes' || currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
+  const { data: entitlementRows } = businessId ? await supabase.from('business_product_entitlements')
+    .select('product_code').eq('business_id', businessId).eq('status', 'active') : { data: [] };
+  const activeProducts = new Set((entitlementRows ?? []).map((item) => item.product_code));
+  const hasIntelligence = productLevel === 'intelligence' || activeProducts.has('nival_intelligence');
+  const hasPoints = hasIntelligence || activeProducts.has('nival_points');
+  if ((!hasPoints && currentSection === 'clientes') || (!hasIntelligence && currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
   const [{ count: customerCount }, { count: visitCount }, { count: campaignCount }] = businessId
     ? await Promise.all([
         supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
@@ -358,9 +362,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </form>
         </section>
       )}
-      {hasIntelligence && canManageProgram && !loyaltyProgram && (
+      {hasPoints && canManageProgram && !loyaltyProgram && (
         <section className="settingsCard">
-          <div className="settingsIntro"><p className="eyebrow">PROGRAMA DE LEALTAD</p><h2>Configura Intelligence para comenzar</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes. Hasta activarlo, Clientes e Inteligencia mostrarán esta configuración en lugar de métricas en cero.</p></div>
+          <div className="settingsIntro"><p className="eyebrow">NIVAL PUNTOS</p><h2>Configura tu programa de lealtad</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes.</p></div>
           <form action={createLoyaltyProgram} className="settingsForm">
             <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue="Programa de lealtad" /></label>
             <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={1} /></label>
@@ -370,7 +374,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </form>
         </section>
       )}
-      {hasIntelligence && canManageProgram && loyaltyProgram && (
+      {hasPoints && canManageProgram && loyaltyProgram && (
         <section className="settingsCard">
           <div className="settingsIntro">
             <p className="eyebrow">PROGRAMA DE LEALTAD</p>
