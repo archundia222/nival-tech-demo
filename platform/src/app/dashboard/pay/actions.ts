@@ -85,7 +85,7 @@ export async function createAdditionalPaymentProfile() {
   if (!membership) redirect('/dashboard/pay?error=No+tienes+permiso.');
   const [{ data: profiles }, { count: paidExtras }] = await Promise.all([
     supabase.from('payment_profiles').select('id, account_holder, bank_name, clabe').eq('business_id', membership.business_id).order('created_at'),
-    supabase.from('product_orders').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id).eq('product_code', 'nival_pay_extra_section').eq('status', 'paid'),
+    supabase.from('product_orders').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id).eq('product_code', 'nival_pay_additional').eq('status', 'paid'),
   ]);
   const current = profiles ?? [];
   if (current.length >= 1 + (paidExtras ?? 0)) redirect('/dashboard/pay?new=1');
