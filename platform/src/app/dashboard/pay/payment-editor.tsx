@@ -1,5 +1,5 @@
 'use client';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
 import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
 import { startExtraSectionCheckoutForProfile } from '@/app/checkout/actions';
@@ -9,6 +9,7 @@ type Profile = { id: string; account_holder: string; bank_name: string; clabe: s
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
+  const [checkoutPending, startCheckoutTransition] = useTransition();
   const [state, action, pending] = useActionState<PaymentFormState, FormData>(savePaymentProfile, {});
   const [holder, setHolder] = useState(profile?.account_holder ?? '');
   const [bank, setBank] = useState(profile?.bank_name ?? '');
@@ -55,8 +56,10 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const freeSectionLimit = 3;
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
   const totalSectionLimit = freeSectionLimit + purchasedSectionLimit;
-  const extraSectionCheckoutFormId = `extra-section-checkout-${profile?.id ?? 'new'}`;
-  const extraSectionCheckoutAction = startExtraSectionCheckoutForProfile.bind(null, profile?.id ?? '');
+  const buyExtraSection = () => {
+    if (!profile?.id) return;
+    startCheckoutTransition(() => startExtraSectionCheckoutForProfile(profile.id));
+  };
   return <>
     <form action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
@@ -91,7 +94,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
         </div>
         <div className="inlineApartados">
           <p className="apartadoIntro">Puedes agregar <strong>hasta 3 apartados gratis</strong>. Cada uno puede tener información propia dentro de esta misma página.</p>
-          {sections.length < totalSectionLimit ? <button key="add-available-section" type="button" className="apartadoRowAdd" onClick={(event) => { event.preventDefault(); event.stopPropagation(); addSection(); }}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < freeSectionLimit ? `Te quedan ${freeSectionLimit-sections.length} gratis` : `${totalSectionLimit-sections.length} apartado comprado disponible`}</small></div></button> : <button key="buy-extra-section" type="submit" form={extraSectionCheckoutFormId} className="apartadoRowAdd apartadoRowLocked"><span><b>🔒</b></span><div><strong>Agregar apartado · $10 MXN</strong><small>Ya usaste tus 3 apartados gratis. Compra uno adicional para desbloquearlo.</small></div></button>}
+          {sections.length < totalSectionLimit ? <button key="add-available-section" type="button" className="apartadoRowAdd" onClick={(event) => { event.preventDefault(); event.stopPropagation(); addSection(); }}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{sections.length < freeSectionLimit ? `Te quedan ${freeSectionLimit-sections.length} gratis` : `${totalSectionLimit-sections.length} apartado comprado disponible`}</small></div></button> : <button key="buy-extra-section" type="button" onClick={buyExtraSection} disabled={checkoutPending || !profile?.id} className="apartadoRowAdd apartadoRowLocked"><span><b>🔒</b></span><div><strong>{checkoutPending ? 'Abriendo Mercado Pago…' : 'Agregar apartado · $10 MXN'}</strong><small>Ya usaste tus 3 apartados gratis. Compra uno adicional para desbloquearlo.</small></div></button>}
           <p className="apartadoFootnote">Los primeros 3 apartados están incluidos. Después, cada apartado adicional cuesta $10 MXN.</p>
         </div>
         <button className="paySavePrimary" disabled={pending} type="submit">{pending ? 'Guardando cambios…' : 'Guardar cambios'}</button>
@@ -100,6 +103,5 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
-    <form id={extraSectionCheckoutFormId} action={extraSectionCheckoutAction} />
   </>;
 }

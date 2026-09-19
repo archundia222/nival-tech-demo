@@ -286,6 +286,6 @@ export async function startExtraSectionCheckout(formData?: FormData) {
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
-export async function startExtraSectionCheckoutForProfile(paymentProfileId: string, _formData?: FormData) {
+export async function startExtraSectionCheckoutForProfile(paymentProfileId: string) {
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
