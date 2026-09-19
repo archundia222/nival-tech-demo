@@ -20,21 +20,23 @@ function NavIcon({ children }: { children: React.ReactNode }) {
 }
 
 export function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
+  const payActive = payItems.some((item) => item.id === active);
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
       <button className="workspaceSwitcher" type="button"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></button>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
-        <span className="sidebarProductLabel">Nival Pay</span>
-        {payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
-        <span className="sidebarProductLabel">Productos</span>
+        <Link className={`sidebarMainProduct ${payActive ? 'active' : ''}`} href="/dashboard/pay"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></NavIcon>Nival Pay</Link>
+        <div className="sidebarSubmenu" aria-label="Opciones de Nival Pay">
+          {payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}
+        </div>
         {productItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
-      <nav aria-label="Navegación móvil del panel"><b>Nival Pay</b>{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<b>Productos</b>{productItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link></nav>
+      <nav aria-label="Navegación móvil del panel"><Link className="mobileMainProduct" href="/dashboard/pay">Nival Pay</Link><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>{productItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link></nav>
     </details>
   </>;
 }
