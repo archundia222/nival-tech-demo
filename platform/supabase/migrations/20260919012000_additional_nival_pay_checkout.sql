@@ -1,3 +1,7 @@
+alter table public.product_orders drop constraint if exists product_orders_product_code_check;
+alter table public.product_orders add constraint product_orders_product_code_check
+  check (product_code in ('nival_pay', 'nival_pay_extra_section', 'nival_pay_additional'));
+
 create or replace function public.finalize_nival_pay_order(
   p_order_id uuid,
   p_provider_payment_id text
