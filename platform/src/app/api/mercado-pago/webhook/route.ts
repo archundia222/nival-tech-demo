@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
   type?: string;
@@ -152,7 +152,8 @@ export async function POST(request: NextRequest) {
     && amountCents === order.amount_cents
     && paidAmountCents === order.amount_cents
     && ((order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_PRICE_CENTS)
-      || (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS))
+      || (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS)
+      || (order.product_code === NIVAL_PAY_ADDITIONAL_PRODUCT && order.amount_cents === NIVAL_PAY_ADDITIONAL_PRICE_CENTS))
     && Boolean(paymentId);
 
   if (!approved || !paymentId) return NextResponse.json({ received: true });
