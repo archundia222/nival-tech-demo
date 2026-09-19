@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { DM_Sans, Manrope } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
-import { CopyField, CopyPrimaryButton } from "./copy-field";
+import { CopyField } from "./copy-field";
 import styles from "./payment-page.module.css";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-pay-body" });
@@ -43,7 +43,6 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
           s.title || s.content ? <CopyField key={s.id} label={s.title || "Información"} value={s.content || "—"} variant="detail" /> : null
         )}
       </div>
-      {profile.clabe_visible && <CopyPrimaryButton value={profile.clabe} />}
       <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
     </section>
     <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
