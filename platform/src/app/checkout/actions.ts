@@ -235,8 +235,7 @@ export async function completeCheckoutBankProfile(
   return { saved: true, token: data.public_token };
 }
 
-export async function startExtraSectionCheckout(formData?: FormData) {
-  const paymentProfileId = formData instanceof FormData ? String(formData.get('profileId') ?? '') : '';
+async function startExtraSectionCheckoutForId(paymentProfileId: string) {
   if (!paymentProfileId) redirect('/dashboard/pay?error=Selecciona+la+Nival+Pay+para+el+apartado.');
 
   // Mercado Pago can redirect back before its webhook finishes, leaving the
@@ -265,4 +264,13 @@ export async function startExtraSectionCheckout(formData?: FormData) {
     returnPath: `/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}`,
     paymentProfileId,
   });
+}
+
+export async function startExtraSectionCheckout(formData?: FormData) {
+  const paymentProfileId = formData instanceof FormData ? String(formData.get('profileId') ?? '') : '';
+  return startExtraSectionCheckoutForId(paymentProfileId);
+}
+
+export async function startExtraSectionCheckoutForProfile(paymentProfileId: string, _formData?: FormData) {
+  return startExtraSectionCheckoutForId(paymentProfileId);
 }
