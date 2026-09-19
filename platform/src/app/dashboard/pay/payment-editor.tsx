@@ -2,7 +2,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
-import { startExtraSectionCheckout } from '@/app/checkout/actions';
+import { startExtraSectionCheckoutForProfile } from '@/app/checkout/actions';
 
 type Section = { id: string; title: string; content: string; public: boolean };
 type Profile = { id: string; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
@@ -56,6 +56,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
   const totalSectionLimit = freeSectionLimit + purchasedSectionLimit;
   const extraSectionCheckoutFormId = `extra-section-checkout-${profile?.id ?? 'new'}`;
+  const extraSectionCheckoutAction = startExtraSectionCheckoutForProfile.bind(null, profile?.id ?? '');
   return <>
     <form action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
@@ -99,8 +100,6 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       {state.error && <p role="alert" className="payError">{state.error}</p>}
       {state.saved && <p role="status" className="paySuccess">Cambios guardados. Tu QR y enlace siguen siendo los mismos.</p>}
     </form>
-    <form id={extraSectionCheckoutFormId} action={startExtraSectionCheckout}>
-      <input type="hidden" name="profileId" value={profile?.id ?? ''} />
-    </form>
+    <form id={extraSectionCheckoutFormId} action={extraSectionCheckoutAction} />
   </>;
 }
