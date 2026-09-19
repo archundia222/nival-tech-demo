@@ -85,7 +85,7 @@ type CheckoutProduct = {
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(`${product.returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
-  const { businessId } = await currentPurchaseContext();
+  const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: order, error } = await admin.from('product_orders').insert({
     business_id: businessId,
@@ -100,6 +100,8 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
   const amount = (product.amountCents / 100).toFixed(2);
+  const payerEmail = process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim() || user.email?.trim();
+  if (!payerEmail) redirect(`${product.returnPath}?error=Tu+cuenta+necesita+un+correo+para+continuar+con+el+pago.`);
   let result: MercadoPagoOrderCreateResponse = {};
 
   try {
@@ -117,7 +119,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
         total_amount: amount,
         external_reference: order.id,
         description: product.description,
-        payer: { email: 'TESTUSER1348852238063419528@testuser.com' },
+        payer: { email: payerEmail },
         items: [{
           external_code: product.productCode,
           title: product.description,
