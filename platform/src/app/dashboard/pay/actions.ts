@@ -42,7 +42,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
     .eq('id', profileId).eq('business_id', businessId).maybeSingle();
   if (readError) return { error: 'No pudimos leer tu configuración. Intenta de nuevo.' };
   if (!existing) return { error: 'No encontramos esta página Nival Pay.' };
-  customSections = customSections.slice(0, 3 + Number(existing?.extra_sections_purchased ?? 0));
+  customSections = customSections.slice(0, Number(existing?.extra_sections_purchased ?? 0));
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
   let uploadedPath: string | null = null;
   const file = form.get('image');

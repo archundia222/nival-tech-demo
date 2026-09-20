@@ -273,7 +273,7 @@ async function startExtraSectionCheckoutForId(paymentProfileId: string) {
   }
 
   const savedSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.length : 0;
-  const sectionLimit = 3 + Number(profile.extra_sections_purchased ?? 0);
+  const sectionLimit = Number(profile.extra_sections_purchased ?? 0);
   if (savedSections < sectionLimit) {
     revalidatePath('/dashboard/pay');
     redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(profile.id)}&unlocked=1`);
