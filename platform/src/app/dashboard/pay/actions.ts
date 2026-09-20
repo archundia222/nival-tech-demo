@@ -17,6 +17,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
     .eq('user_id', user.id).eq('business_id', businessId).single();
   if (!membership || !['owner', 'manager'].includes(membership.role)) return { error: 'No tienes permiso para editar este negocio.' };
 
+  const displayName = String(form.get('displayName') ?? '').trim();
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\s/g, '');
@@ -32,6 +33,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
       content: String(s.content ?? '').trim().slice(0,200), public: s.public !== false,
     }));
   } catch { return { error: 'No pudimos leer los apartados. Recarga e intenta de nuevo.' }; }
+  if (displayName.length < 2 || displayName.length > 60) return { error: 'El nombre de la tarjeta debe tener entre 2 y 60 caracteres.' };
   if (holder.length < 2 || holder.length > 120) return { error: 'El titular debe tener entre 2 y 120 caracteres.' };
   if (bank.length < 2 || bank.length > 80) return { error: 'El banco debe tener entre 2 y 80 caracteres.' };
   if (!isValidClabe(clabe)) return { error: 'Revisa la CLABE: debe tener 18 dígitos y un dígito de verificación válido.' };
@@ -60,7 +62,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
     imageUrl = supabase.storage.from('payment-images').getPublicUrl(uploadedPath).data.publicUrl;
   }
   const { data, error } = await supabase.from('payment_profiles').update({
-    account_holder: holder, bank_name: bank, clabe,
+    display_name: displayName, account_holder: holder, bank_name: bank, clabe,
     concept: concept || null, payment_url: paymentUrl || null, image_url: imageUrl,
     holder_visible: !!visibility.holder, bank_visible: !!visibility.bank, clabe_visible: !!visibility.clabe,
     concept_visible: !!visibility.concept, payment_url_visible: !!visibility.paymentUrl,
@@ -92,7 +94,7 @@ export async function createAdditionalPaymentProfile() {
   const source = current[0];
   if (!source) redirect('/dashboard/pay?error=Configura+primero+tu+Nival+Pay+principal.');
   const { data, error } = await supabase.from('payment_profiles').insert({
-    business_id: membership.business_id, display_name: `Nival Pay ${current.length + 1}`,
+    business_id: membership.business_id, display_name: 'Nival Pay',
     account_holder: source.account_holder, bank_name: source.bank_name, clabe: source.clabe, active: true,
   }).select('id').single();
   if (error || !data) redirect('/dashboard/pay?error=No+se+pudo+crear+la+nueva+Nival+Pay.');
