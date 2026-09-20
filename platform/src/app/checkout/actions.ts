@@ -214,7 +214,7 @@ export async function completeCheckoutBankProfile(
   form: FormData,
 ): Promise<CheckoutBankState> {
   const { businessId } = await currentPurchaseContext();
-  const supabase = await createClient();
+  const admin = createAdminClient();
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\D/g, '');
@@ -232,7 +232,7 @@ export async function completeCheckoutBankProfile(
     return { error: 'La CLABE no es válida. Revisa los 18 dígitos.' };
   }
 
-  const { data: paidOrder } = await supabase.from('product_orders')
+  const { data: paidOrder } = await admin.from('product_orders')
     .select('id')
     .eq('business_id', businessId)
     .eq('product_code', NIVAL_PAY_PRODUCT)
@@ -241,17 +241,54 @@ export async function completeCheckoutBankProfile(
     .maybeSingle();
   if (!paidOrder) return { error: 'Primero necesitamos confirmar tu pago.' };
 
-  const { data, error } = await supabase.from('payment_profiles').upsert({
+  // A business can now own several Nival Pay profiles, so business_id is no
+  // longer a unique conflict target. Update the first profile created by the
+  // payment activation RPC instead of using an upsert on business_id.
+  const { data: existingProfile, error: profileLookupError } = await admin
+    .from('payment_profiles')
+    .select('id')
+    .eq('business_id', businessId)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (profileLookupError) {
+    console.error('[checkout] Payment profile lookup failed', {
+      businessId,
+      code: profileLookupError.code,
+      message: profileLookupError.message,
+    });
+    return { error: 'No pudimos guardar los datos. Intenta nuevamente.' };
+  }
+
+  const profileValues = {
     business_id: businessId,
     account_holder: holder,
     bank_name: bank,
     clabe,
     active: true,
     updated_at: new Date().toISOString(),
-  }, { onConflict: 'business_id' }).select('public_token').single();
+  };
+  const result = existingProfile
+    ? await admin.from('payment_profiles').update(profileValues)
+      .eq('id', existingProfile.id)
+      .eq('business_id', businessId)
+      .select('public_token')
+      .single()
+    : await admin.from('payment_profiles').insert(profileValues)
+      .select('public_token')
+      .single();
 
-  if (error || !data) return { error: 'No pudimos guardar los datos. Intenta nuevamente.' };
-  return { saved: true, token: data.public_token };
+  if (result.error || !result.data) {
+    console.error('[checkout] Payment profile save failed', {
+      businessId,
+      profileId: existingProfile?.id ?? null,
+      code: result.error?.code ?? null,
+      message: result.error?.message ?? null,
+    });
+    return { error: 'No pudimos guardar los datos. Intenta nuevamente.' };
+  }
+  return { saved: true, token: result.data.public_token };
 }
 
 async function startExtraSectionCheckoutForId(paymentProfileId: string) {
