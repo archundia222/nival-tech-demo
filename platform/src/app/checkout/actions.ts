@@ -82,9 +82,15 @@ type CheckoutProduct = {
   paymentProfileId?: string;
 };
 
+function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: string) {
+  const url = new URL(returnPath, 'https://nival-tech-platform.vercel.app');
+  url.searchParams.set(key, value);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!token) redirect(`${product.returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
+  if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: order, error } = await admin.from('product_orders').insert({
@@ -95,7 +101,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     status: 'pending',
     payment_profile_id: product.paymentProfileId ?? null,
   }).select('id').single();
-  if (error || !order) redirect(`${product.returnPath}?error=No+se+pudo+crear+la+orden.`);
+  if (error || !order) redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudo crear la orden.'));
 
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
@@ -105,7 +111,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   const payerEmail = process.env.VERCEL_ENV === 'production'
     ? user.email?.trim()
     : process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim() || user.email?.trim();
-  if (!payerEmail) redirect(`${product.returnPath}?error=Tu+cuenta+necesita+un+correo+para+continuar+con+el+pago.`);
+  if (!payerEmail) redirect(checkoutReturnPath(product.returnPath, 'error', 'Tu cuenta necesita un correo para continuar con el pago.'));
   let result: MercadoPagoOrderCreateResponse = {};
 
   try {
@@ -132,9 +138,9 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
         }],
         config: {
           online: {
-            success_url: `${origin}${product.returnPath}?result=success`,
-            pending_url: `${origin}${product.returnPath}?result=pending`,
-            failure_url: `${origin}${product.returnPath}?result=failure`,
+            success_url: `${origin}${checkoutReturnPath(product.returnPath, 'result', 'success')}`,
+            pending_url: `${origin}${checkoutReturnPath(product.returnPath, 'result', 'pending')}`,
+            failure_url: `${origin}${checkoutReturnPath(product.returnPath, 'result', 'failure')}`,
             auto_return: 'approved',
           },
         },
@@ -158,7 +164,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   } catch (checkoutError) {
     console.error('Mercado Pago order error', checkoutError);
     await admin.from('product_orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', order.id);
-    redirect(`${product.returnPath}?error=No+se+pudo+abrir+Mercado+Pago.+Intenta+de+nuevo.`);
+    redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudo abrir Mercado Pago. Intenta de nuevo.'));
   }
 
   await admin.from('product_orders').update({
