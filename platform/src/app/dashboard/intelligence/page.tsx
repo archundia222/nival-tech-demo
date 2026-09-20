@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalIntelligenceSubscription } from '@/app/checkout/actions';
+import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 
 export default async function NivalIntelligencePage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
   const params = await searchParams;
@@ -11,6 +12,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const { data: membership } = await supabase.from('business_members')
     .select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard');
+  if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const { data: entitlements } = await supabase.from('business_product_entitlements').select('product_code')
     .eq('business_id', membership.business_id).eq('status', 'active');
