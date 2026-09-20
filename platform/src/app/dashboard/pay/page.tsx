@@ -84,7 +84,7 @@ async function reconcileLatestPayOrder(businessId: string, productCode: typeof N
   if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
 }
 
-export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string }> }) {
+export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string }> }) {
   const params = await searchParams;
   const currentView = params.view === 'add' ? 'add' : params.view === 'share' ? 'share' : 'manage';
   const supabase = await createClient();
@@ -100,6 +100,45 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS),
     reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS),
   ]);
+
+  // A successful additional-card checkout should finish the job in one trip.
+  // Create the purchased profile immediately instead of asking the customer to
+  // press the plus button a second time.
+  if (params.result === 'success' && currentView === 'add') {
+    const [{ data: purchasedProfiles }, { count: purchasedExtras }] = await Promise.all([
+      supabase.from('payment_profiles')
+        .select('id, account_holder, bank_name, clabe')
+        .eq('business_id', membership.business_id)
+        .order('created_at'),
+      supabase.from('product_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('business_id', membership.business_id)
+        .eq('product_code', NIVAL_PAY_ADDITIONAL_PRODUCT)
+        .eq('status', 'paid'),
+    ]);
+    const currentProfiles = purchasedProfiles ?? [];
+    const sourceProfile = currentProfiles[0];
+    if (sourceProfile && currentProfiles.length < 1 + (purchasedExtras ?? 0)) {
+      const { data: createdProfile, error: createError } = await supabase.from('payment_profiles').insert({
+        business_id: membership.business_id,
+        display_name: 'Nival Pay',
+        account_holder: sourceProfile.account_holder,
+        bank_name: sourceProfile.bank_name,
+        clabe: sourceProfile.clabe,
+        active: true,
+      }).select('id').single();
+      if (createError) {
+        console.error('[pay] Purchased Nival Pay profile creation failed', {
+          businessId: membership.business_id,
+          code: createError.code,
+          message: createError.message,
+        });
+      } else if (createdProfile) {
+        redirect(`/dashboard/pay?view=manage&profile=${createdProfile.id}&created=1`);
+      }
+    }
+  }
+
   const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }, { data: smartLinks }] = await Promise.all([
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
