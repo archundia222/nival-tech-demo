@@ -1154,3 +1154,77 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 @media(max-width:900px){.productShowcase{grid-template-columns:1fr;padding:38px 28px}.pointsVisual,.intelligenceVisual{min-height:360px}.productFeatureStrip{grid-template-columns:1fr}.productFeatureStrip article{min-height:auto}.statOne{right:4%}.statTwo{left:4%}}@media(max-width:520px){.productShowcase{padding:30px 20px;border-radius:22px}.productShowcase h1{font-size:39px}.walletCard{width:235px;height:330px}.pointsVisual,.intelligenceVisual{min-height:340px}.floatStat{padding:9px 11px}.aiPanel{padding:15px}}
 
 .cardNameEditor{display:grid;gap:7px;width:min(100%,360px);margin-top:16px}.cardNameEditor>span{color:#bfa66f;font-size:10px;font-weight:900;letter-spacing:.11em;text-transform:uppercase}.cardNameEditor>input{width:100%;height:46px;padding:0 14px;border:1px solid rgba(191,166,111,.48);border-radius:12px;color:#fff;background:rgba(255,255,255,.055);font:inherit;font-size:15px;font-weight:800;transition:border-color .15s,background .15s,box-shadow .15s}.cardNameEditor>input::placeholder{color:#777}.cardNameEditor>input:hover{border-color:#bfa66f;background:rgba(255,255,255,.08)}.cardNameEditor>input:focus{outline:none;border-color:#d2b875;background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(191,166,111,.14)}
+
+
+/* 2026 usability pass: clearer navigation and product decisions */
+.professionalSidebar{width:284px;padding:24px 18px 20px}
+.dashboardApp{grid-template-columns:284px minmax(0,1fr)}
+.professionalBrand{padding:5px 10px 24px}
+.professionalBrand>span{width:34px;height:34px;font-size:14px}
+.workspaceSwitcher{min-height:64px;padding:12px 13px;border-color:#34363b;background:#151619}
+.workspaceSwitcher small{color:#a6a9af;font-size:10px}
+.workspaceSwitcher strong{font-size:14px;line-height:1.35}
+.sidebarSectionLabel{display:block;margin:24px 11px 7px;color:#a9acb2;font-size:11px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.professionalNav{margin-top:8px}
+.professionalNav a{min-height:48px;padding:12px 13px;color:#c0c3c8;font-size:14px;line-height:1.25}
+.professionalNav a svg{width:20px;height:20px}
+.professionalNav a:hover{background:#1d1f23;color:#fff}
+.professionalNav a.active{background:#f3ead7;color:#17181b;box-shadow:inset 4px 0 0 #b8954c}
+.professionalNav .sidebarMainProduct{margin-top:0}
+.sidebarSubmenu{gap:4px;margin:5px 0 4px 24px;padding:4px 0 4px 13px}
+.professionalNav .sidebarSubmenu a{min-height:42px;padding:10px 12px;color:#b2b5bb;font-size:13px}
+.professionalFooter a,.professionalFooter .textButton{min-height:46px;padding:12px 10px;color:#b4b7bd;font-size:13px}
+
+.productShowcase{min-height:570px;grid-template-columns:minmax(420px,1.05fr) minmax(360px,.95fr);gap:52px;padding:64px;background:linear-gradient(135deg,#fffdf8 0%,#f1eadc 100%);box-shadow:0 20px 60px rgba(0,0,0,.14)}
+.pointsShowcase{color:#17181b}
+.productShowcaseCopy{max-width:620px}
+.productShowcase h1{max-width:640px;margin:22px 0 18px;font-size:clamp(44px,4.6vw,66px);line-height:1.02;color:inherit}
+.productShowcaseCopy>p{max-width:560px;color:#524f48;font-size:18px;line-height:1.6}
+.productBenefits{display:grid;gap:10px;margin:25px 0 0;padding:0;list-style:none}
+.productBenefits li{position:relative;padding-left:30px;color:#292824;font-size:15px;font-weight:700;line-height:1.45}
+.productBenefits li:before{content:"✓";position:absolute;left:0;top:-1px;display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#d9c28e;color:#171717;font-size:12px;font-weight:950}
+.productPrice{margin:28px 0 18px}
+.productPrice strong{font-size:44px}
+.productPrice span{font-size:14px}
+.productCta{min-height:58px;padding:0 25px;border-radius:14px;font-size:15px}
+.productCta:focus-visible,.professionalNav a:focus-visible,.professionalFooter a:focus-visible,.professionalFooter button:focus-visible{outline:3px solid #e2bf70;outline-offset:3px}
+.productShowcaseCopy>small{font-size:12px;line-height:1.45}
+.productFeatureStrip article{min-height:160px;padding:30px}
+.productFeatureStrip b{font-size:18px}
+.productFeatureStrip p{font-size:14px;line-height:1.6}
+
+.intelligenceShowcase{background:radial-gradient(circle at 78% 30%,#3a3220 0,#1b1c1f 38%,#0e0f11 78%)}
+.intelligenceShowcase .productShowcaseCopy>p{color:#d0cec8}
+.intelligenceShowcase .productBenefits li{color:#f1eee7}
+.intelligenceShowcase .productBenefits li:before{background:#d1b36e}
+.intelligenceShowcase .productPrice span,.intelligenceShowcase .productShowcaseCopy>small{color:#d0cec8}
+.aiPanel{width:min(100%,440px);padding:24px;border-color:#595548;background:#17181bea}
+.aiInsight strong{font-size:24px;line-height:1.2}
+.aiInsight p{font-size:13px;color:#c2bfb7}
+.aiInsight button{min-height:44px;font-size:12px}
+.aiMiniGrid>div{padding:16px}
+.aiMiniGrid small{font-size:9px}
+.aiMiniGrid b{font-size:25px}
+
+input,select,textarea,button,a{touch-action:manipulation}
+button,a,summary{ -webkit-tap-highlight-color:transparent }
+@media(max-width:900px){
+ .dashboardApp{grid-template-columns:1fr}
+ .productShowcase{grid-template-columns:1fr;min-height:0;padding:42px 30px}
+ .productShowcaseCopy>p{font-size:16px}
+ .productShowcase h1{font-size:clamp(40px,9vw,56px)}
+}
+@media(max-width:520px){
+ .dashboardContent{padding:18px 16px 56px}
+ .professionalMobileMenu summary{min-height:68px}
+ .professionalMobileMenu nav a{min-height:52px;display:flex;align-items:center;padding:14px 12px;font-size:15px}
+ .professionalMobileMenu .mobileSubmenu a{font-size:14px}
+ .productShowcase{padding:30px 22px;border-radius:20px}
+ .productShowcase h1{font-size:40px;line-height:1.02}
+ .productShowcaseCopy>p{font-size:16px}
+ .productBenefits li{font-size:14px}
+ .productCta{width:100%;justify-content:center}
+ .productPrice{align-items:flex-end}
+ .pointsVisual,.intelligenceVisual{min-height:315px;transform:scale(.92)}
+ .productFeatureStrip article{padding:24px 21px}
+}
