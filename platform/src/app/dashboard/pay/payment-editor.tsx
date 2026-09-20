@@ -89,7 +89,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <input type="hidden" name="fieldVisibility" value={JSON.stringify(fieldVisibility)} />
       <input type="hidden" name="customSections" value={JSON.stringify(sections)} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
-      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><label><span>Nombre de la tarjeta</span><input className="inlinePayInput" value={displayName} onChange={e=>{setDisplayName(e.target.value);markDirty()}} minLength={2} maxLength={60} placeholder="Nival Pay" aria-label="Nombre de la tarjeta" /></label></div></div>
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><label className="cardNameEditor"><span>Nombre de la tarjeta</span><input value={displayName} onChange={e=>{setDisplayName(e.target.value);markDirty()}} minLength={2} maxLength={60} placeholder="Nival Pay" aria-label="Nombre de la tarjeta" /></label></div></div>
       <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile" style={{position:"relative"}}><button type="button" className={fieldVisibility.holder ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("holder","el titular")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.holder ? "Visible" : "Oculto"}</button>
