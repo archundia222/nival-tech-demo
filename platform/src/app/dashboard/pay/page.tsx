@@ -84,7 +84,7 @@ async function reconcileLatestPayOrder(businessId: string, productCode: typeof N
   if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
 }
 
-export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string }> }) {
+export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string; created?: string }> }) {
   const params = await searchParams;
   const currentView = params.view === 'add' ? 'add' : params.view === 'share' ? 'share' : 'manage';
   const supabase = await createClient();
@@ -177,6 +177,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>{currentView === 'add' ? 'Agregar tarjetas' : currentView === 'share' ? 'Comparte tus páginas' : 'Tus tarjetas'}</strong></div><span className="ready">Activo</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
+      {params.created === '1' && <p role="status" className="formMessage">¡Listo! Tu nueva Nival Pay fue creada y ya está seleccionada para que la configures.</p>}
       {params.unlocked === '1' && <p role="status" className="formMessage">Tu apartado comprado ya está disponible. Presiona “Agregar apartado” para crearlo y editarlo.</p>}
       {!['trial','active'].includes(business?.subscription_status ?? '') && <p role="status" className="formMessage">Tu servicio está suspendido. Puedes editar los datos, pero la página pública no estará disponible hasta reactivar el servicio.</p>}
       {currentView === 'manage' && <><header className="payHeading"><p className="eyebrow">TUS TARJETAS</p><h1>Edita una tarjeta.</h1><p>Selecciona cuál Nival Pay quieres administrar.</p></header><form className="cardSelector" method="get"><label>Tarjeta seleccionada<select name="profile" defaultValue={profile?.id}>{profiles?.map(item => <option key={item.id} value={item.id}>{item.display_name}</option>)}</select></label><button className="primaryButton">Elegir</button></form>{['owner','manager'].includes(membership.role) ? profile && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} /> : <p>Solo el propietario o un administrador puede configurar Nival Pay.</p>}</>}
