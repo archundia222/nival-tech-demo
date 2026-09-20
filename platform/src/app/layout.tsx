@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Nival Tech | Cobra con un toque",
-  description: "Nival Pay convierte una tarjeta NFC en la página de pago de tu negocio. Tarjeta y página configurada por $199 MXN, sin mensualidad.",
+  description: "Nival Pay convierte una tarjeta NFC en la página de pago de tu negocio. Precio temporal de prueba: $1 MXN.",
   icons: { icon: "/wallet/nival-logo.svg" },
 };
 

@@ -200,11 +200,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL PAY</span><h2>Página de cobro</h2></div></div>
           <p>{hasNivalPay ? "Tu producto está activado. Desde aquí puedes revisar y actualizar los datos que verá el cliente al acercar la tarjeta." : "Activa Nival Pay para preparar la página de cobro que abrirá tu tarjeta NFC."}</p>
-          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $199 MXN"}</a>
+          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $1 MXN (prueba)"}</a>
         </article>
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Tu Nival Pay principal queda protegido aquí. Agrega nuevos links con QR por $10 MXN y, cuando necesites presencia física, añade una tarjeta NFC por $99 MXN.</p>
+          <p>Precio temporal para pruebas reales: activa Nival Pay y agrega nuevos links con QR por $1 MXN. La tarjeta física conserva su precio porque aún no se cobra en línea.</p>
           <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
@@ -257,7 +257,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </article>
           <article className="nivalAddProduct">
             <span className="nivalAddIcon" aria-hidden="true">+</span>
-            <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$10 MXN</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
+            <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$1 MXN · prueba</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
             <div className="nivalAddDivider" />
             <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/products">Ver tarjetas</a></div>
           </article>

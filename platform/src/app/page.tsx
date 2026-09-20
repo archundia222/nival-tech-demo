@@ -28,7 +28,7 @@ export default function Home() {
           <h1 className="heroReveal heroReveal2">Cobra sin volver a dictar tu CLABE.</h1>
           <p className="landingHeroLead heroReveal heroReveal3">Acerca el celular a tu tarjeta NFC, abre tus datos de pago y copia la CLABE.</p>
           <div className="landingPriceLine heroReveal heroReveal4">
-            <strong>$199 MXN</strong>
+            <strong>$1 MXN · PRUEBA</strong>
             <span>pago único · tarjeta NFC + página configurada</span>
           </div>
           <div className="landingHeroActions heroReveal heroReveal5">
@@ -124,7 +124,7 @@ export default function Home() {
         </div>
         <article className="priceCard">
           <p>NIVAL PAY</p>
-          <div className="priceAmount"><span>$</span><strong>199</strong><small>MXN</small></div>
+          <div className="priceAmount"><span>$</span><strong>1</strong><small>MXN · PRUEBA</small></div>
           <p className="priceFrequency">Pago único. Sin mensualidad.</p>
           <ul>
             <li>1 tarjeta NFC personalizada</li>
@@ -144,7 +144,7 @@ export default function Home() {
           <p>Empieza con tu página, QR y tarjeta. Después agrega nuevos puntos de cobro sin cambiar de cuenta.</p>
         </div>
         <div className="payExpansionOptions">
-          <article><span>LINK + QR</span><strong>$10 MXN</strong><p>Un enlace adicional con su propio código QR.</p></article>
+          <article><span>LINK + QR</span><strong>$1 MXN · PRUEBA</strong><p>Un enlace adicional con su propio código QR.</p></article>
           <article><span>TARJETA NFC ADICIONAL</span><strong>$99 MXN</strong><p>Una tarjeta física extra vinculada al punto de cobro que elijas.</p></article>
         </div>
       </section>
@@ -187,7 +187,7 @@ export default function Home() {
       <section className="landingFinalCta scrollReveal">
         <p className="landingEyebrow">NIVAL PAY</p>
         <h2>Tu negocio ya acepta transferencias.<br />Ahora hazlo más fácil.</h2>
-        <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay — $199</Link>
+        <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay — $1 de prueba</Link>
       </section>
 
       <footer className="landingFooter">
