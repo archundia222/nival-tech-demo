@@ -5,7 +5,7 @@ import { savePaymentProfile, type PaymentFormState } from './actions';
 import { startExtraSectionCheckoutForProfile } from '@/app/checkout/actions';
 
 type Section = { id: string; title: string; content: string; public: boolean };
-type Profile = { id: string; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
+type Profile = { id: string; display_name?: string | null; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
 export function PaymentEditor({ businessId, businessName, businessLogo, profile, siteUrl }: {
   businessId: string; businessName: string; businessLogo: string | null; profile: Profile | null; siteUrl: string;
 }) {
@@ -17,6 +17,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const [revision, setRevision] = useState(0);
   const [savedRevision, setSavedRevision] = useState(0);
   const markDirty = () => setRevision(current => current + 1);
+  const [displayName, setDisplayName] = useState(profile?.display_name?.trim() || 'Nival Pay');
   const [holder, setHolder] = useState(profile?.account_holder ?? '');
   const [bank, setBank] = useState(profile?.bank_name ?? '');
   const [clabe, setClabe] = useState(profile?.clabe ?? '');
@@ -82,12 +83,13 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
     <form ref={formRef} action={action} className="visualPayEditor">
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="profileId" value={profile?.id ?? ''} />
+      <input type="hidden" name="displayName" value={displayName} />
       <input type="hidden" name="paymentUrl" value={paymentUrl} />
       <input type="hidden" name="active" value={active ? "on" : ""} />
       <input type="hidden" name="fieldVisibility" value={JSON.stringify(fieldVisibility)} />
       <input type="hidden" name="customSections" value={JSON.stringify(sections)} />
       <input type="hidden" name="removeImage" value={removeImage ? "on" : ""} />
-      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2></div></div>
+      <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><label><span>Nombre de la tarjeta</span><input className="inlinePayInput" value={displayName} onChange={e=>{setDisplayName(e.target.value);markDirty()}} minLength={2} maxLength={60} placeholder="Nival Pay" aria-label="Nombre de la tarjeta" /></label></div></div>
       <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
         <div className="nivalClientProfile" style={{position:"relative"}}><button type="button" className={fieldVisibility.holder ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("holder","el titular")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.holder ? "Visible" : "Oculto"}</button>
