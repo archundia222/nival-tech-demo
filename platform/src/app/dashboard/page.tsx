@@ -308,15 +308,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />
       </>}
       {currentSection === "configuracion" && <>
-      {canManageProgram && business && <section className="settingsCard">
-        <div className="settingsIntro">
-          <p className="eyebrow">NFC PARA COBROS</p>
-          <h2>Comparte datos para transferencias</h2>
-          <p>El cliente podrá copiar el titular, banco y CLABE desde una página segura. No guardes NIP, CVV, contraseñas ni códigos.</p>
-          {hasNivalPay && paymentProfile && <PaymentProfileQr businessName={business.name} url={`https://nival-tech-platform.vercel.app/pay/${paymentProfile.public_token}`} views={Number(paymentProfile.view_count)} />}
-        </div>
-        <a className="primaryButton" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Configurar mi página Nival Pay" : "Activar Nival Pay"}</a>
-      </section>}
       {hasIntelligence && canManageProgram && business && (
         <section className="settingsCard teamCard">
           <div className="settingsIntro">
