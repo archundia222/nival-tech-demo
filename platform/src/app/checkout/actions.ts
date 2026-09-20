@@ -213,8 +213,7 @@ export async function completeCheckoutBankProfile(
   _state: CheckoutBankState,
   form: FormData,
 ): Promise<CheckoutBankState> {
-  const { businessId } = await currentPurchaseContext();
-  const admin = createAdminClient();
+  const { businessId, supabase } = await currentPurchaseContext();
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\D/g, '');
@@ -232,7 +231,7 @@ export async function completeCheckoutBankProfile(
     return { error: 'La CLABE no es válida. Revisa los 18 dígitos.' };
   }
 
-  const { data: paidOrder } = await admin.from('product_orders')
+  const { data: paidOrder } = await supabase.from('product_orders')
     .select('id')
     .eq('business_id', businessId)
     .eq('product_code', NIVAL_PAY_PRODUCT)
@@ -244,7 +243,7 @@ export async function completeCheckoutBankProfile(
   // A business can now own several Nival Pay profiles, so business_id is no
   // longer a unique conflict target. Update the first profile created by the
   // payment activation RPC instead of using an upsert on business_id.
-  const { data: existingProfile, error: profileLookupError } = await admin
+  const { data: existingProfile, error: profileLookupError } = await supabase
     .from('payment_profiles')
     .select('id')
     .eq('business_id', businessId)
@@ -270,12 +269,12 @@ export async function completeCheckoutBankProfile(
     updated_at: new Date().toISOString(),
   };
   const result = existingProfile
-    ? await admin.from('payment_profiles').update(profileValues)
+    ? await supabase.from('payment_profiles').update(profileValues)
       .eq('id', existingProfile.id)
       .eq('business_id', businessId)
       .select('public_token')
       .single()
-    : await admin.from('payment_profiles').insert(profileValues)
+    : await supabase.from('payment_profiles').insert(profileValues)
       .select('public_token')
       .single();
 
