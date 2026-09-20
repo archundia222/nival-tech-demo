@@ -3,6 +3,7 @@ import { useActionState, useEffect, useRef, useState, useTransition } from 'reac
 import Image from 'next/image';
 import { savePaymentProfile, type PaymentFormState } from './actions';
 import { startExtraSectionCheckoutForProfile } from '@/app/checkout/actions';
+import { NIVAL_PAY_INCLUDED_SECTIONS } from '@/lib/orders';
 
 type Section = { id: string; title: string; content: string; public: boolean };
 type Profile = { id: string; display_name?: string | null; account_holder: string; bank_name: string; clabe: string; concept: string | null; payment_url: string | null; image_url: string | null; public_token: string; active: boolean; view_count: number; clabe_copy_count?: number; holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean; custom_sections?: Section[]; extra_sections_purchased?: number };
@@ -36,7 +37,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   const [newSectionId, setNewSectionId] = useState<string | null>(null);
   const newSectionInput = useRef<HTMLInputElement | null>(null);
   const addSection = () => {
-    if (sections.length >= (profile?.extra_sections_purchased ?? 0)) return;
+    if (sections.length >= NIVAL_PAY_INCLUDED_SECTIONS + (profile?.extra_sections_purchased ?? 0)) return;
     markDirty();
     setSections(current => {
       const id = crypto.randomUUID();
@@ -74,7 +75,7 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
   }, [state]);
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
-  const totalSectionLimit = purchasedSectionLimit;
+  const totalSectionLimit = NIVAL_PAY_INCLUDED_SECTIONS + purchasedSectionLimit;
   const buyExtraSection = () => {
     if (!profile?.id) return;
     startCheckoutTransition(() => startExtraSectionCheckoutForProfile(profile.id));
@@ -113,9 +114,9 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
           </div>)}
         </div>
         <div className="inlineApartados">
-          <p className="apartadoIntro">Agrega los apartados que necesites. <strong>Precio temporal de prueba: $10 MXN</strong> y queda ligado a esta Nival Pay.</p>
-          {sections.length < totalSectionLimit ? <button key="add-available-section" type="button" className="apartadoRowAdd" onClick={(event) => { event.preventDefault(); event.stopPropagation(); addSection(); }}><span><b>+</b></span><div><strong>Crear apartado comprado</strong><small>{totalSectionLimit-sections.length} disponible</small></div></button> : <button key="buy-extra-section" type="button" onClick={buyExtraSection} disabled={checkoutPending || !profile?.id} className="apartadoRowAdd apartadoRowLocked"><span><b>+</b></span><div><strong>{checkoutPending ? 'Abriendo Mercado Pago…' : 'Agregar apartado · $10 MXN (prueba)'}</strong><small>Paga una sola vez y edítalo cuando quieras.</small></div></button>}
-          <p className="apartadoFootnote">No hay apartados gratuitos. Cada compra desbloquea un apartado nuevo.</p>
+          <p className="apartadoIntro">Tu Nival Pay incluye <strong>3 apartados</strong>. Después puedes agregar los que necesites por $49 MXN cada uno.</p>
+          {sections.length < totalSectionLimit ? <button key="add-available-section" type="button" className="apartadoRowAdd" onClick={(event) => { event.preventDefault(); event.stopPropagation(); addSection(); }}><span><b>+</b></span><div><strong>Agregar apartado</strong><small>{totalSectionLimit-sections.length} disponible{totalSectionLimit-sections.length === 1 ? '' : 's'}</small></div></button> : <button key="buy-extra-section" type="button" onClick={buyExtraSection} disabled={checkoutPending || !profile?.id} className="apartadoRowAdd apartadoRowLocked"><span><b>+</b></span><div><strong>{checkoutPending ? 'Abriendo Mercado Pago…' : 'Agregar apartado · $49 MXN'}</strong><small>Paga una sola vez y edítalo cuando quieras.</small></div></button>}
+          <p className="apartadoFootnote">Los primeros 3 están incluidos. Cada compra posterior desbloquea un apartado nuevo.</p>
         </div>
         <p className={state.error ? "payError" : "paySuccess"} role={state.error ? "alert" : "status"}>{pending ? 'Guardando automáticamente…' : state.error ? state.error : revision > savedRevision ? 'Cambios pendientes…' : revision > 0 ? 'Todos los cambios están guardados.' : 'Los cambios se guardan automáticamente.'}</p>
       </div>

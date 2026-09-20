@@ -199,11 +199,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL PAY</span><h2>Página de cobro</h2></div></div>
           <p>{hasNivalPay ? "Tu producto está activado. Desde aquí puedes revisar y actualizar los datos que verá el cliente al acercar la tarjeta." : "Activa Nival Pay para preparar la página de cobro que abrirá tu tarjeta NFC."}</p>
-          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $10 MXN (prueba)"}</a>
+          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $199 MXN"}</a>
         </article>
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Precio temporal para pruebas reales: activa Nival Pay y agrega nuevos links con QR por $10 MXN. La tarjeta física conserva su precio porque aún no se cobra en línea.</p>
+          <p>Nival Pay incluye una tarjeta física, página configurable, QR y 3 apartados. Cada apartado adicional cuesta $49 MXN y cada tarjeta física adicional, $99 MXN.</p>
           <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
