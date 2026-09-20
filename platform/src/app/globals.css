@@ -1253,3 +1253,35 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .professionalNav a{min-height:44px;padding-block:10px}
   .professionalNav .sidebarSubmenu a{min-height:38px;padding-block:8px}
 }
+
+
+/* Refined compact sidebar: professional density without sacrificing access. */
+.professionalSidebar{width:252px;padding:19px 14px 16px}
+.dashboardApp{grid-template-columns:252px minmax(0,1fr)}
+.professionalBrand{gap:5px;padding:3px 8px 18px}
+.professionalBrand>span{width:30px;height:30px;margin-right:5px;border-radius:8px;font-size:12px}
+.professionalBrand b{font-size:15px}
+.professionalBrand small{font-size:11px}
+.workspaceSwitcher{min-height:54px;gap:10px;padding:9px 10px;border-color:#2c2e33;border-radius:10px;background:#121316}
+.workspaceSwitcher>span{width:29px;height:29px}
+.workspaceSwitcher small{font-size:8px;letter-spacing:.12em;color:#8d9198}
+.workspaceSwitcher strong{font-size:12px}
+.sidebarSectionLabel{margin:18px 10px 6px;color:#777b82;font-size:9px;letter-spacing:.13em}
+.professionalNav{gap:2px;margin-top:6px}
+.professionalNav a{min-height:40px;gap:10px;padding:9px 10px;border-radius:8px;color:#9ea2a9;font-size:12.5px}
+.professionalNav a svg{width:17px;height:17px}
+.professionalNav a:hover{background:#15171a;color:#eceef0}
+.professionalNav a.active{background:#1b1d21;color:#fff;box-shadow:inset 3px 0 0 #b99750}
+.sidebarSubmenu{gap:2px;margin:3px 0 3px 23px;padding:3px 0 3px 10px;border-left-color:#343029}
+.professionalNav .sidebarSubmenu a{min-height:34px;padding:7px 9px;color:#8f939a;font-size:11.5px}
+.professionalNav .sidebarSubmenu a.active{background:rgba(185,151,80,.12);color:#d8bc80;box-shadow:none}
+.professionalFooter{margin-top:16px;padding-top:10px}
+.professionalFooter a,.professionalFooter .textButton{min-height:38px;padding:9px 8px;font-size:12px}
+@media(max-height:720px) and (min-width:851px){
+ .professionalSidebar{padding-top:12px}
+ .professionalBrand{padding-bottom:11px}
+ .workspaceSwitcher{min-height:50px}
+ .sidebarSectionLabel{margin-top:12px}
+ .professionalNav a{min-height:37px;padding-block:8px}
+ .professionalNav .sidebarSubmenu a{min-height:31px;padding-block:6px}
+}
