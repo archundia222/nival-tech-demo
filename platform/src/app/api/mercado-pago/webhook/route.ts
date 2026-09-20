@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
   type?: string;
@@ -178,7 +178,8 @@ export async function POST(request: NextRequest) {
     && paidAmountCents === order.amount_cents
     && ((order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_PRICE_CENTS)
       || (order.product_code === NIVAL_PAY_EXTRA_SECTION_PRODUCT && order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS)
-      || (order.product_code === NIVAL_PAY_ADDITIONAL_PRODUCT && order.amount_cents === NIVAL_PAY_ADDITIONAL_PRICE_CENTS))
+      || (order.product_code === NIVAL_PAY_ADDITIONAL_PRODUCT && order.amount_cents === NIVAL_PAY_ADDITIONAL_PRICE_CENTS)
+      || (order.product_code === NIVAL_PAY_PHYSICAL_CARD_PRODUCT && order.amount_cents === NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS))
     && Boolean(paymentId);
 
   if (!approved || !paymentId) return NextResponse.json({ received: true });
