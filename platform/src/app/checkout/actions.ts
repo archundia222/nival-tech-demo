@@ -100,7 +100,11 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
   const amount = (product.amountCents / 100).toFixed(2);
-  const payerEmail = process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim() || user.email?.trim();
+  // Never send a test payer to a live checkout. The override is intentionally
+  // limited to preview/development deployments.
+  const payerEmail = process.env.VERCEL_ENV === 'production'
+    ? user.email?.trim()
+    : process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim() || user.email?.trim();
   if (!payerEmail) redirect(`${product.returnPath}?error=Tu+cuenta+necesita+un+correo+para+continuar+con+el+pago.`);
   let result: MercadoPagoOrderCreateResponse = {};
 

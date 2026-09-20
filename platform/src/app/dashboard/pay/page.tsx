@@ -4,7 +4,7 @@ import { publicSiteUrl } from '@/lib/payment-profile';
 import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 import { createAdditionalPaymentProfile } from './actions';
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
@@ -21,7 +21,7 @@ type MercadoPagoOrder = {
   transactions?: { payments?: Array<{ id?: string; status?: string; status_detail?: string }> };
 };
 
-async function reconcileLatestExtraSectionOrder(businessId: string) {
+async function reconcileLatestPayOrder(businessId: string, productCode: typeof NIVAL_PAY_EXTRA_SECTION_PRODUCT | typeof NIVAL_PAY_ADDITIONAL_PRODUCT, expectedAmountCents: number) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!accessToken) return;
 
@@ -29,7 +29,7 @@ async function reconcileLatestExtraSectionOrder(businessId: string) {
   const { data: order } = await admin.from('product_orders')
     .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
     .eq('business_id', businessId)
-    .eq('product_code', NIVAL_PAY_EXTRA_SECTION_PRODUCT)
+    .eq('product_code', productCode)
     .eq('payment_method', 'mercado_pago')
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
@@ -62,7 +62,7 @@ async function reconcileLatestExtraSectionOrder(businessId: string) {
     currency: !payload.currency_id || payload.currency_id === order.currency,
     totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
     totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
-    catalogAmount: order.amount_cents === NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
+    catalogAmount: order.amount_cents === expectedAmountCents,
     paymentId: Boolean(paymentId),
     storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
   };
@@ -96,7 +96,10 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   if (error) throw new Error('No se pudo cargar el negocio.');
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
-  await reconcileLatestExtraSectionOrder(membership.business_id);
+  await Promise.all([
+    reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS),
+    reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS),
+  ]);
   const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }, { data: smartLinks }] = await Promise.all([
     supabase.from('product_orders').select('id')
       .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),

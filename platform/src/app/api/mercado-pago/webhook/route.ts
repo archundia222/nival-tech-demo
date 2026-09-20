@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
   type?: string;
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
       external_reference?: string;
       status?: string;
       next_payment_date?: string;
+      auto_recurring?: { transaction_amount?: number; currency_id?: string };
     };
     const subscriptionId = subscription.external_reference;
     if (!subscriptionId || !UUID_PATTERN.test(subscriptionId) || subscription.id !== dataId) {
@@ -89,6 +90,28 @@ export async function POST(request: NextRequest) {
       : subscription.status === 'cancelled' ? 'cancelled'
       : 'pending';
     const admin = createAdminClient();
+    const { data: storedSubscription, error: lookupError } = await admin.from('product_subscriptions')
+      .select('product_code, amount_cents, provider_subscription_id')
+      .eq('id', subscriptionId)
+      .eq('provider', 'mercado_pago')
+      .maybeSingle();
+    if (lookupError || !storedSubscription) {
+      return NextResponse.json({ error: 'Subscription lookup failed' }, { status: 500 });
+    }
+    const catalogAmount = storedSubscription.product_code === NIVAL_POINTS_PRODUCT ? NIVAL_POINTS_PRICE_CENTS
+      : storedSubscription.product_code === NIVAL_INTELLIGENCE_PRODUCT ? NIVAL_INTELLIGENCE_PRICE_CENTS
+      : storedSubscription.product_code === NIVAL_POINTS_INTELLIGENCE_PRODUCT ? NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS
+      : null;
+    const providerAmountCents = Math.round(Number(subscription.auto_recurring?.transaction_amount) * 100);
+    const subscriptionVerified = catalogAmount !== null
+      && storedSubscription.amount_cents === catalogAmount
+      && providerAmountCents === storedSubscription.amount_cents
+      && subscription.auto_recurring?.currency_id === 'MXN'
+      && (!storedSubscription.provider_subscription_id || storedSubscription.provider_subscription_id === dataId);
+    if (!subscriptionVerified) {
+      console.error('Nival subscription verification failed', { subscriptionId });
+      return NextResponse.json({ error: 'Subscription verification failed' }, { status: 409 });
+    }
     const { error } = await admin.rpc('sync_nival_product_subscription', {
       p_subscription_id: subscriptionId,
       p_provider_subscription_id: dataId,
