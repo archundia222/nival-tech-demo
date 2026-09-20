@@ -256,7 +256,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </article>
           <article className="nivalAddProduct">
             <span className="nivalAddIcon" aria-hidden="true">+</span>
-            <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$10 MXN · prueba</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
+            <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$49 MXN</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
             <div className="nivalAddDivider" />
             <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/products">Ver tarjetas</a></div>
           </article>
