@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 
 async function currentPurchaseContext() {
@@ -80,6 +80,7 @@ type CheckoutProduct = {
   description: string;
   returnPath: string;
   paymentProfileId?: string;
+  physicalOrder?: Record<string, string | null>;
 };
 
 function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: string) {
@@ -102,6 +103,18 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     payment_profile_id: product.paymentProfileId ?? null,
   }).select('id').single();
   if (error || !order) redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudo crear la orden.'));
+  if (product.physicalOrder) {
+    const { error: physicalError } = await admin.from('physical_card_orders').insert({
+      ...product.physicalOrder,
+      product_order_id: order.id,
+      business_id: businessId,
+    });
+    if (physicalError) {
+      await admin.from('product_orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', order.id);
+      console.error('[physical-card] Order details save failed', { code: physicalError.code });
+      redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudieron guardar los datos de entrega.'));
+    }
+  }
 
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
@@ -406,4 +419,81 @@ export async function startNivalIntelligenceSubscription() {
   return startMercadoPagoSubscription(points
     ? { productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Puntos + Intelligence · plan mensual' }
     : { productCode: NIVAL_INTELLIGENCE_PRODUCT, amountCents: NIVAL_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Intelligence · plan mensual' });
+}
+
+
+type PhysicalCardInput = {
+  design: 'black' | 'white' | 'custom';
+  design_notes: string | null;
+  delivery_method: 'sunday_local' | 'shipping';
+  recipient_name: string;
+  phone: string;
+  address_line1: string;
+  address_line2: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  requested_delivery_date: string | null;
+};
+
+function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
+  const design = String(form.get('design') ?? '');
+  const delivery = String(form.get('deliveryMethod') ?? '');
+  const recipient = String(form.get('recipientName') ?? '').trim();
+  const phone = String(form.get('phone') ?? '').replace(/[^0-9+]/g, '');
+  const address1 = String(form.get('addressLine1') ?? '').trim();
+  const address2 = String(form.get('addressLine2') ?? '').trim();
+  const city = String(form.get('city') ?? '').trim();
+  const state = String(form.get('state') ?? '').trim();
+  const postalCode = String(form.get('postalCode') ?? '').trim();
+  const notes = String(form.get('designNotes') ?? '').trim();
+  const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
+  if (!['black','white','custom'].includes(design) || !['sunday_local','shipping'].includes(delivery)
+    || recipient.length < 2 || phone.length < 10 || address1.length < 5 || city.length < 2
+    || state.length < 2 || !/^\d{5}$/.test(postalCode) || notes.length > 500) return null;
+  if (delivery === 'sunday_local' && requestedDate) {
+    const parsed = new Date(requestedDate + 'T12:00:00Z');
+    if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== 0) return null;
+  }
+  return {
+    design: design as PhysicalCardInput['design'], design_notes: notes || null,
+    delivery_method: delivery as PhysicalCardInput['delivery_method'],
+    recipient_name: recipient.slice(0,120), phone: phone.slice(0,20),
+    address_line1: address1.slice(0,180), address_line2: address2.slice(0,180) || null,
+    city: city.slice(0,100), state: state.slice(0,100), postal_code: postalCode,
+    requested_delivery_date: delivery === 'sunday_local' ? requestedDate || null : null,
+  };
+}
+
+export async function startPhysicalCardCheckout(form: FormData) {
+  const details = readPhysicalCardInput(form);
+  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
+    amountCents: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
+    description: 'Nival Pay · tarjeta física NFC',
+    returnPath: '/dashboard/pay/physical',
+    physicalOrder: details,
+  });
+}
+
+export async function requestPhysicalCardCashPayment(form: FormData) {
+  const details = readPhysicalCardInput(form);
+  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: order, error } = await admin.from('product_orders').insert({
+    business_id: businessId, product_code: NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
+    amount_cents: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, payment_method: 'cash',
+    status: 'pending_cash_confirmation',
+  }).select('id').single();
+  if (error || !order) redirect('/dashboard/pay/physical?error=No+se+pudo+registrar+el+pedido.');
+  const { error: detailsError } = await admin.from('physical_card_orders').insert({
+    ...details, product_order_id: order.id, business_id: businessId,
+  });
+  if (detailsError) {
+    await admin.from('product_orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', order.id);
+    redirect('/dashboard/pay/physical?error=No+se+pudieron+guardar+los+datos+de+entrega.');
+  }
+  redirect('/dashboard/pay/physical?result=cash');
 }
