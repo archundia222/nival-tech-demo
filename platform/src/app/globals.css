@@ -1285,3 +1285,93 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
  .professionalNav a{min-height:37px;padding-block:8px}
  .professionalNav .sidebarSubmenu a{min-height:31px;padding-block:6px}
 }
+
+
+/* Full product stories and public digital profile */
+.productStorySection,.productSolutionsSection{margin:24px 0;padding:52px;border:1px solid #303238;border-radius:24px;background:#141518}
+.productStoryHeading{max-width:760px}
+.productStoryHeading>span,.productUseCases>div>span,.intelligenceConnection>div>span{color:#bea15f;font-size:10px;font-weight:900;letter-spacing:.14em}
+.productStoryHeading h2,.productUseCases h2,.intelligenceConnection h2{margin:10px 0 0;font-size:clamp(29px,3.2vw,46px);line-height:1.08;letter-spacing:-.045em}
+.productStoryHeading p{max-width:650px;margin:14px 0 0;color:#a9abb0;font-size:15px;line-height:1.65}
+.productSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}
+.productSteps article{display:flex;gap:16px;padding:23px;border:1px solid #2f3136;border-radius:16px;background:#1a1b1f}
+.productSteps article>b{flex:0 0 auto;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:#d2b36c;color:#17181b;font-size:13px}
+.productSteps h3,.solutionGrid h3{margin:2px 0 8px;font-size:18px}
+.productSteps p,.solutionGrid p{margin:0;color:#a9abb0;font-size:13px;line-height:1.6}
+.productSolutionsSection{background:linear-gradient(145deg,#f8f3e8,#eee2c9);color:#17181b;border-color:#dbcba8}
+.productSolutionsSection .productStoryHeading>span{color:#866a2f}
+.solutionGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:32px}
+.solutionGrid article{min-height:170px;padding:25px;border:1px solid rgba(31,30,27,.13);border-radius:17px;background:rgba(255,255,255,.64)}
+.solutionGrid article>span{color:#82672f;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.solutionGrid h3{margin-top:15px;font-size:21px}
+.solutionGrid p{color:#5f5a50;font-size:14px}
+.productUseCases{display:flex;align-items:center;justify-content:space-between;gap:35px;margin:24px 0 38px;padding:38px 42px;border:1px solid #32343a;border-radius:22px;background:#191a1e}
+.productUseCases>div{max-width:760px}
+.productUseCases h2{font-size:clamp(24px,2.5vw,36px)}
+.productUseCases form{flex:0 0 auto}
+.intelligenceStory{background:linear-gradient(145deg,#111215,#1b1c20)}
+.intelligenceSolutions{background:linear-gradient(145deg,#17181b,#22231f);color:#f4f0e8;border-color:#4a4638}
+.intelligenceSolutions .productStoryHeading>span,.intelligenceSolutions .solutionGrid article>span{color:#d1b36e}
+.intelligenceSolutions .solutionGrid article{border-color:#3b3c39;background:#1d1e21}
+.intelligenceSolutions .solutionGrid p{color:#b1afa8}
+.intelligenceConnection{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center;margin:24px 0;padding:48px;border:1px solid #3d392f;border-radius:24px;background:radial-gradient(circle at 85% 50%,#302a1b,#121315 65%)}
+.intelligenceConnection h2{font-size:clamp(26px,3vw,42px)}
+.connectionFlow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px}
+.connectionFlow span,.connectionFlow strong{padding:14px 16px;border:1px solid #49463d;border-radius:12px;background:#1d1e21;font-size:13px}
+.connectionFlow strong{color:#17181b;background:#d1b36e;border-color:#d1b36e}
+.connectionFlow i{color:#8f8c84;font-style:normal}
+.darkUseCases{background:#111214}
+
+.profileExperience{position:relative;overflow:hidden;min-height:100vh;padding:48px 20px;color:#17181b;background:#f1eee7;color-scheme:light}
+.profileAmbient{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 5%,color-mix(in srgb,var(--business-accent) 22%,transparent),transparent 35%),radial-gradient(circle at 90% 100%,#c7b07833,transparent 34%)}
+.profileCard{position:relative;width:min(100%,680px);margin:0 auto;overflow:hidden;border:1px solid #ded9cf;border-radius:28px;background:#fff;box-shadow:0 28px 80px rgba(34,31,25,.12)}
+.profileExperience .profileHeader{padding:40px 40px 30px;text-align:left;background:linear-gradient(145deg,#fff,#faf8f3)}
+.profileIdentity{display:flex;align-items:center;gap:20px}
+.profileExperience .profileLogo,.profileExperience .profileFallback{width:78px;height:78px;flex:0 0 auto;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+.profileExperience .profileLogo{object-fit:cover}
+.profileExperience .profileFallback{display:grid;place-items:center;color:#17181b;background:var(--business-accent);font-size:30px;font-weight:900}
+.profileVerified{display:inline-flex;align-items:center;gap:5px;color:#6f685a;font-size:10px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.profileVerified:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--business-accent)}
+.profileExperience .profileHeader h1{margin:7px 0 0;color:#17181b;font-size:clamp(30px,6vw,46px);line-height:1.05;letter-spacing:-.045em}
+.profileDescription{max-width:560px;margin:22px 0 0!important;color:#59564f!important;font-size:16px!important;line-height:1.6!important}
+.profileQuickActions{display:flex;gap:10px;margin-top:24px}
+.profileQuickActions a{min-height:46px;display:inline-flex;align-items:center;gap:9px;padding:11px 16px;border:1px solid #d9d5cd;border-radius:12px;color:#24231f;background:#fff;font-size:13px}
+.profileQuickActions a span{color:#7b642f}
+.profileActionSection{padding:30px 40px 36px;border-top:1px solid #ebe7df}
+.profileSectionHeading span{color:#817a6d;font-size:10px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.profileSectionHeading h2{margin:7px 0 0;font-size:24px;letter-spacing:-.03em}
+.profileExperience .profileLinks{display:grid;gap:11px;margin-top:20px}
+.profileLink{min-height:78px;display:grid!important;grid-template-columns:44px minmax(0,1fr) 24px;align-items:center;gap:14px;padding:14px 17px!important;border:1px solid #dedbd4!important;border-radius:16px!important;color:#20201d!important;background:#fff!important;box-shadow:0 3px 10px rgba(20,20,18,.025)}
+.profileLink:hover{transform:translateY(-1px);border-color:#a9a399!important;box-shadow:0 8px 24px rgba(20,20,18,.07)}
+.profileLink.featured{border-color:color-mix(in srgb,var(--business-accent) 55%,#d9d4c9)!important;background:color-mix(in srgb,var(--business-accent) 9%,#fff)!important}
+.profileLinkIcon{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#f0ede6;color:#5f502d;font-size:17px;font-weight:900}
+.profileLink.featured .profileLinkIcon{background:var(--business-accent);color:#17181b}
+.profileLink>span:nth-child(2){display:grid;gap:4px}
+.profileLink b{font-size:15px}
+.profileLink small{color:#6a675f;font-size:12px;line-height:1.4}
+.profileLink i{color:#817b70;font-size:20px;font-style:normal}
+.profileExperience .profileFooter{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 40px;border-top:1px solid #ebe7df;color:#747068;background:#faf9f6;font-size:11px}
+.profileExperience .profileFooter b{color:#24231f;letter-spacing:.08em}
+@media(max-width:800px){
+ .productStorySection,.productSolutionsSection,.intelligenceConnection{padding:34px 26px}
+ .productSteps{grid-template-columns:1fr}
+ .solutionGrid{grid-template-columns:1fr}
+ .productUseCases{align-items:flex-start;flex-direction:column;padding:30px 26px}
+ .productUseCases form,.productUseCases .productCta{width:100%}
+ .intelligenceConnection{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+ .profileExperience{padding:0;background:#fff}
+ .profileCard{min-height:100vh;border:0;border-radius:0;box-shadow:none}
+ .profileExperience .profileHeader{padding:30px 20px 25px}
+ .profileIdentity{align-items:flex-start;gap:15px}
+ .profileExperience .profileLogo,.profileExperience .profileFallback{width:62px;height:62px;border-radius:17px}
+ .profileExperience .profileHeader h1{font-size:30px}
+ .profileDescription{font-size:15px!important}
+ .profileQuickActions a{flex:1;justify-content:center}
+ .profileActionSection{padding:25px 20px 30px}
+ .profileLink{min-height:74px;padding:13px!important}
+ .profileExperience .profileFooter{padding:18px 20px}
+ .profileExperience .profileFooter span{max-width:170px}
+ .productStorySection,.productSolutionsSection,.intelligenceConnection{padding:28px 20px;border-radius:20px}
+}
