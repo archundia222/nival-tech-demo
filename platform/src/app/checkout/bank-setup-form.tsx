@@ -29,6 +29,7 @@ export function BankSetupForm({ businessName, siteUrl }: { businessName: string;
         }}>{copied ? 'Enlace copiado' : 'Copiar enlace'}</button>
       </div>
       <a className="checkoutQuietLink" href="/dashboard/pay">Abrir configuración</a>
+      <a className="checkoutQuietLink" href="/dashboard/pay/physical">Solicitar mi tarjeta NFC incluida</a>
     </section>;
   }
 
@@ -70,5 +71,6 @@ export function ActiveCard({ businessName, url }: { businessName: string; url: s
       <button type="button" onClick={async () => { await navigator.clipboard.writeText(url); setCopied(true); }}>{copied ? 'Enlace copiado' : 'Copiar enlace'}</button>
     </div>
     <a className="checkoutQuietLink" href="/dashboard/pay">Administrar Nival Pay</a>
+    <a className="checkoutQuietLink" href="/dashboard/pay/physical">Solicitar mi tarjeta NFC incluida</a>
   </section>;
 }

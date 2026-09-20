@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
@@ -475,6 +476,44 @@ export async function startPhysicalCardCheckout(form: FormData) {
     returnPath: '/dashboard/pay/physical',
     physicalOrder: details,
   });
+}
+
+export async function claimIncludedPhysicalCard(form: FormData) {
+  const details = readPhysicalCardInput(form);
+  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!token) redirect('/dashboard/pay/physical?error=Mercado+Pago+aún+no+está+configurado.');
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const [{ data: paidOrders, error: paidError }, { data: existingCards, error: cardsError }] = await Promise.all([
+    admin.from('product_orders')
+      .select('id, provider_preference_id')
+      .eq('business_id', businessId)
+      .eq('product_code', NIVAL_PAY_PRODUCT)
+      .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
+      .eq('status', 'paid')
+      .order('paid_at', { ascending: true }),
+    admin.from('physical_card_orders').select('product_order_id').eq('business_id', businessId),
+  ]);
+  if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
+  const claimedOrderIds = new Set((existingCards ?? []).map((card) => card.product_order_id));
+  const includedOrder = paidOrders?.find((order) =>
+    order.provider_preference_id
+      && isCompatibleMercadoPagoOrderId(order.provider_preference_id, token)
+      && !claimedOrderIds.has(order.id)
+  );
+  if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
+  const { error } = await admin.from('physical_card_orders').insert({
+    ...details,
+    product_order_id: includedOrder.id,
+    business_id: businessId,
+  });
+  if (error) {
+    if (error.code === '23505') redirect('/dashboard/pay/physical?result=included');
+    console.error('[physical-card] Included card claim failed', { code: error.code });
+    redirect('/dashboard/pay/physical?error=No+se+pudieron+guardar+los+datos+de+entrega.');
+  }
+  redirect('/dashboard/pay/physical?result=included');
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {

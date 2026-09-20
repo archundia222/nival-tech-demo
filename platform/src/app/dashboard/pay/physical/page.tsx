@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../../dashboard-navigation';
-import { requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
+import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 export default async function PhysicalCardOrderPage({ searchParams }: {
   searchParams: Promise<{ error?: string; result?: string }>;
@@ -14,6 +17,24 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const admin = createAdminClient();
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const [{ data: paidInitialOrders }, { data: claimedCards }] = await Promise.all([
+    admin.from('product_orders')
+      .select('id, provider_preference_id')
+      .eq('business_id', membership.business_id)
+      .eq('product_code', NIVAL_PAY_PRODUCT)
+      .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
+      .eq('status', 'paid')
+      .order('paid_at', { ascending: true }),
+    admin.from('physical_card_orders').select('product_order_id').eq('business_id', membership.business_id),
+  ]);
+  const claimedOrderIds = new Set((claimedCards ?? []).map((card) => card.product_order_id));
+  const hasIncludedCard = Boolean(accessToken && paidInitialOrders?.some((order) =>
+    order.provider_preference_id
+      && isCompatibleMercadoPagoOrderId(order.provider_preference_id, accessToken)
+      && !claimedOrderIds.has(order.id)
+  ));
   const { data: orders } = await supabase.from('physical_card_orders')
     .select('id, design, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders(status, payment_method)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
@@ -21,13 +42,14 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="agregar-tarjetas" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">$99 MXN</span></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : '$99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       {params.result === 'success' && <p role="status" className="formMessage">Pago recibido. Tu tarjeta entrará a producción cuando confirmemos el diseño.</p>}
       {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido registrado. Pagarás $99 en efectivo al recibirla.</p>}
-      <header className="payHeading"><p className="eyebrow">NIVAL CARD</p><h1>Elige diseño y entrega.</h1><p>La tarjeta cuesta $99. La entrega local se realiza los domingos; en paquetería, el envío se cotiza antes de despacharla.</p></header>
-      <form className="paymentEditor" action={startPhysicalCardCheckout}>
+      {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
+      <header className="payHeading"><p className="eyebrow">NIVAL CARD</p><h1>Elige diseño y entrega.</h1><p>{hasIncludedCard ? 'Tu primera tarjeta está incluida en Nival Pay. Completa estos datos para solicitarla sin pagar de nuevo.' : 'La tarjeta adicional cuesta $99. La entrega local se realiza los domingos; en paquetería, el envío se cotiza antes de despacharla.'}</p></header>
+      <form className="paymentEditor" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
         <section className="chartCard">
           <h2>1. Diseño</h2>
           <label>Estilo<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Personalizada</option></select></label>
@@ -50,8 +72,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <label>Código postal<input name="postalCode" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5}/></label>
         </section>
         <div className="checkoutActions">
-          <button className="primaryButton" type="submit">Pagar $99 con Mercado Pago</button>
-          <button className="secondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Pagar $99 en efectivo al recibir</button>
+          <button className="primaryButton" type="submit">{hasIncludedCard ? 'Solicitar mi tarjeta incluida' : 'Pagar $99 con Mercado Pago'}</button>
+          {!hasIncludedCard && <button className="secondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Pagar $99 en efectivo al recibir</button>}
         </div>
       </form>
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
