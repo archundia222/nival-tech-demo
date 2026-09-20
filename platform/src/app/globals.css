@@ -1228,3 +1228,28 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
  .pointsVisual,.intelligenceVisual{min-height:315px;transform:scale(.92)}
  .productFeatureStrip article{padding:24px 21px}
 }
+
+
+/* Keep the enlarged sidebar usable on short screens. */
+.professionalSidebar{
+  position:sticky;
+  top:0;
+  height:100vh;
+  height:100dvh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#45484f #090a0c;
+}
+.professionalSidebar::-webkit-scrollbar{width:8px}
+.professionalSidebar::-webkit-scrollbar-track{background:#090a0c}
+.professionalSidebar::-webkit-scrollbar-thumb{border:2px solid #090a0c;border-radius:999px;background:#45484f}
+.professionalFooter{margin-top:22px}
+@media(max-height:720px) and (min-width:851px){
+  .professionalSidebar{padding-top:16px}
+  .professionalBrand{padding-bottom:15px}
+  .workspaceSwitcher{min-height:56px}
+  .sidebarSectionLabel{margin-top:16px}
+  .professionalNav a{min-height:44px;padding-block:10px}
+  .professionalNav .sidebarSubmenu a{min-height:38px;padding-block:8px}
+}
