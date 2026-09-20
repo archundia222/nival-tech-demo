@@ -7,6 +7,7 @@ import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -29,14 +30,17 @@ async function reconcileLatestOrder(businessId: string) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!accessToken) return;
   const admin = createAdminClient();
-  const { data: order } = await admin.from('product_orders')
+  const { data: recentOrders } = await admin.from('product_orders')
     .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
     .eq('business_id', businessId)
     .eq('product_code', 'nival_pay')
     .eq('payment_method', 'mercado_pago')
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(20);
+  const order = recentOrders?.find((candidate) =>
+    candidate.provider_preference_id
+      && isCompatibleMercadoPagoOrderId(candidate.provider_preference_id, accessToken)
+  );
   if (!order?.provider_preference_id) return;
 
   const activateBusiness = async () => {

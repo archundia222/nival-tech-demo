@@ -9,6 +9,7 @@ import { createAdditionalPaymentProfile } from './actions';
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 import { SmartLinkQr } from '../smart-link-qr';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -26,15 +27,18 @@ async function reconcileLatestPayOrder(businessId: string, productCode: typeof N
   if (!accessToken) return;
 
   const admin = createAdminClient();
-  const { data: order } = await admin.from('product_orders')
+  const { data: pendingOrders } = await admin.from('product_orders')
     .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
     .eq('business_id', businessId)
     .eq('product_code', productCode)
     .eq('payment_method', 'mercado_pago')
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(20);
+  const order = pendingOrders?.find((candidate) =>
+    candidate.provider_preference_id
+      && isCompatibleMercadoPagoOrderId(candidate.provider_preference_id, accessToken)
+  );
   if (!order?.provider_preference_id) return;
 
   const response = await fetch(

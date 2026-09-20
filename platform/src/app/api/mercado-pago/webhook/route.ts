@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
@@ -124,6 +125,13 @@ export async function POST(request: NextRequest) {
       console.error('Nival subscription sync failed', { subscriptionId, code: error.code });
       return NextResponse.json({ error: 'Subscription sync failed' }, { status: 500 });
     }
+    return NextResponse.json({ received: true });
+  }
+
+  // Test and production Orders API records belong to different credential
+  // scopes. Acknowledge stale notifications from the other mode instead of
+  // querying them with incompatible credentials and producing a false 404.
+  if (!isCompatibleMercadoPagoOrderId(dataId, accessToken)) {
     return NextResponse.json({ received: true });
   }
 
