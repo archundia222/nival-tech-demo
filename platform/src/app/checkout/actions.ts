@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
-import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
@@ -498,9 +497,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).map((card) => card.product_order_id));
   const includedOrder = paidOrders?.find((order) =>
-    order.provider_preference_id
-      && isCompatibleMercadoPagoOrderId(order.provider_preference_id, token)
-      && !claimedOrderIds.has(order.id)
+    order.provider_preference_id && !claimedOrderIds.has(order.id)
   );
   if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
   const { error } = await admin.from('physical_card_orders').insert({
