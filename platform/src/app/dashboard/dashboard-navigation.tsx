@@ -5,7 +5,7 @@ type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'clientes' | 'nival-ca
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
-  { id: 'agregar-tarjetas', label: 'Agregar tarjetas', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
+  { id: 'agregar-tarjetas', label: 'Agregar o comprar', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
   { id: 'compartir-paginas', label: 'Comparte tus páginas', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
 ];
 
@@ -24,12 +24,14 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
-      <button className="workspaceSwitcher" type="button"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></button>
+      <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>NEGOCIO ACTUAL</small><strong>{businessName}</strong></div></div>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
+        <span className="sidebarSectionLabel">Cobros y tarjetas</span>
         <Link className={`sidebarMainProduct ${payActive ? 'active' : ''}`} href="/dashboard/pay"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></NavIcon>Nival Pay</Link>
         <div className="sidebarSubmenu" aria-label="Opciones de Nival Pay">
           {payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}
         </div>
+        <span className="sidebarSectionLabel">Más herramientas</span>
         {productItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
