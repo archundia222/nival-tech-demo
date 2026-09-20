@@ -55,7 +55,10 @@ export async function POST(request: NextRequest) {
       secret: webhookSecret,
     });
   } catch (error) {
-    console.warn('Mercado Pago webhook signature rejected', {
+    // Do not trust the webhook payload when its signature fails. Continue only
+    // with the notification ID and verify the complete payment directly
+    // against Mercado Pago below (reference, amount, currency and paid state).
+    console.warn('Mercado Pago webhook signature rejected; using provider verification', {
       reason: error instanceof InvalidWebhookSignatureError ? error.reason : 'Unknown',
       dataIdSource: queryDataId ? 'query' : 'body',
       queryBodyDataIdMatch: queryDataId && bodyDataId ? queryDataId === bodyDataId : null,
@@ -65,7 +68,6 @@ export async function POST(request: NextRequest) {
       action: body?.action ?? null,
       liveMode: body?.live_mode ?? null,
     });
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   if (eventType === 'subscription_preapproval' || eventType === 'preapproval') {
