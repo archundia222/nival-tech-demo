@@ -7,7 +7,6 @@ import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
-import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -37,11 +36,6 @@ async function reconcileLatestOrder(businessId: string) {
     .eq('payment_method', 'mercado_pago')
     .order('created_at', { ascending: false })
     .limit(20);
-  const order = recentOrders?.find((candidate) =>
-    candidate.provider_preference_id
-      && isCompatibleMercadoPagoOrderId(candidate.provider_preference_id, accessToken)
-  );
-  if (!order?.provider_preference_id) return;
 
   const activateBusiness = async () => {
     const now = new Date().toISOString();
@@ -50,49 +44,65 @@ async function reconcileLatestOrder(businessId: string) {
       .eq('id', businessId)
       .neq('subscription_status', 'active');
   };
-  if (order.status === 'paid' && order.provider_payment_id) {
+
+  for (const order of recentOrders ?? []) {
+    if (order.status === 'paid' && order.provider_payment_id) {
+      await activateBusiness();
+      return;
+    }
+    if (!order.provider_preference_id) continue;
+
+    const response = await fetch(
+      `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
+      { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
+    );
+
+    // Mercado Pago can return orders from a different credential scope in the
+    // same database during QA. A 404 only means this token cannot see that
+    // order, so continue with the next recent order instead of getting stuck.
+    if (response.status === 404) continue;
+    if (!response.ok) {
+      console.warn('Mercado Pago reconciliation request failed', {
+        providerOrderId: order.provider_preference_id,
+        httpStatus: response.status,
+      });
+      continue;
+    }
+
+    const payload = await response.json() as MercadoPagoOrder;
+    const payment = payload.transactions?.payments?.find((candidate) =>
+      candidate.status === 'processed' && candidate.status_detail === 'accredited'
+    );
+    const paymentId = payment?.id ? String(payment.id) : null;
+    const checks = {
+      orderId: payload.id === order.provider_preference_id,
+      externalReference: payload.external_reference === order.id,
+      orderStatus: payload.status === 'processed',
+      orderStatusDetail: payload.status_detail === 'accredited',
+      currency: !payload.currency_id || payload.currency_id === order.currency,
+      totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
+      totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
+      catalogAmount: order.amount_cents === NIVAL_PAY_PRICE_CENTS,
+      paymentId: Boolean(paymentId),
+      storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
+    };
+    const approved = Object.values(checks).every(Boolean);
+    if (!approved || !paymentId) continue;
+
+    const { error: finalizeError } = await admin.rpc('finalize_nival_pay_order', {
+      p_order_id: order.id,
+      p_provider_payment_id: paymentId,
+    });
+    if (finalizeError) {
+      console.error('Nival Pay reconciliation finalization failed', {
+        orderId: order.id,
+        code: finalizeError.code,
+      });
+      continue;
+    }
     await activateBusiness();
     return;
   }
-
-  const response = await fetch(
-    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
-    { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
-  );
-  if (!response.ok) {
-    console.warn('Mercado Pago reconciliation request failed', {
-      providerOrderId: order.provider_preference_id,
-      httpStatus: response.status,
-    });
-    return;
-  }
-  const payload = await response.json() as MercadoPagoOrder;
-  const payment = payload.transactions?.payments?.find((candidate) =>
-    candidate.status === 'processed' && candidate.status_detail === 'accredited'
-  );
-  const paymentId = payment?.id ? String(payment.id) : null;
-  const checks = {
-    orderId: payload.id === order.provider_preference_id,
-    externalReference: payload.external_reference === order.id,
-    orderStatus: payload.status === 'processed',
-    orderStatusDetail: payload.status_detail === 'accredited',
-    currency: !payload.currency_id || payload.currency_id === order.currency,
-    totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
-    totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
-    catalogAmount: order.amount_cents === NIVAL_PAY_PRICE_CENTS,
-    paymentId: Boolean(paymentId),
-    storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
-  };
-  const approved = Object.values(checks).every(Boolean);
-  if (!approved || !paymentId) return;
-
-  const now = new Date().toISOString();
-  const { error: paymentError } = await admin.from('product_orders')
-    .update({ status: 'paid', provider_payment_id: paymentId, paid_at: now, updated_at: now })
-    .eq('id', order.id)
-    .neq('status', 'paid');
-  if (paymentError) return;
-  await activateBusiness();
 }
 
 export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ result?: string; error?: string }> }) {
