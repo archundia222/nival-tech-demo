@@ -4,7 +4,6 @@ import { signOut } from "@/app/auth/actions";
 import { createLoyaltyProgram, createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
 import { BusinessQr } from "./business-qr";
 import { SmartLinkQr } from "./smart-link-qr";
-import { PaymentProfileQr } from "./payment-profile-qr";
 import { InvitationLink } from "./invitation-link";
 import { BusinessOnboardingForm } from "./business-onboarding-form";
 import { DashboardNavigation } from "./dashboard-navigation";
