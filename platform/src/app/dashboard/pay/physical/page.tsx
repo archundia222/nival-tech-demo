@@ -1,0 +1,63 @@
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { DashboardNavigation } from '../../dashboard-navigation';
+import { requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
+
+export default async function PhysicalCardOrderPage({ searchParams }: {
+  searchParams: Promise<{ error?: string; result?: string }>;
+}) {
+  const params = await searchParams;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/auth?next=%2Fdashboard%2Fpay%2Fphysical');
+  const { data: membership } = await supabase.from('business_members')
+    .select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
+  if (!membership) redirect('/dashboard');
+  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: orders } = await supabase.from('physical_card_orders')
+    .select('id, design, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders(status, payment_method)')
+    .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
+
+  return <main className="dashboardApp">
+    <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="agregar-tarjetas" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
+    <div className="dashboardContent dashboardPayContent">
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">$99 MXN</span></header>
+      {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
+      {params.result === 'success' && <p role="status" className="formMessage">Pago recibido. Tu tarjeta entrará a producción cuando confirmemos el diseño.</p>}
+      {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago.</p>}
+      {params.result === 'cash' && <p role="status" className="formMessage">Pedido registrado. Pagarás $99 en efectivo al recibirla.</p>}
+      <header className="payHeading"><p className="eyebrow">NIVAL CARD</p><h1>Elige diseño y entrega.</h1><p>La tarjeta cuesta $99. La entrega local se realiza los domingos; en paquetería, el envío se cotiza antes de despacharla.</p></header>
+      <form className="paymentEditor" action={startPhysicalCardCheckout}>
+        <section className="chartCard">
+          <h2>1. Diseño</h2>
+          <label>Estilo<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Personalizada</option></select></label>
+          <label>Indicaciones del diseño<textarea name="designNotes" maxLength={500} placeholder="Nombre, colores, texto o indicaciones para tu logotipo."/></label>
+        </section>
+        <section className="chartCard">
+          <h2>2. Entrega</h2>
+          <label>Método<select name="deliveryMethod" required defaultValue="sunday_local"><option value="sunday_local">Entrega local en domingo · sin costo</option><option value="shipping">Paquetería · envío por cotizar</option></select></label>
+          <label>Domingo solicitado<input name="requestedDeliveryDate" type="date" /></label>
+          <p className="payHelp">La fecha se confirma según producción y disponibilidad. Si eliges paquetería, puedes dejarla vacía.</p>
+        </section>
+        <section className="chartCard">
+          <h2>3. Datos para recibir</h2>
+          <label>Nombre de quien recibe<input name="recipientName" required minLength={2} maxLength={120}/></label>
+          <label>Teléfono<input name="phone" required inputMode="tel" minLength={10} maxLength={20}/></label>
+          <label>Calle, número y colonia<input name="addressLine1" required minLength={5} maxLength={180}/></label>
+          <label>Referencias<input name="addressLine2" maxLength={180}/></label>
+          <label>Ciudad o municipio<input name="city" required minLength={2} maxLength={100}/></label>
+          <label>Estado<input name="state" required minLength={2} maxLength={100}/></label>
+          <label>Código postal<input name="postalCode" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5}/></label>
+        </section>
+        <div className="checkoutActions">
+          <button className="primaryButton" type="submit">Pagar $99 con Mercado Pago</button>
+          <button className="secondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Pagar $99 en efectivo al recibir</button>
+        </div>
+      </form>
+      {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
+        const payment = Array.isArray(order.product_orders) ? order.product_orders[0] : order.product_orders;
+        return <p key={order.id}><strong>{order.design === 'custom' ? 'Personalizada' : order.design === 'white' ? 'Blanca' : 'Negra'}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega dominical'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
+      })}</section> : null}
+    </div>
+  </main>;
+}
