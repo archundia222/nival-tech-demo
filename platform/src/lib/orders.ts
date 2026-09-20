@@ -15,6 +15,9 @@ export const NIVAL_PAY_ADDITIONAL_PRODUCT = 'nival_pay_additional';
 export const NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS = 1000;
 export const NIVAL_PAY_EXTRA_SECTION_PRODUCT = 'nival_pay_extra_section';
 
+export const NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS = 9900;
+export const NIVAL_PAY_PHYSICAL_CARD_PRODUCT = 'nival_pay_physical_card';
+
 export const NIVAL_POINTS_PRODUCT = 'nival_points';
 export const NIVAL_INTELLIGENCE_PRODUCT = 'nival_intelligence';
 export const NIVAL_POINTS_INTELLIGENCE_PRODUCT = 'nival_points_intelligence';
