@@ -1850,3 +1850,395 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .productShowcase h1{font-size:42px}
   .productStorySection,.productSolutionsSection,.productPreviewSection,.intelligenceConnection,.productUseCases{padding:36px 0}
 }
+
+
+/* White editorial product pages + interactive demos */
+.productMarketingLight{
+  --light-ink:#171717;
+  --light-muted:#6e6a61;
+  --light-line:#ddd7cb;
+  --light-gold:#b8954c;
+  color:var(--light-ink);
+  background:#fffdf9;
+}
+.productMarketingLight .dashboardContentTopbar{
+  color:var(--light-ink);
+  border-bottom:1px solid var(--light-line);
+  background:transparent;
+}
+.productMarketingLight .dashboardContentTopbar div span,
+.productMarketingLight .dashboardContentTopbar div b{color:var(--light-ink)}
+.productMarketingLight .dashboardContentTopbar .ready{
+  color:#6e5622;
+  border-color:#ddcfad;
+  background:#f6efdf;
+}
+.productMarketingLight .productShowcase{
+  padding:58px 0 62px;
+  border:0;
+  border-bottom:1px solid var(--light-line);
+  border-radius:0;
+  color:var(--light-ink);
+  background:transparent;
+  box-shadow:none;
+}
+.productMarketingLight .intelligenceShowcase{
+  color:var(--light-ink);
+  background:transparent;
+}
+.productMarketingLight .productShowcaseCopy>p,
+.productMarketingLight .intelligenceShowcase .productShowcaseCopy>p,
+.productMarketingLight .intelligenceShowcase .productPrice span,
+.productMarketingLight .intelligenceShowcase .productShowcaseCopy>small{
+  color:var(--light-muted);
+}
+.productMarketingLight .productBenefits li{color:#2b2925}
+.productMarketingLight .productPill{
+  color:#80652f;
+  border-color:#d7c49a;
+  background:#faf4e8;
+}
+.productMarketingLight .productCta{
+  color:#fff;
+  background:#171717;
+  box-shadow:none;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.productMarketingLight .productCta:hover{
+  transform:translateY(-2px);
+  background:#26231f;
+  box-shadow:0 12px 26px rgba(30,25,18,.12);
+}
+.productMarketingLight .intelligenceShowcase .productCta{
+  color:#171717;
+  background:#d1b36e;
+}
+.productMarketingLight .productFeatureStrip,
+.productMarketingLight .darkFeatureStrip{
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  margin:0;
+  padding:12px 0 34px;
+  overflow:visible;
+  border:0;
+  border-bottom:1px solid var(--light-line);
+  border-radius:0;
+  background:transparent;
+}
+.productMarketingLight .productFeatureStrip article,
+.productMarketingLight .darkFeatureStrip article{
+  min-height:0;
+  padding:24px 28px;
+  border:0;
+  border-right:1px solid var(--light-line);
+  color:var(--light-ink);
+  background:transparent;
+}
+.productMarketingLight .productFeatureStrip article:first-child{padding-left:0}
+.productMarketingLight .productFeatureStrip article:last-child{padding-right:0;border-right:0}
+.productMarketingLight .productFeatureStrip p,
+.productMarketingLight .darkFeatureStrip p{color:var(--light-muted)}
+.productMarketingLight .productStorySection,
+.productMarketingLight .productSolutionsSection,
+.productMarketingLight .productPreviewSection,
+.productMarketingLight .intelligenceConnection,
+.productMarketingLight .productUseCases{
+  margin:0;
+  padding:54px 0;
+  border:0;
+  border-bottom:1px solid var(--light-line);
+  border-radius:0;
+  color:var(--light-ink);
+  background:transparent;
+}
+.productMarketingLight .productStoryHeading>span,
+.productMarketingLight .productSolutionsSection .productStoryHeading>span,
+.productMarketingLight .intelligenceSolutions .productStoryHeading>span,
+.productMarketingLight .productUseCases>div>span,
+.productMarketingLight .intelligenceConnection>div>span{color:#9b7b38}
+.productMarketingLight .productStoryHeading h2,
+.productMarketingLight .productUseCases h2,
+.productMarketingLight .intelligenceConnection h2,
+.productMarketingLight .solutionGrid h3{color:var(--light-ink)}
+.productMarketingLight .productStoryHeading p,
+.productMarketingLight .solutionGrid p,
+.productMarketingLight .intelligenceSolutions .solutionGrid p{color:var(--light-muted)}
+.productMarketingLight .productSteps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  margin-top:34px;
+}
+.productMarketingLight .productSteps article{
+  min-height:0;
+  padding:10px 30px;
+  border:0;
+  border-right:1px solid var(--light-line);
+  color:var(--light-ink);
+  background:transparent;
+}
+.productMarketingLight .productSteps article:first-child{padding-left:0}
+.productMarketingLight .productSteps article:last-child{padding-right:0;border-right:0}
+.productMarketingLight .productSteps article>b{
+  width:auto;height:auto;
+  display:block;
+  color:#b8954c;
+  background:transparent;
+  font-size:28px;
+  line-height:1;
+}
+.productMarketingLight .solutionGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:0;
+  margin-top:30px;
+}
+.productMarketingLight .solutionGrid article{
+  min-height:0;
+  padding:24px 30px 24px 0;
+  border:0;
+  border-top:1px solid var(--light-line);
+  border-radius:0;
+  color:var(--light-ink);
+  background:transparent;
+}
+.productMarketingLight .solutionGrid article:nth-child(even){padding-left:30px}
+.productMarketingLight .solutionGrid article>span,
+.productMarketingLight .intelligenceSolutions .solutionGrid article>span{color:#9b7b38}
+.productMarketingLight .productUseCases{
+  align-items:center;
+  justify-content:space-between;
+}
+.productMarketingLight .productUseCases.darkUseCases{background:transparent}
+.productMarketingLight .connectionFlow span,
+.productMarketingLight .connectionFlow strong{
+  border-color:#d8d1c4;
+  background:#faf7f0;
+}
+.productMarketingLight .connectionFlow strong{
+  color:#171717;
+  border-color:#d1b36e;
+  background:#d1b36e;
+}
+.productMarketingLight .pointsVisual,
+.productMarketingLight .intelligenceVisual{
+  transition:transform .22s ease;
+}
+.productMarketingLight .pointsVisual:hover,
+.productMarketingLight .intelligenceVisual:hover{transform:translateY(-4px)}
+.productMarketingLight .intelligenceVisual .aiPanel{
+  border-color:#343434;
+  background:#17181b;
+}
+.productMarketingLight .intelligenceVisual .aiPanel,
+.productMarketingLight .intelligenceVisual .aiPanel *{color:inherit}
+.productMarketingLight .intelligenceVisual .aiInsight p,
+.productMarketingLight .intelligenceVisual .aiMiniGrid small{color:#aaa79f}
+
+.interactiveProductDemo{
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(360px,1.05fr);
+  gap:58px;
+  align-items:center;
+  padding:62px 0;
+  border-bottom:1px solid #ddd7cb;
+}
+.interactiveDemoCopy>span{
+  color:#9b7b38;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+.interactiveDemoCopy h2{
+  max-width:620px;
+  margin:10px 0 14px;
+  color:#171717;
+  font-size:clamp(32px,3.3vw,48px);
+  line-height:1.04;
+  letter-spacing:-.04em;
+}
+.interactiveDemoCopy>p{
+  max-width:560px;
+  margin:0;
+  color:#6e6a61;
+  font-size:15px;
+  line-height:1.65;
+}
+.interactiveDemoActions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:24px;
+}
+.interactiveDemoActions button,
+.interactiveInsightCard>button{
+  min-height:44px;
+  padding:10px 15px;
+  border:0;
+  border-radius:10px;
+  color:#fff;
+  background:#171717;
+  font:inherit;
+  font-size:12px;
+  font-weight:850;
+  cursor:pointer;
+  transition:transform .16s ease,opacity .16s ease,background .16s ease;
+}
+.interactiveDemoActions button:hover:not(:disabled),
+.interactiveInsightCard>button:hover{transform:translateY(-2px)}
+.interactiveDemoActions button:disabled{opacity:.35;cursor:not-allowed}
+.interactiveDemoActions .secondary{
+  color:#171717;
+  border:1px solid #cfc7b8;
+  background:#fff;
+}
+.interactiveDemoActions .textual{
+  color:#7a7469;
+  background:transparent;
+}
+.interactiveLoyaltyCard{
+  min-height:430px;
+  padding:32px;
+  border-radius:30px;
+  color:#171717;
+  background:linear-gradient(145deg,#fffdf8,#efe4cb);
+  box-shadow:0 28px 60px rgba(57,44,18,.15);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.interactiveLoyaltyCard:hover{
+  transform:translateY(-4px) rotate(.25deg);
+  box-shadow:0 34px 72px rgba(57,44,18,.2);
+}
+.interactiveCardTop{display:flex;justify-content:space-between;gap:20px;font-size:10px;letter-spacing:.1em}
+.interactiveCardTop span{color:#8d7440;font-weight:900}
+.interactivePointsValue{display:flex;align-items:end;gap:10px;margin-top:56px}
+.interactivePointsValue small{align-self:flex-start;margin-top:9px;color:#897b61;font-size:9px;font-weight:900;letter-spacing:.12em}
+.interactivePointsValue strong{font-size:92px;line-height:.78;letter-spacing:-.06em}
+.interactivePointsValue span{color:#756e61;font-size:13px}
+.interactiveProgress{
+  height:10px;
+  margin-top:28px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#d8cdb8;
+}
+.interactiveProgress i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:#b18d43;
+  transition:width .35s ease;
+}
+.interactiveRewardState{
+  display:grid;
+  gap:6px;
+  margin-top:28px;
+  padding-top:24px;
+  border-top:1px solid #d4c7ad;
+}
+.interactiveRewardState small{color:#89764b;font-size:9px;font-weight:900;letter-spacing:.12em}
+.interactiveRewardState b{font-size:19px}
+.interactiveRewardState p{margin:0;color:#726b5e;font-size:12px}
+.interactiveRewardState.ready small{color:#2f7a49}
+
+.insightSelector{
+  display:grid;
+  gap:0;
+  margin-top:26px;
+  border-top:1px solid #d9d2c6;
+}
+.insightSelector button{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:20px;
+  width:100%;
+  padding:14px 0;
+  border:0;
+  border-bottom:1px solid #d9d2c6;
+  color:#5f5a50;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  transition:padding .16s ease,color .16s ease;
+}
+.insightSelector button:hover,
+.insightSelector button.active{
+  padding-left:10px;
+  color:#171717;
+}
+.insightSelector button.active span{font-weight:850}
+.insightSelector button b{color:#a9843c;font-size:18px}
+.interactiveInsightCard{
+  min-height:420px;
+  padding:34px;
+  border-radius:28px;
+  color:#f5f1e9;
+  background:radial-gradient(circle at 90% 10%,#3b3220,#17181b 52%);
+  box-shadow:0 30px 70px rgba(0,0,0,.18);
+  transition:transform .2s ease;
+}
+.interactiveInsightCard:hover{transform:translateY(-4px)}
+.interactiveInsightCard>span{color:#d1b36e;font-size:9px;font-weight:900;letter-spacing:.13em}
+.interactiveInsightCard h3{max-width:520px;margin:18px 0 12px;font-size:34px;line-height:1.08;letter-spacing:-.035em}
+.interactiveInsightCard>p{max-width:520px;color:#b9b6ae;font-size:14px;line-height:1.6}
+.interactiveInsightCard>div{
+  display:grid;
+  gap:7px;
+  margin:34px 0 24px;
+  padding-top:22px;
+  border-top:1px solid #3a3934;
+}
+.interactiveInsightCard small{color:#d1b36e;font-size:9px;font-weight:900;letter-spacing:.12em}
+.interactiveInsightCard strong{max-width:470px;font-size:16px;line-height:1.45}
+.interactiveInsightCard>button{color:#171717;background:#d1b36e}
+
+.nivalAddProduct .nivalAddIcon,
+.nivalPayCatalog .nivalAddProduct .nivalAddIcon{
+  width:148px!important;
+  height:148px!important;
+  min-width:148px!important;
+  border-radius:38px!important;
+  font-size:76px!important;
+  line-height:1!important;
+  box-shadow:0 20px 45px rgba(185,151,80,.24)!important;
+  transition:transform .18s ease,box-shadow .18s ease!important;
+}
+.nivalAddProduct button.nivalAddIcon:hover{
+  transform:translateY(-4px) scale(1.07)!important;
+  box-shadow:0 26px 52px rgba(185,151,80,.32)!important;
+}
+
+@media(max-width:900px){
+  .productMarketingLight .productFeatureStrip{grid-template-columns:1fr}
+  .productMarketingLight .productFeatureStrip article{
+    padding:20px 0;
+    border-right:0;
+    border-bottom:1px solid var(--light-line);
+  }
+  .productMarketingLight .productFeatureStrip article:last-child{border-bottom:0}
+  .productMarketingLight .productSteps{grid-template-columns:1fr}
+  .productMarketingLight .productSteps article{
+    padding:22px 0!important;
+    border-right:0;
+    border-bottom:1px solid var(--light-line);
+  }
+  .interactiveProductDemo{grid-template-columns:1fr;gap:32px}
+}
+@media(max-width:600px){
+  .productMarketingLight .productShowcase{padding:40px 0}
+  .productMarketingLight .solutionGrid{grid-template-columns:1fr}
+  .productMarketingLight .solutionGrid article,
+  .productMarketingLight .solutionGrid article:nth-child(even){padding:20px 0}
+  .interactiveProductDemo{padding:42px 0}
+  .interactiveLoyaltyCard,.interactiveInsightCard{min-height:0;padding:24px;border-radius:22px}
+  .interactivePointsValue strong{font-size:72px}
+  .interactiveDemoActions>*{width:100%}
+  .nivalAddProduct .nivalAddIcon,
+  .nivalPayCatalog .nivalAddProduct .nivalAddIcon{
+    width:118px!important;
+    height:118px!important;
+    min-width:118px!important;
+    font-size:64px!important;
+  }
+}
