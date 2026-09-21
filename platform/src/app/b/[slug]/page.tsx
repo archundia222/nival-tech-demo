@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { enrollCustomer } from "./actions";
+import { getPublicPointsProgram } from "@/app/points/actions";
 
 interface BusinessPageProps {
   params: Promise<{ slug: string }>;
@@ -12,8 +13,11 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
   const { slug } = await params;
   const query = await searchParams;
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_public_business_v2", { business_slug: slug });
-  if (error || !data?.[0]) notFound();
+  const [{ data, error }, pointsProgram] = await Promise.all([
+    supabase.rpc("get_public_business_v2", { business_slug: slug }),
+    getPublicPointsProgram(slug).catch(() => null),
+  ]);
+  if (error || !data?.[0] || !pointsProgram) notFound();
   const business = data[0];
 
   return (
@@ -34,9 +38,9 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
           {query.error && <div className="formMessage errorMessage">{query.error}</div>}
           <form action={enrollCustomer} className="authForm">
             <input type="hidden" name="slug" value={business.slug} />
+            <input type="hidden" name="origin" value="qr" />
             <label>Nombre<input name="name" required minLength={2} maxLength={100} autoComplete="name" /></label>
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
-            <label>Correo <small>Opcional</small><input name="email" type="email" autoComplete="email" /></label>
             <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el aviso de privacidad y el uso de mis datos para operar el programa.</label>
             <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta</button>
