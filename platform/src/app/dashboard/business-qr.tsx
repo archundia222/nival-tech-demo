@@ -13,6 +13,12 @@ interface BusinessQrProps {
   fileSuffix?: string;
 }
 
+function ActionIcon({ type }: { type: "copy" | "share" | "download" }) {
+  if (type === "copy") return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="10" height="10" rx="2"/><path d="M6 16H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>;
+  if (type === "share") return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.2M8.7 13.3l6.6 4.2"/></svg>;
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>;
+}
+
 export function BusinessQr({
   businessName,
   url,
@@ -65,20 +71,22 @@ export function BusinessQr({
         <p className="eyebrow">{eyebrow}</p>
         <h2>{title}</h2>
         <p>{description}</p>
-        <code className="qrUrl">{url}</code>
-        <p className="qrNotice" role="status">{notice}</p>
+        <div className="businessQrUrlRow">
+          <code className="qrUrl">{url}</code>
+          <button className="businessQrIconButton" type="button" onClick={copyUrl} aria-label="Copiar enlace"><ActionIcon type="copy" /></button>
+        </div>
         <div className="businessQrActions">
-          <a className="primaryButton" href={url} target="_blank" rel="noreferrer">Abrir perfil</a>
-          <button className="secondaryButton" type="button" onClick={copyUrl}>Copiar enlace</button>
-          <button className="secondaryButton" type="button" onClick={shareUrl}>Compartir</button>
-          <button className="secondaryButton" type="button" onClick={downloadQr}>Descargar QR</button>
+          <a className="businessQrPrimary" href={url} target="_blank" rel="noreferrer">Abrir perfil</a>
+          <button className="businessQrSecondary" type="button" onClick={copyUrl}><ActionIcon type="copy" />Copiar enlace</button>
+          <button className="businessQrSecondary" type="button" onClick={shareUrl}><ActionIcon type="share" />Compartir</button>
+          <button className="businessQrSecondary" type="button" onClick={downloadQr}><ActionIcon type="download" />Descargar QR</button>
         </div>
       </div>
       <div className="qrCanvas">
         <QRCodeSVG
           id={qrId}
           value={url}
-          size={190}
+          size={220}
           level="H"
           marginSize={2}
           bgColor="#ffffff"
@@ -86,6 +94,7 @@ export function BusinessQr({
           title={`${title} de ${businessName}`}
         />
       </div>
+      <p className={`qrNotice ${notice ? "isVisible" : ""}`} role="status" aria-live="polite">{notice}</p>
     </section>
   );
 }
