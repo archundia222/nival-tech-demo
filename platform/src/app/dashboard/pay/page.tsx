@@ -165,7 +165,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
         <div>
           <p className="eyebrow">NIVAL PAY</p>
           <h1>Convierte tu tarjeta NFC en una página de cobro.</h1>
-          <p>Recibe transferencias con tarjeta NFC, enlace y QR propios. Incluye 3 apartados configurables.</p>
+          <p>Recibe transferencias con tarjeta NFC, enlace y QR propios. Incluye 10 apartados configurables.</p>
           <a className="loginLink" href="/checkout">Activar Nival Pay · $199 MXN</a>
         </div>
       </section>
