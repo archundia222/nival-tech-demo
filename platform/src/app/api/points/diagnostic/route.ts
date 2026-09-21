@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 
 export async function GET() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
   const projectRef = url.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1] ?? "unknown";
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.from("businesses").select("id").eq("slug", "cafe-puntos-qa").maybeSingle();
   return NextResponse.json({
     ok: projectRef === "wwuihvpudtsowjeaityr" && Boolean(data) && !error,
