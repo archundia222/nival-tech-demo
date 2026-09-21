@@ -176,7 +176,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     </div>
   </main>;
 
-  return <main className="dashboardApp">
+  return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'add' ? 'agregar-tarjetas' : currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>{currentView === 'add' ? 'Agregar tarjetas' : currentView === 'share' ? 'Comparte tus páginas' : 'Tus tarjetas'}</strong></div><span className="ready">Activo</span></header>
