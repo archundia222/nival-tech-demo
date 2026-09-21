@@ -39,11 +39,7 @@ export function ProfilePublicView({
   showQuickActions = true,
   showFooter = true,
 }: ProfilePublicViewProps) {
-  return (
-    <div
-      className={embedded ? "profileExperience profileDashboardShared" : "profileShell profileExperience brandedCustomerShell"}
-      style={{ "--business-accent": brandColor || "#b99750" } as CSSProperties}
-    >
+  const card = <>
       {!embedded && <div className="profileAmbient" aria-hidden="true" />}
       <article className="profileCard">
         <header className="profileHeader">
@@ -79,6 +75,17 @@ export function ProfilePublicView({
 
         {showFooter && <footer className="profileFooter"><span>Información proporcionada por el negocio</span><b>NIVAL tech</b></footer>}
       </article>
-    </div>
-  );
+    </>;
+
+  if (embedded) {
+    return <div
+      className="profileExperience profileDashboardShared"
+      style={{ "--business-accent": brandColor || "#b99750" } as CSSProperties}
+    >{card}</div>;
+  }
+
+  return <main
+    className="profileShell profileExperience brandedCustomerShell"
+    style={{ "--business-accent": brandColor || "#b99750" } as CSSProperties}
+  >{card}</main>;
 }
