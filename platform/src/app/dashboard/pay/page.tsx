@@ -105,6 +105,31 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS),
   ]);
 
+  // A successful extra-section checkout should also finish in one trip.
+  // If Mercado Pago has already granted a new section entitlement, create the
+  // blank editable section immediately instead of making the customer press
+  // “Agregar apartado” after returning from checkout.
+  if (params.result === 'success' && currentView === 'manage' && params.profile) {
+    const { data: returnedProfile } = await supabase.from('payment_profiles')
+      .select('id, custom_sections, extra_sections_purchased')
+      .eq('id', params.profile)
+      .eq('business_id', membership.business_id)
+      .maybeSingle();
+    if (returnedProfile) {
+      const savedSections = Array.isArray(returnedProfile.custom_sections) ? returnedProfile.custom_sections : [];
+      const sectionLimit = 3 + Number(returnedProfile.extra_sections_purchased ?? 0);
+      if (savedSections.length < sectionLimit) {
+        const nextSections = [...savedSections, { id: crypto.randomUUID(), title: '', content: '', public: true }];
+        const { error: sectionCreateError } = await supabase.from('payment_profiles')
+          .update({ custom_sections: nextSections, updated_at: new Date().toISOString() })
+          .eq('id', returnedProfile.id)
+          .eq('business_id', membership.business_id);
+        if (!sectionCreateError) redirect(`/dashboard/pay?view=manage&profile=${returnedProfile.id}&unlocked=1`);
+        console.error('[pay] Purchased section auto-create failed', { profileId: returnedProfile.id, code: sectionCreateError.code });
+      }
+    }
+  }
+
   // A successful additional-card checkout should finish the job in one trip.
   // Create the purchased profile immediately instead of asking the customer to
   // press the plus button a second time.
@@ -182,7 +207,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
       <header className="dashboardContentTopbar payTopbar"><div><strong>{currentView === 'add' ? 'Agregar tarjetas' : currentView === 'share' ? 'Comparte tus páginas' : 'Tus tarjetas'}</strong></div><span className="ready">Activo</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       {params.created === '1' && <p role="status" className="formMessage">¡Listo! Tu nueva Nival Pay fue creada y ya está seleccionada para que la configures.</p>}
-      {params.unlocked === '1' && <p role="status" className="formMessage">Tu apartado comprado ya está disponible. Presiona “Agregar apartado” para crearlo y editarlo.</p>}
+      {params.unlocked === '1' && <p role="status" className="formMessage">Tu nuevo apartado ya está creado y listo para editar.</p>}
       {!['trial','active'].includes(business?.subscription_status ?? '') && <p role="status" className="formMessage">Tu servicio está suspendido. Puedes editar los datos, pero la página pública no estará disponible hasta reactivar el servicio.</p>}
       {currentView === 'manage' && <><header className="payHeading payManageHeading"><p className="eyebrow">NIVAL PAY</p><h1>Tu página de cobro.</h1><p>Edita una sola vez lo que verán tus clientes desde la tarjeta NFC, el enlace y el QR.</p></header><form className="cardSelector cardSelectorRefined" method="get"><label><span>Nival Pay seleccionada</span><select name="profile" defaultValue={profile?.id}>{profiles?.map(item => <option key={item.id} value={item.id}>{item.display_name}</option>)}</select></label><button className="nvPrimaryButton">Abrir</button></form>{['owner','manager'].includes(membership.role) ? profile && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} profile={profile} siteUrl={publicSiteUrl()} /> : <p>Solo el propietario o un administrador puede configurar Nival Pay.</p>}</>}
       {currentView === 'add' && <><header className="payHeading"><p className="eyebrow">MÁS PUNTOS DE COBRO</p><h1>Agrega otro Nival Pay.</h1><p>Crea una página de cobro independiente para otra caja, sucursal, empleado o unidad de negocio.</p></header><section className="nivalPayCatalog">{profiles?.map((item,index) => <article className="nivalPayCatalogCard" key={item.id}><a className="nivalCardDirectLink" href={`/dashboard/pay?view=manage&profile=${item.id}`} aria-label={`Abrir ${item.display_name} en Tus tarjetas`}><div className="nivalPhysicalCard"><div className="nivalCardMark">N</div><div className="nivalCardCopy"><strong>NIVAL</strong><span>PAY {index+1}</span></div><small>NFC · PÁGINA DE COBRO</small></div></a><h2>{item.display_name}</h2><a href={`/dashboard/pay?view=manage&profile=${item.id}`}>Editar tarjeta</a></article>)}<article className="nivalAddProduct"><form action={canCreateAdditional ? createAdditionalPaymentProfile : startAdditionalNivalPayCheckout}><button className="nivalAddIcon" aria-label={canCreateAdditional ? 'Crear Nival Pay disponible' : 'Comprar y crear otra Nival Pay'}>+</button></form><div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$49 MXN</strong></div><div className="nivalAddDivider"/><div><p>Tarjeta NFC física adicional</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/dashboard/pay/physical">Comprar tarjeta física</a></div></article></section></>}
