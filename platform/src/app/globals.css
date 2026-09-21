@@ -2242,3 +2242,1478 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
     font-size:64px!important;
   }
 }
+
+
+/* Nival dashboard design system — scoped, Round 1 */
+.nivalDashboard{
+  --nv-bg:#0B0B0D;
+  --nv-surface:#151519;
+  --nv-surface-raised:#1D1D22;
+  --nv-border:#303038;
+  --nv-accent:#C8A65A;
+  --nv-accent-strong:#D6B66C;
+  --nv-text:#F7F7F8;
+  --nv-text-secondary:#B8B8C0;
+  --text-on-dark:#F7F7F8;
+  --text-on-light:#17171A;
+  --nv-marketing-surface:#FFFDF9;
+  --nv-marketing-text:#17171A;
+  --nv-marketing-text-secondary:#5D5960;
+  --nv-danger:#FF9696;
+  --nv-success:#A9D7B5;
+  --nv-space-1:8px;
+  --nv-space-2:16px;
+  --nv-space-3:24px;
+  --nv-space-4:32px;
+  --nv-space-5:40px;
+  --nv-space-6:48px;
+  --nv-radius-sm:8px;
+  --nv-radius-md:16px;
+  --nv-radius-lg:24px;
+  --nv-text-xs:12px;
+  --nv-text-sm:14px;
+  --nv-text-md:16px;
+  --nv-text-lg:20px;
+  --nv-text-xl:24px;
+  --nv-text-h1:32px;
+  --nv-motion-fast:180ms;
+  --nv-motion-medium:260ms;
+  --nv-ease-out:cubic-bezier(.16,1,.3,1);
+}
+
+.nivalDashboard .nvPrimaryButton{
+  min-height:44px;
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-accent);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+  font:inherit;
+  font-size:var(--nv-text-sm);
+  font-weight:800;
+  cursor:pointer;
+  transition:transform var(--nv-motion-fast) var(--nv-ease-out),opacity var(--nv-motion-fast) var(--nv-ease-out);
+}
+.nivalDashboard .nvPrimaryButton:hover:not(:disabled){transform:translateY(-1px)}
+.nivalDashboard .nvPrimaryButton:disabled{opacity:.58;cursor:default}
+.nivalDashboard .nvSecondaryButton{
+  min-height:44px;
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-text);
+  background:transparent;
+  font:inherit;
+  font-size:var(--nv-text-sm);
+  font-weight:750;
+  cursor:pointer;
+  transition:transform var(--nv-motion-fast) var(--nv-ease-out),opacity var(--nv-motion-fast) var(--nv-ease-out);
+}
+.nivalDashboard .nvSecondaryButton:hover:not(:disabled){transform:translateY(-1px)}
+.nivalDashboard .nvTertiaryLink{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  padding:0;
+  border:0;
+  color:var(--nv-accent-strong);
+  background:transparent;
+  font:inherit;
+  font-size:var(--nv-text-sm);
+  font-weight:750;
+  cursor:pointer;
+}
+.nivalDashboard .nvPrimaryButton:focus-visible,
+.nivalDashboard .nvSecondaryButton:focus-visible,
+.nivalDashboard .nvTertiaryLink:focus-visible{
+  outline:2px solid var(--nv-accent-strong);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .nvPrimaryButton,
+  .nivalDashboard .nvSecondaryButton{transition:none}
+}
+
+
+/* Round 1 concrete visual corrections — dashboard scoped */
+.nivalDashboard .productMarketingLight .pointsShowcase{
+  color:var(--nv-marketing-text);
+  background:var(--nv-marketing-surface);
+}
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy h1,
+.nivalDashboard .productMarketingLight .pointsShowcase .productBenefits li,
+.nivalDashboard .productMarketingLight .pointsShowcase .productPrice strong{
+  color:var(--nv-marketing-text);
+}
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy>p,
+.nivalDashboard .productMarketingLight .pointsShowcase .productPrice span,
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy>small{
+  color:var(--nv-marketing-text-secondary);
+}
+.nivalDashboard .productMarketingLight .productCta,
+.nivalDashboard .productMarketingLight .intelligenceShowcase .productCta,
+.nivalDashboard .productMarketingLight .productUseCases .productCta{
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+  border:1px solid var(--nv-accent);
+  box-shadow:none;
+}
+.nivalDashboard .productMarketingLight .productCta:hover{
+  transform:translateY(-1px);
+  background:var(--nv-accent-strong);
+}
+.nivalDashboard .productMarketingLight .productCta:focus-visible{
+  outline:2px solid var(--nv-accent-strong);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .productMarketingLight .productCta{transition:none}
+}
+
+
+/* Round 1 — Nival Pay editor, scoped to dashboard */
+.nivalDashboard .dashboardPayContent .payManageHeading{
+  padding:var(--nv-space-4) 0 var(--nv-space-2);
+}
+.nivalDashboard .dashboardPayContent .payManageHeading h1{
+  max-width:720px;
+  margin:var(--nv-space-1) 0 0;
+  color:var(--nv-text);
+  font-size:var(--nv-text-h1);
+  line-height:1.15;
+  letter-spacing:-.03em;
+}
+.nivalDashboard .dashboardPayContent .payManageHeading>p:last-child{
+  max-width:680px;
+  margin-top:var(--nv-space-1);
+  color:var(--nv-text-secondary);
+  font-size:var(--nv-text-sm);
+  line-height:1.55;
+}
+
+.nivalDashboard .nivalPayEditorShell{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(360px,424px);
+  gap:var(--nv-space-4);
+  align-items:start;
+  margin-top:var(--nv-space-3);
+}
+.nivalDashboard .nivalPayEditorPanel{
+  min-width:0;
+  padding:var(--nv-space-3);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-md);
+  color:var(--nv-text);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPayEditorHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:var(--nv-space-2);
+  padding-bottom:var(--nv-space-3);
+  border-bottom:1px solid var(--nv-border);
+}
+.nivalDashboard .nivalPayEditorHeader .eyebrow{
+  margin:0 0 var(--nv-space-1);
+  color:var(--nv-accent);
+  font-size:var(--nv-text-xs);
+  letter-spacing:.12em;
+}
+.nivalDashboard .nivalPayEditorHeader h2{
+  margin:0;
+  color:var(--nv-text);
+  font-size:var(--nv-text-xl);
+  line-height:1.2;
+}
+.nivalDashboard .nivalPaySaveCluster{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:var(--nv-space-1);
+  flex-wrap:wrap;
+}
+.nivalDashboard .nivalPaySaveStatus{
+  color:var(--nv-success);
+  font-size:var(--nv-text-xs);
+  font-weight:750;
+}
+.nivalDashboard .nivalPaySaveStatus.isSaving{color:var(--nv-text-secondary)}
+.nivalDashboard .nivalPaySaveStatus.isError{color:var(--nv-danger)}
+.nivalDashboard .nivalPaySaveButton{min-width:128px}
+.nivalDashboard .nivalPaySaveError{
+  margin:var(--nv-space-2) 0 0;
+  color:var(--nv-danger);
+  font-size:var(--nv-text-sm);
+  line-height:1.5;
+}
+
+.nivalDashboard .nivalPayFieldGroup,
+.nivalDashboard .nivalPayCustomSection,
+.nivalDashboard .nivalPaySectionsAction{
+  display:grid;
+  gap:var(--nv-space-2);
+  padding:var(--nv-space-3) 0;
+  border-bottom:1px solid var(--nv-border);
+}
+.nivalDashboard .nivalPaySectionsAction{border-bottom:0;padding-bottom:0}
+.nivalDashboard .nivalPayField{
+  display:grid;
+  gap:var(--nv-space-1);
+}
+.nivalDashboard .nivalPayField>span,
+.nivalDashboard .nivalPayFieldHeading>span,
+.nivalDashboard .nivalPayFileControl>span{
+  color:var(--nv-text-secondary);
+  font-size:var(--nv-text-xs);
+  font-weight:750;
+}
+.nivalDashboard .nivalPayFieldHeading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--nv-space-2);
+}
+.nivalDashboard .nivalPayFieldHeading small{
+  color:var(--nv-text-secondary);
+  font-size:var(--nv-text-xs);
+  font-weight:500;
+}
+.nivalDashboard .nivalPayField input,
+.nivalDashboard .nivalPayTextInput,
+.nivalDashboard .nivalPayFileControl input{
+  width:100%;
+  min-height:44px;
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-text);
+  background:var(--nv-surface-raised);
+  font:inherit;
+  font-size:var(--nv-text-sm);
+  transition:border-color var(--nv-motion-fast) var(--nv-ease-out),opacity var(--nv-motion-fast) var(--nv-ease-out);
+}
+.nivalDashboard .nivalPayField input:focus,
+.nivalDashboard .nivalPayTextInput:focus,
+.nivalDashboard .nivalPayFileControl input:focus{
+  outline:2px solid var(--nv-accent);
+  outline-offset:2px;
+  border-color:var(--nv-accent);
+}
+.nivalDashboard .nivalPayFileControl{
+  display:grid;
+  gap:var(--nv-space-1);
+}
+.nivalDashboard .nivalPayFileControl input{
+  min-height:48px;
+  padding:var(--nv-space-1);
+}
+.nivalDashboard .nivalPayFileControl input::file-selector-button{
+  min-height:32px;
+  margin-right:var(--nv-space-1);
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-text);
+  background:transparent;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.nivalDashboard .nivalPayVisibility{
+  min-width:64px;
+  min-height:44px;
+  padding:0 var(--nv-space-1);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-text-secondary);
+  background:transparent;
+  font:inherit;
+  font-size:var(--nv-text-xs);
+  font-weight:750;
+  cursor:pointer;
+  transition:transform var(--nv-motion-fast) var(--nv-ease-out),opacity var(--nv-motion-fast) var(--nv-ease-out);
+}
+.nivalDashboard .nivalPayVisibility.isVisible{
+  color:var(--nv-bg);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPayVisibility:hover{transform:translateY(-1px)}
+.nivalDashboard .nivalPayVisibility:focus-visible,
+.nivalDashboard .nivalPayInlineLink:focus-visible{
+  outline:2px solid var(--nv-accent);
+  outline-offset:2px;
+}
+.nivalDashboard .nivalPayInlineLink{
+  min-height:44px;
+  padding:0;
+  border:0;
+  color:var(--nv-accent-strong);
+  background:transparent;
+  font:inherit;
+  font-size:inherit;
+  font-weight:750;
+  cursor:pointer;
+}
+.nivalDashboard .nivalPayCustomSection{
+  gap:var(--nv-space-2);
+}
+.nivalDashboard .nivalPaySectionsAction .apartadoIntro,
+.nivalDashboard .nivalPaySectionsAction .apartadoFootnote{
+  margin:0;
+  color:var(--nv-text-secondary);
+  font-size:var(--nv-text-sm);
+  line-height:1.55;
+}
+.nivalDashboard .nivalPaySectionsAction .apartadoIntro strong{color:var(--nv-text)}
+.nivalDashboard .nivalPaySecondaryAction{
+  justify-self:start;
+  min-width:176px;
+}
+
+.nivalDashboard .nivalPayLivePreview{
+  position:sticky;
+  top:var(--nv-space-3);
+  display:grid;
+  place-items:start center;
+}
+.nivalDashboard .nivalPayPhoneFrame{
+  width:min(100%,424px);
+  padding:var(--nv-space-2);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-lg);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPayPhoneSpeaker{
+  width:72px;
+  height:4px;
+  margin:0 auto var(--nv-space-2);
+  border-radius:999px;
+  background:var(--nv-border);
+}
+.nivalDashboard .nivalPayPhoneViewport{
+  max-height:760px;
+  overflow:auto;
+  border-radius:var(--nv-radius-md);
+  background:var(--nv-surface);
+  scrollbar-width:thin;
+  scrollbar-color:var(--nv-border) transparent;
+}
+.nivalDashboard .nivalPayPhoneViewport::-webkit-scrollbar{width:8px}
+.nivalDashboard .nivalPayPhoneViewport::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:var(--nv-border);
+}
+
+@media(max-width:1100px){
+  .nivalDashboard .nivalPayEditorShell{
+    grid-template-columns:minmax(0,1fr) minmax(320px,380px);
+    gap:var(--nv-space-3);
+  }
+}
+@media(max-width:900px){
+  .nivalDashboard .nivalPayEditorShell{grid-template-columns:1fr}
+  .nivalDashboard .nivalPayLivePreview{position:static}
+  .nivalDashboard .nivalPayPhoneFrame{width:min(100%,420px)}
+}
+@media(max-width:600px){
+  .nivalDashboard .nivalPayEditorPanel{padding:var(--nv-space-2)}
+  .nivalDashboard .nivalPayEditorHeader{align-items:stretch;flex-direction:column}
+  .nivalDashboard .nivalPaySaveCluster{align-items:stretch;flex-direction:column}
+  .nivalDashboard .nivalPaySaveButton{width:100%}
+  .nivalDashboard .nivalPayFieldHeading{align-items:flex-start}
+  .nivalDashboard .nivalPayPhoneFrame{padding:var(--nv-space-1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .nivalPayField input,
+  .nivalDashboard .nivalPayTextInput,
+  .nivalDashboard .nivalPayFileControl input,
+  .nivalDashboard .nivalPayVisibility{transition:none}
+}
+
+
+/* Round 1 fixes — active Nival Pay + dark Nival Points */
+.nivalDashboard .dashboardPayContent .cardSelectorRefined{
+  width:min(100%,720px);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:var(--nv-space-2);
+  margin:0 0 var(--nv-space-3);
+  padding:0 0 var(--nv-space-3);
+  border:0;
+  border-bottom:1px solid var(--nv-border);
+  border-radius:0;
+  background:transparent;
+}
+.nivalDashboard .dashboardPayContent .cardSelectorRefined label{
+  display:grid;
+  gap:var(--nv-space-1);
+  color:var(--nv-text-secondary);
+  font-size:var(--nv-text-xs);
+  font-weight:750;
+}
+.nivalDashboard .dashboardPayContent .cardSelectorRefined select{
+  width:100%;
+  min-height:44px;
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-text);
+  background:var(--nv-surface-raised);
+  font:inherit;
+  font-size:var(--nv-text-sm);
+}
+.nivalDashboard .dashboardPayContent .cardSelectorRefined select:focus{
+  outline:2px solid var(--nv-accent);
+  outline-offset:2px;
+}
+.nivalDashboard .dashboardPayContent .cardSelectorRefined .primaryButton{
+  min-height:44px;
+  padding:0 var(--nv-space-2);
+  border:1px solid var(--nv-accent);
+  border-radius:var(--nv-radius-sm);
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+  font:inherit;
+  font-size:var(--nv-text-sm);
+  font-weight:800;
+}
+.nivalDashboard .nivalPayEditorShell label{
+  color:var(--nv-text);
+}
+.nivalDashboard .nivalPayEditorShell input,
+.nivalDashboard .nivalPayEditorShell select,
+.nivalDashboard .nivalPayEditorShell button{
+  box-sizing:border-box;
+}
+.nivalDashboard .nivalPayEditorShell input::placeholder{
+  color:var(--nv-text-secondary);
+  opacity:.72;
+}
+.nivalDashboard .nivalPayEditorShell input[type="file"]{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPayEditorShell input[type="file"]::file-selector-button{
+  color:var(--nv-text);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalPayPhoneViewport{
+  min-height:560px;
+}
+.nivalDashboard .nivalPayPhoneViewport > *{
+  width:100%;
+}
+
+.nivalDashboard .nivalPointsDark{
+  color:var(--nv-text);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar{
+  color:var(--nv-text);
+  border-bottom-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar span,
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar b{
+  color:var(--nv-text);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar .ready{
+  color:var(--nv-bg);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase{
+  color:var(--nv-text);
+  background:var(--nv-bg);
+  border-color:var(--nv-border);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPill{
+  color:var(--nv-accent-strong);
+  border-color:var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase h1,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productBenefits li,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice strong{
+  color:var(--nv-text);
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>p,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice span,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase .productBenefits li:before{
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .productCta{
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip,
+.nivalDashboard .nivalPointsDark .productStorySection,
+.nivalDashboard .nivalPointsDark .productPreviewSection,
+.nivalDashboard .nivalPointsDark .productSolutionsSection,
+.nivalDashboard .nivalPointsDark .productUseCases,
+.nivalDashboard .nivalPointsDark .interactiveProductDemo{
+  color:var(--nv-text);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip{
+  background:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article{
+  color:var(--nv-text);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip p,
+.nivalDashboard .nivalPointsDark .productStoryHeading p,
+.nivalDashboard .nivalPointsDark .solutionGrid p,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>p,
+.nivalDashboard .nivalPointsDark .previewNote{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading h2,
+.nivalDashboard .nivalPointsDark .productSteps h3,
+.nivalDashboard .nivalPointsDark .solutionGrid h3,
+.nivalDashboard .nivalPointsDark .productUseCases h2,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy h2{
+  color:var(--nv-text);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading>span,
+.nivalDashboard .nivalPointsDark .solutionGrid article>span,
+.nivalDashboard .nivalPointsDark .productUseCases>div>span,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>span{
+  color:var(--nv-accent-strong);
+}
+.nivalDashboard .nivalPointsDark .productSteps article,
+.nivalDashboard .nivalPointsDark .solutionGrid article{
+  color:var(--nv-text);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .interactiveDemoActions button{
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .secondary{
+  color:var(--nv-text);
+  border-color:var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .textual{
+  color:var(--nv-accent-strong);
+  background:transparent;
+}
+.nivalDashboard .nivalPointsDark .merchantPreview,
+.nivalDashboard .nivalPointsDark .merchantPreview header h3,
+.nivalDashboard .nivalPointsDark .merchantMetrics strong,
+.nivalDashboard .nivalPointsDark .merchantCustomer b{
+  color:var(--nv-text);
+}
+.nivalDashboard .nivalPointsDark .merchantPreview{
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .merchantPreview>header,
+.nivalDashboard .nivalPointsDark .merchantMetrics>div,
+.nivalDashboard .nivalPointsDark .merchantCustomer{
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .merchantMetrics>div{
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer{
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header small,
+.nivalDashboard .nivalPointsDark .merchantMetrics small,
+.nivalDashboard .nivalPointsDark .merchantCustomer small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header>span{
+  color:var(--nv-success);
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer button{
+  min-height:44px;
+  color:var(--nv-bg);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .customerPhonePreview,
+.nivalDashboard .nivalPointsDark .walletCard,
+.nivalDashboard .nivalPointsDark .interactiveLoyaltyCard{
+  color:#17181B;
+}
+@media(max-width:900px){
+  .nivalDashboard .dashboardPayContent .cardSelectorRefined{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:600px){
+  .nivalDashboard .nivalPayPhoneViewport{
+    min-height:0;
+    max-height:none;
+  }
+}
+
+
+/* Round 1 contrast ownership — every surface owns its text color */
+.nivalDashboard .nivalPointsDark,
+.nivalDashboard .nivalIntelligenceDark{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar{
+  color:var(--text-on-dark);
+  border-bottom-color:var(--nv-border);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar div span,
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar div b,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar div span,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar div b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar .ready,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar .ready{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Heroes: dark surface owns light text. */
+.nivalDashboard .nivalPointsDark .pointsShowcase,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+  border-color:var(--nv-border);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase h1,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productBenefits li,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice strong,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase h1,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productBenefits li,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productPrice strong{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>p,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice span,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>small,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productShowcaseCopy>p,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productPrice span,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productShowcaseCopy>small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .productPill,
+.nivalDashboard .nivalIntelligenceDark .productPill{
+  color:var(--nv-accent-strong);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productCta,
+.nivalDashboard .nivalIntelligenceDark .productCta{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+  box-shadow:none;
+}
+
+/* Light mockups/chips own dark text, independent of page color. */
+.nivalDashboard .nivalPointsDark .walletCard,
+.nivalDashboard .nivalPointsDark .customerPhonePreview,
+.nivalDashboard .nivalPointsDark .interactiveLoyaltyCard,
+.nivalDashboard .nivalPointsDark .floatStat{
+  color:var(--text-on-light);
+}
+.nivalDashboard .nivalPointsDark .floatStat{
+  background:#FFF;
+}
+.nivalDashboard .nivalPointsDark .floatStat b{
+  color:var(--text-on-light);
+}
+.nivalDashboard .nivalPointsDark .floatStat span{
+  color:#5E5E63;
+}
+
+/* Intelligence hero mockup: dark panel owns light text. */
+.nivalDashboard .nivalIntelligenceDark .aiPanel{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop,
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop b,
+.nivalDashboard .nivalIntelligenceDark .aiInsight strong,
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .aiInsight p,
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid i{
+  color:var(--nv-success);
+}
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop em,
+.nivalDashboard .nivalIntelligenceDark .aiInsight small,
+.nivalDashboard .nivalIntelligenceDark .aiInsight button{
+  color:var(--nv-accent-strong);
+}
+
+/* Benefit strips: no exposed gray gutter; cells fill the surface. */
+.nivalDashboard .nivalPointsDark .productFeatureStrip,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin:0 0 var(--nv-space-4);
+  padding:0;
+  overflow:hidden;
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-md);
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--nv-space-2);
+  min-height:144px;
+  padding:var(--nv-space-3);
+  border:0;
+  border-right:1px solid var(--nv-border);
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article:last-child,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article:last-child,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article:last-child{
+  border-right:0;
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article>span,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article>span,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article>span{
+  flex:0 0 auto;
+  margin:0;
+  padding:0;
+  color:var(--nv-accent-strong);
+  line-height:1.45;
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip b,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip b,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip p,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip p,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip p{
+  color:var(--nv-text-secondary);
+}
+
+/* Continuous dark sections own their foreground colors. */
+.nivalDashboard .nivalPointsDark .productStorySection,
+.nivalDashboard .nivalPointsDark .productSolutionsSection,
+.nivalDashboard .nivalPointsDark .productPreviewSection,
+.nivalDashboard .nivalPointsDark .productUseCases,
+.nivalDashboard .nivalPointsDark .interactiveProductDemo,
+.nivalDashboard .nivalIntelligenceDark .productStorySection,
+.nivalDashboard .nivalIntelligenceDark .productSolutionsSection,
+.nivalDashboard .nivalIntelligenceDark .productPreviewSection,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection,
+.nivalDashboard .nivalIntelligenceDark .productUseCases,
+.nivalDashboard .nivalIntelligenceDark .interactiveProductDemo{
+  color:var(--text-on-dark);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading h2,
+.nivalDashboard .nivalPointsDark .productSteps h3,
+.nivalDashboard .nivalPointsDark .solutionGrid h3,
+.nivalDashboard .nivalPointsDark .productUseCases h2,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy h2,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading h2,
+.nivalDashboard .nivalIntelligenceDark .productSteps h3,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid h3,
+.nivalDashboard .nivalIntelligenceDark .productUseCases h2,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection h2,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy h2{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading p,
+.nivalDashboard .nivalPointsDark .solutionGrid p,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>p,
+.nivalDashboard .nivalPointsDark .previewNote,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading p,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid p,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy>p,
+.nivalDashboard .nivalIntelligenceDark .previewNote{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading>span,
+.nivalDashboard .nivalPointsDark .solutionGrid article>span,
+.nivalDashboard .nivalPointsDark .productUseCases>div>span,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>span,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading>span,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid article>span,
+.nivalDashboard .nivalIntelligenceDark .productUseCases>div>span,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection>div>span,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy>span{
+  color:var(--nv-accent-strong);
+}
+.nivalDashboard .nivalPointsDark .productSteps article,
+.nivalDashboard .nivalPointsDark .solutionGrid article,
+.nivalDashboard .nivalIntelligenceDark .productSteps article,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid article{
+  color:var(--text-on-dark);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+
+/* Interactive dark controls and cards own their text. */
+.nivalDashboard .nivalIntelligenceDark .insightSelector{
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalIntelligenceDark .insightSelector button{
+  color:var(--nv-text-secondary);
+  border-color:var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .insightSelector button:hover,
+.nivalDashboard .nivalIntelligenceDark .insightSelector button.active,
+.nivalDashboard .nivalIntelligenceDark .insightSelector button.active span{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard{
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard h3,
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard strong{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>p{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>button{
+  color:var(--text-on-light);
+  background:var(--nv-accent);
+}
+
+/* Real dashboard previews: dark panels own light text. */
+.nivalDashboard .nivalPointsDark .merchantPreview,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header h3,
+.nivalDashboard .nivalPointsDark .merchantMetrics strong,
+.nivalDashboard .nivalPointsDark .merchantCustomer b,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview header h3,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow strong,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow h4,
+.nivalDashboard .nivalIntelligenceDark .previewSegments h4,
+.nivalDashboard .nivalIntelligenceDark .previewSegments b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header small,
+.nivalDashboard .nivalPointsDark .merchantMetrics small,
+.nivalDashboard .nivalPointsDark .merchantCustomer small,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview header>span,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow small,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow span,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow p,
+.nivalDashboard .nivalIntelligenceDark .previewSegments span{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow article,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow>article{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow .positive{
+  color:var(--nv-success);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction b{
+  color:var(--nv-accent-strong);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction p{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction button{
+  color:var(--text-on-light);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .merchantMetrics>div{
+  color:var(--text-on-dark);
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer button{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Connection chips: dark chips use light text; gold result uses dark text. */
+.nivalDashboard .nivalIntelligenceDark .connectionFlow span{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalIntelligenceDark .connectionFlow i{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .connectionFlow strong{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Dashboard surfaces audited in this round. */
+.nivalDashboard .dashboardHero,
+.nivalDashboard .metricGrid article,
+.nivalDashboard .chartCard,
+.nivalDashboard .paymentQrPanelRefined,
+.nivalDashboard .businessQrRefined,
+.nivalDashboard .nivalPayEditorPanel{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .dashboardHero h1,
+.nivalDashboard .metricGrid article strong,
+.nivalDashboard .chartCard h2,
+.nivalDashboard .paymentQrPanelRefined strong,
+.nivalDashboard .businessQrRefined h2,
+.nivalDashboard .nivalPayEditorPanel h2{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .profileDashboardPreview{
+  color:var(--text-on-light);
+}
+
+@media(max-width:900px){
+  .nivalDashboard .nivalPointsDark .productFeatureStrip,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip{
+    grid-template-columns:1fr;
+  }
+  .nivalDashboard .nivalPointsDark .productFeatureStrip article,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip article,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article{
+    min-height:0;
+    padding:var(--nv-space-3);
+    border-right:0;
+    border-bottom:1px solid var(--nv-border);
+  }
+  .nivalDashboard .nivalPointsDark .productFeatureStrip article:last-child,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip article:last-child,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article:last-child{
+    border-bottom:0;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .nivalPointsDark *,
+  .nivalDashboard .nivalIntelligenceDark *{
+    scroll-behavior:auto;
+  }
+}
+
+
+/* Round 1 dashboard surface ownership audit */
+.nivalDashboard .nivalPayCatalogCard,
+.nivalDashboard .sharePageItem,
+.nivalDashboard .nivalAddProduct,
+.nivalDashboard .paymentQrPanelRefined,
+.nivalDashboard .businessQrRefined{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPayCatalogCard h2,
+.nivalDashboard .sharePageItem h2,
+.nivalDashboard .nivalAddProduct h2,
+.nivalDashboard .nivalAddProduct strong,
+.nivalDashboard .paymentQrPanelRefined strong,
+.nivalDashboard .businessQrRefined h2{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPhysicalCard{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalCardMark{
+  color:var(--text-on-light);
+}
+.nivalDashboard .nivalClientPreview{
+  color:var(--text-on-light);
+}
+
+
+/* Profile público — scoped visual polish */
+.profileDigitalTopbar b{
+  text-transform:none;
+}
+
+.profileDigitalWorkspace{
+  --profile-ui-bg:#0B0B0D;
+  --profile-ui-surface:#151519;
+  --profile-ui-line:#303038;
+  --profile-ui-accent:#C8A65A;
+  --profile-ui-accent-hover:#D6B66C;
+  --profile-ui-text:#F7F7F8;
+  --profile-ui-muted:#B8B8C0;
+  --profile-ui-on-light:#17171A;
+  padding:44px 0 56px;
+}
+.profileDigitalWorkspace .profileDigitalHeading{
+  max-width:780px;
+  margin-bottom:28px;
+}
+.profileDigitalWorkspace .profileDigitalHeading h1{
+  margin:8px 0 0;
+  color:var(--profile-ui-text);
+  font-size:clamp(34px,4vw,54px);
+  line-height:1;
+  letter-spacing:-.045em;
+}
+.profileDigitalWorkspace .profileDigitalHeading>p:last-child{
+  max-width:640px;
+  margin:14px 0 0;
+  color:var(--profile-ui-muted);
+  line-height:1.6;
+}
+.profileDigitalWorkspace .profileDashboardGrid{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(420px,.95fr);
+  gap:32px;
+  align-items:stretch;
+}
+
+/* Shared public profile, embedded without nested boxes. */
+.profileDigitalWorkspace .profileDashboardPreview{
+  min-height:520px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:0;
+  border:0;
+  border-radius:20px;
+  color:var(--profile-ui-on-light);
+  background:#F7F3EA;
+  box-shadow:none;
+}
+.profileDigitalWorkspace .profileDashboardShared{
+  flex:1;
+  min-height:0;
+  color:var(--profile-ui-on-light);
+}
+.profileDigitalWorkspace .profileDashboardShared .profileCard{
+  width:100%;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  margin:0;
+  overflow:hidden;
+  border:0;
+  border-radius:0;
+  background:#F7F3EA;
+  box-shadow:none;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileHeader{
+  padding:30px 32px 24px;
+  background:transparent;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLogo,
+.profileDigitalWorkspace .profileDashboardShared .profileFallback{
+  width:68px;
+  height:68px;
+  border-radius:16px;
+  box-shadow:none;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileVerified{
+  color:#6A6254;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileHeader h1{
+  color:var(--profile-ui-on-light);
+  font-size:30px;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileDescription{
+  margin-top:18px!important;
+  color:#5C574E!important;
+  font-size:14px!important;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileActionSection{
+  flex:1;
+  display:flex;
+  padding:0 32px;
+  border-top:1px solid #D9D2C6;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLinks{
+  width:100%;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  margin:0;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink{
+  flex:1;
+  min-height:76px;
+  display:grid!important;
+  grid-template-columns:32px minmax(0,1fr) 22px;
+  align-items:center;
+  gap:14px;
+  padding:16px 0!important;
+  border:0!important;
+  border-top:1px solid #D9D2C6!important;
+  border-radius:0!important;
+  color:var(--profile-ui-on-light)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transition:transform 180ms ease-out,opacity 180ms ease-out;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink:first-child{
+  border-top:0!important;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink:hover{
+  transform:translateX(4px);
+  border-color:#D9D2C6!important;
+  box-shadow:none!important;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLinkIcon{
+  width:32px;
+  height:32px;
+  border-radius:0;
+  color:#7B642F;
+  background:transparent;
+  font-size:18px;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink.featured .profileLinkIcon{
+  color:#7B642F;
+  background:transparent;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink b{
+  color:var(--profile-ui-on-light);
+  font-size:14px;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink small{
+  color:#676158;
+  font-size:12px;
+}
+.profileDigitalWorkspace .profileDashboardShared .profileLink i{
+  color:#756E63;
+}
+.profileDigitalWorkspace .profileDashboardFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:auto;
+  padding:18px 32px;
+  border-top:1px solid #D9D2C6;
+  color:#746E64;
+  background:transparent;
+  font-size:11px;
+}
+.profileDigitalWorkspace .profileDashboardFooter a{
+  color:#5D4B27;
+  font-weight:800;
+}
+
+/* Share panel: one actionable surface, two columns on desktop. */
+.profileDigitalWorkspace .businessQrRefined{
+  position:relative;
+  min-height:520px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:32px;
+  padding:32px 0;
+  border:0;
+  border-top:1px solid var(--profile-ui-line);
+  border-bottom:1px solid var(--profile-ui-line);
+  border-radius:0;
+  color:var(--profile-ui-text);
+  background:transparent;
+}
+.profileDigitalWorkspace .businessQrCopy{
+  min-width:0;
+}
+.profileDigitalWorkspace .businessQrCopy h2{
+  margin:8px 0 10px;
+  color:var(--profile-ui-text);
+  font-size:30px;
+  letter-spacing:-.035em;
+}
+.profileDigitalWorkspace .businessQrCopy>p:not(.eyebrow){
+  max-width:520px;
+  color:var(--profile-ui-muted);
+  line-height:1.6;
+}
+.profileDigitalWorkspace .businessQrUrlRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 44px;
+  align-items:center;
+  gap:12px;
+  margin-top:24px;
+  padding:12px 0;
+  border-top:1px solid var(--profile-ui-line);
+  border-bottom:1px solid var(--profile-ui-line);
+}
+.profileDigitalWorkspace .businessQrUrlRow .qrUrl{
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  color:var(--profile-ui-muted);
+  background:transparent;
+  font-size:11px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.profileDigitalWorkspace .businessQrIconButton,
+.profileDigitalWorkspace .businessQrSecondary{
+  min-height:44px;
+  border:1px solid var(--profile-ui-line);
+  border-radius:10px;
+  color:var(--profile-ui-text);
+  background:transparent;
+  font:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform 180ms ease-out,opacity 180ms ease-out;
+}
+.profileDigitalWorkspace .businessQrIconButton{
+  width:44px;
+  display:grid;
+  place-items:center;
+  padding:0;
+}
+.profileDigitalWorkspace .businessQrPrimary{
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 16px;
+  border:1px solid var(--profile-ui-accent);
+  border-radius:10px;
+  color:var(--profile-ui-on-light);
+  background:var(--profile-ui-accent);
+  font-size:12px;
+  font-weight:850;
+  text-decoration:none;
+  transition:transform 180ms ease-out,opacity 180ms ease-out;
+}
+.profileDigitalWorkspace .businessQrSecondary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:0 14px;
+}
+.profileDigitalWorkspace .businessQrSecondary svg,
+.profileDigitalWorkspace .businessQrIconButton svg{
+  width:16px;
+  height:16px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.profileDigitalWorkspace .businessQrPrimary:hover,
+.profileDigitalWorkspace .businessQrSecondary:hover,
+.profileDigitalWorkspace .businessQrIconButton:hover{
+  transform:translateY(-1px);
+}
+.profileDigitalWorkspace .businessQrPrimary:focus-visible,
+.profileDigitalWorkspace .businessQrSecondary:focus-visible,
+.profileDigitalWorkspace .businessQrIconButton:focus-visible{
+  outline:2px solid var(--profile-ui-accent-hover);
+  outline-offset:3px;
+}
+.profileDigitalWorkspace .businessQrActions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:18px;
+}
+.profileDigitalWorkspace .qrCanvas{
+  display:grid;
+  place-items:center;
+  align-self:center;
+  padding:12px;
+  border:0;
+  border-radius:14px;
+  background:#FFF;
+}
+.profileDigitalWorkspace .qrCanvas svg{
+  display:block;
+  max-width:100%;
+  height:auto;
+}
+.profileDigitalWorkspace .qrNotice{
+  position:absolute;
+  right:0;
+  top:16px;
+  z-index:3;
+  min-height:0;
+  margin:0;
+  padding:10px 12px;
+  border:1px solid var(--profile-ui-line);
+  border-radius:10px;
+  color:var(--profile-ui-text);
+  background:var(--profile-ui-surface);
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(-6px);
+  transition:transform 180ms ease-out,opacity 180ms ease-out;
+}
+.profileDigitalWorkspace .qrNotice.isVisible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+@media(max-width:980px){
+  .profileDigitalWorkspace .profileDashboardGrid{
+    grid-template-columns:1fr;
+  }
+  .profileDigitalWorkspace .businessQrRefined{
+    min-height:0;
+  }
+}
+@media(max-width:640px){
+  .profileDigitalWorkspace{
+    padding:32px 0 44px;
+  }
+  .profileDigitalWorkspace .profileDigitalHeading h1{
+    font-size:36px;
+  }
+  .profileDigitalWorkspace .profileDashboardShared .profileHeader{
+    padding:24px 20px 20px;
+  }
+  .profileDigitalWorkspace .profileDashboardShared .profileActionSection{
+    padding:0 20px;
+  }
+  .profileDigitalWorkspace .profileDashboardFooter{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:16px 20px;
+  }
+  .profileDigitalWorkspace .businessQrRefined{
+    grid-template-columns:1fr;
+    gap:24px;
+    padding:28px 0;
+  }
+  .profileDigitalWorkspace .businessQrActions{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .profileDigitalWorkspace .businessQrPrimary,
+  .profileDigitalWorkspace .businessQrSecondary{
+    width:100%;
+  }
+  .profileDigitalWorkspace .qrCanvas{
+    justify-self:start;
+  }
+  .profileDigitalWorkspace .qrNotice{
+    right:0;
+    top:8px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .profileDigitalWorkspace .profileLink,
+  .profileDigitalWorkspace .businessQrPrimary,
+  .profileDigitalWorkspace .businessQrSecondary,
+  .profileDigitalWorkspace .businessQrIconButton,
+  .profileDigitalWorkspace .qrNotice{
+    transition:none;
+  }
+}
+
+
+/* Final dashboard button-system sweep */
+/* Explicitly beat older component-specific button rules without touching global selectors. */
+.nivalDashboard .nivalPointsDark .customerPhonePreview .nvSecondaryButton{
+  width:100%;
+  min-height:44px;
+  margin-top:28px;
+  color:var(--text-on-light);
+  border:1px solid #7C756A;
+  background:transparent;
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .aiInsight .nvTertiaryLink{
+  min-height:44px;
+  color:var(--nv-accent-strong);
+  border:0;
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .interactiveDemoActions .nvSecondaryButton,
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .interactiveDemoActions .nvTertiaryLink,
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .nvTertiaryLink{
+  min-height:44px;
+  color:var(--nv-accent-strong);
+  border:0;
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>.nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .paymentShareActions .nvPrimaryButton,
+.nivalDashboard .paymentShareActions .nvSecondaryButton{
+  min-height:44px;
+  border-radius:var(--nv-radius-sm);
+}
+.nivalDashboard .paymentShareActions .nvPrimaryButton{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+.nivalDashboard .paymentShareActions .nvSecondaryButton{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:transparent;
+}

@@ -64,9 +64,9 @@ function PointsInteractiveDemo() {
         <h2>Así se siente Nival Puntos en una visita real.</h2>
         <p>Simula una visita, desbloquea la recompensa y mira cómo el progreso cambia frente al cliente.</p>
         <div className="interactiveDemoActions">
-          <button type="button" onClick={addVisit} disabled={rewardReady}>Registrar visita +1</button>
-          <button type="button" className="secondary" onClick={redeem} disabled={!rewardReady}>Canjear recompensa</button>
-          <button type="button" className="textual" onClick={reset}>Reiniciar demo</button>
+          <button type="button" className="nvSecondaryButton" onClick={addVisit} disabled={rewardReady}>Registrar visita +1</button>
+          <button type="button" className="nvSecondaryButton" onClick={redeem} disabled={!rewardReady}>Canjear recompensa</button>
+          <button type="button" className="nvTertiaryLink" onClick={reset}>Reiniciar demo</button>
         </div>
       </div>
       <article className="interactiveLoyaltyCard">
@@ -117,7 +117,7 @@ function IntelligenceInteractiveDemo() {
           <small>ACCIÓN RECOMENDADA</small>
           <strong>{insight.action}</strong>
         </div>
-        <button type="button">Preparar acción →</button>
+        <button type="button" className="nvSecondaryButton">Preparar acción →</button>
       </article>
     </section>
   );

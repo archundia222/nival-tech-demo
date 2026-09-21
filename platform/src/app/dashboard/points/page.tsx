@@ -22,9 +22,9 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const active = Boolean(entitlement) || business?.product_level === 'intelligence';
-  return <main className="dashboardApp">
+  return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
-    <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
+    <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
@@ -42,8 +42,8 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         <section className="productPreviewSection pointsProductPreview">
           <div className="productStoryHeading"><span>VISTA PREVIA</span><h2>Esto es lo que usarán todos los días.</h2><p>El cliente consulta sus puntos desde el celular. El negocio registra visitas y canjes desde su panel.</p></div>
           <div className="pointsPreviewGrid">
-            <article className="customerPhonePreview"><div className="phoneTop"><span>9:41</span><i>● ● ●</i></div><div className="phoneBrand">CAFÉ DEL CENTRO</div><div className="phonePoints"><small>TUS PUNTOS</small><strong>8</strong><span>Te faltan 2 para tu bebida gratis</span></div><div className="phoneProgress"><i /></div><div className="phoneReward"><b>Tu próxima recompensa</b><span>Bebida mediana gratis</span></div><button type="button">Mostrar mi tarjeta</button></article>
-            <article className="merchantPreview"><header><div><small>NIVAL PUNTOS</small><h3>Clientes de hoy</h3></div><span>Programa activo</span></header><div className="merchantMetrics"><div><small>Visitas hoy</small><strong>14</strong></div><div><small>Premios disponibles</small><strong>3</strong></div></div><div className="merchantCustomer"><span>AM</span><div><b>Ana Martínez</b><small>8 de 10 puntos</small></div><button type="button">Registrar visita</button></div><div className="merchantCustomer"><span>JR</span><div><b>José Ramírez</b><small>10 de 10 puntos</small></div><button type="button">Canjear premio</button></div></article>
+            <article className="customerPhonePreview"><div className="phoneTop"><span>9:41</span><i>● ● ●</i></div><div className="phoneBrand">CAFÉ DEL CENTRO</div><div className="phonePoints"><small>TUS PUNTOS</small><strong>8</strong><span>Te faltan 2 para tu bebida gratis</span></div><div className="phoneProgress"><i /></div><div className="phoneReward"><b>Tu próxima recompensa</b><span>Bebida mediana gratis</span></div><button type="button" className="nvSecondaryButton">Mostrar mi tarjeta</button></article>
+            <article className="merchantPreview"><header><div><small>NIVAL PUNTOS</small><h3>Clientes de hoy</h3></div><span>Programa activo</span></header><div className="merchantMetrics"><div><small>Visitas hoy</small><strong>14</strong></div><div><small>Premios disponibles</small><strong>3</strong></div></div><div className="merchantCustomer"><span>AM</span><div><b>Ana Martínez</b><small>8 de 10 puntos</small></div><button type="button" className="nvSecondaryButton">Registrar visita</button></div><div className="merchantCustomer"><span>JR</span><div><b>José Ramírez</b><small>10 de 10 puntos</small></div><button type="button" className="nvSecondaryButton">Canjear premio</button></div></article>
           </div>
           <p className="previewNote">Ejemplo visual. Los nombres y cifras son demostrativos.</p>
         </section>

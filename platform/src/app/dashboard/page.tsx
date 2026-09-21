@@ -1,6 +1,4 @@
 import { redirect } from "next/navigation";
-import Image from "next/image";
-import type { CSSProperties } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { createLoyaltyProgram, createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
@@ -9,6 +7,7 @@ import { SmartLinkQr } from "./smart-link-qr";
 import { InvitationLink } from "./invitation-link";
 import { BusinessOnboardingForm } from "./business-onboarding-form";
 import { DashboardNavigation } from "./dashboard-navigation";
+import { ProfilePublicView, type ProfileActionItem } from "@/app/p/[slug]/profile-public-view";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
@@ -176,12 +175,44 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   ];
   const maxSegmentValue = Math.max(...segmentMetrics.map((segment) => segment.value), 1);
   const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
+  const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
+    ...(paymentProfile ? [{
+      key: `payment-${paymentProfile.public_token}`,
+      label: "Pago",
+      description: "Datos para transferencia",
+      href: `/pay/${paymentProfile.public_token}`,
+      icon: "＄",
+      featured: true,
+    }] : []),
+    ...(hasPoints ? [{
+      key: "loyalty",
+      label: "Lealtad",
+      description: "Puntos y recompensas",
+      href: `/b/${business.slug}`,
+      icon: "★",
+    }] : []),
+    ...(business.website_url ? [{
+      key: "website",
+      label: "Sitio web",
+      description: "Abrir tu página",
+      href: business.website_url,
+      icon: "↗",
+      external: true,
+    }] : []),
+    ...(smartLinks?.length ? [{
+      key: "links",
+      label: "Enlaces",
+      description: `${smartLinks.length} accesos activos`,
+      href: `/p/${business.slug}`,
+      icon: "↗",
+    }] : []),
+  ] : [];
 
   return (
     <main className="dashboardApp">
       <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
-      <header className="dashboardContentTopbar"><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
+      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
       <section className="dashboardHero" id="resumen">
         <div>
@@ -298,20 +329,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <section className="profileDigitalWorkspace">
           <header className="profileDigitalHeading"><p className="eyebrow">TU PERFIL PÚBLICO</p><h1>Así te ven tus clientes.</h1><p>Tu negocio, formas de contacto y accesos importantes en una sola página lista para compartir.</p></header>
           <div className="profileDashboardGrid">
-            <article className="profileDashboardPreview" style={{"--profile-accent": business.brand_color ?? "#b99750"} as CSSProperties}>
-              <div className="profileDashboardIdentity">
-                {business.logo_url ? <Image src={business.logo_url} width={72} height={72} unoptimized alt={`Logo de ${business.name}`} /> : <span>{business.name.slice(0,1).toUpperCase()}</span>}
-                <div><small>PERFIL OFICIAL</small><h2>{business.name}</h2></div>
-              </div>
-              <p>{business.description ?? "Información, contacto y formas de pago en un solo lugar."}</p>
-              <div className="profileDashboardActions">
-                {paymentProfile && <span><b>Pago</b><small>Datos para transferencia</small></span>}
-                {hasPoints && <span><b>Lealtad</b><small>Puntos y recompensas</small></span>}
-                {business.website_url && <span><b>Sitio web</b><small>Abrir tu página</small></span>}
-                {!!smartLinks?.length && <span><b>Enlaces</b><small>{smartLinks.length} accesos activos</small></span>}
-              </div>
+            <div className="profileDashboardPreview">
+              <ProfilePublicView
+                businessName={business.name}
+                slug={business.slug}
+                description={business.description}
+                logoUrl={business.logo_url}
+                brandColor={business.brand_color}
+                actions={profilePreviewActions}
+                verifiedLabel="PERFIL OFICIAL"
+                embedded
+                showQuickActions={false}
+                showFooter={false}
+              />
               <div className="profileDashboardFooter"><span>Vista previa del perfil público</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver perfil completo ↗</a></div>
-            </article>
+            </div>
             <BusinessQr
               businessName={business.name}
               url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
