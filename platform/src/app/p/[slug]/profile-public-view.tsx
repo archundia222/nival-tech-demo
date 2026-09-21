@@ -41,7 +41,7 @@ export function ProfilePublicView({
 }: ProfilePublicViewProps) {
   return (
     <div
-      className={embedded ? "profileExperience profileDashboardShared" : "profileExperience brandedCustomerShell"}
+      className={embedded ? "profileExperience profileDashboardShared" : "profileShell profileExperience brandedCustomerShell"}
       style={{ "--business-accent": brandColor || "#b99750" } as CSSProperties}
     >
       {!embedded && <div className="profileAmbient" aria-hidden="true" />}
