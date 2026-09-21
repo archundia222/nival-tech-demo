@@ -24,7 +24,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const active = Boolean(entitlement) || business?.product_level === 'intelligence';
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
-    <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
+    <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
