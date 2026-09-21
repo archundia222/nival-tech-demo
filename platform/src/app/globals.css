@@ -1401,3 +1401,73 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .previewSegments h4{margin:0 0 14px}.previewSegments>div{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid #33353a;font-size:11px}.previewSegments>div span{display:flex;align-items:center;gap:8px}.previewSegments i{width:8px;height:8px;border-radius:50%}.greenDot{background:#65bd82}.goldDot{background:#d1b36e}.redDot{background:#d87168}.blueDot{background:#6c92d9}
 @media(max-width:900px){.productPreviewSection{padding:36px 28px}.pointsPreviewGrid{grid-template-columns:1fr}.merchantPreview{width:100%}.previewInsightRow{grid-template-columns:1fr}}
 @media(max-width:600px){.productPreviewSection{padding:28px 18px;border-radius:20px}.customerPhonePreview{min-height:490px}.merchantPreview>header,.intelligenceDashboardPreview>header{align-items:flex-start;flex-direction:column}.merchantMetrics,.previewMetricRow{grid-template-columns:1fr}.merchantCustomer{grid-template-columns:38px minmax(0,1fr)}.merchantCustomer button{grid-column:1/-1;width:100%}.previewMetricRow,.previewInsightRow{padding-left:16px;padding-right:16px}.intelligenceDashboardPreview>header{padding:22px 18px}}
+
+
+/* Nival Card order: compact, polished fulfillment form. */
+.physicalCardPage { max-width: 1180px; margin: 0 auto; }
+.physicalCardHero { padding-bottom: 26px; }
+.physicalCardHero h1 { max-width: 760px; }
+.physicalCardHero > p:last-child { max-width: 780px; }
+.physicalCardForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.physicalCardSection {
+  min-height: 0;
+  padding: 26px;
+  display: grid;
+  gap: 18px;
+  border-radius: 20px;
+}
+.physicalCardSection:nth-of-type(3) { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.physicalCardSection:nth-of-type(3) h2,
+.physicalCardSection:nth-of-type(3) .payHelp { grid-column: 1 / -1; }
+.physicalCardSection h2 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.03em; }
+.physicalCardSection label {
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+.physicalCardSection input,
+.physicalCardSection select,
+.physicalCardSection textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  background: #101010;
+  color: #f5f5f5;
+  font: inherit;
+  font-size: 15px;
+}
+.physicalCardSection textarea { min-height: 112px; resize: vertical; }
+.physicalCardSection input:focus,
+.physicalCardSection select:focus,
+.physicalCardSection textarea:focus {
+  outline: 2px solid #c9a85c;
+  outline-offset: 2px;
+  border-color: #c9a85c;
+}
+.physicalCardSection .payHelp { margin: 0; }
+.physicalCardForm .checkoutActions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 4px;
+}
+.physicalCardForm .checkoutActions button { min-height: 48px; }
+@media (max-width: 760px) {
+  .physicalCardForm { grid-template-columns: 1fr; }
+  .physicalCardSection:nth-of-type(3) { grid-column: auto; grid-template-columns: 1fr; }
+  .physicalCardSection:nth-of-type(3) h2,
+  .physicalCardSection:nth-of-type(3) .payHelp { grid-column: auto; }
+  .physicalCardForm .checkoutActions { grid-column: auto; flex-direction: column; }
+  .physicalCardForm .checkoutActions button { width: 100%; }
+}
