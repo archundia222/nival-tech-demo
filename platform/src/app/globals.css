@@ -3751,3 +3751,111 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nivalDashboard .pointsCustomerQr{margin-top:14px}.nivalDashboard .pointsQrHeading b{color:var(--nv-accent,#C8A65A)}.nivalDashboard .pointsQrCanvas{display:grid;place-items:center;padding:18px;background:#fff;border-radius:16px}.nivalDashboard .pointsCustomerQr>p,.nivalDashboard .pointsPrivacyNote{color:var(--nv-text-secondary,#B8B8C0);font-size:12px;line-height:1.5}
 @media(max-width:760px){.nivalDashboard .pointsV1Hero{align-items:stretch;flex-direction:column}.nivalDashboard .pointsMetricGrid{grid-template-columns:repeat(2,1fr)}.nivalDashboard .pointsAdminGrid{grid-template-columns:1fr}.nivalDashboard .pointsFormGrid{grid-template-columns:1fr}.nivalDashboard .pointsSectionHeading{display:grid}.nivalDashboard .pointsCashActions{display:grid}.nivalDashboard .pointsManualScan{grid-template-columns:1fr}.nivalDashboard .pointsHistoryList article{align-items:flex-start}.nivalDashboard .pointsHistoryList article>div:last-child{min-width:96px}}
 @media(prefers-reduced-motion:reduce){.nivalDashboard .pointsProgress i{transition:none}}
+
+
+/* Mobile dashboard navigation — compact, readable and thumb-friendly */
+@media (max-width: 820px) {
+  .dashboardApp { display:block; }
+  .dashboardSidebar { display:none !important; }
+  .dashboardMobileMenu.professionalMobileMenu {
+    position:sticky;
+    top:0;
+    z-index:80;
+    display:block;
+    width:100%;
+    margin:0;
+    border:0;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    background:rgba(11,11,13,.96);
+    backdrop-filter:blur(18px);
+  }
+  .professionalMobileMenu > summary {
+    min-height:60px;
+    display:grid;
+    grid-template-columns:36px auto minmax(0,1fr);
+    align-items:center;
+    gap:10px;
+    padding:10px 16px;
+    list-style:none;
+    cursor:pointer;
+  }
+  .professionalMobileMenu > summary::-webkit-details-marker { display:none; }
+  .professionalMobileMenu > summary > span:nth-child(2) {
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.06em;
+    white-space:nowrap;
+  }
+  .professionalMobileMenu > summary > strong {
+    min-width:0;
+    overflow:hidden;
+    color:#b8b8c0;
+    font-size:12px;
+    font-weight:650;
+    text-align:right;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .hamburgerIcon {
+    width:34px;
+    height:34px;
+    display:grid;
+    place-content:center;
+    gap:4px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:9px;
+  }
+  .hamburgerIcon i {
+    width:15px;
+    height:1.5px;
+    display:block;
+    background:#f7f7f8;
+    border-radius:99px;
+  }
+  .professionalMobileMenu[open] .hamburgerIcon i:first-child { transform:translateY(5.5px) rotate(45deg); }
+  .professionalMobileMenu[open] .hamburgerIcon i:nth-child(2) { opacity:0; }
+  .professionalMobileMenu[open] .hamburgerIcon i:last-child { transform:translateY(-5.5px) rotate(-45deg); }
+  .professionalMobileMenu > nav {
+    max-height:calc(100dvh - 60px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    display:grid;
+    gap:3px;
+    padding:8px 12px calc(18px + env(safe-area-inset-bottom));
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .professionalMobileMenu > nav > a,
+  .professionalMobileMenu .mobileSubmenu a {
+    min-height:46px;
+    display:flex;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:10px;
+    color:#d6d6db;
+    font-size:14px;
+    font-weight:700;
+  }
+  .professionalMobileMenu > nav > a[aria-current="page"],
+  .professionalMobileMenu .mobileSubmenu a[aria-current="page"] {
+    color:#f7f7f8;
+    background:#1d1d22;
+    box-shadow:inset 3px 0 0 #c8a65a;
+  }
+  .professionalMobileMenu .mobileMainProduct {
+    color:#f7f7f8;
+    font-weight:850;
+  }
+  .professionalMobileMenu .mobileSubmenu {
+    display:grid;
+    gap:2px;
+    margin:0 0 6px 14px;
+    padding:2px 0 6px 10px;
+    border-left:1px solid rgba(255,255,255,.12);
+  }
+  .professionalMobileMenu .mobileSubmenu a {
+    min-height:42px;
+    color:#b8b8c0;
+    font-size:13px;
+  }
+  .dashboardContent { padding:20px 16px 64px; }
+}
