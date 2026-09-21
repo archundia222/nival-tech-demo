@@ -94,14 +94,14 @@ export function PaymentEditor({ businessId, businessName, businessLogo, profile,
       <div className="visualPayToolbar"><div><p className="eyebrow">EDITA DIRECTAMENTE</p><h2>Tu página Nival Pay</h2><label className="cardNameEditor"><span>Nombre de la tarjeta</span><input value={displayName} onChange={e=>{setDisplayName(e.target.value);markDirty()}} minLength={2} maxLength={60} placeholder="Nival Pay" aria-label="Nombre de la tarjeta" /></label></div></div>
       <div className="nivalClientPreview editableClientPreview" style={{position:"relative"}}>
         <div className="nivalClientBrand"><span>N</span><b>Nival Pay</b><small>Datos verificados</small></div>
-        <div className="nivalClientProfile" style={{position:"relative"}}><button type="button" className={fieldVisibility.holder ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("holder","el titular")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.holder ? "Visible" : "Oculto"}</button>
+        <div className="nivalClientProfile" style={{position:"relative"}}>
           <label className="editableLogo" title="Cambiar foto o logo">
             {image ? <Image src={image} width={104} height={104} unoptimized alt={`Imagen de ${businessName}`} /> : <div className="nivalClientMonogram">{businessName.slice(0,2).toUpperCase()}</div>}
             <input ref={imageInputRef} name="image" type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>{const selected=e.target.files?.[0];setPreview(selected?URL.createObjectURL(selected):null);setRemoveImage(false);markDirty()}} />
             <span>Cambiar logo</span>
           </label>
-          <p>Realiza tu transferencia a · <b className="fieldEditHint">Editar</b></p>
-          <input className="inlinePayInput holderInput" aria-label="Titular de la cuenta" name="accountHolder" value={holder} onChange={e=>{setHolder(e.target.value);markDirty()}} required minLength={2} maxLength={120} />
+          <p>Realiza tu transferencia a</p>
+          <div className="holderEditRow"><input className="inlinePayInput holderInput" aria-label="Titular de la cuenta" name="accountHolder" value={holder} onChange={e=>{setHolder(e.target.value);markDirty()}} required minLength={2} maxLength={120} /><button type="button" className={fieldVisibility.holder ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("holder","el titular")}>{fieldVisibility.holder ? "Visible" : "Oculto"}</button></div>
         </div>
         <div className="nivalClientDetails editableDetails">
           <label style={{position:"relative"}}><button type="button" className={fieldVisibility.bank ? "visibilityToggle public" : "visibilityToggle hidden"} onClick={()=>toggleDefaultField("bank","Banco")} style={{position:"absolute",right:".65rem",top:".5rem",minWidth:"auto",padding:".3rem .55rem",fontSize:".65rem",zIndex:3}}>{fieldVisibility.bank ? "Visible" : "Oculto"}</button><span>Banco · <b className="fieldEditHint">Editar</b></span><input className="inlinePayInput" name="bankName" value={bank} onChange={e=>{setBank(e.target.value);markDirty()}} required minLength={2} maxLength={80} /></label>
