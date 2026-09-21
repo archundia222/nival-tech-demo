@@ -41,40 +41,37 @@ export function PaymentPageView({
     .join("")
     .toUpperCase();
 
-  return (
-    <div className={embedded ? `${styles.pageShell} ${styles.embeddedShell}` : styles.pageShell}>
-      <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} aria-labelledby={embedded ? undefined : "payment-title"}>
-        <div className={styles.brandRow}>
-          <span className={styles.brandMark} aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M14 2.4 24 8.2v11.6L14 25.6 4 19.8V8.2L14 2.4Z"/><path d="m9.2 16.5 3.1 3.1 6.7-8"/></svg></span>
-          <span className={styles.brandName}>Nival <strong>Pay</strong></span>
-          <span className={styles.securePill}>Datos verificados</span>
+  const content = <>
+    <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} aria-labelledby={embedded ? undefined : "payment-title"}>
+      <div className={styles.brandRow}>
+        <span className={styles.brandMark} aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M14 2.4 24 8.2v11.6L14 25.6 4 19.8V8.2L14 2.4Z"/><path d="m9.2 16.5 3.1 3.1 6.7-8"/></svg></span>
+        <span className={styles.brandName}>Nival <strong>Pay</strong></span>
+        <span className={styles.securePill}>Datos verificados</span>
+      </div>
+      <div className={styles.profile}>
+        <div className={styles.logoWrap}>
+          {profile.logo_url ? <Image src={profile.logo_url} alt={`Logotipo de ${profile.business_name}`} width={116} height={116} unoptimized priority={!embedded} /> : <span className={styles.monogram}>{initials || "N"}</span>}
         </div>
+        <p className={styles.eyebrow}>Realiza tu transferencia a</p>
+        {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="name" headingId={embedded ? null : "payment-title"} />}
+      </div>
+      <div className={styles.details}>
+        {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
+        {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />}
+        {profile.concept_visible && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
+        {profile.payment_url_visible && profile.payment_url && <CopyField label="Enlace de pago" value={profile.payment_url} variant="detail" />}
+        {Array.isArray(profile.custom_sections) && profile.custom_sections.filter((section) => section.public !== false).map((section) =>
+          section.title || section.content ? <CopyField key={section.id} label={section.title || "Información"} value={section.content || "—"} variant="detail" /> : null
+        )}
+      </div>
+      <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
+    </section>
+    <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
+  </>;
 
-        <div className={styles.profile}>
-          <div className={styles.logoWrap}>
-            {profile.logo_url
-              ? <Image src={profile.logo_url} alt={`Logotipo de ${profile.business_name}`} width={116} height={116} unoptimized />
-              : <span className={styles.monogram}>{initials || "N"}</span>}
-          </div>
-          <p className={styles.eyebrow}>Realiza tu transferencia a</p>
-          {profile.holder_visible !== false && <CopyField label="Beneficiario" value={profile.account_holder} variant="name" headingId={embedded ? undefined : "payment-title"} />}
-        </div>
+  if (embedded) {
+    return <div className={`${styles.pageShell} ${styles.embeddedShell}`}>{content}</div>;
+  }
 
-        <div className={styles.details}>
-          {profile.bank_visible !== false && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
-          {profile.clabe_visible !== false && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />}
-          {profile.concept_visible !== false && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
-          {profile.payment_url_visible !== false && profile.payment_url && <CopyField label="Enlace de pago" value={profile.payment_url} variant="detail" />}
-          {Array.isArray(profile.custom_sections) && profile.custom_sections
-            .filter((section) => section.public !== false)
-            .map((section) => section.title || section.content
-              ? <CopyField key={section.id} label={section.title || "Información"} value={section.content || "—"} variant="detail" />
-              : null)}
-        </div>
-
-        <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
-      </section>
-      <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
-    </div>
-  );
+  return content;
 }
