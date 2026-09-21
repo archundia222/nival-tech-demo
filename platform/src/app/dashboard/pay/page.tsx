@@ -4,7 +4,7 @@ import { publicSiteUrl } from '@/lib/payment-profile';
 import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 import { createAdditionalPaymentProfile } from './actions';
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
@@ -117,7 +117,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
       .maybeSingle();
     if (returnedProfile) {
       const savedSections = Array.isArray(returnedProfile.custom_sections) ? returnedProfile.custom_sections : [];
-      const sectionLimit = 3 + Number(returnedProfile.extra_sections_purchased ?? 0);
+      const sectionLimit = NIVAL_PAY_INCLUDED_SECTIONS + Number(returnedProfile.extra_sections_purchased ?? 0);
       if (savedSections.length < sectionLimit) {
         const nextSections = [...savedSections, { id: crypto.randomUUID(), title: '', content: '', public: true }];
         const { error: sectionCreateError } = await supabase.from('payment_profiles')
