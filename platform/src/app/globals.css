@@ -3943,3 +3943,17 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
     outline-offset:-2px;
   }
 }
+
+@media (max-width: 820px) {
+  .professionalMobileMenu .mobileSignOut button::before {
+    content:"";
+    width:15px;
+    height:15px;
+    flex:0 0 15px;
+    margin-right:10px;
+    background:currentColor;
+    opacity:.72;
+    clip-path:polygon(0 44%,58% 44%,58% 18%,100% 50%,58% 82%,58% 56%,0 56%);
+    transform:none;
+  }
+}
