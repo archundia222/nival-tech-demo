@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
 interface BusinessQrProps {
@@ -18,9 +19,11 @@ export function BusinessQr({
   qrId = "business-enrollment-qr",
   eyebrow = "QR DEL NEGOCIO",
   title = "Registro de clientes",
-  description = "Imprime este QR o úsalo como destino de tus tarjetas NFC. Cada cliente llegará al formulario público de este negocio.",
+  description = "Imprime este QR o úsalo como destino de tus tarjetas NFC.",
   fileSuffix = "qr",
 }: BusinessQrProps) {
+  const [notice, setNotice] = useState("");
+
   function downloadQr() {
     const svg = document.getElementById(qrId);
     if (!svg) return;
@@ -34,20 +37,48 @@ export function BusinessQr({
     URL.revokeObjectURL(downloadUrl);
   }
 
+  async function copyUrl() {
+    try {
+      await navigator.clipboard.writeText(url);
+      setNotice("Enlace copiado.");
+    } catch {
+      setNotice("No se pudo copiar automáticamente.");
+    }
+  }
+
+  async function shareUrl() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: businessName, text: `Conoce ${businessName}`, url });
+        setNotice("Perfil compartido.");
+        return;
+      }
+      await copyUrl();
+    } catch {
+      setNotice("");
+    }
+  }
+
   return (
-    <section className="businessQrCard">
-      <div>
+    <section className="businessQrCard businessQrRefined">
+      <div className="businessQrCopy">
         <p className="eyebrow">{eyebrow}</p>
         <h2>{title}</h2>
         <p>{description}</p>
-        <a className="qrUrl" href={url} target="_blank" rel="noreferrer">{url}</a>
-        <button className="primaryButton" type="button" onClick={downloadQr}>Descargar QR</button>
+        <code className="qrUrl">{url}</code>
+        <p className="qrNotice" role="status">{notice}</p>
+        <div className="businessQrActions">
+          <a className="primaryButton" href={url} target="_blank" rel="noreferrer">Abrir perfil</a>
+          <button className="secondaryButton" type="button" onClick={copyUrl}>Copiar enlace</button>
+          <button className="secondaryButton" type="button" onClick={shareUrl}>Compartir</button>
+          <button className="secondaryButton" type="button" onClick={downloadQr}>Descargar QR</button>
+        </div>
       </div>
       <div className="qrCanvas">
         <QRCodeSVG
           id={qrId}
           value={url}
-          size={220}
+          size={190}
           level="H"
           marginSize={2}
           bgColor="#ffffff"
