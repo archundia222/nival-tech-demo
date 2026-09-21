@@ -122,3 +122,10 @@ export async function reversePoint(ledgerId: string) {
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }
+
+
+export async function reversePointForm(formData: FormData) {
+  const ledgerId = String(formData.get("ledgerId") ?? "");
+  if (!ledgerId) return;
+  await reversePoint(ledgerId);
+}
