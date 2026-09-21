@@ -487,8 +487,6 @@ export async function startPhysicalCardCheckout(form: FormData) {
 export async function claimIncludedPhysicalCard(form: FormData) {
   const details = readPhysicalCardInput(form);
   if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!token) redirect('/dashboard/pay/physical?error=Mercado+Pago+aún+no+está+configurado.');
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const [{ data: paidOrders, error: paidError }, { data: existingCards, error: cardsError }] = await Promise.all([
@@ -504,7 +502,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).map((card) => card.product_order_id));
   const includedOrder = paidOrders?.find((order) =>
-    order.provider_preference_id && !claimedOrderIds.has(order.id)
+    !claimedOrderIds.has(order.id)
   );
   if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
   const { error } = await admin.from('physical_card_orders').insert({
