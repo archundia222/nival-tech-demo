@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
+import type { CSSProperties } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { createLoyaltyProgram, createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
@@ -203,7 +205,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </article>
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Nival Pay incluye una tarjeta física, página configurable, QR y 3 apartados. Cada apartado adicional cuesta $49 MXN y cada tarjeta física adicional, $99 MXN.</p>
+          <p>Nival Pay incluye tu página configurable, QR y la primera tarjeta NFC física. Los apartados opcionales cuestan $10 MXN cada uno y cada tarjeta física adicional, $99 MXN.</p>
           <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
@@ -258,7 +260,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <span className="nivalAddIcon" aria-hidden="true">+</span>
             <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$49 MXN</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
             <div className="nivalAddDivider" />
-            <div><p>Comprar plástico NFC</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/products">Ver tarjetas</a></div>
+            <div><p>Tarjeta NFC física adicional</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/dashboard/pay/physical">Agregar tarjeta</a></div>
           </article>
         </div>
       </section>
@@ -293,18 +295,34 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>}
       </>}
       {currentSection === "perfil-digital" && business?.slug && <>
-        <section className="nivalAssetsIntro profileDigitalIntro">
-          <div className="assetsHeading"><p className="eyebrow">PERFIL DIGITAL</p><h1>Todo tu negocio en un enlace</h1><p>Comparte contacto, reseñas, pagos y enlaces desde una sola página.</p></div>
+        <section className="profileDigitalWorkspace">
+          <header className="profileDigitalHeading"><p className="eyebrow">TU PERFIL PÚBLICO</p><h1>Así te ven tus clientes.</h1><p>Tu negocio, formas de contacto y accesos importantes en una sola página lista para compartir.</p></header>
+          <div className="profileDashboardGrid">
+            <article className="profileDashboardPreview" style={{"--profile-accent": business.brand_color ?? "#b99750"} as CSSProperties}>
+              <div className="profileDashboardIdentity">
+                {business.logo_url ? <Image src={business.logo_url} width={72} height={72} unoptimized alt={`Logo de ${business.name}`} /> : <span>{business.name.slice(0,1).toUpperCase()}</span>}
+                <div><small>PERFIL OFICIAL</small><h2>{business.name}</h2></div>
+              </div>
+              <p>{business.description ?? "Información, contacto y formas de pago en un solo lugar."}</p>
+              <div className="profileDashboardActions">
+                {paymentProfile && <span><b>Pago</b><small>Datos para transferencia</small></span>}
+                {hasPoints && <span><b>Lealtad</b><small>Puntos y recompensas</small></span>}
+                {business.website_url && <span><b>Sitio web</b><small>Abrir tu página</small></span>}
+                {!!smartLinks?.length && <span><b>Enlaces</b><small>{smartLinks.length} accesos activos</small></span>}
+              </div>
+              <div className="profileDashboardFooter"><span>Vista previa del perfil público</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver perfil completo ↗</a></div>
+            </article>
+            <BusinessQr
+              businessName={business.name}
+              url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
+              qrId="business-digital-profile-qr"
+              eyebrow="COMPARTE TU NEGOCIO"
+              title="Un enlace para todo"
+              description="Copia el enlace, compártelo por WhatsApp o descarga el QR para mostrador, redes e impresos."
+              fileSuffix="perfil-digital"
+            />
+          </div>
         </section>
-        <BusinessQr
-          businessName={business.name}
-          url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
-          qrId="business-digital-profile-qr"
-          eyebrow="TU ENLACE PÚBLICO"
-          title="Perfil digital del negocio"
-          description="Comparte este enlace o descarga el QR para mostrar toda la información pública de tu negocio."
-          fileSuffix="perfil-digital"
-        />
       </>}
       {currentSection === "configuracion" && <>
       {hasIntelligence && canManageProgram && business && (
