@@ -119,10 +119,17 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   const requestHeaders = await headers();
   const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
   const amount = (product.amountCents / 100).toFixed(2);
-  // Use the authenticated customer in every environment. A configured test
-  // payer can leak into a live checkout when environment metadata is absent.
-  const payerEmail = user.email?.trim();
-  if (!payerEmail) redirect(checkoutReturnPath(product.returnPath, 'error', 'Tu cuenta necesita un correo para continuar con el pago.'));
+  // In Preview/QA, never send the real Nival account email to a Mercado Pago
+  // test seller. Mercado Pago rejects mixed real/test parties. A dedicated test
+  // buyer email can be configured; otherwise Checkout will collect the test
+  // buyer identity when the tester signs in.
+  const isPreviewCheckout = process.env.VERCEL_ENV === 'preview';
+  const payerEmail = isPreviewCheckout
+    ? process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim()
+    : user.email?.trim();
+  if (!isPreviewCheckout && !payerEmail) {
+    redirect(checkoutReturnPath(product.returnPath, 'error', 'Tu cuenta necesita un correo para continuar con el pago.'));
+  }
   let result: MercadoPagoOrderCreateResponse = {};
 
   try {
@@ -140,7 +147,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
         total_amount: amount,
         external_reference: order.id,
         description: product.description,
-        payer: { email: payerEmail },
+        ...(payerEmail ? { payer: { email: payerEmail } } : {}),
         items: [{
           external_code: product.productCode,
           title: product.description,
