@@ -3859,3 +3859,28 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   }
   .dashboardContent { padding:20px 16px 64px; }
 }
+
+@media (max-width: 820px) {
+  .professionalMobileMenu .mobileSignOut {
+    margin-top:6px;
+    padding-top:8px;
+    border-top:1px solid rgba(255,255,255,.10);
+  }
+  .professionalMobileMenu .mobileSignOut button {
+    width:100%;
+    min-height:46px;
+    padding:10px 12px;
+    border:0;
+    border-radius:10px;
+    color:#ffaaa2;
+    background:transparent;
+    font:inherit;
+    font-size:14px;
+    font-weight:750;
+    text-align:left;
+    cursor:pointer;
+  }
+  .professionalMobileMenu .mobileSignOut button:active {
+    background:rgba(255,83,73,.08);
+  }
+}
