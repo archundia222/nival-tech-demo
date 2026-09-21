@@ -38,7 +38,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .select('id, design, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders(status, payment_method)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
 
-  return <main className="dashboardApp">
+  return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="agregar-tarjetas" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent physicalCardPage">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : '$99 MXN'}</span></header>
@@ -71,8 +71,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <label>Código postal<input name="postalCode" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5}/></label>
         </section>
         <div className="checkoutActions">
-          <button className="primaryButton" type="submit">{hasIncludedCard ? 'Solicitar mi tarjeta incluida' : 'Pagar $99 con Mercado Pago'}</button>
-          {!hasIncludedCard && <button className="secondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Pagar $99 en efectivo al recibir</button>}
+          <button className="nvPrimaryButton" type="submit">{hasIncludedCard ? 'Solicitar mi tarjeta incluida' : 'Pagar $99 con Mercado Pago'}</button>
+          {!hasIncludedCard && <button className="nvSecondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Pagar $99 en efectivo al recibir</button>}
         </div>
       </form>
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
