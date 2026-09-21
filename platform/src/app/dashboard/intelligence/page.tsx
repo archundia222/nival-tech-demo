@@ -20,7 +20,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const activeProducts = new Set((entitlements ?? []).map((item) => item.product_code));
   const hasPoints = activeProducts.has('nival_points') || business?.product_level === 'intelligence';
   const active = activeProducts.has('nival_intelligence') || business?.product_level === 'intelligence';
-  return <main className="dashboardApp">
+  return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="inteligencia" />
     <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Pay + Puntos en un solo lugar</b></div><span className="ready">{active ? 'Activo' : hasPoints ? '$449/mes' : '$399/mes'}</span></header>
@@ -52,7 +52,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
         </section>
         <section className="intelligenceConnection">
           <div><span>UNA SOLA VISTA</span><h2>Nival Pay registra interés. Nival Puntos registra relaciones. Intelligence conecta ambos.</h2></div>
-          <div className="connectionFlow"><span>Nival Pay</span><i>+</i><span>Nival Puntos</span><i>→</i><strong>Decisiones claras</strong></div>
+          <div className="connectionFlow"><span>Nival Pay</span><i>+</i><span>Nival Puntos</span><i>→</i><strong>Intelligence</strong></div>
         </section>
         <section className="productUseCases darkUseCases"><div><span>EMPIEZA CON TUS DATOS REALES</span><h2>Activa Intelligence y convierte la actividad diaria en oportunidades.</h2></div><form action={startNivalIntelligenceSubscription}><button className="productCta">{hasPoints ? 'Activar Puntos + Intelligence' : 'Comenzar con Intelligence'} <span>→</span></button></form></section>
       </> : <section className="dashboardHero"><div><p className="eyebrow">INTELLIGENCE ACTIVO</p><h1>Tu operación, conectada.</h1><p>Abre el análisis conjunto de Pay y Puntos para revisar segmentos y recomendaciones.</p><a className="loginLink" href="/dashboard?section=inteligencia">Abrir panel Intelligence</a></div></section>}
