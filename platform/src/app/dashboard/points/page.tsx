@@ -22,7 +22,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const active = Boolean(entitlement) || business?.product_level === 'intelligence';
-  return <main className="dashboardApp">
+  return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
     <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
