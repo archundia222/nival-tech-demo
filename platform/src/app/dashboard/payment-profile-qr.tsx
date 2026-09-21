@@ -57,9 +57,9 @@ export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrP
       <code className="paymentQrUrl">{url}</code>
       <p className="paymentQrNotice" role="status">{notice}</p>
       <div className="smartLinkActions paymentShareActions">
-        <button className="visitButton primaryShareAction" type="button" onClick={copyUrl}>Copiar enlace</button>
-        <button className="visitButton" type="button" onClick={shareUrl}>Compartir</button>
-        <button className="visitButton" type="button" onClick={downloadQr}>Descargar QR</button>
+        <button className="nvPrimaryButton" type="button" onClick={copyUrl}>Copiar enlace</button>
+        <button className="nvSecondaryButton" type="button" onClick={shareUrl}>Compartir</button>
+        <button className="nvSecondaryButton" type="button" onClick={downloadQr}>Descargar QR</button>
       </div>
     </div>
     <div className="miniQr refinedQr"><QRCodeSVG id={qrId} value={url} size={156} level="H" marginSize={2} bgColor="#fff" fgColor="#07100e" title="QR de Nival Pay" /></div>
