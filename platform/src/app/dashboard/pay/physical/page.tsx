@@ -17,7 +17,6 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   if (!membership) redirect('/dashboard');
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const admin = createAdminClient();
-  const isPreviewCheckout = process.env.VERCEL_ENV === 'preview';
   const [{ data: paidInitialOrders }, { data: claimedCards }] = await Promise.all([
     admin.from('product_orders')
       .select('id, provider_preference_id')
@@ -29,11 +28,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     admin.from('physical_card_orders').select('product_order_id').eq('business_id', membership.business_id),
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).map((card) => card.product_order_id));
-  const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => {
-    if (!order.provider_preference_id || claimedOrderIds.has(order.id)) return false;
-    const isTestOrder = order.provider_preference_id.toUpperCase().startsWith('ORDTST');
-    return isPreviewCheckout ? isTestOrder : !isTestOrder;
-  }));
+  const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
   const { data: orders } = await supabase.from('physical_card_orders')
     .select('id, design, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders(status, payment_method)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
