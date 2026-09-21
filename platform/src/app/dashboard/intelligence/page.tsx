@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalIntelligenceSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
+import { ProductInteractiveDemo } from '../product-interactive-demo';
 
 export default async function NivalIntelligencePage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
   const params = await searchParams;
@@ -21,7 +22,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const active = activeProducts.has('nival_intelligence') || business?.product_level === 'intelligence';
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="inteligencia" />
-    <div className="dashboardContent">
+    <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Pay + Puntos en un solo lugar</b></div><span className="ready">{active ? 'Activo' : hasPoints ? '$449/mes' : '$399/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
@@ -35,6 +36,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
           <div className="productStoryHeading"><span>DE LOS DATOS A LA ACCIÓN</span><h2>No necesitas ser experto para entender tu negocio.</h2><p>Intelligence organiza la información de Pay y Puntos y la convierte en respuestas claras.</p></div>
           <div className="productSteps"><article><b>1</b><div><h3>Observa la actividad</h3><p>Reúne visitas, clientes, recurrencia y uso de tus páginas.</p></div></article><article><b>2</b><div><h3>Detecta cambios</h3><p>Señala oportunidades, clientes en riesgo y comportamientos importantes.</p></div></article><article><b>3</b><div><h3>Recomienda una acción</h3><p>Te dice qué puedes hacer después con una explicación sencilla.</p></div></article></div>
         </section>
+        <ProductInteractiveDemo mode="intelligence" />
         <section className="productPreviewSection intelligenceProductPreview">
           <div className="productStoryHeading"><span>VISTA PREVIA</span><h2>Abres el panel y sabes qué necesita atención.</h2><p>Sin tablas complicadas: primero ves el hallazgo, después la explicación y finalmente la acción sugerida.</p></div>
           <div className="intelligenceDashboardPreview">
