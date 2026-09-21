@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
@@ -13,7 +13,7 @@ async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
 }
 
 async function enforceRate(endpoint: "enroll" | "card" | "scan_token", limit: number, windowSeconds: number) {
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("consume_points_rate_limit", {
     p_endpoint: endpoint,
     p_identifier_hash: await rateKey(endpoint),
@@ -25,7 +25,7 @@ async function enforceRate(endpoint: "enroll" | "card" | "scan_token", limit: nu
 
 export async function getPublicPointsProgram(slug: string) {
   await enforceRate("card", 30, 60);
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("get_public_points_program", { p_business_slug: slug });
   if (error) throw new Error(error.message);
   return data?.[0] ?? null;
@@ -34,7 +34,7 @@ export async function getPublicPointsProgram(slug: string) {
 export async function enrollPointsCustomer(formData: FormData) {
   await enforceRate("enroll", 8, 60);
   const slug = String(formData.get("slug") ?? "").trim();
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("enroll_points_customer", {
     p_business_slug: slug,
     p_customer_name: String(formData.get("name") ?? "").trim(),
@@ -49,7 +49,7 @@ export async function enrollPointsCustomer(formData: FormData) {
 
 export async function getPublicLoyaltyCard(token: string) {
   await enforceRate("card", 60, 60);
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("get_public_loyalty_card_v3", { p_account_token: token });
   if (error) throw new Error(error.message);
   return data?.[0] ?? null;
@@ -58,7 +58,7 @@ export async function getPublicLoyaltyCard(token: string) {
 export async function issueCustomerScanToken(token: string) {
   await enforceRate("scan_token", 12, 60);
   const raw = crypto.randomBytes(32).toString("base64url");
-  const admin = createAdminClient();
+  const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("issue_customer_scan_token", {
     p_account_token: token,
     p_raw_token: raw,
