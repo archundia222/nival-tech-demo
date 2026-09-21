@@ -38,7 +38,7 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
     </aside>
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
-      <nav aria-label="Navegación móvil del panel"><Link className="mobileMainProduct" href="/dashboard/pay">Nival Pay</Link><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>{productItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link></nav>
+      <nav aria-label="Navegación móvil del panel"><Link className="mobileMainProduct" href="/dashboard/pay">Nival Pay</Link><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>{productItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form></nav>
     </details>
   </>;
 }
