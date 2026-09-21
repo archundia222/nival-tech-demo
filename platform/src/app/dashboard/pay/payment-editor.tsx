@@ -149,6 +149,7 @@ export function PaymentEditor({
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
   const extraSectionPriceMx = NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS / 100;
   const totalSectionLimit = NIVAL_PAY_INCLUDED_SECTIONS + purchasedSectionLimit;
+  const freeSectionsRemaining = Math.max(0, NIVAL_PAY_INCLUDED_SECTIONS - sections.length);
 
   const buyExtraSection = () => {
     if (!profile?.id) return;
@@ -356,7 +357,7 @@ export function PaymentEditor({
         ))}
 
         <div className="nivalPaySectionsAction">
-          <p className="apartadoIntro">Agrega los apartados que necesites por <strong>${extraSectionPriceMx} MXN cada uno</strong>.</p>
+          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados. <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
           {sections.length < totalSectionLimit ? (
             <button
               key="add-available-section"
@@ -381,7 +382,7 @@ export function PaymentEditor({
               {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · $${extraSectionPriceMx} MXN`}
             </button>
           )}
-          <p className="apartadoFootnote">Cada compra desbloquea un apartado nuevo para editarlo cuando quieras.</p>
+          <p className="apartadoFootnote">{freeSectionsRemaining > 0 ? 'Los apartados incluidos se pueden editar y ocultar cuando quieras.' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
         </div>
       </section>
 
