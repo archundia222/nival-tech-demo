@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalPointsSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
+import { ProductInteractiveDemo } from '../product-interactive-demo';
 
 export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
   const params = await searchParams;
@@ -23,7 +24,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const active = Boolean(entitlement) || business?.product_level === 'intelligence';
   return <main className="dashboardApp">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
-    <div className="dashboardContent">
+    <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
@@ -37,6 +38,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           <div className="productStoryHeading"><span>CÓMO FUNCIONA</span><h2>Un programa sencillo para ti y para tus clientes.</h2><p>No necesitan descargar una aplicación ni aprender un sistema complicado.</p></div>
           <div className="productSteps"><article><b>1</b><div><h3>Comparte tu QR</h3><p>El cliente lo escanea y registra su tarjeta digital desde el teléfono.</p></div></article><article><b>2</b><div><h3>Registra cada visita</h3><p>Tu equipo busca al cliente y agrega sus puntos en segundos.</p></div></article><article><b>3</b><div><h3>Entrega recompensas</h3><p>Cuando llega a la meta, el sistema indica que su premio ya está disponible.</p></div></article></div>
         </section>
+        <ProductInteractiveDemo mode="points" />
         <section className="productPreviewSection pointsProductPreview">
           <div className="productStoryHeading"><span>VISTA PREVIA</span><h2>Esto es lo que usarán todos los días.</h2><p>El cliente consulta sus puntos desde el celular. El negocio registra visitas y canjes desde su panel.</p></div>
           <div className="pointsPreviewGrid">
