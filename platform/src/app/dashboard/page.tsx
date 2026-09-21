@@ -236,7 +236,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </article>
         <article className="chartCard">
           <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Nival Pay incluye tu página configurable, QR y la primera tarjeta NFC física. Los apartados opcionales cuestan $10 MXN cada uno y cada tarjeta física adicional, $99 MXN.</p>
+          <p>Nival Pay incluye tu página configurable, QR y la primera tarjeta NFC física. Incluye 3 apartados; los adicionales cuestan $49 MXN cada uno y cada tarjeta física adicional, $99 MXN.</p>
           <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
         </article>
       </section>
