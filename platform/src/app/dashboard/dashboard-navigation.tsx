@@ -4,15 +4,15 @@ import { signOut } from '@/app/auth/actions';
 type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
-  { id: 'nival-pay', label: 'Editar Nival Pay', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
-  { id: 'agregar-tarjetas', label: 'Agregar otro Nival Pay', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
-  { id: 'compartir-paginas', label: 'Compartir y QR', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
+  { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
+  { id: 'agregar-tarjetas', label: 'Agregar tarjetas', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
+  { id: 'compartir-paginas', label: 'Comparte tus páginas', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
 ];
 
 const productItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'puntos', label: 'Nival Puntos', href: '/dashboard/points', icon: <><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></> },
   { id: 'inteligencia', label: 'Nival Intelligence', href: '/dashboard/intelligence', icon: <path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z" /> },
-  { id: 'perfil-digital', label: 'Perfil público', href: '/dashboard?section=perfil-digital', icon: <><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></> },
+  { id: 'perfil-digital', label: 'Perfil digital del negocio', href: '/dashboard?section=perfil-digital', icon: <><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></> },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
