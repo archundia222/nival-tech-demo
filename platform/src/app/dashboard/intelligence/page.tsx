@@ -22,7 +22,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const active = activeProducts.has('nival_intelligence') || business?.product_level === 'intelligence';
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="inteligencia" />
-    <div className={`dashboardContent ${!active ? "productMarketingLight" : ""}`}>
+    <div className={`dashboardContent ${!active ? "nivalIntelligenceDark" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Pay + Puntos en un solo lugar</b></div><span className="ready">{active ? 'Activo' : hasPoints ? '$449/mes' : '$399/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
