@@ -217,7 +217,7 @@ export function PaymentEditor({
               type="submit"
               disabled={pending || (!hasPendingChanges && !state.error)}
             >
-              {pending ? 'Guardando…' : hasPendingChanges || state.error ? 'Guardar cambios' : 'Guardado ✓'}
+              {pending ? 'Guardando…' : 'Guardar cambios'}
             </button>
           </div>
         </header>
@@ -356,7 +356,7 @@ export function PaymentEditor({
         ))}
 
         <div className="nivalPaySectionsAction">
-          <p className="apartadoIntro">Agrega los apartados que necesites por <strong>$${extraSectionPriceMx} MXN cada uno</strong>.</p>
+          <p className="apartadoIntro">Agrega los apartados que necesites por <strong>${extraSectionPriceMx} MXN cada uno</strong>.</p>
           {sections.length < totalSectionLimit ? (
             <button
               key="add-available-section"
