@@ -130,7 +130,7 @@ export default function Home() {
             <li>1 tarjeta NFC personalizada</li>
             <li>Página de pago configurada</li>
             <li>Código QR del negocio</li>
-            <li>3 apartados o puntos de cobro incluidos</li>
+            <li>10 apartados o puntos de cobro incluidos</li>
             <li>Datos editables sin cambiar la tarjeta</li>
           </ul>
           <Link className="landingPrimary dark" href={signupUrl}>Empezar mi configuración</Link>
@@ -145,7 +145,7 @@ export default function Home() {
           <p>Empieza con tu página, QR y tarjeta. Después agrega nuevos puntos de cobro sin cambiar de cuenta.</p>
         </div>
         <div className="payExpansionOptions">
-          <article><span>APARTADO ADICIONAL</span><strong>$49 MXN</strong><p>Un enlace o bloque adicional integrado en tu página de cobro.</p></article>
+          <article><span>APARTADO ADICIONAL</span><strong>$10 MXN</strong><p>Un enlace o bloque adicional integrado en tu página de cobro.</p></article>
           <article><span>TARJETA NFC ADICIONAL</span><strong>$99 MXN</strong><p>Una tarjeta física extra vinculada al punto de cobro que elijas.</p></article>
         </div>
       </section>
