@@ -157,7 +157,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
   const profile = profiles?.find((item) => item.id === params.profile) ?? profiles?.[0] ?? null;
   const canCreateAdditional = (profiles?.length ?? 0) < 1 + (paidExtras ?? 0);
-  if (!paidOrder) return <main className="dashboardApp">
+  if (!paidOrder) return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'add' ? 'agregar-tarjetas' : currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Sin activar</span></header>
