@@ -2254,6 +2254,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   --nv-accent-strong:#D6B66C;
   --nv-text:#F7F7F8;
   --nv-text-secondary:#B8B8C0;
+  --text-on-dark:#F7F7F8;
+  --text-on-light:#17171A;
   --nv-marketing-surface:#FFFDF9;
   --nv-marketing-text:#17171A;
   --nv-marketing-text-secondary:#5D5960;
@@ -2855,5 +2857,383 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .nivalDashboard .nivalPayPhoneViewport{
     min-height:0;
     max-height:none;
+  }
+}
+
+
+/* Round 1 contrast ownership — every surface owns its text color */
+.nivalDashboard .nivalPointsDark,
+.nivalDashboard .nivalIntelligenceDark{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar{
+  color:var(--text-on-dark);
+  border-bottom-color:var(--nv-border);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar div span,
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar div b,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar div span,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar div b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .dashboardContentTopbar .ready,
+.nivalDashboard .nivalIntelligenceDark .dashboardContentTopbar .ready{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Heroes: dark surface owns light text. */
+.nivalDashboard .nivalPointsDark .pointsShowcase,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+  border-color:var(--nv-border);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase h1,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productBenefits li,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice strong,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase h1,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productBenefits li,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productPrice strong{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>p,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productPrice span,
+.nivalDashboard .nivalPointsDark .pointsShowcase .productShowcaseCopy>small,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productShowcaseCopy>p,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productPrice span,
+.nivalDashboard .nivalIntelligenceDark .intelligenceShowcase .productShowcaseCopy>small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .productPill,
+.nivalDashboard .nivalIntelligenceDark .productPill{
+  color:var(--nv-accent-strong);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productCta,
+.nivalDashboard .nivalIntelligenceDark .productCta{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+  box-shadow:none;
+}
+
+/* Light mockups/chips own dark text, independent of page color. */
+.nivalDashboard .nivalPointsDark .walletCard,
+.nivalDashboard .nivalPointsDark .customerPhonePreview,
+.nivalDashboard .nivalPointsDark .interactiveLoyaltyCard,
+.nivalDashboard .nivalPointsDark .floatStat{
+  color:var(--text-on-light);
+}
+.nivalDashboard .nivalPointsDark .floatStat{
+  background:#FFF;
+}
+.nivalDashboard .nivalPointsDark .floatStat b{
+  color:var(--text-on-light);
+}
+.nivalDashboard .nivalPointsDark .floatStat span{
+  color:#5E5E63;
+}
+
+/* Intelligence hero mockup: dark panel owns light text. */
+.nivalDashboard .nivalIntelligenceDark .aiPanel{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop,
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop b,
+.nivalDashboard .nivalIntelligenceDark .aiInsight strong,
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .aiInsight p,
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid small{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .aiMiniGrid i{
+  color:var(--nv-success);
+}
+.nivalDashboard .nivalIntelligenceDark .aiPanelTop em,
+.nivalDashboard .nivalIntelligenceDark .aiInsight small,
+.nivalDashboard .nivalIntelligenceDark .aiInsight button{
+  color:var(--nv-accent-strong);
+}
+
+/* Benefit strips: no exposed gray gutter; cells fill the surface. */
+.nivalDashboard .nivalPointsDark .productFeatureStrip,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  margin:0 0 var(--nv-space-4);
+  padding:0;
+  overflow:hidden;
+  border:1px solid var(--nv-border);
+  border-radius:var(--nv-radius-md);
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article{
+  display:flex;
+  align-items:flex-start;
+  gap:var(--nv-space-2);
+  min-height:144px;
+  padding:var(--nv-space-3);
+  border:0;
+  border-right:1px solid var(--nv-border);
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article:last-child,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article:last-child,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article:last-child{
+  border-right:0;
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip article>span,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip article>span,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article>span{
+  flex:0 0 auto;
+  margin:0;
+  padding:0;
+  color:var(--nv-accent-strong);
+  line-height:1.45;
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip b,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip b,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .productFeatureStrip p,
+.nivalDashboard .nivalIntelligenceDark .productFeatureStrip p,
+.nivalDashboard .nivalIntelligenceDark .darkFeatureStrip p{
+  color:var(--nv-text-secondary);
+}
+
+/* Continuous dark sections own their foreground colors. */
+.nivalDashboard .nivalPointsDark .productStorySection,
+.nivalDashboard .nivalPointsDark .productSolutionsSection,
+.nivalDashboard .nivalPointsDark .productPreviewSection,
+.nivalDashboard .nivalPointsDark .productUseCases,
+.nivalDashboard .nivalPointsDark .interactiveProductDemo,
+.nivalDashboard .nivalIntelligenceDark .productStorySection,
+.nivalDashboard .nivalIntelligenceDark .productSolutionsSection,
+.nivalDashboard .nivalIntelligenceDark .productPreviewSection,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection,
+.nivalDashboard .nivalIntelligenceDark .productUseCases,
+.nivalDashboard .nivalIntelligenceDark .interactiveProductDemo{
+  color:var(--text-on-dark);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading h2,
+.nivalDashboard .nivalPointsDark .productSteps h3,
+.nivalDashboard .nivalPointsDark .solutionGrid h3,
+.nivalDashboard .nivalPointsDark .productUseCases h2,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy h2,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading h2,
+.nivalDashboard .nivalIntelligenceDark .productSteps h3,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid h3,
+.nivalDashboard .nivalIntelligenceDark .productUseCases h2,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection h2,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy h2{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading p,
+.nivalDashboard .nivalPointsDark .solutionGrid p,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>p,
+.nivalDashboard .nivalPointsDark .previewNote,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading p,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid p,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy>p,
+.nivalDashboard .nivalIntelligenceDark .previewNote{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalPointsDark .productStoryHeading>span,
+.nivalDashboard .nivalPointsDark .solutionGrid article>span,
+.nivalDashboard .nivalPointsDark .productUseCases>div>span,
+.nivalDashboard .nivalPointsDark .interactiveDemoCopy>span,
+.nivalDashboard .nivalIntelligenceDark .productStoryHeading>span,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid article>span,
+.nivalDashboard .nivalIntelligenceDark .productUseCases>div>span,
+.nivalDashboard .nivalIntelligenceDark .intelligenceConnection>div>span,
+.nivalDashboard .nivalIntelligenceDark .interactiveDemoCopy>span{
+  color:var(--nv-accent-strong);
+}
+.nivalDashboard .nivalPointsDark .productSteps article,
+.nivalDashboard .nivalPointsDark .solutionGrid article,
+.nivalDashboard .nivalIntelligenceDark .productSteps article,
+.nivalDashboard .nivalIntelligenceDark .solutionGrid article{
+  color:var(--text-on-dark);
+  background:transparent;
+  border-color:var(--nv-border);
+}
+
+/* Interactive dark controls and cards own their text. */
+.nivalDashboard .nivalIntelligenceDark .insightSelector{
+  border-color:var(--nv-border);
+}
+.nivalDashboard .nivalIntelligenceDark .insightSelector button{
+  color:var(--nv-text-secondary);
+  border-color:var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .insightSelector button:hover,
+.nivalDashboard .nivalIntelligenceDark .insightSelector button.active,
+.nivalDashboard .nivalIntelligenceDark .insightSelector button.active span{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard{
+  color:var(--text-on-dark);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard h3,
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard strong{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>p{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>button{
+  color:var(--text-on-light);
+  background:var(--nv-accent);
+}
+
+/* Real dashboard previews: dark panels own light text. */
+.nivalDashboard .nivalPointsDark .merchantPreview,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+  box-shadow:none;
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header h3,
+.nivalDashboard .nivalPointsDark .merchantMetrics strong,
+.nivalDashboard .nivalPointsDark .merchantCustomer b,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview header h3,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow strong,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow h4,
+.nivalDashboard .nivalIntelligenceDark .previewSegments h4,
+.nivalDashboard .nivalIntelligenceDark .previewSegments b{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalPointsDark .merchantPreview header small,
+.nivalDashboard .nivalPointsDark .merchantMetrics small,
+.nivalDashboard .nivalPointsDark .merchantCustomer small,
+.nivalDashboard .nivalIntelligenceDark .intelligenceDashboardPreview header>span,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow small,
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow span,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow p,
+.nivalDashboard .nivalIntelligenceDark .previewSegments span{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow article,
+.nivalDashboard .nivalIntelligenceDark .previewInsightRow>article{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalIntelligenceDark .previewMetricRow .positive{
+  color:var(--nv-success);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction b{
+  color:var(--nv-accent-strong);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction p{
+  color:var(--nv-text-secondary);
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction button{
+  color:var(--text-on-light);
+  background:var(--nv-accent);
+}
+.nivalDashboard .nivalPointsDark .merchantMetrics>div{
+  color:var(--text-on-dark);
+  background:var(--nv-surface-raised);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer{
+  color:var(--text-on-dark);
+  background:var(--nv-bg);
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer button{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Connection chips: dark chips use light text; gold result uses dark text. */
+.nivalDashboard .nivalIntelligenceDark .connectionFlow span{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:var(--nv-surface);
+}
+.nivalDashboard .nivalIntelligenceDark .connectionFlow i{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .nivalIntelligenceDark .connectionFlow strong{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+
+/* Dashboard surfaces audited in this round. */
+.nivalDashboard .dashboardHero,
+.nivalDashboard .metricGrid article,
+.nivalDashboard .chartCard,
+.nivalDashboard .paymentQrPanelRefined,
+.nivalDashboard .businessQrRefined,
+.nivalDashboard .nivalPayEditorPanel{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .dashboardHero h1,
+.nivalDashboard .metricGrid article strong,
+.nivalDashboard .chartCard h2,
+.nivalDashboard .paymentQrPanelRefined strong,
+.nivalDashboard .businessQrRefined h2,
+.nivalDashboard .nivalPayEditorPanel h2{
+  color:var(--text-on-dark);
+}
+.nivalDashboard .profileDashboardPreview{
+  color:var(--text-on-light);
+}
+
+@media(max-width:900px){
+  .nivalDashboard .nivalPointsDark .productFeatureStrip,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip{
+    grid-template-columns:1fr;
+  }
+  .nivalDashboard .nivalPointsDark .productFeatureStrip article,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip article,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article{
+    min-height:0;
+    padding:var(--nv-space-3);
+    border-right:0;
+    border-bottom:1px solid var(--nv-border);
+  }
+  .nivalDashboard .nivalPointsDark .productFeatureStrip article:last-child,
+  .nivalDashboard .nivalIntelligenceDark .productFeatureStrip article:last-child,
+  .nivalDashboard .nivalIntelligenceDark .darkFeatureStrip article:last-child{
+    border-bottom:0;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .nivalPointsDark *,
+  .nivalDashboard .nivalIntelligenceDark *{
+    scroll-behavior:auto;
   }
 }
