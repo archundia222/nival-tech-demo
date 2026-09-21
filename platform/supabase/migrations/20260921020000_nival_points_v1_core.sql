@@ -30,15 +30,22 @@ alter table public.points_ledger
 update public.points_ledger pl
 set program_id = la.program_id,
     customer_id = la.customer_id,
-    employee_user_id = coalesce(v.approved_by, rr.redeemed_by),
+    employee_user_id = coalesce(
+      (select v.approved_by from public.visits v where v.id = pl.visit_id),
+      (select rr.redeemed_by from public.reward_redemptions rr
+       where rr.loyalty_account_id = pl.loyalty_account_id
+         and rr.redeemed_at between pl.created_at - interval '2 seconds' and pl.created_at + interval '2 seconds'
+       order by rr.redeemed_at desc limit 1)
+    ),
     event_type = case when pl.delta > 0 then 'visit_award' else 'reward_redeem' end,
     occurred_at = pl.created_at,
-    redemption_id = rr.id
+    redemption_id = (
+      select rr.id from public.reward_redemptions rr
+      where rr.loyalty_account_id = pl.loyalty_account_id
+        and rr.redeemed_at between pl.created_at - interval '2 seconds' and pl.created_at + interval '2 seconds'
+      order by rr.redeemed_at desc limit 1
+    )
 from public.loyalty_accounts la
-left join public.visits v on v.id = pl.visit_id
-left join public.reward_redemptions rr
-  on rr.loyalty_account_id = pl.loyalty_account_id
- and rr.redeemed_at between pl.created_at - interval '2 seconds' and pl.created_at + interval '2 seconds'
 where la.id = pl.loyalty_account_id
   and (pl.program_id is null or pl.customer_id is null or pl.event_type is null);
 
