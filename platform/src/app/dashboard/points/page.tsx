@@ -6,6 +6,7 @@ import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
+import { reversePointForm } from '@/app/points/actions';
 
 export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
   const params = await searchParams;
@@ -97,7 +98,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
             <div className="pointsHistoryList">{ledgerRows.map((movement) => {
               const linkedCustomer = Array.isArray(movement.customers) ? movement.customers[0] : movement.customers;
-              return <article key={movement.id}><div><strong>{linkedCustomer?.name ?? 'Cliente'}</strong><span>{movement.reason}</span></div><div><b>{movement.delta > 0 ? '+' : ''}{movement.delta}</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(movement.occurred_at))}</time></div></article>;
+              return <article key={movement.id}><div><strong>{linkedCustomer?.name ?? 'Cliente'}</strong><span>{movement.reason}</span></div><div><b>{movement.delta > 0 ? '+' : ''}{movement.delta}</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(movement.occurred_at))}</time>{movement.event_type === 'visit_award' && <form action={reversePointForm}><input type="hidden" name="ledgerId" value={movement.id} /><button className="nvTertiaryButton" type="submit">Anular punto</button></form>}</div></article>;
             })}</div>}
         </section>}
       </>}
