@@ -2254,6 +2254,9 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   --nv-accent-strong:#D6B66C;
   --nv-text:#F7F7F8;
   --nv-text-secondary:#B8B8C0;
+  --nv-marketing-surface:#FFFDF9;
+  --nv-marketing-text:#17171A;
+  --nv-marketing-text-secondary:#5D5960;
   --nv-danger:#FF9696;
   --nv-success:#A9D7B5;
   --nv-space-1:8px;
@@ -2322,4 +2325,40 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 @media(prefers-reduced-motion:reduce){
   .nivalDashboard .nvPrimaryButton,
   .nivalDashboard .nvSecondaryButton{transition:none}
+}
+
+
+/* Round 1 concrete visual corrections — dashboard scoped */
+.nivalDashboard .productMarketingLight .pointsShowcase{
+  color:var(--nv-marketing-text);
+  background:var(--nv-marketing-surface);
+}
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy h1,
+.nivalDashboard .productMarketingLight .pointsShowcase .productBenefits li,
+.nivalDashboard .productMarketingLight .pointsShowcase .productPrice strong{
+  color:var(--nv-marketing-text);
+}
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy>p,
+.nivalDashboard .productMarketingLight .pointsShowcase .productPrice span,
+.nivalDashboard .productMarketingLight .pointsShowcase .productShowcaseCopy>small{
+  color:var(--nv-marketing-text-secondary);
+}
+.nivalDashboard .productMarketingLight .productCta,
+.nivalDashboard .productMarketingLight .intelligenceShowcase .productCta,
+.nivalDashboard .productMarketingLight .productUseCases .productCta{
+  color:var(--nv-bg);
+  background:var(--nv-accent);
+  border:1px solid var(--nv-accent);
+  box-shadow:none;
+}
+.nivalDashboard .productMarketingLight .productCta:hover{
+  transform:translateY(-1px);
+  background:var(--nv-accent-strong);
+}
+.nivalDashboard .productMarketingLight .productCta:focus-visible{
+  outline:2px solid var(--nv-accent-strong);
+  outline-offset:3px;
+}
+@media(prefers-reduced-motion:reduce){
+  .nivalDashboard .productMarketingLight .productCta{transition:none}
 }
