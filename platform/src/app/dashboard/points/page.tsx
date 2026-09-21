@@ -4,6 +4,8 @@ import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalPointsSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
+import { PointsEmployeeScanner } from './points-employee-scanner';
+import { PointsProgramForm } from './points-controls';
 
 export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
   const params = await searchParams;
@@ -11,7 +13,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpoints');
   const { data: membership } = await supabase.from('business_members')
-    .select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
+    .select('business_id, role, businesses(name, slug, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
@@ -19,9 +21,19 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').eq('status', 'active').maybeSingle(),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('visits').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
-    supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
+    supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
-  const active = Boolean(entitlement) || business?.product_level === 'intelligence';
+  const active = Boolean(entitlement);
+  const canManage = membership.role === 'owner' || membership.role === 'manager';
+  const [{ data: metricRows }, { data: ledgerRows }] = active && canManage ? await Promise.all([
+    supabase.rpc('get_points_dashboard_metrics'),
+    supabase.from('points_ledger')
+      .select('id,event_type,delta,reason,occurred_at,customer_id,customers(name)')
+      .eq('business_id', membership.business_id)
+      .order('occurred_at', { ascending: false })
+      .limit(20),
+  ]) : [{ data: [] }, { data: [] }];
+  const metrics = metricRows?.[0];
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
     <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
@@ -53,9 +65,41 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         </section>
         <section className="productUseCases"><div><span>IDEAL PARA</span><h2>Cafeterías, restaurantes, barberías, salones y negocios con clientes frecuentes.</h2></div><form action={startNivalPointsSubscription}><button className="productCta">Crear mi programa <span>→</span></button></form></section>
       </> : <>
-        <section className="dashboardHero"><div><p className="eyebrow">TU PROGRAMA</p><h1>{program?.name ?? 'Configura Nival Puntos'}</h1><p>{program ? `${program.points_per_visit} puntos por visita · Premio al llegar a ${program.reward_threshold} puntos.` : 'Define los puntos por visita y la recompensa de tus clientes.'}</p><a className="loginLink" href="/dashboard?section=configuracion">{program ? 'Editar programa' : 'Configurar programa'}</a></div></section>
-        <section className="metricGrid"><article><span>Clientes</span><strong>{customers ?? 0}</strong></article><article><span>Visitas</span><strong>{visits ?? 0}</strong></article><article><span>Recompensa</span><strong>{program?.reward_threshold ?? '—'} pts</strong></article></section>
-        <section className="analyticsGrid"><article className="chartCard"><h2>Clientes y canjes</h2><p>Registra visitas, revisa saldos y canjea premios.</p><a className="loginLink" href="/dashboard?section=clientes">Abrir clientes</a></article><article className="chartCard"><h2>Tarjeta y QR</h2><p>Comparte el registro público y la tarjeta virtual del programa.</p><a className="loginLink" href="/dashboard?section=configuracion">Administrar programa</a></article></section>
+        <section className="pointsV1Hero">
+          <div><p className="eyebrow">NIVAL PUNTOS V1</p><h1>{program?.name ?? 'Tu programa de puntos'}</h1><p>{program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · Máximo ${program.daily_points_cap} al día.` : 'Configura tu programa para comenzar.'}</p></div>
+          {business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro de clientes ↗</a>}
+        </section>
+
+        {canManage && <section className="pointsMetricGrid">
+          <article><span>Visitas hoy</span><strong>{metrics?.visits_today ?? 0}</strong></article>
+          <article><span>Clientes nuevos</span><strong>{metrics?.new_customers_today ?? 0}</strong></article>
+          <article><span>Regresaron</span><strong>{metrics?.returning_customers_today ?? 0}</strong></article>
+          <article><span>Premios canjeados</span><strong>{metrics?.rewards_redeemed_today ?? 0}</strong></article>
+        </section>}
+
+        <PointsEmployeeScanner />
+
+        {canManage && program && <section className="pointsAdminGrid">
+          <article className="pointsPanel">
+            <div className="pointsSectionHeading"><div><span>CONFIGURACIÓN</span><h2>Programa</h2></div><p>Los límites se validan en el servidor.</p></div>
+            <PointsProgramForm program={program} />
+          </article>
+          <article className="pointsPanel">
+            <div className="pointsSectionHeading"><div><span>COMPARTIR</span><h2>Alta de clientes</h2></div></div>
+            <p>Comparte este enlace como QR o prográmalo en una tarjeta NFC.</p>
+            {business?.slug && <code className="pointsShareUrl">{`/b/${business.slug}`}</code>}
+            <p className="pointsMuted">{customers ?? 0} clientes · {visits ?? 0} visitas históricas</p>
+          </article>
+        </section>}
+
+        {canManage && <section className="pointsHistory">
+          <div className="pointsSectionHeading"><div><span>HISTORIAL</span><h2>Movimientos recientes</h2></div><p>El ledger es inmutable; las correcciones se registran como reversas.</p></div>
+          {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
+            <div className="pointsHistoryList">{ledgerRows.map((movement) => {
+              const linkedCustomer = Array.isArray(movement.customers) ? movement.customers[0] : movement.customers;
+              return <article key={movement.id}><div><strong>{linkedCustomer?.name ?? 'Cliente'}</strong><span>{movement.reason}</span></div><div><b>{movement.delta > 0 ? '+' : ''}{movement.delta}</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(movement.occurred_at))}</time></div></article>;
+            })}</div>}
+        </section>}
       </>}
     </div>
   </main>;
