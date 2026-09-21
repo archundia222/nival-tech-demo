@@ -4,15 +4,15 @@ import { signOut } from '@/app/auth/actions';
 type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
-  { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
-  { id: 'agregar-tarjetas', label: 'Agregar o comprar', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
-  { id: 'compartir-paginas', label: 'Comparte tus páginas', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
+  { id: 'nival-pay', label: 'Editar Nival Pay', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
+  { id: 'agregar-tarjetas', label: 'Agregar otro Nival Pay', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
+  { id: 'compartir-paginas', label: 'Compartir y QR', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
 ];
 
 const productItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'puntos', label: 'Nival Puntos', href: '/dashboard/points', icon: <><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></> },
   { id: 'inteligencia', label: 'Nival Intelligence', href: '/dashboard/intelligence', icon: <path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z" /> },
-  { id: 'perfil-digital', label: 'Perfil digital del negocio', href: '/dashboard?section=perfil-digital', icon: <><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></> },
+  { id: 'perfil-digital', label: 'Perfil público', href: '/dashboard?section=perfil-digital', icon: <><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></> },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
@@ -26,12 +26,12 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
       <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>NEGOCIO ACTUAL</small><strong>{businessName}</strong></div></div>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
-        <span className="sidebarSectionLabel">Cobros y tarjetas</span>
+        <span className="sidebarSectionLabel">Cobros</span>
         <Link className={`sidebarMainProduct ${payActive ? 'active' : ''}`} href="/dashboard/pay"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></NavIcon>Nival Pay</Link>
         <div className="sidebarSubmenu" aria-label="Opciones de Nival Pay">
           {payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}
         </div>
-        <span className="sidebarSectionLabel">Más herramientas</span>
+        <span className="sidebarSectionLabel">Crecimiento</span>
         {productItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
