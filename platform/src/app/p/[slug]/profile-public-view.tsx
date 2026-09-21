@@ -60,7 +60,7 @@ export function ProfilePublicView({
           </div>}
         </header>
 
-        <section className="profileActionSection" aria-labelledby={embedded ? undefined : "profile-actions"}>
+        {actions.length > 0 && <section className="profileActionSection" aria-labelledby={embedded ? undefined : "profile-actions"}>
           {!embedded && <div className="profileSectionHeading"><span>Todo lo que necesitas</span><h2 id="profile-actions">¿Qué deseas hacer?</h2></div>}
           <div className="profileLinks">
             {actions.map((item) => <a
@@ -75,7 +75,7 @@ export function ProfilePublicView({
               <i aria-hidden="true">→</i>
             </a>)}
           </div>
-        </section>
+        </section>}
 
         {showFooter && <footer className="profileFooter"><span>Información proporcionada por el negocio</span><b>NIVAL tech</b></footer>}
       </article>
