@@ -10,7 +10,7 @@ export const NIVAL_PAY_ADDITIONAL_PRICE_CENTS = 4900;
 export const NIVAL_PAY_ADDITIONAL_PRODUCT = 'nival_pay_additional';
 
 export const NIVAL_PAY_INCLUDED_SECTIONS = 3;
-export const NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS = 4900;
+export const NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS = 1000;
 export const NIVAL_PAY_EXTRA_SECTION_PRODUCT = 'nival_pay_extra_section';
 
 export const NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS = 9900;
