@@ -7,3 +7,4 @@ export function createAdminClient() {
   if (!url || !secret) throw new Error('Supabase server credentials are not configured.');
   return createClient(url, secret, { auth: { persistSession: false, autoRefreshToken: false } });
 }
+
