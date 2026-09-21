@@ -13,6 +13,8 @@ drop policy if exists "members manage loyalty accounts" on public.loyalty_accoun
 drop policy if exists "members manage visits" on public.visits;
 drop policy if exists "members read reward redemptions" on public.reward_redemptions;
 drop policy if exists "members manage loyalty programs" on public.loyalty_programs;
+drop policy if exists "members read loyalty programs" on public.loyalty_programs;
+drop policy if exists "owners and managers manage loyalty programs" on public.loyalty_programs;
 drop policy if exists "members read points ledger" on public.points_ledger;
 
 create policy "owners managers read loyalty accounts" on public.loyalty_accounts
