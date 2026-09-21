@@ -1,0 +1,16 @@
+import { NextResponse } from "next/server";
+import { createPointsAdminClient } from "@/lib/supabase/points-admin";
+
+export async function GET() {
+  if (process.env.VERCEL_ENV === "production") return new NextResponse(null, { status: 404 });
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const projectRef = url.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1] ?? "unknown";
+  const admin = createPointsAdminClient();
+  const { data, error } = await admin.from("businesses").select("id").eq("slug", "cafe-puntos-qa").maybeSingle();
+  return NextResponse.json({
+    ok: projectRef === "wwuihvpudtsowjeaityr" && Boolean(data) && !error,
+    environment: process.env.VERCEL_ENV ?? "local",
+    projectRef,
+    testDatabaseReachable: Boolean(data) && !error,
+  }, { headers: { "Cache-Control": "no-store" } });
+}

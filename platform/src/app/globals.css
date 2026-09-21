@@ -3717,3 +3717,37 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   border-color:var(--nv-border);
   background:transparent;
 }
+
+
+/* Nival Puntos V1 — scoped */
+.nivalDashboard .pointsV1Hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:44px 0 28px}
+.nivalDashboard .pointsV1Hero h1{max-width:680px;font-size:clamp(36px,5vw,58px);line-height:1;letter-spacing:-.045em}
+.nivalDashboard .pointsV1Hero p:not(.eyebrow),.nivalDashboard .pointsMuted{color:var(--nv-text-secondary,#B8B8C0);line-height:1.55}
+.nivalDashboard .pointsMetricGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.nivalDashboard .pointsMetricGrid article{display:grid;gap:20px;padding:20px;background:var(--nv-surface,#151519);border:1px solid var(--nv-border,#303038);border-radius:14px}
+.nivalDashboard .pointsMetricGrid span{color:var(--nv-text-secondary,#B8B8C0);font-size:12px}.nivalDashboard .pointsMetricGrid strong{font-size:30px}
+.nivalDashboard .pointsScannerCard,.nivalDashboard .pointsPanel,.nivalDashboard .pointsHistory,.nivalDashboard .pointsCustomerQr{padding:24px;background:var(--nv-surface,#151519);border:1px solid var(--nv-border,#303038);border-radius:18px}
+.nivalDashboard .pointsScannerCard{margin:18px 0}.nivalDashboard .pointsSectionHeading,.nivalDashboard .pointsQrHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:20px}
+.nivalDashboard .pointsSectionHeading span,.nivalDashboard .pointsQrHeading span{color:var(--nv-accent,#C8A65A);font-size:10px;font-weight:800;letter-spacing:.14em}
+.nivalDashboard .pointsSectionHeading h2,.nivalDashboard .pointsQrHeading strong{display:block;margin:5px 0 0;font-size:24px}
+.nivalDashboard .pointsSectionHeading p{max-width:360px;margin:0;color:var(--nv-text-secondary,#B8B8C0);font-size:13px;line-height:1.5}
+.nivalDashboard .pointsScanButton{width:100%;min-height:48px}.nivalDashboard .pointsCamera{position:relative;overflow:hidden;margin-top:14px;border-radius:16px;background:#000;aspect-ratio:4/3}
+.nivalDashboard .pointsCamera video{width:100%;height:100%;object-fit:cover}.nivalDashboard .pointsCamera span{position:absolute;left:12px;right:12px;bottom:12px;padding:10px;color:#fff;background:rgba(0,0,0,.72);border-radius:9px;text-align:center;font-size:12px}
+.nivalDashboard .pointsManualScan{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:14px}.nivalDashboard .pointsManualScan input,.nivalDashboard .pointsProgramForm input{min-height:44px;padding:11px 12px;color:var(--nv-text,#F7F7F8);background:var(--nv-surface-raised,#1D1D22);border:1px solid var(--nv-border,#303038);border-radius:10px;font:inherit}
+.nivalDashboard .pointsScannedCustomer{display:grid;gap:20px}.nivalDashboard .pointsScannedCustomer h3{margin:5px 0;font-size:34px}.nivalDashboard .pointsScannedCustomer p{margin:0;color:var(--nv-text-secondary,#B8B8C0)}
+.nivalDashboard .pointsCashActions{display:flex;flex-wrap:wrap;gap:10px}.nivalDashboard .pointsCashActions button{min-height:44px}
+.nivalDashboard .pointsStatus{margin:14px 0 0;color:var(--nv-accent,#C8A65A);font-size:13px}.nivalDashboard .pointsStatusError{color:#ffaaa2}
+.nivalDashboard .pointsAdminGrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:14px;margin-top:18px}.nivalDashboard .pointsProgramForm{display:grid;gap:14px}.nivalDashboard .pointsProgramForm label{display:grid;gap:7px;color:var(--nv-text-secondary,#B8B8C0);font-size:12px;font-weight:700}
+.nivalDashboard .pointsFormGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.nivalDashboard .pointsShareUrl{display:block;margin:18px 0;padding:14px;overflow-wrap:anywhere;background:var(--nv-surface-raised,#1D1D22);border-radius:10px}
+.nivalDashboard .pointsHistory{margin-top:18px}.nivalDashboard .pointsHistoryList{display:grid}.nivalDashboard .pointsHistoryList article{display:flex;justify-content:space-between;gap:18px;padding:15px 0;border-top:1px solid var(--nv-border,#303038)}
+.nivalDashboard .pointsHistoryList article>div{display:grid;gap:5px}.nivalDashboard .pointsHistoryList article>div:last-child{text-align:right;justify-items:end}.nivalDashboard .pointsHistoryList span,.nivalDashboard .pointsHistoryList time{color:var(--nv-text-secondary,#B8B8C0);font-size:12px}
+.nivalDashboard .pointsEmptyState,.nivalDashboard .pointsErrorState{padding:24px;text-align:center;color:var(--nv-text-secondary,#B8B8C0)}
+.nivalDashboard.pointsCustomerShell{width:min(560px,calc(100% - 28px));margin:0 auto;padding:24px 0 56px;min-height:100vh}.nivalDashboard .pointsCustomerBrand{display:flex;align-items:center;gap:10px;padding-bottom:20px;color:var(--nv-text-secondary,#B8B8C0);font-size:12px}
+.nivalDashboard .pointsCustomerCard{display:grid;gap:28px;padding:26px;color:var(--nv-text,#F7F7F8);background:linear-gradient(145deg,var(--nv-surface-raised,#1D1D22),var(--nv-surface,#151519));border:1px solid var(--nv-border,#303038);border-radius:24px}
+.nivalDashboard .pointsCustomerCard h1{margin:5px 0 8px;font-size:clamp(36px,10vw,52px);line-height:1}.nivalDashboard .pointsCustomerName{color:var(--nv-text-secondary,#B8B8C0)}
+.nivalDashboard .pointsBalance{display:flex;align-items:baseline;gap:9px}.nivalDashboard .pointsBalance strong{color:var(--nv-accent,#C8A65A);font-size:64px;line-height:.9}.nivalDashboard .pointsBalance span{color:var(--nv-text-secondary,#B8B8C0)}
+.nivalDashboard .pointsProgress{height:8px;overflow:hidden;background:var(--nv-border,#303038);border-radius:99px}.nivalDashboard .pointsProgress i{display:block;height:100%;background:var(--nv-accent,#C8A65A);border-radius:inherit;transition:width .25s ease}
+.nivalDashboard .pointsReward{display:grid;gap:6px}.nivalDashboard .pointsReward span{color:var(--nv-text-secondary,#B8B8C0);font-size:11px}.nivalDashboard .pointsReward b{color:var(--nv-accent,#C8A65A);font-size:12px}
+.nivalDashboard .pointsCustomerQr{margin-top:14px}.nivalDashboard .pointsQrHeading b{color:var(--nv-accent,#C8A65A)}.nivalDashboard .pointsQrCanvas{display:grid;place-items:center;padding:18px;background:#fff;border-radius:16px}.nivalDashboard .pointsCustomerQr>p,.nivalDashboard .pointsPrivacyNote{color:var(--nv-text-secondary,#B8B8C0);font-size:12px;line-height:1.5}
+@media(max-width:760px){.nivalDashboard .pointsV1Hero{align-items:stretch;flex-direction:column}.nivalDashboard .pointsMetricGrid{grid-template-columns:repeat(2,1fr)}.nivalDashboard .pointsAdminGrid{grid-template-columns:1fr}.nivalDashboard .pointsFormGrid{grid-template-columns:1fr}.nivalDashboard .pointsSectionHeading{display:grid}.nivalDashboard .pointsCashActions{display:grid}.nivalDashboard .pointsManualScan{grid-template-columns:1fr}.nivalDashboard .pointsHistoryList article{align-items:flex-start}.nivalDashboard .pointsHistoryList article>div:last-child{min-width:96px}}
+@media(prefers-reduced-motion:reduce){.nivalDashboard .pointsProgress i{transition:none}}
