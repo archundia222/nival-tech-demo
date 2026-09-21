@@ -2314,9 +2314,14 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   min-height:44px;
   display:inline-flex;
   align-items:center;
+  padding:0;
+  border:0;
   color:var(--nv-accent-strong);
+  background:transparent;
+  font:inherit;
   font-size:var(--nv-text-sm);
   font-weight:750;
+  cursor:pointer;
 }
 .nivalDashboard .nvPrimaryButton:focus-visible,
 .nivalDashboard .nvSecondaryButton:focus-visible,
@@ -3646,4 +3651,69 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .profileDigitalWorkspace .qrNotice{
     transition:none;
   }
+}
+
+
+/* Final dashboard button-system sweep */
+/* Explicitly beat older component-specific button rules without touching global selectors. */
+.nivalDashboard .nivalPointsDark .customerPhonePreview .nvSecondaryButton{
+  width:100%;
+  min-height:44px;
+  margin-top:28px;
+  color:var(--text-on-light);
+  border:1px solid #7C756A;
+  background:transparent;
+}
+.nivalDashboard .nivalPointsDark .merchantCustomer .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .aiInsight .nvTertiaryLink{
+  min-height:44px;
+  color:var(--nv-accent-strong);
+  border:0;
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .suggestedAction .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .interactiveDemoActions .nvSecondaryButton,
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .interactiveDemoActions .nvTertiaryLink,
+.nivalDashboard .nivalPointsDark .interactiveDemoActions .nvTertiaryLink{
+  min-height:44px;
+  color:var(--nv-accent-strong);
+  border:0;
+  background:transparent;
+}
+.nivalDashboard .nivalIntelligenceDark .interactiveInsightCard>.nvSecondaryButton{
+  min-height:44px;
+  color:var(--text-on-dark);
+  border:1px solid var(--nv-border);
+  background:transparent;
+}
+.nivalDashboard .paymentShareActions .nvPrimaryButton,
+.nivalDashboard .paymentShareActions .nvSecondaryButton{
+  min-height:44px;
+  border-radius:var(--nv-radius-sm);
+}
+.nivalDashboard .paymentShareActions .nvPrimaryButton{
+  color:var(--text-on-light);
+  border-color:var(--nv-accent);
+  background:var(--nv-accent);
+}
+.nivalDashboard .paymentShareActions .nvSecondaryButton{
+  color:var(--text-on-dark);
+  border-color:var(--nv-border);
+  background:transparent;
 }
