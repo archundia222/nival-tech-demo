@@ -130,7 +130,7 @@ export default function Home() {
             <li>1 tarjeta NFC personalizada</li>
             <li>Página de pago configurada</li>
             <li>Código QR del negocio</li>
-            <li>10 apartados o puntos de cobro incluidos</li>
+            <li>Apartados opcionales por $10 MXN cada uno</li>
             <li>Datos editables sin cambiar la tarjeta</li>
           </ul>
           <Link className="landingPrimary dark" href={signupUrl}>Empezar mi configuración</Link>
@@ -142,7 +142,7 @@ export default function Home() {
         <div className="payExpansionCopy">
           <p className="landingEyebrow">CRECE CUANDO LO NECESITES</p>
           <h2 id="crece-con-pay">Un Nival Pay. Más puntos para cobrar.</h2>
-          <p>Empieza con tu página, QR y tarjeta. Después agrega nuevos puntos de cobro sin cambiar de cuenta.</p>
+          <p>Empieza con tu página, QR y tarjeta. Agrega apartados cuando los necesites por $10 MXN cada uno.</p>
         </div>
         <div className="payExpansionOptions">
           <article><span>APARTADO ADICIONAL</span><strong>$10 MXN</strong><p>Un enlace o bloque adicional integrado en tu página de cobro.</p></article>
