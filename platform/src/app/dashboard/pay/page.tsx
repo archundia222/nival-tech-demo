@@ -127,6 +127,10 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
         if (!sectionCreateError) redirect(`/dashboard/pay?view=manage&profile=${returnedProfile.id}&unlocked=1`);
         console.error('[pay] Purchased section auto-create failed', { profileId: returnedProfile.id, code: sectionCreateError.code });
       }
+      // If the paid entitlement has not landed yet, do not leave the customer
+      // on a success URL that still looks locked. The normal page remains safe
+      // and the webhook/reconciliation can finish without creating duplicates.
+      redirect(`/dashboard/pay?view=manage&profile=${returnedProfile.id}`);
     }
   }
 
