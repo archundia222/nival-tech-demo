@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
@@ -11,10 +11,12 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'puntos', label: 'Resumen', href: '/dashboard/points' },
-  { id: 'puntos-analitica', label: 'Analítica de datos', href: '/dashboard/points?view=analytics' },
-  { id: 'puntos-clientes', label: 'Clientes y puntos', href: '/dashboard/points?view=customers' },
-  { id: 'puntos-compartir', label: 'QR y enlace', href: '/dashboard/points?view=share' },
-  { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings' },
+  { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers' },
+  { id: 'puntos-analitica', label: 'Analítica', href: '/dashboard/points?view=analytics' },
+  { id: 'puntos-configuracion', label: 'Programa de lealtad', href: '/dashboard/points?view=settings' },
+  { id: 'puntos-visitas', label: 'Registro de visitas', href: '/dashboard/points?view=visits' },
+  { id: 'puntos-compartir', label: 'QR y NFC', href: '/dashboard/points?view=share' },
+  { id: 'puntos-canjes', label: 'Canjes', href: '/dashboard/points?view=redemptions' },
 ];
 
 const productItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
