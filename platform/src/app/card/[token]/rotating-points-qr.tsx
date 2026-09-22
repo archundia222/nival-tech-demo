@@ -7,10 +7,11 @@ import { issueCustomerScanToken } from "@/app/points/actions";
 export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
   const [raw, setRaw] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
+  const [shortCode, setShortCode] = useState("");
   const [error, setError] = useState("");
   const [remaining, setRemaining] = useState(0);
 
-  const manualCode = raw;
+
 
   const refresh = useCallback(async () => {
     const result = await issueCustomerScanToken(accountToken);
@@ -19,6 +20,7 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
       return;
     }
     setRaw(result.raw);
+    setShortCode(result.shortCode ?? "");
     setExpiresAt(result.expiresAt);
     setError("");
   }, [accountToken]);
@@ -42,7 +44,7 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
         <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
-        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{manualCode}</strong><small>También puedes mostrar o copiar este código en caja.</small></div>
+        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{shortCode}</strong><small>Díctalo o muéstralo en caja si no pueden escanear el QR.</small></div>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
     <p>El QR y el código cambian automáticamente y solo pueden usarse una vez.</p>
