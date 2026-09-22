@@ -16,7 +16,7 @@ type BarcodeDetectorLike = {
   detect(source: HTMLVideoElement): Promise<Array<{ rawValue: string }>>;
 };
 
-export function PointsEmployeeScanner() {
+export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "redeem" }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [manual, setManual] = useState("");
@@ -81,7 +81,7 @@ export function PointsEmployeeScanner() {
   }
 
   return <section className="pointsScannerCard">
-    <div className="pointsSectionHeading"><div><span>CAJA</span><h2>Escanear cliente</h2></div><p>El QR dura 45 segundos y solo puede reclamarse una vez.</p></div>
+    <div className="pointsSectionHeading"><div><span>{mode === "redeem" ? "CANJES" : "VISITAS"}</span><h2>{mode === "redeem" ? "Canjear recompensa" : "Registrar visita"}</h2></div><p>Escanea el QR temporal del cliente para {mode === "redeem" ? "validar y entregar su recompensa" : "registrar su visita y sumar el punto correspondiente"}.</p></div>
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>
       {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><span>Centra el QR dentro del recuadro</span></div>}
@@ -90,8 +90,7 @@ export function PointsEmployeeScanner() {
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.reward_description}</p></div>
       <div className="pointsCashActions">
-        <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Sumar punto</button>
-        <button className="nvSecondaryButton" disabled={pending || customer.points_balance < customer.reward_threshold} type="button" onClick={redeem}>Canjear premio</button>
+        {mode === "visit" ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Registrar visita</button> : <button className="nvPrimaryButton" disabled={pending || customer.points_balance < customer.reward_threshold} type="button" onClick={redeem}>Canjear recompensa</button>}
         <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); }}>Otro cliente</button>
       </div>
     </div>}
