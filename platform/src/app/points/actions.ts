@@ -58,13 +58,15 @@ export async function getPublicLoyaltyCard(token: string) {
 export async function issueCustomerScanToken(token: string) {
   await enforceRate("scan_token", 12, 60);
   const raw = crypto.randomBytes(32).toString("base64url");
+  const shortCode = crypto.randomBytes(4).toString("hex").slice(0, 6).toUpperCase();
   const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("issue_customer_scan_token", {
     p_account_token: token,
     p_raw_token: raw,
+    p_short_code: shortCode,
   });
   if (error || !data?.[0]) return { ok: false, error: error?.message ?? "No pudimos generar el QR." };
-  return { ok: true, raw, expiresAt: data[0].expires_at as string };
+  return { ok: true, raw, shortCode, expiresAt: data[0].expires_at as string };
 }
 
 export async function claimScanToken(raw: string) {
