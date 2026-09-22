@@ -14,7 +14,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
 
 
   const refresh = useCallback(async () => {
-    const result = await issueCustomerScanToken(accountToken);
+    const result = await issueCustomerScanToken(accountToken, purpose);
     if (!result.ok || !result.raw || !result.expiresAt) {
       setError(result.error ?? "No pudimos generar el QR.");
       return;
@@ -23,7 +23,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
     setShortCode(result.shortCode ?? "");
     setExpiresAt(result.expiresAt);
     setError("");
-  }, [accountToken]);
+  }, [accountToken, purpose]);
 
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -43,7 +43,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
     <div className="pointsQrHeading"><div><span>{purpose === "redeem" ? "CÓDIGO PARA CANJEAR" : "CÓDIGO PARA SUMAR PUNTOS"}</span><strong>{purpose === "redeem" ? "Canjea tu recompensa" : "Suma tus puntos"}</strong><small>{purpose === "redeem" ? "Muéstralo al personal para validar y confirmar tu canje." : "Muéstralo al personal después de tu compra o visita."}</small></div><b>{remaining}s</b></div>
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
-        <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
+        <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${purpose}:${raw}`} size={220} level="M" /></div>
         <div className="pointsManualCode"><span>{purpose === "redeem" ? "CÓDIGO TEMPORAL DE CANJE" : "CÓDIGO TEMPORAL"}</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
