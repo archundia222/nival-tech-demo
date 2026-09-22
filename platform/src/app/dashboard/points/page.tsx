@@ -8,7 +8,7 @@ import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
 import { reversePointForm } from '@/app/points/actions';
 
-export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string }> }) {
+export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string }> }) {
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -25,6 +25,8 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const active = Boolean(entitlement);
+  const view = params.view ?? 'overview';
+  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
   const [{ data: metricRows }, { data: ledgerRows }] = active && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics'),
@@ -36,7 +38,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   ]) : [{ data: [] }, { data: [] }];
   const metrics = metricRows?.[0];
   return <main className="dashboardApp nivalDashboard">
-    <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="puntos" />
+    <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
@@ -67,33 +69,37 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         <section className="productUseCases"><div><span>IDEAL PARA</span><h2>Cafeterías, restaurantes, barberías, salones y negocios con clientes frecuentes.</h2></div><form action={startNivalPointsSubscription}><button className="productCta">Crear mi programa <span>→</span></button></form></section>
       </> : <>
         <section className="pointsV1Hero">
+          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Analítica de datos' : view === 'customers' ? 'Clientes y puntos' : view === 'share' ? 'QR y enlace' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Entiende visitas, clientes nuevos, recurrencia y recompensas.' : view === 'customers' ? 'Consulta la actividad de tus clientes y sus puntos.' : view === 'share' ? 'Comparte el registro de tu programa por enlace, QR o NFC.' : view === 'settings' ? 'Define las reglas y recompensa de tu programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · Máximo ${program.daily_points_cap} al día.` : 'Configura tu programa para comenzar.')}</p></div>
+          {view === 'share' && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro ↗</a>}
+        </section>
+        {view === 'overview' && <section className="pointsV1Hero pointsOverviewIntro">
           <div><p className="eyebrow">NIVAL PUNTOS V1</p><h1>{program?.name ?? 'Tu programa de puntos'}</h1><p>{program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · Máximo ${program.daily_points_cap} al día.` : 'Configura tu programa para comenzar.'}</p></div>
           {business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro de clientes ↗</a>}
-        </section>
+        </section>}
 
-        {canManage && <section className="pointsMetricGrid">
+        {canManage && (view === 'overview' || view === 'analytics') && <section className="pointsMetricGrid">
           <article><span>Visitas hoy</span><strong>{metrics?.visits_today ?? 0}</strong></article>
           <article><span>Clientes nuevos</span><strong>{metrics?.new_customers_today ?? 0}</strong></article>
           <article><span>Regresaron</span><strong>{metrics?.returning_customers_today ?? 0}</strong></article>
           <article><span>Premios canjeados</span><strong>{metrics?.rewards_redeemed_today ?? 0}</strong></article>
         </section>}
 
-        <PointsEmployeeScanner />
+        {(view === 'overview' || view === 'customers') && <PointsEmployeeScanner />}
 
-        {canManage && program && <section className="pointsAdminGrid">
-          <article className="pointsPanel">
+        {canManage && program && (view === 'settings' || view === 'share') && <section className="pointsAdminGrid">
+          {view === 'settings' && <article className="pointsPanel">
             <div className="pointsSectionHeading"><div><span>CONFIGURACIÓN</span><h2>Programa</h2></div><p>Los límites se validan en el servidor.</p></div>
             <PointsProgramForm program={program} />
-          </article>
-          <article className="pointsPanel">
+          </article>}
+          {view === 'share' && <article className="pointsPanel">
             <div className="pointsSectionHeading"><div><span>COMPARTIR</span><h2>Alta de clientes</h2></div></div>
             <p>Comparte este enlace como QR o prográmalo en una tarjeta NFC.</p>
             {business?.slug && <code className="pointsShareUrl">{`/b/${business.slug}`}</code>}
             <p className="pointsMuted">{customers ?? 0} clientes · {visits ?? 0} visitas históricas</p>
-          </article>
+          </article>}
         </section>}
 
-        {canManage && <section className="pointsHistory">
+        {canManage && (view === 'overview' || view === 'analytics' || view === 'customers') && <section className="pointsHistory">
           <div className="pointsSectionHeading"><div><span>HISTORIAL</span><h2>Movimientos recientes</h2></div><p>El ledger es inmutable; las correcciones se registran como reversas.</p></div>
           {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
             <div className="pointsHistoryList">{ledgerRows.map((movement) => {
