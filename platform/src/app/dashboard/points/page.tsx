@@ -7,6 +7,7 @@ import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
 import { reversePointForm } from '@/app/points/actions';
+import { PointsShareTools } from './points-share-tools';
 
 export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string }> }) {
   const params = await searchParams;
@@ -85,6 +86,8 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         </section>}
 
         {(view === 'overview' || view === 'customers') && <PointsEmployeeScanner />}
+
+        {view === 'share' && business?.slug && <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
         {canManage && program && (view === 'settings' || view === 'share') && <section className="pointsAdminGrid">
           {view === 'settings' && <article className="pointsPanel">
