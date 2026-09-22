@@ -47,6 +47,13 @@ export async function enrollPointsCustomer(formData: FormData) {
   return { ok: true, token: data[0].account_token as string };
 }
 
+export async function getPublicLoyaltyRewards(token: string) {
+  const admin = createPointsAdminClient();
+  const { data, error } = await admin.rpc("get_public_loyalty_rewards", { p_account_token: token });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getPublicLoyaltyCard(token: string) {
   await enforceRate("card", 60, 60);
   const admin = createPointsAdminClient();
@@ -94,7 +101,7 @@ export async function redeemPointReward(scanSessionId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("redeem_reward", { p_scan_session_id: scanSessionId });
   if (error) {
-    const message = error.message.includes("insufficient") ? "El cliente todavía no tiene puntos suficientes."
+    const message = error.message.includes("no_available_reward") ? "Este cliente no tiene recompensas disponibles."
       : error.message.includes("already_redeemed") ? "Este premio ya fue canjeado."
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
