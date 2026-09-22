@@ -8,6 +8,7 @@ import { InvitationLink } from "./invitation-link";
 import { BusinessOnboardingForm } from "./business-onboarding-form";
 import { DashboardNavigation } from "./dashboard-navigation";
 import { ProfilePublicView, type ProfileActionItem } from "@/app/p/[slug]/profile-public-view";
+import { BusinessHealthCard } from "./business-health-card";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
@@ -184,6 +185,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
     ...(smartLinks?.some((link) => link.kind === "custom" && link.active) ? [{ key: "links", label: "Más enlaces", description: "Redes, menú y otros accesos", href: `/p/${business.slug}`, icon: "+" }] : []),
   ] : [];
+  const businessHealthItems = [
+    { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },
+    { label: "Perfil del negocio", complete: Boolean(business?.description && business?.phone && business?.logo_url), href: "/dashboard?section=perfil-digital", action: "Agrega descripción, teléfono y logotipo" },
+    { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=nival-card", action: "Conecta tu enlace de reseñas" },
+    { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
+  ];
 
   return (
     <main className="dashboardApp">
@@ -199,6 +206,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Abrir Nival Pay" : "Activar Nival Pay"}</a>
         </div>
       </section>
+      <BusinessHealthCard items={businessHealthItems} />
       <section className="metricGrid">
         <article><span>Nival Pay</span><strong>{hasNivalPay ? "Activo" : "Sin activar"}</strong></article>
         {hasIntelligence && <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>}
