@@ -175,37 +175,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   ];
   const maxSegmentValue = Math.max(...segmentMetrics.map((segment) => segment.value), 1);
   const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
+  const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
-    ...(paymentProfile ? [{
-      key: `payment-${paymentProfile.public_token}`,
-      label: "Pago",
-      description: "Datos para transferencia",
-      href: `/pay/${paymentProfile.public_token}`,
-      icon: "＄",
-      featured: true,
-    }] : []),
-    ...(hasPoints ? [{
-      key: "loyalty",
-      label: "Lealtad",
-      description: "Puntos y recompensas",
-      href: `/b/${business.slug}`,
-      icon: "★",
-    }] : []),
-    ...(business.website_url ? [{
-      key: "website",
-      label: "Sitio web",
-      description: "Abrir tu página",
-      href: business.website_url,
-      icon: "↗",
-      external: true,
-    }] : []),
-    ...(smartLinks?.length ? [{
-      key: "links",
-      label: "Enlaces",
-      description: `${smartLinks.length} accesos activos`,
-      href: `/p/${business.slug}`,
-      icon: "↗",
-    }] : []),
+    ...(paymentProfile ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pago", description: "Datos para transferencia", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
+    ...(hasPoints ? [{ key: "loyalty", label: "Lealtad", description: "Puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
+    ...(business.phone ? [{ key: "contact", label: "Contacto", description: "Llamar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
+    ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
+    ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
+    ...(smartLinks?.some((link) => link.kind === "custom" && link.active) ? [{ key: "links", label: "Más enlaces", description: "Redes, menú y otros accesos", href: `/p/${business.slug}`, icon: "+" }] : []),
   ] : [];
 
   return (
