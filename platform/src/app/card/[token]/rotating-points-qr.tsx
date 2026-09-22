@@ -10,7 +10,7 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
   const [error, setError] = useState("");
   const [remaining, setRemaining] = useState(0);
 
-  const manualCode = raw ? raw.slice(0, 8).toUpperCase() : "";
+  const manualCode = raw;
 
   const refresh = useCallback(async () => {
     const result = await issueCustomerScanToken(accountToken);
@@ -42,7 +42,7 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
         <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
-        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong>{manualCode}</strong><small>También puedes mostrar este código en caja.</small></div>
+        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{manualCode}</strong><small>También puedes mostrar o copiar este código en caja.</small></div>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
     <p>El QR y el código cambian automáticamente y solo pueden usarse una vez.</p>
