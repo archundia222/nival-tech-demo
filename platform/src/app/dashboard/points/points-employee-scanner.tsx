@@ -30,9 +30,10 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
   const [confirmRedeem, setConfirmRedeem] = useState(false);
 
   async function claim(value: string) {
-    const raw = value.trim().replace(/^nivalpoints:/, "");
+    const cleaned = value.trim().replace(/^nivalpoints:/, "");
+    const raw = cleaned.replace(/^(visit|redeem):/, "");
     if (!raw || pending) return;
-    const result = await claimScanToken(raw);
+    const result = await claimScanToken(raw, mode);
     if (!result.ok || !result.customer) {
       setCustomer(null); setMessage(result.error ?? "QR expirado."); return;
     }
