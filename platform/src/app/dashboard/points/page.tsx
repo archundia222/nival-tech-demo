@@ -27,7 +27,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   ]);
   const active = Boolean(entitlement);
   const view = params.view ?? 'overview';
-  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
+  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
   const [{ data: metricRows }, { data: ledgerRows }] = active && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics'),
@@ -70,7 +70,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         <section className="productUseCases"><div><span>IDEAL PARA</span><h2>Cafeterías, restaurantes, barberías, salones y negocios con clientes frecuentes.</h2></div><form action={startNivalPointsSubscription}><button className="productCta">Crear mi programa <span>→</span></button></form></section>
       </> : <>
         <section className="pointsV1Hero">
-          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Analítica de datos' : view === 'customers' ? 'Clientes y puntos' : view === 'share' ? 'QR y enlace' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Entiende visitas, clientes nuevos, recurrencia y recompensas.' : view === 'customers' ? 'Consulta la actividad de tus clientes y sus puntos.' : view === 'share' ? 'Comparte el registro de tu programa por enlace, QR o NFC.' : view === 'settings' ? 'Define las reglas y recompensa de tu programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · Máximo ${program.daily_points_cap} al día.` : 'Configura tu programa para comenzar.')}</p></div>
+          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Analítica de datos' : view === 'customers' ? 'Clientes' : view === 'visits' ? 'Registro de visitas' : view === 'redemptions' ? 'Canjes' : view === 'share' ? 'QR y NFC' : view === 'settings' ? 'Programa de lealtad' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Entiende visitas, clientes nuevos, recurrencia y recompensas.' : view === 'customers' ? 'Consulta cada cliente, su saldo y su historial de actividad.' : view === 'visits' ? 'Identifica al cliente y registra una nueva visita.' : view === 'redemptions' ? 'Valida el saldo del cliente y registra la entrega de su recompensa.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · Máximo ${program.daily_points_cap} al día.` : 'Configura tu programa para comenzar.')}</p></div>
           {view === 'share' && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro ↗</a>}
         </section>
         {view === 'overview' && <section className="pointsV1Hero pointsOverviewIntro">
@@ -85,7 +85,9 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           <article><span>Premios canjeados</span><strong>{metrics?.rewards_redeemed_today ?? 0}</strong></article>
         </section>}
 
-        {(view === 'overview' || view === 'customers') && <PointsEmployeeScanner />}
+        {view === 'visits' && <PointsEmployeeScanner mode="visit" />}
+
+        {view === 'redemptions' && <PointsEmployeeScanner mode="redeem" />}
 
         {view === 'share' && business?.slug && <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
@@ -102,7 +104,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           </article>}
         </section>}
 
-        {canManage && (view === 'overview' || view === 'analytics' || view === 'customers') && <section className="pointsHistory">
+        {canManage && (view === 'overview' || view === 'customers') && <section className="pointsHistory">
           <div className="pointsSectionHeading"><div><span>HISTORIAL</span><h2>Movimientos recientes</h2></div><p>El ledger es inmutable; las correcciones se registran como reversas.</p></div>
           {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
             <div className="pointsHistoryList">{ledgerRows.map((movement) => {
