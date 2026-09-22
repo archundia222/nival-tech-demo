@@ -13,7 +13,7 @@ export function PointsProgramForm({ program }: { program: { name: string; reward
     <label>Nombre del programa<input name="name" defaultValue={program.name} required minLength={2} maxLength={80} /></label>
     <div className="pointsFormGrid">
       <label>Meta de puntos<input name="threshold" type="number" min={1} max={1000} defaultValue={program.reward_threshold} required /></label>
-      <label>Tope diario<input name="dailyCap" type="number" min={1} max={100} defaultValue={program.daily_points_cap} required /></label>
+      <label>Tope diario<select name="dailyCap" defaultValue={String(program.daily_points_cap)}><option value="0">Sin tope</option>{Array.from({ length: 20 }, (_, index) => index + 1).map((value) => <option key={value} value={value}>{value} {value === 1 ? "punto" : "puntos"} al día</option>)}</select><small>“Sin tope” permite registrar puntos sin límite diario.</small></label>
       <label>Espera entre puntos (min)<input name="cooldown" type="number" min={0} max={1440} defaultValue={program.point_cooldown_minutes} required /></label>
     </div>
     <label>Premio<input name="reward" defaultValue={program.reward_description} required minLength={2} maxLength={160} /></label>
