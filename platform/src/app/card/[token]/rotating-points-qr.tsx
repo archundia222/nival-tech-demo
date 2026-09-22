@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { issueCustomerScanToken } from "@/app/points/actions";
 
-export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
+export function RotatingPointsQr({ accountToken, purpose = "points" }: { accountToken: string; purpose?: "points" | "redeem" }) {
   const [raw, setRaw] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [shortCode, setShortCode] = useState("");
@@ -40,13 +40,13 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
   }, [expiresAt, refresh]);
 
   return <section className="pointsCustomerQr" aria-live="polite">
-    <div className="pointsQrHeading"><div><span>TU CÓDIGO TEMPORAL</span><strong>Muéstralo en caja</strong><small>Sirve para sumar puntos o canjear una recompensa.</small></div><b>{remaining}s</b></div>
+    <div className="pointsQrHeading"><div><span>{purpose === "redeem" ? "CÓDIGO PARA CANJEAR" : "CÓDIGO PARA SUMAR PUNTOS"}</span><strong>{purpose === "redeem" ? "Canjea tu recompensa" : "Suma tus puntos"}</strong><small>{purpose === "redeem" ? "Muéstralo al personal para validar y confirmar tu canje." : "Muéstralo al personal después de tu compra o visita."}</small></div><b>{remaining}s</b></div>
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
         <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
-        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
+        <div className="pointsManualCode"><span>{purpose === "redeem" ? "CÓDIGO TEMPORAL DE CANJE" : "CÓDIGO TEMPORAL"}</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
-    <p>Por seguridad, el QR y el código cambian automáticamente. El personal elegirá si registra tu visita o confirma un canje.</p>
+    <p>Por seguridad, este QR y código cambian automáticamente y son de un solo uso.</p>
   </section>;
 }
