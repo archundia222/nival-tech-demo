@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { QRCodeSVG } from "qrcode.react";
 import { awardPoint, claimScanToken, redeemPointReward } from "@/app/points/actions";
 
 type ScanCustomer = {
@@ -23,6 +24,8 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
   const [customer, setCustomer] = useState<ScanCustomer | null>(null);
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
+  const [reviewUrl, setReviewUrl] = useState("");
+  const [reviewPrompt, setReviewPrompt] = useState(false);
 
   async function claim(value: string) {
     const raw = value.trim().replace(/^nivalpoints:/, "");
@@ -66,6 +69,8 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
       const result = await awardPoint(customer.scan_session_id);
       if (!result.ok) { setMessage(result.error ?? "No pudimos sumar el punto."); return; }
       setCustomer({ ...customer, points_balance: result.result?.new_points_balance ?? customer.points_balance + 1 });
+      setReviewPrompt(Boolean(result.result?.review_prompt));
+      setReviewUrl(result.result?.review_url ?? "");
       setMessage("Punto registrado.");
     });
   }
@@ -91,9 +96,15 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.reward_description}</p></div>
       <div className="pointsCashActions">
         {mode === "visit" ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Registrar visita</button> : <button className="nvPrimaryButton" disabled={pending || customer.points_balance < customer.reward_threshold} type="button" onClick={redeem}>Canjear recompensa</button>}
-        <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); }}>Otro cliente</button>
+        <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); }}>Otro cliente</button>
       </div>
     </div>}
     {message && <p className={message.includes("registrado") || message.includes("canjeado") ? "pointsStatus" : "pointsStatus pointsStatusError"}>{message}</p>}
+    {mode === "visit" && message === "Punto registrado." && reviewPrompt && reviewUrl && <div className="pointsReviewPrompt">
+      <div><span>RESEÑA RECOMENDADA</span><h3>Este es un buen momento para pedir una reseña</h3><p>Pídele al cliente, sin condicionar su opinión, que comparta su experiencia. Puede escanear este QR o usar tu tarjeta NFC de Nival Reseñas.</p></div>
+      <div className="pointsQrCanvas"><QRCodeSVG value={reviewUrl} size={180} level="M" /></div>
+      <a className="nvSecondaryButton" href={reviewUrl} target="_blank" rel="noreferrer">Abrir enlace de reseña ↗</a>
+    </div>}
+    {mode === "visit" && message === "Punto registrado." && <button className="nvPrimaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); }}>Regresar al registro de visitas</button>}
   </section>;
 }
