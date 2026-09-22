@@ -105,7 +105,7 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
         <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setConfirmRedeem(false); }}>Otro cliente</button>
       </div>
     </div>}
-    {message && <p className={message.includes("registrado") || message.includes("canjeado") ? "pointsStatus" : "pointsStatus pointsStatusError"}>{message}</p>}
+    {message && <p className={message.includes("registrado") || message.includes("canjeado") || message.includes("Canje confirmado") ? "pointsStatus" : "pointsStatus pointsStatusError"}>{message}</p>}
     {mode === "visit" && message === "Punto registrado." && reviewPrompt && reviewUrl && <div className="pointsReviewPrompt">
       <div><span>RESEÑA RECOMENDADA</span><h3>Este es un buen momento para pedir una reseña</h3><p>Pídele al cliente, sin condicionar su opinión, que comparta su experiencia. Puede escanear este QR o usar tu tarjeta NFC de Nival Reseñas.</p></div>
       <div className="pointsQrCanvas"><QRCodeSVG value={reviewUrl} size={180} level="M" /></div>
