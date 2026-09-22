@@ -29,14 +29,19 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const view = params.view ?? 'overview';
   const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
-  const [{ data: metricRows }, { data: ledgerRows }] = active && canManage ? await Promise.all([
+  const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }] = active && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics'),
     supabase.from('points_ledger')
       .select('id,event_type,delta,reason,occurred_at,customer_id,customers(name)')
       .eq('business_id', membership.business_id)
       .order('occurred_at', { ascending: false })
       .limit(20),
-  ]) : [{ data: [] }, { data: [] }];
+    supabase.from('customers')
+      .select('id,name,phone,email,origin,created_at,loyalty_accounts(points_balance)')
+      .eq('business_id', membership.business_id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+  ]) : [{ data: [] }, { data: [] }, { data: [] }];
   const metrics = metricRows?.[0];
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
@@ -104,7 +109,16 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           </article>}
         </section>}
 
-        {canManage && (view === 'overview' || view === 'customers') && <section className="pointsHistory">
+        {canManage && view === 'customers' && <section className="pointsHistory">
+          <div className="pointsSectionHeading"><div><span>CLIENTES</span><h2>Clientes registrados</h2></div><p>{customerRows?.length ?? 0} registros recientes del programa.</p></div>
+          {!customerRows?.length ? <div className="pointsEmptyState">Todavía no hay clientes registrados.</div> :
+            <div className="pointsHistoryList">{customerRows.map((customer) => {
+              const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts;
+              return <article key={customer.id}><div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email ?? 'Sin contacto'} · {customer.origin?.toUpperCase() ?? 'REGISTRO'}</span></div><div><b>{account?.points_balance ?? 0} pts</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></div></article>;
+            })}</div>}
+        </section>}
+
+        {canManage && view === 'overview' && <section className="pointsHistory">
           <div className="pointsSectionHeading"><div><span>HISTORIAL</span><h2>Movimientos recientes</h2></div><p>El ledger es inmutable; las correcciones se registran como reversas.</p></div>
           {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
             <div className="pointsHistoryList">{ledgerRows.map((movement) => {
