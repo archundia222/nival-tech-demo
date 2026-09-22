@@ -44,7 +44,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('visits').select('customer_id,visited_at').eq('business_id', membership.business_id).order('visited_at',{ascending:false}).limit(2000),
     supabase.from('loyalty_rewards').select('customer_id,description,earned_at,redeemed_at').eq('business_id', membership.business_id).order('earned_at',{ascending:false}).limit(1000),
   ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
-  const metrics = metricRows?.[0];
+  const metrics = metricRows?.[0]; // deployment sync
   const nowMs=Date.now(), dayMs=86400000;
   const customerInsights=new Map((customerRows??[]).map(customer=>{const cv=(visitRows??[]).filter(v=>v.customer_id===customer.id);const cr=(rewardRows??[]).filter(r=>r.customer_id===customer.id);const last=cv[0]?.visited_at?new Date(cv[0].visited_at).getTime():null;const first=cv.length?new Date(cv[cv.length-1].visited_at).getTime():null;const avg=cv.length>1&&first&&last?Math.round((last-first)/dayMs/(cv.length-1)):null;return [customer.id,{visits30:cv.filter(v=>nowMs-new Date(v.visited_at).getTime()<=30*dayMs).length,totalVisits:cv.length,lastVisit:last?new Date(last):null,avgDays:avg,rewardsAvailable:cr.filter(x=>!x.redeemed_at).length,rewardsRedeemed:cr.filter(x=>x.redeemed_at).length,lastReward:cr.find(x=>x.redeemed_at)?.description??null}]}));
   return <main className="dashboardApp nivalDashboard">
