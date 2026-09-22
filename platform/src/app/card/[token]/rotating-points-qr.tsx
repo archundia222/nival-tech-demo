@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { issueCustomerScanToken } from "@/app/points/actions";
 
-export function RotatingPointsQr({ accountToken, purpose = "points" }: { accountToken: string; purpose?: "points" | "redeem" }) {
+export function RotatingPointsQr({ accountToken, purpose = "points", rewardId }: { accountToken: string; purpose?: "points" | "redeem"; rewardId?: string }) {
   const [raw, setRaw] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [shortCode, setShortCode] = useState("");
@@ -14,7 +14,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
 
 
   const refresh = useCallback(async () => {
-    const result = await issueCustomerScanToken(accountToken, purpose === "points" ? "visit" : "redeem");
+    const result = await issueCustomerScanToken(accountToken, purpose === "points" ? "visit" : "redeem", rewardId);
     if (!result.ok || !result.raw || !result.expiresAt) {
       setError(result.error ?? "No pudimos generar el QR.");
       return;
@@ -23,7 +23,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
     setShortCode(result.shortCode ?? "");
     setExpiresAt(result.expiresAt);
     setError("");
-  }, [accountToken, purpose]);
+  }, [accountToken, purpose, rewardId]);
 
   useEffect(() => { void refresh(); }, [refresh]);
 
@@ -43,7 +43,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
     <div className="pointsQrHeading"><div><span>{purpose === "redeem" ? "CÓDIGO PARA CANJEAR" : "CÓDIGO PARA SUMAR PUNTOS"}</span><strong>{purpose === "redeem" ? "Canjea tu recompensa" : "Suma tus puntos"}</strong><small>{purpose === "redeem" ? "Muéstralo al personal para validar y confirmar tu canje." : "Muéstralo al personal después de tu compra o visita."}</small></div><b>{remaining}s</b></div>
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
-        <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${purpose}:${raw}`} size={220} level="M" /></div>
+        <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${purpose === "points" ? "visit" : "redeem"}:${raw}`} size={220} level="M" /></div>
         <div className="pointsManualCode"><span>{purpose === "redeem" ? "CÓDIGO TEMPORAL DE CANJE" : "CÓDIGO TEMPORAL"}</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
