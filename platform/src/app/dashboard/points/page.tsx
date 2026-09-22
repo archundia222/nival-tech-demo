@@ -102,16 +102,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
 
         {view === 'share' && business?.slug && <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
-        {canManage && program && (view === 'settings' || view === 'share') && <section className="pointsAdminGrid">
+        {canManage && program && view === 'settings' && <section className="pointsAdminGrid">
           {view === 'settings' && <article className="pointsPanel">
             <div className="pointsSectionHeading"><div><span>CONFIGURACIÓN</span><h2>Programa</h2></div><p>Los límites se validan en el servidor.</p></div>
             <PointsProgramForm program={program} />
-          </article>}
-          {view === 'share' && <article className="pointsPanel">
-            <div className="pointsSectionHeading"><div><span>COMPARTIR</span><h2>Alta de clientes</h2></div></div>
-            <p>Comparte este enlace como QR o prográmalo en una tarjeta NFC.</p>
-            {business?.slug && <code className="pointsShareUrl">{`/b/${business.slug}`}</code>}
-            <p className="pointsMuted">{customers ?? 0} clientes · {visits ?? 0} visitas históricas</p>
           </article>}
         </section>}
 
