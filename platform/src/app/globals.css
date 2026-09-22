@@ -4013,3 +4013,16 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nivalDashboard .pointsManualCode{display:grid;justify-items:center;gap:5px;margin-top:15px;padding:13px;background:#f6f7f8;border-radius:13px}.nivalDashboard .pointsManualCode>span{color:#777d86;font-size:9px;font-weight:800;letter-spacing:.12em}.nivalDashboard .pointsManualCodeValue{color:#17191c;font-size:25px;letter-spacing:.14em;font-variant-numeric:tabular-nums}.nivalDashboard .pointsManualCode small{color:#777d86;font-size:10px;text-align:center}
 .nivalDashboard .pointsCustomerQr>p,.nivalDashboard .pointsPrivacyNote{color:#777d86;font-size:10px;line-height:1.5;text-align:center}.nivalDashboard .pointsPrivacyNote{margin:16px 10px 0}
 @media(max-width:540px){.nivalDashboard.pointsCustomerShell{padding:0 12px 36px}.nivalDashboard .pointsCustomerCard{padding:21px;border-radius:24px}.nivalDashboard .pointsCustomerMemberBadge{display:none}.nivalDashboard .pointsCustomerGreeting{align-items:flex-start;flex-direction:column;gap:4px}.nivalDashboard .pointsCustomerGreeting small{order:-1;padding-top:15px}.nivalDashboard .pointsReward{align-items:flex-start;flex-direction:column;gap:11px}.nivalDashboard .pointsCustomerQr{padding:17px}}
+
+
+/* Reward redemption clarity + premium temporary code */
+.nivalDashboard .pointsManualCode{position:relative;margin:16px auto 0;padding:18px 20px;overflow:hidden;background:linear-gradient(135deg,#f4e5bb 0%,#c8a65a 55%,#ad8a3f 100%);border:1px solid #a78338;border-radius:18px;box-shadow:0 10px 26px rgba(160,125,48,.18)}
+.nivalDashboard .pointsManualCode::after{content:"";position:absolute;inset:1px;border:1px solid rgba(255,255,255,.35);border-radius:16px;pointer-events:none}
+.nivalDashboard .pointsManualCode>span{position:relative;z-index:1;color:#54431e;font-size:9px;font-weight:900;letter-spacing:.16em}
+.nivalDashboard .pointsManualCodeValue{position:relative;z-index:1;color:#17140d;font-size:30px;font-weight:900;letter-spacing:.18em;text-shadow:0 1px rgba(255,255,255,.25)}
+.nivalDashboard .pointsManualHint{display:block;margin:7px auto 0;color:#777d86;font-size:9px;line-height:1.4;text-align:center}
+.nivalDashboard .pointsRewardAvailable{padding:16px!important;background:#fffdf8!important;border-color:#e4d4aa!important}
+.nivalDashboard .pointsRewardAvailableTop{display:flex;align-items:center;gap:9px}.nivalDashboard .pointsRewardGift{width:27px;height:27px;display:grid;place-items:center;flex:0 0 27px;color:#fff!important;background:#c09b4d;border-radius:9px;font-size:12px!important}
+.nivalDashboard .pointsRedeemCta{min-height:44px;display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding:0 14px;color:#fff!important;background:#17191c;border-radius:11px;font-size:12px!important;font-weight:850}.nivalDashboard .pointsRedeemCta span{color:#d8bd7c!important;font-size:17px!important}
+.nivalDashboard .pointsProgramForm label small{color:var(--nv-text-secondary,#B8B8C0);font-size:10px;font-weight:500;line-height:1.4}
+#codigo-temporal{scroll-margin-top:18px}
