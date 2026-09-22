@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { updatePointsProgram } from "@/app/points/actions";
 
-export function PointsProgramForm({ program }: { program: { name: string; reward_threshold: number; reward_description: string; point_cooldown_minutes: number; daily_points_cap: number } }) {
+export function PointsProgramForm({ program }: { program: { name: string; reward_threshold: number; reward_description: string; point_cooldown_minutes: number; daily_points_cap: number; review_url?: string | null; review_request_visit?: number | null } }) {
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
   return <form className="pointsProgramForm" action={(formData) => startTransition(async () => {
@@ -17,6 +17,11 @@ export function PointsProgramForm({ program }: { program: { name: string; reward
       <label>Espera entre puntos (min)<input name="cooldown" type="number" min={0} max={1440} defaultValue={program.point_cooldown_minutes} required /></label>
     </div>
     <label>Premio<input name="reward" defaultValue={program.reward_description} required minLength={2} maxLength={160} /></label>
+    <div className="pointsFormGrid">
+      <label>Enlace para reseñas<input name="reviewUrl" type="url" placeholder="https://..." defaultValue={program.review_url ?? ""} /></label>
+      <label>Pedir reseña en la visita<input name="reviewVisit" type="number" min={1} max={20} defaultValue={program.review_request_visit ?? 2} required /></label>
+    </div>
+    <p className="pointsMuted">Nival sugerirá pedir la reseña una sola vez por cliente al llegar a esa visita. No depende de si la opinión será positiva o negativa.</p>
     <button className="nvPrimaryButton" disabled={pending} type="submit">{pending ? "Guardando…" : "Guardar programa"}</button>
     {message && <p className="pointsStatus">{message}</p>}
   </form>;
