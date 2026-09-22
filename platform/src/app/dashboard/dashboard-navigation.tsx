@@ -10,11 +10,9 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React
 ];
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
-  { id: 'puntos', label: 'Inicio', href: '/dashboard/points', group: 'operacion' },
+  { id: 'puntos', label: 'Clientes y actividad', href: '/dashboard/points', group: 'clientes' },
   { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
   { id: 'puntos-canjes', label: 'Canjear recompensa', href: '/dashboard/points?view=redemptions', group: 'operacion' },
-  { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
-  { id: 'puntos-analitica', label: 'Analítica', href: '/dashboard/points?view=analytics', group: 'clientes' },
   { id: 'puntos-configuracion', label: 'Programa de lealtad', href: '/dashboard/points?view=settings', group: 'gestion' },
   { id: 'puntos-compartir', label: 'QR y NFC', href: '/dashboard/points?view=share', group: 'gestion' },
 ];
@@ -44,7 +42,7 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
         </div>
         <span className="sidebarSectionLabel">Crecimiento</span>
         <Link className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`} href="/dashboard/points"><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon>Nival Puntos</Link>
-        <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'OPERACIÓN' : group === 'clientes' ? 'CLIENTES Y DATOS' : 'CONFIGURACIÓN'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+        <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'OPERACIÓN' : group === 'clientes' ? 'CLIENTES Y ACTIVIDAD' : 'CONFIGURACIÓN'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         {productItems.filter((item) => item.id !== 'puntos').map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
