@@ -23,7 +23,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').eq('status', 'active').maybeSingle(),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('visits').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
-    supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
+    supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap, review_url, review_request_visit').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const active = Boolean(entitlement);
   const view = params.view ?? 'overview';
