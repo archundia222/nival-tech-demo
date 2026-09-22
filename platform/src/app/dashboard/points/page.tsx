@@ -29,7 +29,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const view = params.view ?? 'overview';
   const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
-  const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }] = active && canManage ? await Promise.all([
+  const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }, { data: visitRows }, { data: rewardRows }] = active && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics'),
     supabase.from('points_ledger')
       .select('id,event_type,delta,reason,occurred_at,customer_id,customers(name)')
@@ -41,8 +41,12 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       .eq('business_id', membership.business_id)
       .order('created_at', { ascending: false })
       .limit(100),
-  ]) : [{ data: [] }, { data: [] }, { data: [] }];
+    supabase.from('visits').select('customer_id,visited_at').eq('business_id', membership.business_id).order('visited_at',{ascending:false}).limit(2000),
+    supabase.from('loyalty_rewards').select('customer_id,description,earned_at,redeemed_at').eq('business_id', membership.business_id).order('earned_at',{ascending:false}).limit(1000),
+  ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
   const metrics = metricRows?.[0];
+  const nowMs=Date.now(), dayMs=86400000;
+  const customerInsights=new Map((customerRows??[]).map(customer=>{const cv=(visitRows??[]).filter(v=>v.customer_id===customer.id);const cr=(rewardRows??[]).filter(r=>r.customer_id===customer.id);const last=cv[0]?.visited_at?new Date(cv[0].visited_at).getTime():null;const first=cv.length?new Date(cv[cv.length-1].visited_at).getTime():null;const avg=cv.length>1&&first&&last?Math.round((last-first)/dayMs/(cv.length-1)):null;return [customer.id,{visits30:cv.filter(v=>nowMs-new Date(v.visited_at).getTime()<=30*dayMs).length,totalVisits:cv.length,lastVisit:last?new Date(last):null,avgDays:avg,rewardsAvailable:cr.filter(x=>!x.redeemed_at).length,rewardsRedeemed:cr.filter(x=>x.redeemed_at).length,lastReward:cr.find(x=>x.redeemed_at)?.description??null}]}));
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
@@ -83,7 +87,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           {business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro de clientes ↗</a>}
         </section>}
 
-        {canManage && (view === 'overview' || view === 'analytics') && <section className="pointsMetricGrid">
+        {canManage && view === 'overview' && <section className="pointsMetricGrid">
           <article><span>Visitas hoy</span><strong>{metrics?.visits_today ?? 0}</strong></article>
           <article><span>Clientes nuevos</span><strong>{metrics?.new_customers_today ?? 0}</strong></article>
           <article><span>Regresaron</span><strong>{metrics?.returning_customers_today ?? 0}</strong></article>
@@ -111,16 +115,16 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           </article>}
         </section>}
 
-        {canManage && view === 'customers' && <section className="pointsHistory">
-          <div className="pointsSectionHeading"><div><span>CLIENTES</span><h2>Historial de clientes</h2></div><p>Más recientes primero · {customerRows?.length ?? 0} registros.</p></div>
+        {canManage && (view === 'overview' || view === 'customers' || view === 'analytics') && <section className="pointsHistory pointsCustomerRegistry">
+          <div className="pointsSectionHeading"><div><span>REGISTRO DE CLIENTES</span><h2>Clientes y actividad</h2></div><p>Información de lealtad para tomar decisiones. Los puntos solo cambian mediante visitas y reglas del programa.</p></div>
           {!customerRows?.length ? <div className="pointsEmptyState">Todavía no hay clientes registrados.</div> :
             <div className="pointsHistoryList">{customerRows.map((customer) => {
               const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts;
-              return <article key={customer.id}><div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email ?? 'Sin contacto'} · {customer.origin?.toUpperCase() ?? 'REGISTRO'}</span></div><div><b>{account?.points_balance ?? 0} pts</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></div></article>;
+              const insight=customerInsights.get(customer.id); return <article key={customer.id} className="pointsCustomerInsightRow"><div className="pointsCustomerIdentity"><strong>{customer.name}</strong><span>{customer.phone ?? customer.email ?? 'Sin contacto'} · {customer.origin?.toUpperCase() ?? 'REGISTRO'}</span><small>Alta: {new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</small></div><div className="pointsCustomerStats"><span><small>Saldo</small><b>{account?.points_balance ?? 0} pts</b></span><span><small>Visitas 30 días</small><b>{insight?.visits30 ?? 0}</b></span><span><small>Visitas totales</small><b>{insight?.totalVisits ?? 0}</b></span><span><small>Frecuencia</small><b>{insight?.avgDays != null ? `cada ${insight.avgDays} d` : '—'}</b></span><span><small>Última visita</small><b>{insight?.lastVisit ? new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeZone:'America/Mexico_City'}).format(insight.lastVisit) : '—'}</b></span><span><small>Recompensas</small><b>{insight?.rewardsAvailable ?? 0} disp. · {insight?.rewardsRedeemed ?? 0} canj.</b></span></div>{insight?.lastReward&&<p className="pointsLastReward">Último premio canjeado: <strong>{insight.lastReward}</strong></p>}</article>;
             })}</div>}
         </section>}
 
-        {canManage && view === 'overview' && customerRows && customerRows.length > 0 && <section className="pointsRecentCustomers">
+        {false && canManage && view === 'overview' && customerRows && customerRows.length > 0 && <section className="pointsRecentCustomers">
           <div className="pointsSectionHeading"><div><span>CLIENTES RECIENTES</span><h2>Últimos registros</h2></div><a href="/dashboard/points?view=customers">Ver historial →</a></div>
           <div className="pointsRecentCustomerList">{customerRows.slice(0,5).map((customer) => { const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts; return <article key={customer.id}><span className="pointsCustomerAvatar">{customer.name?.trim()?.charAt(0)?.toUpperCase() || "C"}</span><div><strong>{customer.name}</strong><small>{customer.origin?.toUpperCase() ?? "REGISTRO"} · ${account?.points_balance ?? 0} pts</small></div><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></article>; })}</div>
         </section>}
