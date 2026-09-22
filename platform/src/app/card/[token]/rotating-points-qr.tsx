@@ -40,13 +40,13 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
   }, [expiresAt, refresh]);
 
   return <section className="pointsCustomerQr" aria-live="polite">
-    <div className="pointsQrHeading"><div><span>QR PARA SUMAR PUNTOS</span><strong>Muéstralo en caja</strong></div><b>{remaining}s</b></div>
+    <div className="pointsQrHeading"><div><span>TU CÓDIGO TEMPORAL</span><strong>Muéstralo en caja</strong><small>Sirve para sumar puntos o canjear una recompensa.</small></div><b>{remaining}s</b></div>
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
         <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
         <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
-    <p>El QR y el código cambian automáticamente y solo pueden usarse una vez.</p>
+    <p>Por seguridad, el QR y el código cambian automáticamente. El personal elegirá si registra tu visita o confirma un canje.</p>
   </section>;
 }
