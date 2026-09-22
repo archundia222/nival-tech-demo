@@ -44,7 +44,7 @@ export function RotatingPointsQr({ accountToken }: { accountToken: string }) {
     {error ? <div className="pointsErrorState"><strong>QR no disponible</strong><p>{error}</p><button className="nvSecondaryButton" type="button" onClick={() => void refresh()}>Intentar de nuevo</button></div>
       : raw ? <>
         <div className="pointsQrCanvas"><QRCodeSVG value={`nivalpoints:${raw}`} size={220} level="M" /></div>
-        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{shortCode}</strong><small>Díctalo o muéstralo en caja si no pueden escanear el QR.</small></div>
+        <div className="pointsManualCode"><span>CÓDIGO TEMPORAL</span><strong className="pointsManualCodeValue">{shortCode}</strong></div><small className="pointsManualHint">Díctalo o muéstralo en caja si no pueden escanear el QR.</small>
       </>
       : <div className="pointsEmptyState">Generando QR seguro…</div>}
     <p>El QR y el código cambian automáticamente y solo pueden usarse una vez.</p>
