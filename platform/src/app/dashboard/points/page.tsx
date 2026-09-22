@@ -124,11 +124,6 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
             })}</div>}
         </section>}
 
-        {false && canManage && view === 'overview' && customerRows && customerRows.length > 0 && <section className="pointsRecentCustomers">
-          <div className="pointsSectionHeading"><div><span>CLIENTES RECIENTES</span><h2>Últimos registros</h2></div><a href="/dashboard/points?view=customers">Ver historial →</a></div>
-          <div className="pointsRecentCustomerList">{customerRows.slice(0,5).map((customer) => { const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts; return <article key={customer.id}><span className="pointsCustomerAvatar">{customer.name?.trim()?.charAt(0)?.toUpperCase() || "C"}</span><div><strong>{customer.name}</strong><small>{customer.origin?.toUpperCase() ?? "REGISTRO"} · ${account?.points_balance ?? 0} pts</small></div><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></article>; })}</div>
-        </section>}
-
         {canManage && view === 'overview' && <section className="pointsHistory">
           <div className="pointsSectionHeading"><div><span>HISTORIAL</span><h2>Movimientos recientes</h2></div><p>El ledger es inmutable; las correcciones se registran como reversas.</p></div>
           {!ledgerRows?.length ? <div className="pointsEmptyState">Todavía no hay movimientos.</div> :
