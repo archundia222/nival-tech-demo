@@ -14,7 +14,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points" }: { account
 
 
   const refresh = useCallback(async () => {
-    const result = await issueCustomerScanToken(accountToken, purpose);
+    const result = await issueCustomerScanToken(accountToken, purpose === "points" ? "visit" : "redeem");
     if (!result.ok || !result.raw || !result.expiresAt) {
       setError(result.error ?? "No pudimos generar el QR.");
       return;
