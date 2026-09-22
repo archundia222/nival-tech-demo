@@ -11,6 +11,7 @@ type ScanCustomer = {
   reward_threshold: number;
   reward_description: string;
   expires_at: string;
+  available_rewards: number;
 };
 
 type BarcodeDetectorLike = {
@@ -80,7 +81,7 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
     startTransition(async () => {
       const result = await redeemPointReward(customer.scan_session_id);
       if (!result.ok) { setMessage(result.error ?? "No pudimos canjear."); return; }
-      setCustomer({ ...customer, points_balance: result.result?.new_points_balance ?? 0 });
+      setCustomer({ ...customer, points_balance: result.result?.new_points_balance ?? customer.points_balance, available_rewards: Math.max(0, customer.available_rewards - 1) });
       setMessage("Premio canjeado.");
     });
   }
@@ -93,9 +94,9 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
       <div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal" aria-label="Código temporal" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
     </>}
     {customer && <div className="pointsScannedCustomer">
-      <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.reward_description}</p></div>
+      <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
       <div className="pointsCashActions">
-        {mode === "visit" ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Registrar visita</button> : <button className="nvPrimaryButton" disabled={pending || customer.points_balance < customer.reward_threshold} type="button" onClick={redeem}>Canjear recompensa</button>}
+        {mode === "visit" ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Registrar visita</button> : <button className="nvPrimaryButton" disabled={pending || customer.available_rewards < 1} type="button" onClick={redeem}>Canjear recompensa</button>}
         <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); }}>Otro cliente</button>
       </div>
     </div>}
