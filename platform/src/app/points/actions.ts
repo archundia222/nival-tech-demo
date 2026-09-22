@@ -111,6 +111,8 @@ export async function updatePointsProgram(formData: FormData) {
     p_reward_description: String(formData.get("reward") ?? "").trim(),
     p_cooldown_minutes: Number(formData.get("cooldown")),
     p_daily_cap: Number(formData.get("dailyCap")),
+    p_review_url: String(formData.get("reviewUrl") ?? "").trim(),
+    p_review_request_visit: Number(formData.get("reviewVisit") ?? 2),
   });
   if (error) return { ok: false, error: error.message };
   revalidatePath("/dashboard/points");
