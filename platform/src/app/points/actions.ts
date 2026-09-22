@@ -62,7 +62,7 @@ export async function getPublicLoyaltyCard(token: string) {
   return data?.[0] ?? null;
 }
 
-export async function issueCustomerScanToken(token: string, purpose: "visit" | "redeem" = "visit") {
+export async function issueCustomerScanToken(token: string, purpose: "visit" | "redeem" = "visit", rewardId?: string) {
   await enforceRate("scan_token", 12, 60);
   const raw = crypto.randomBytes(32).toString("base64url");
   const shortCode = crypto.randomBytes(4).toString("hex").slice(0, 6).toUpperCase();
@@ -72,6 +72,7 @@ export async function issueCustomerScanToken(token: string, purpose: "visit" | "
     p_raw_token: raw,
     p_short_code: shortCode,
     p_purpose: purpose,
+    p_reward_id: purpose === "redeem" ? rewardId ?? null : null,
   });
   if (error || !data?.[0]) return { ok: false, error: error?.message ?? "No pudimos generar el QR." };
   return { ok: true, raw, shortCode, expiresAt: data[0].expires_at as string };
@@ -104,6 +105,7 @@ export async function redeemPointReward(scanSessionId: string) {
   if (error) {
     const message = error.message.includes("no_available_reward") ? "Este cliente no tiene recompensas disponibles."
       : error.message.includes("already_redeemed") ? "Este premio ya fue canjeado."
+      : error.message.includes("wrong_scan_purpose") ? "Este código no sirve para canjear recompensas."
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
   }
