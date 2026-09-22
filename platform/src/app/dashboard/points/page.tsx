@@ -110,12 +110,17 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         </section>}
 
         {canManage && view === 'customers' && <section className="pointsHistory">
-          <div className="pointsSectionHeading"><div><span>CLIENTES</span><h2>Clientes registrados</h2></div><p>{customerRows?.length ?? 0} registros recientes del programa.</p></div>
+          <div className="pointsSectionHeading"><div><span>CLIENTES</span><h2>Historial de clientes</h2></div><p>Más recientes primero · {customerRows?.length ?? 0} registros.</p></div>
           {!customerRows?.length ? <div className="pointsEmptyState">Todavía no hay clientes registrados.</div> :
             <div className="pointsHistoryList">{customerRows.map((customer) => {
               const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts;
               return <article key={customer.id}><div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email ?? 'Sin contacto'} · {customer.origin?.toUpperCase() ?? 'REGISTRO'}</span></div><div><b>{account?.points_balance ?? 0} pts</b><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></div></article>;
             })}</div>}
+        </section>}
+
+        {canManage && view === 'overview' && customerRows && customerRows.length > 0 && <section className="pointsRecentCustomers">
+          <div className="pointsSectionHeading"><div><span>CLIENTES RECIENTES</span><h2>Últimos registros</h2></div><a href="/dashboard/points?view=customers">Ver historial →</a></div>
+          <div className="pointsRecentCustomerList">{customerRows.slice(0,5).map((customer) => { const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts; return <article key={customer.id}><span className="pointsCustomerAvatar">{customer.name?.trim()?.charAt(0)?.toUpperCase() || "C"}</span><div><strong>{customer.name}</strong><small>{customer.origin?.toUpperCase() ?? "REGISTRO"} · ${account?.points_balance ?? 0} pts</small></div><time>{new Intl.DateTimeFormat('es-MX',{dateStyle:'short',timeStyle:'short',timeZone:'America/Mexico_City'}).format(new Date(customer.created_at))}</time></article>; })}</div>
         </section>}
 
         {canManage && view === 'overview' && <section className="pointsHistory">
