@@ -67,19 +67,19 @@ export async function issueCustomerScanToken(token: string, purpose: "visit" | "
   const raw = crypto.randomBytes(32).toString("base64url");
   const shortCode = crypto.randomBytes(4).toString("hex").slice(0, 6).toUpperCase();
   const admin = createPointsAdminClient();
-  const { data, error } = await admin.rpc("issue_customer_scan_token" as never, {
+  const { data, error } = await admin.rpc("issue_customer_scan_token", {
     p_account_token: token,
     p_raw_token: raw,
     p_short_code: shortCode,
     p_purpose: purpose,
-  } as never) as { data: Array<{ expires_at: string }> | null; error: { message: string } | null };
+  });
   if (error || !data?.[0]) return { ok: false, error: error?.message ?? "No pudimos generar el QR." };
   return { ok: true, raw, shortCode, expiresAt: data[0].expires_at as string };
 }
 
 export async function claimScanToken(raw: string, purpose: "visit" | "redeem") {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("claim_customer_scan_token" as never, { p_raw_token: raw.trim(), p_expected_purpose: purpose } as never) as { data: Array<Record<string, unknown>> | null; error: { message: string } | null };
+  const { data, error } = await supabase.rpc("claim_customer_scan_token", { p_raw_token: raw.trim(), p_expected_purpose: purpose });
   if (error || !data?.[0]) return { ok: false, error: error?.message.includes("wrong_scan_purpose") ? (purpose === "visit" ? "Este código es para canjear una recompensa, no para sumar puntos." : "Este código es para sumar puntos, no para canjear.") : "QR expirado, usado o no pertenece a este negocio." };
   return { ok: true, customer: data[0] };
 }
