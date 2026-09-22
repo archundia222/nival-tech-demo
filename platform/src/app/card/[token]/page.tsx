@@ -27,19 +27,20 @@ export default async function CardPage({ params }: CardPageProps) {
       {availableRewards.length > 0 && <div className="pointsAvailableNotice"><span>✓</span><div><strong>{availableRewards.length} {availableRewards.length === 1 ? "recompensa disponible" : "recompensas disponibles"}</strong><small>Ya puedes canjear {availableRewards.length === 1 ? "tu premio" : "tus premios"} en caja.</small></div></div>}
     </section>
     <nav className="pointsCustomerQuickActions" aria-label="Acciones de tu tarjeta">
-      <a href="#codigo-temporal"><span>＋</span><div><strong>Sumar puntos</strong><small>Muestra tu código en caja</small></div><b>→</b></a>
-      <a className={availableRewards.length ? "hasReward" : ""} href="#mis-recompensas"><span>★</span><div><strong>Mis recompensas</strong><small>{availableRewards.length ? `${availableRewards.length} lista${availableRewards.length === 1 ? "" : "s"} para canjear` : "Consulta tus premios"}</small></div><b>→</b></a>
+      <a href="#sumar-puntos"><span>＋</span><div><strong>Sumar puntos</strong><small>Abrir QR y código temporal</small></div><b>→</b></a>
+      <a className={availableRewards.length ? "hasReward" : ""} href="#mis-recompensas"><span>★</span><div><strong>Mis recompensas</strong><small>{availableRewards.length ? `Canjear ${availableRewards.length} recompensa${availableRewards.length === 1 ? "" : "s"}` : "Consulta tus premios"}</small></div><b>→</b></a>
     </nav>
     <details id="mis-recompensas" className="pointsCustomerRewards" open={availableRewards.length > 0}>
       <summary><span>Ver recompensas</span><b>{availableRewards.length > 0 ? availableRewards.length : "›"}</b></summary>
       <div className="pointsRewardList">
         <div className="pointsRewardsIntro"><span>RECOMPENSAS</span><h2>{availableRewards.length ? "Tienes un premio listo" : "Sigue acumulando puntos"}</h2><p>{availableRewards.length ? "Elige Canjear recompensa y enseña el código temporal al personal. Ellos confirmarán la entrega." : `Te faltan ${card.points_remaining} puntos para tu próxima recompensa.`}</p></div><h2>Disponibles</h2>
-        {availableRewards.length ? availableRewards.map((reward: { id: string; description: string; earned_at: string }) => <article key={reward.id} className="pointsRewardAvailable"><div className="pointsRewardAvailableTop"><span className="pointsRewardGift">★</span><strong>{reward.description}</strong></div><span>Disponible · obtenida {new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeZone:"America/Mexico_City"}).format(new Date(reward.earned_at))}</span><p>Tu recompensa ya está guardada. Para usarla, genera tu código temporal y muéstralo en caja.</p><a className="pointsRedeemCta" href="#codigo-temporal">Canjear recompensa <span>→</span></a></article>) : <p className="pointsMuted">Todavía no tienes recompensas disponibles.</p>}
+        {availableRewards.length ? availableRewards.map((reward: { id: string; description: string; earned_at: string }) => <article key={reward.id} className="pointsRewardAvailable"><div className="pointsRewardAvailableTop"><span className="pointsRewardGift">★</span><strong>{reward.description}</strong></div><span>Disponible · obtenida {new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeZone:"America/Mexico_City"}).format(new Date(reward.earned_at))}</span><p>Tu recompensa ya está guardada. Abre el código de canje y muéstralo en caja.</p><a className="pointsRedeemCta" href="#codigo-canje">Mostrar código para canjear <span>→</span></a></article>) : <p className="pointsMuted">Todavía no tienes recompensas disponibles.</p>}
         <h2 className="pointsRewardHistoryTitle">Ya utilizadas</h2>
         {redeemedRewards.length ? redeemedRewards.map((reward: { id: string; description: string; redeemed_at: string }) => <article key={reward.id}><strong>{reward.description}</strong><span>Canjeada · {new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeZone:"America/Mexico_City"}).format(new Date(reward.redeemed_at))}</span></article>) : <p className="pointsMuted">Aún no has canjeado recompensas.</p>}
+        {availableRewards.length > 0 && <div id="codigo-canje" className="pointsPurposeQr"><div className="pointsPurposeLabel"><b>CANJEAR RECOMPENSA</b><span>Este código es para entregar uno de tus premios disponibles.</span></div><RotatingPointsQr accountToken={token} purpose="redeem" /></div>}
       </div>
     </details>
-    <div id="codigo-temporal"><RotatingPointsQr accountToken={token} /></div>
+    <section id="sumar-puntos" className="pointsPurposeQr"><div className="pointsPurposeLabel"><b>SUMAR PUNTOS</b><span>Usa este código cuando quieras registrar una nueva visita.</span></div><RotatingPointsQr accountToken={token} purpose="points" /></section>
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. El QR temporal solo sirve para identificar tu cuenta en caja.</p>
   </main>;
 }
