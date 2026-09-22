@@ -1,12 +1,20 @@
 import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
   { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></> },
   { id: 'agregar-tarjetas', label: 'Agregar tarjetas', href: '/dashboard/pay?view=add', icon: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></> },
   { id: 'compartir-paginas', label: 'Comparte tus páginas', href: '/dashboard/pay?view=share', icon: <><path d="M8 12h8M12 8v8"/><rect x="3" y="3" width="18" height="18" rx="3" /></> },
+];
+
+const pointsItems: Array<{ id: ActiveItem; label: string; href: string }> = [
+  { id: 'puntos', label: 'Resumen', href: '/dashboard/points' },
+  { id: 'puntos-analitica', label: 'Analítica de datos', href: '/dashboard/points?view=analytics' },
+  { id: 'puntos-clientes', label: 'Clientes y puntos', href: '/dashboard/points?view=customers' },
+  { id: 'puntos-compartir', label: 'QR y enlace', href: '/dashboard/points?view=share' },
+  { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings' },
 ];
 
 const productItems: Array<{ id: ActiveItem; label: string; href: string; icon: React.ReactNode }> = [
@@ -21,6 +29,7 @@ function NavIcon({ children }: { children: React.ReactNode }) {
 
 export function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
   const payActive = payItems.some((item) => item.id === active);
+  const pointsActive = pointsItems.some((item) => item.id === active);
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
@@ -32,13 +41,15 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
           {payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}
         </div>
         <span className="sidebarSectionLabel">Crecimiento</span>
-        {productItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
+        <Link className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`} href="/dashboard/points"><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon>Nival Puntos</Link>
+        <div className="sidebarSubmenu" aria-label="Opciones de Nival Puntos">{pointsItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>
+        {productItems.filter((item) => item.id !== 'puntos').map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}><NavIcon>{item.icon}</NavIcon>{item.label}</Link>)}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
-      <nav aria-label="Navegación móvil del panel"><Link className="mobileMainProduct" href="/dashboard/pay">Nival Pay</Link><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>{productItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form></nav>
+      <nav aria-label="Navegación móvil del panel"><Link className="mobileMainProduct" href="/dashboard/pay">Nival Pay</Link><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div><Link className="mobileMainProduct" href="/dashboard/points">Nival Puntos</Link><div className="mobileSubmenu">{pointsItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>{productItems.filter((item) => item.id !== 'puntos').map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}<Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form></nav>
     </details>
   </>;
 }
