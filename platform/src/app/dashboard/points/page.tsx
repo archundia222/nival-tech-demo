@@ -63,7 +63,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
-      <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Lealtad y recompensas</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
+      <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Haz que vuelvan</b></div><span className="ready">{active ? 'Activo' : '$199/mes'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
       {!active ? <>
@@ -93,7 +93,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       </> : <>
         <section className="pointsV1Hero">
           <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
-          {view === 'share' && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro ↗</a>}
+          {(view === 'share' || view === 'overview') && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">{view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}</a>}
         </section>
 
         {canManage && view === 'overview' && <section className="pointsMetricGrid">
