@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveBusinessMembership } from "@/lib/active-business";
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
   const h = await headers();
@@ -122,7 +123,13 @@ export async function redeemPointReward(scanSessionId: string) {
 
 export async function updatePointsProgram(formData: FormData) {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("update_points_program", {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Tu sesión terminó. Vuelve a iniciar sesión." };
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !["owner", "manager"].includes(membership.role)) return { ok: false, error: "No tienes permiso para editar este programa." };
+
+  const { error } = await supabase.rpc("update_points_program_for", {
+    p_business_id: membership.business_id,
     p_name: String(formData.get("name") ?? "").trim(),
     p_reward_threshold: Number(formData.get("threshold")),
     p_reward_description: String(formData.get("reward") ?? "").trim(),
