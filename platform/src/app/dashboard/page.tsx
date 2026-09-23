@@ -198,33 +198,39 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <div className="dashboardContent">
       <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
-      <section className="dashboardHero" id="resumen">
+      <section className="dashboardHero nivalHomeHero" id="resumen">
         <div>
-          <p className="eyebrow">OPERACIÓN NIVAL TECH</p>
+          <p className="eyebrow">TU NEGOCIO EN NIVAL</p>
           <h1>{business?.name ?? "Tu negocio"}</h1>
-          <p>Consulta lo esencial de tu cuenta y entra directamente a los productos que ya utilizas.</p>
-          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Abrir Nival Pay" : "Activar Nival Pay"}</a>
+          <p>Cobra, haz que tus clientes vuelvan y decide qué hacer después desde un solo lugar.</p>
         </div>
       </section>
+      <section className="nivalProductHub" aria-label="Productos Nival">
+        <article className={hasNivalPay ? "activeProduct" : ""}>
+          <div><span>COBRAR</span><b>{hasNivalPay ? "ACTIVO" : "$199 · PAGO ÚNICO"}</b></div>
+          <h2>Nival Pay</h2>
+          <p>Una página de cobro clara para NFC y QR. Tu cliente abre, copia y paga sin pedirte datos por mensaje.</p>
+          <a href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar cobros →" : "Activar Nival Pay →"}</a>
+        </article>
+        <article className={hasPoints ? "activeProduct" : ""}>
+          <div><span>HACER QUE VUELVAN</span><b>{hasPoints ? "ACTIVO" : "$199/MES"}</b></div>
+          <h2>Nival Puntos</h2>
+          <p>Registra visitas, recompensa recurrencia y crea una razón sencilla para que tus clientes regresen.</p>
+          <a href="/dashboard/points">{hasPoints ? "Abrir mi programa →" : "Conocer Nival Puntos →"}</a>
+        </article>
+        <article className={"intelligenceProduct " + (hasIntelligence ? "activeProduct" : "")}>
+          <div><span>CRECER</span><b>{hasIntelligence ? "ACTIVO" : "$399/MES"}</b></div>
+          <h2>Nival Intelligence</h2>
+          <p>Te dice a quién recuperar, qué campaña probar y qué funcionó. Menos análisis; más decisiones listas para ejecutar.</p>
+          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Intelligence →"}</a>
+        </article>
+      </section>
+      <section className="nivalSignals">
+        <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
+        <div><span>Clientes registrados</span><strong>{customerCount ?? 0}</strong><small>{hasPoints ? "dentro de tu programa" : "disponibles al activar lealtad"}</small></div>
+        <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
+      </section>
       <BusinessHealthCard items={businessHealthItems} />
-      <section className="metricGrid">
-        <article><span>Nival Pay</span><strong>{hasNivalPay ? "Activo" : "Sin activar"}</strong></article>
-        {hasIntelligence && <article><span>Clientes</span><strong>{customerCount ?? 0}</strong></article>}
-        <article><span>Vistas de cobro</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong></article>
-        <article><span>Cuenta</span><strong>{business?.subscription_status === "active" ? "Activa" : "Configuración"}</strong></article>
-      </section>
-      <section className="analyticsGrid" aria-label="Accesos rápidos">
-        <article className="chartCard">
-          <div className="chartHeading"><div><span>NIVAL PAY</span><h2>Página de cobro</h2></div></div>
-          <p>{hasNivalPay ? "Tu producto está activado. Desde aquí puedes revisar y actualizar los datos que verá el cliente al acercar la tarjeta." : "Activa Nival Pay para preparar la página de cobro que abrirá tu tarjeta NFC."}</p>
-          <a className="loginLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar Nival Pay" : "Activar por $199 MXN"}</a>
-        </article>
-        <article className="chartCard">
-          <div className="chartHeading"><div><span>NIVAL CARD</span><h2>Tarjetas y enlaces</h2></div></div>
-          <p>Nival Pay incluye tu página configurable, QR y la primera tarjeta NFC física. Incluye 3 apartados; los adicionales cuestan $49 MXN cada uno y cada tarjeta física adicional, $99 MXN.</p>
-          <a className="loginLink" href="/dashboard?section=nival-card">Abrir Nival Card</a>
-        </article>
-      </section>
       </>}
       {currentSection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
