@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { CopyField } from "./copy-field";
 import styles from "./payment-page.module.css";
 
@@ -16,6 +17,7 @@ export type PaymentPageViewProfile = {
   business_slug?: string | null;
   points_enabled?: boolean;
   logo_url?: string | null;
+  brand_color?: string | null;
   account_holder: string;
   bank_name: string;
   clabe: string;
@@ -46,7 +48,7 @@ export function PaymentPageView({
     .toUpperCase();
 
   const content = <>
-    <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} aria-labelledby={embedded ? undefined : "payment-title"}>
+    <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} style={{ "--blue": profile.brand_color || "#b89a5a" } as CSSProperties} aria-labelledby={embedded ? undefined : "payment-title"}>
       <div className={styles.brandRow}>
         <span className={styles.brandMark} aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M14 2.4 24 8.2v11.6L14 25.6 4 19.8V8.2L14 2.4Z"/><path d="m9.2 16.5 3.1 3.1 6.7-8"/></svg></span>
         <span className={styles.brandName}>Nival <strong>Pay</strong></span>
