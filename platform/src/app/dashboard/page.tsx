@@ -148,7 +148,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
-        supabase.rpc("get_current_business_team"),
+        supabase.rpc("get_business_team", { p_business_id: businessId }),
         supabase
           .from("business_invitations")
           .select("id, email, role, token, expires_at")
@@ -159,7 +159,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ])
     : [{ data: [] }, { data: [] }];
   const { data: segmentRows } = businessId
-    ? await supabase.rpc("get_current_business_segments")
+    ? await supabase.rpc("get_business_segments", { p_business_id: businessId })
     : { data: [] };
   const segments = segmentRows?.[0];
   const recentVisits = Number(segments?.visits_last_30_days ?? 0);
