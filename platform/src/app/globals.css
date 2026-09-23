@@ -4201,3 +4201,16 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 /* Enterprise credibility without changing the simple SMB core */
 .enterpriseReady{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:104px 0;border-top:1px solid var(--landing-line)}.enterpriseReadyIntro{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px 48px}.enterpriseReadyIntro h2{max-width:820px;margin:0;font-size:clamp(32px,4.5vw,58px);line-height:1.02;letter-spacing:-.05em}.enterpriseReadyIntro>p:last-child{grid-column:2;max-width:740px;margin:0;color:var(--landing-muted);font-size:14px;line-height:1.65}.enterpriseReadyGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:38px}.enterpriseReadyGrid article{min-height:190px;padding:24px;border:1px solid var(--landing-line);border-radius:18px;background:#121212}.enterpriseReadyGrid span,.enterprisePilot span{color:var(--landing-accent);font-size:8px;font-weight:900;letter-spacing:.12em}.enterpriseReadyGrid strong{display:block;margin:13px 0 8px;font-size:18px}.enterpriseReadyGrid p{margin:0;color:var(--landing-muted);font-size:11px;line-height:1.6}.enterprisePilot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center;margin-top:14px;padding:25px 27px;border:1px solid rgba(181,154,97,.35);border-radius:19px;background:linear-gradient(120deg,rgba(181,154,97,.09),#111)}.enterprisePilot strong{display:block;margin:6px 0;font-size:19px}.enterprisePilot p{max-width:730px;margin:0;color:var(--landing-muted);font-size:11px;line-height:1.55}.enterprisePilot>a{padding:12px 15px;border-radius:10px;color:#111;background:var(--landing-accent);font-size:10px;font-weight:900;text-decoration:none;white-space:nowrap}
 @media(max-width:760px){.enterpriseReady{width:min(100% - 28px,1180px);padding:76px 0}.enterpriseReadyIntro{grid-template-columns:1fr}.enterpriseReadyIntro>p:last-child{grid-column:1}.enterpriseReadyGrid{grid-template-columns:1fr}.enterprisePilot{grid-template-columns:1fr}.enterprisePilot>a{text-align:center}}
+
+/* Multi-workspace controls */
+.workspaceSwitcherForm{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px 10px;align-items:center}
+.workspaceSwitcherForm>div{min-width:0}
+.workspaceSwitcherForm label{display:block;margin-top:5px}
+.workspaceSwitcherForm select{width:100%;max-width:180px;padding:5px 7px;border:1px solid rgba(255,255,255,.1);border-radius:7px;background:#151515;color:inherit;font:inherit;font-size:9px}
+.workspaceSwitcherForm button{grid-column:2;justify-self:start;padding:0;border:0;background:none;color:var(--muted);font-size:8px;font-weight:800;cursor:pointer}
+.workspaceSwitcherForm button:hover{color:inherit}
+.mobileWorkspaceSwitcher{display:grid;gap:8px;padding:12px 0 16px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.mobileWorkspaceSwitcher label{display:grid;gap:6px}
+.mobileWorkspaceSwitcher label>span{font-size:8px;font-weight:900;letter-spacing:.12em;color:var(--muted)}
+.mobileWorkspaceSwitcher select{width:100%;padding:10px 11px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#151515;color:inherit}
+.mobileWorkspaceSwitcher button{padding:9px 11px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#202020;color:inherit;font-size:9px;font-weight:800}
