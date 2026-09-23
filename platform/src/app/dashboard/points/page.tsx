@@ -138,6 +138,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
                 <label>Nombre<input name="name" required minLength={2} maxLength={100} placeholder="Ej. Ana López"/></label>
                 <label>Teléfono<input name="phone" required inputMode="tel" minLength={10} maxLength={18} placeholder="55 1234 5678"/></label>
                 <label>Correo <small>opcional</small><input name="email" type="email" placeholder="cliente@correo.com"/></label>
+                <label className="checkLabel"><input name="privacyAcknowledged" type="checkbox" required/> Confirmo que informé al cliente que sus datos se registrarán en Nival para operar este servicio.</label>
                 <label className="checkLabel"><input name="marketingConsent" type="checkbox"/> El cliente acepta recibir promociones.</label>
                 <button type="submit">Registrar cliente</button>
               </form>
@@ -168,6 +169,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
               <span>IMPORTAR</span><h3>Trae un CSV de tu sistema actual</h3><p>Acepta hasta 500 ventas por archivo. Solo necesitas una columna <b>Monto</b>; opcionalmente Fecha, Teléfono y Método.</p>
               <form action={importSalesCsv}>
                 <label>Archivo CSV<input name="salesFile" type="file" accept=".csv,text/csv" required/></label>
+                <label className="checkLabel"><input name="dataAuthorization" type="checkbox" required/> Confirmo que el negocio puede utilizar los datos incluidos en este archivo.</label>
                 <small className="captureFormat">Ejemplo: Fecha, Monto, Teléfono, Método</small>
                 <button type="submit">Importar ventas</button>
               </form>

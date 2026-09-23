@@ -43,7 +43,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const hasReviewDestination = Boolean(loyaltyProgram?.review_url);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
   const { data: orders } = await supabase.from('physical_card_orders')
-    .select('id, design, front_template, back_style, target_url, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
+    .select('id, design, front_template, back_style, back_design_url, target_url, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
 
   return <main className="dashboardApp nivalDashboard">
@@ -51,7 +51,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     <div className="dashboardContent dashboardPayContent physicalCardPage">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
-      {params.result === 'success' && <p role="status" className="formMessage">Pago recibido. Tu tarjeta entrará a producción cuando confirmemos el diseño.</p>}
+      {params.result === 'success' && <p role="status" className="formMessage">Regresaste de Mercado Pago. Estamos confirmando el pago; cuando quede acreditado, tu tarjeta podrá pasar a producción.</p>}
       {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
@@ -76,8 +76,9 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
             <label><input type="radio" name="backStyle" value="nival" defaultChecked/><span><b>Reverso Nival</b><small>Diseño limpio de Nival Tech · incluido</small></span><strong>$0</strong></label>
             <label><input type="radio" name="backStyle" value="custom"/><span><b>Reverso personalizado</b><small>Tu imagen, frase, promoción, redes o diseño propio</small></span><strong>+$10</strong></label>
           </div>
+          <label>Sube tu diseño o imagen <small>opcional · JPG, PNG o WebP</small><input name="backDesign" type="file" accept="image/jpeg,image/png,image/webp"/></label>
           <label>Indicaciones para el reverso personalizado<textarea name="backDesignNotes" maxLength={500} placeholder="Ej. fondo negro, Instagram @minegocio y la frase Gracias por visitarnos."/></label>
-          <p className="payHelp">Si eliges reverso Nival, estas indicaciones se ignoran.</p>
+          <p className="payHelp">Puedes subir una imagen ya hecha o describir lo que quieres. Si eliges reverso Nival, estos campos se ignoran.</p>
         </section>
         <section className="chartCard physicalCardSection">
           <h2>3. Entrega</h2>
@@ -103,7 +104,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       </form>
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
         const payment = Array.isArray(order.product_orders) ? order.product_orders[0] : order.product_orders;
-        return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega dominical'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
+        return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}{order.back_design_url ? ' · archivo recibido' : ''}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega dominical'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
       })}</section> : null}
     </div>
   </main>;

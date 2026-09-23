@@ -176,6 +176,9 @@ function normalizedPhoneKeys(value: string | null | undefined) {
 
 export async function registerQuickCustomer(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
+  if (formData.get("privacyAcknowledged") !== "on") {
+    redirect(captureReturn(formData, "error", "Confirma que informaste al cliente sobre el uso de sus datos."));
+  }
   const name = String(formData.get("name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
@@ -256,6 +259,9 @@ export async function registerDailySalesSummary(formData: FormData) {
 
 export async function importSalesCsv(formData: FormData) {
   const { supabase, user, membership } = await activeBusinessContext();
+  if (formData.get("dataAuthorization") !== "on") {
+    redirect(captureReturn(formData, "error", "Confirma que puedes utilizar los datos incluidos en este archivo."));
+  }
   const entry = formData.get("salesFile");
   if (!(entry instanceof File) || !entry.size) redirect(captureReturn(formData, "error", "Selecciona un archivo CSV."));
   if (entry.size > 2_000_000) redirect(captureReturn(formData, "error", "El CSV debe pesar menos de 2 MB."));

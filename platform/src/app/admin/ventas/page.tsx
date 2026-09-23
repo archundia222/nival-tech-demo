@@ -5,7 +5,7 @@ import { isNivalAdmin } from '@/lib/admin';
 import { money } from '@/lib/orders';
 import { AdminNavigation, type AdminSection } from './admin-navigation';
 import { ClientsTable, SalesTable, type AdminClientRow, type AdminSaleRow } from './admin-tables';
-import { updatePhysicalCardFulfillment } from './actions';
+import { confirmCashPayment, updatePhysicalCardFulfillment } from './actions';
 
 const sections: AdminSection[] = ['nival-pay', 'clientes', 'resumen', 'nival-card', 'configuracion', 'inteligencia'];
 
@@ -19,7 +19,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
 
   const admin = createAdminClient();
   const { data: physicalCards } = await admin.from('physical_card_orders')
-    .select('id, business_id, front_template, back_style, design, design_notes, back_design_notes, target_url, recipient_name, phone, delivery_method, requested_delivery_date, fulfillment_status, tracking_code, created_at, businesses(name), product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
+    .select('id, business_id, front_template, back_style, design, design_notes, back_design_notes, back_design_url, target_url, recipient_name, phone, delivery_method, requested_delivery_date, fulfillment_status, tracking_code, created_at, businesses(name), product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .order('created_at', { ascending: false })
     .limit(250);
 
@@ -92,8 +92,8 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
           const front = card.front_template === 'points' ? 'Puntos' : card.front_template === 'reviews' ? 'Reseñas' : card.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay';
           return <article key={card.id}>
             <div className="adminCardIdentity"><span>{front}</span><strong>{business?.name ?? 'Negocio'}</strong><small>{card.back_style === 'custom' ? 'Reverso personalizado' : 'Reverso Nival'} · {card.design === 'custom' ? 'color de marca' : card.design}</small></div>
-            <div className="adminCardMeta"><span>Recibe <b>{card.recipient_name}</b></span><span>{card.phone}</span><span>{card.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega local'}{card.requested_delivery_date ? ` · ${card.requested_delivery_date}` : ''}</span><span>Pago <b>{payment?.status === 'paid' ? 'confirmado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'}</b> · {money(Number(payment?.amount_cents ?? 0))}</span></div>
-            <div className="adminCardTarget"><small>DESTINO NFC / QR</small>{card.target_url ? <a href={card.target_url} target="_blank" rel="noreferrer">{card.target_url.replace(/^https?:\/\//,'')}</a> : <span>Pendiente de definir</span>}</div>
+            <div className="adminCardMeta"><span>Recibe <b>{card.recipient_name}</b></span><span>{card.phone}</span><span>{card.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega local'}{card.requested_delivery_date ? ` · ${card.requested_delivery_date}` : ''}</span><span>Pago <b>{payment?.status === 'paid' ? 'confirmado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : payment?.status === 'cancelled' ? 'cancelado' : 'pendiente'}</b> · {money(Number(payment?.amount_cents ?? 0))}</span>{payment?.status === 'pending_cash_confirmation' && <form action={confirmCashPayment}><input type="hidden" name="orderId" value={card.product_order_id}/><button className="adminConfirmButton" type="submit">Confirmar efectivo</button></form>}</div>
+            <div className="adminCardTarget"><small>DESTINO NFC / QR</small>{card.target_url ? <a href={card.target_url} target="_blank" rel="noreferrer">{card.target_url.replace(/^https?:\/\//,'')}</a> : <span>Pendiente de definir</span>}{card.back_design_url && <a href={card.back_design_url} target="_blank" rel="noreferrer">Abrir archivo del reverso ↗</a>}</div>
             <form action={updatePhysicalCardFulfillment} className="adminCardStatusForm">
               <input type="hidden" name="cardId" value={card.id}/>
               <select name="status" defaultValue={card.fulfillment_status}><option value="new">Nuevo</option><option value="confirmed">Confirmado</option><option value="producing">En producción</option><option value="ready">Listo</option><option value="shipped">Enviado</option><option value="delivered">Entregado</option><option value="cancelled">Cancelado</option></select>

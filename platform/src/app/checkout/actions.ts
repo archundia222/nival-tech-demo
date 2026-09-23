@@ -1,5 +1,6 @@
 'use server';
 
+import crypto from 'node:crypto';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -446,6 +447,7 @@ type PhysicalCardInput = {
   front_template: 'pay' | 'points' | 'reviews' | 'profile';
   back_style: 'nival' | 'custom';
   back_design_notes: string | null;
+  back_design_url: string | null;
   delivery_method: 'sunday_local' | 'shipping';
   recipient_name: string;
   phone: string;
@@ -488,6 +490,7 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
     front_template: frontTemplate as PhysicalCardInput['front_template'],
     back_style: backStyle as PhysicalCardInput['back_style'],
     back_design_notes: backStyle === 'custom' ? backDesignNotes || null : null,
+    back_design_url: null,
     delivery_method: delivery as PhysicalCardInput['delivery_method'],
     recipient_name: recipient.slice(0,120), phone: phone.slice(0,20),
     address_line1: address1.slice(0,180), address_line2: address2.slice(0,180) || null,
@@ -496,6 +499,29 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
     target_payment_profile_id: targetPaymentProfileId,
     target_url: null,
   };
+}
+
+async function attachPhysicalCardArtwork(businessId: string, form: FormData, details: PhysicalCardInput) {
+  if (details.back_style !== 'custom') return { ...details, back_design_url: null };
+  const file = form.get('backDesign');
+  if (!(file instanceof File) || file.size === 0) return details;
+  if (file.size > 4 * 1024 * 1024) redirect('/dashboard/pay/physical?error=La+imagen+del+reverso+debe+pesar+menos+de+4+MB.');
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const pngSignature = [137,80,78,71,13,10,26,10];
+  const png = bytes.length >= 8 && pngSignature.every((value,index) => bytes[index] === value);
+  const riff = bytes.length >= 12 && new TextDecoder().decode(bytes.slice(0,4)) === 'RIFF' && new TextDecoder().decode(bytes.slice(8,12)) === 'WEBP';
+  const contentType = jpeg ? 'image/jpeg' : png ? 'image/png' : riff ? 'image/webp' : null;
+  if (!contentType || contentType !== file.type) redirect('/dashboard/pay/physical?error=Sube+una+imagen+JPG,+PNG+o+WebP+válida.');
+
+  const ext = contentType === 'image/jpeg' ? 'jpg' : contentType === 'image/png' ? 'png' : 'webp';
+  const path = `${businessId}/${crypto.randomUUID()}.${ext}`;
+  const admin = createAdminClient();
+  const { error } = await admin.storage.from('card-designs').upload(path, bytes, { contentType, upsert: false });
+  if (error) redirect('/dashboard/pay/physical?error=No+pudimos+subir+el+diseño+del+reverso.');
+  const backDesignUrl = admin.storage.from('card-designs').getPublicUrl(path).data.publicUrl;
+  return { ...details, back_design_url: backDesignUrl };
 }
 
 async function resolvePhysicalCardDestination(businessId: string, details: PhysicalCardInput) {
@@ -533,7 +559,8 @@ export async function startPhysicalCardCheckout(form: FormData) {
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
-  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const targetedDetails = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const details = await attachPhysicalCardArtwork(businessId, form, targetedDetails);
   const customBack = details.back_style === 'custom';
   return startMercadoPagoProductCheckout({
     productCode: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
@@ -548,7 +575,8 @@ export async function claimIncludedPhysicalCard(form: FormData) {
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
-  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const targetedDetails = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const details = await attachPhysicalCardArtwork(businessId, form, targetedDetails);
   const admin = createAdminClient();
   const [{ data: paidOrders, error: paidError }, { data: existingCards, error: cardsError }] = await Promise.all([
     admin.from('product_orders')
@@ -594,7 +622,8 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
-  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const targetedDetails = await resolvePhysicalCardDestination(businessId, rawDetails);
+  const details = await attachPhysicalCardArtwork(businessId, form, targetedDetails);
   const admin = createAdminClient();
   const customBack = details.back_style === 'custom';
   const { data: order, error } = await admin.from('product_orders').insert({
