@@ -9,17 +9,21 @@ import { PointsProgramForm } from './points-controls';
 import { reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
 import { activateFreeNivalPoints } from './free-actions';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string }> }) {
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpoints');
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, role, businesses(name, slug, product_level)').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
+  const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: business } = await supabase.from('businesses')
+    .select('name, slug, product_level')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+  if (!business) redirect('/dashboard');
   const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: customers }, { count: visits }, { data: program }] = await Promise.all([
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').maybeSingle(),
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_intelligence').eq('status', 'active').maybeSingle(),
