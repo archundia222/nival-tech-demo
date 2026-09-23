@@ -66,7 +66,15 @@ export function PaymentPageView({
       </div>
       <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
     </section>
-    <footer className={styles.footer}>Pago fácil y seguro con <strong>Nival Pay</strong></footer>
+    {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
+      <div>
+        <span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span>
+        <strong>Cobra así con tu propia Nival Pay.</strong>
+        <p>Tarjeta NFC, QR y una página de cobro que puedes actualizar cuando quieras.</p>
+      </div>
+      <a href="/?from=nival-pay#productos">Conocer Nival Tech <b>→</b></a>
+    </aside>}
+    <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <a href="/?from=nival-pay">Nival Tech</a>}</footer>
   </>;
 
   if (embedded) {
