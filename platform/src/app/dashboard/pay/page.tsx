@@ -10,6 +10,7 @@ import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 import { SmartLinkQr } from '../smart-link-qr';
 import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -94,12 +95,13 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
-  const { data: membership, error } = await supabase.from('business_members')
-    .select('business_id, role, businesses(name, logo_url, brand_color, subscription_status, product_level, nival_pay_free_enabled)').eq('user_id', user.id)
-    .order('created_at', { ascending: true }).limit(1).maybeSingle();
-  if (error) throw new Error('No se pudo cargar el negocio.');
+  const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: business, error } = await supabase.from('businesses')
+    .select('name, logo_url, brand_color, subscription_status, product_level, nival_pay_free_enabled')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+  if (error || !business) throw new Error('No se pudo cargar el negocio.');
   await Promise.all([
     reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS),
     reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS),
