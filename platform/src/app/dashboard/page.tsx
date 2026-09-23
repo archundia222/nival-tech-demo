@@ -53,7 +53,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: memberships } = await supabase
     .from("business_members")
     .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled)")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
   const membership = memberships?.[0];
 
   if (!membership) {
