@@ -4,16 +4,18 @@ import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalIntelligenceSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
+import { saveAverageTicket, startIntelligenceCampaign } from './actions';
 import styles from './intelligence-dashboard.module.css';
 
 type Visit = { customer_id: string; visited_at: string };
+type Campaign = { id: string; name: string; audience_rule: unknown; message: string; status: string; sent_at: string | null; created_at: string };
 
-export default async function NivalIntelligencePage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string }> }) {
+export default async function NivalIntelligencePage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string; campaign?: string; ticket?: string; question?: string }> }) {
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fintelligence');
-  const { data: membership } = await supabase.from('business_members').select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
+  const { data: membership } = await supabase.from('business_members').select('business_id, businesses(name, product_level, average_ticket_cents)').eq('user_id', user.id).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
@@ -24,11 +26,12 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const view = params.view ?? 'overview';
   const navActive = view === 'risk' ? 'inteligencia-riesgo' : view === 'recurring' ? 'inteligencia-recurrentes' : view === 'campaigns' ? 'inteligencia-campanas' : view === 'impact' ? 'inteligencia-impacto' : view === 'imports' ? 'inteligencia-importar' : view === 'assistant' ? 'inteligencia-asistente' : 'inteligencia';
 
-  const [{ data: customerRows }, { data: visitRows }, { data: rewardRows }] = active ? await Promise.all([
-    supabase.from('customers').select('id,name,phone,email,created_at').eq('business_id', membership.business_id).order('created_at',{ascending:false}).limit(500),
+  const [{ data: customerRows }, { data: visitRows }, { data: rewardRows }, { data: campaignRows }] = active ? await Promise.all([
+    supabase.from('customers').select('id,name,phone,email,marketing_consent_at,created_at').eq('business_id', membership.business_id).order('created_at',{ascending:false}).limit(500),
     supabase.from('visits').select('customer_id,visited_at').eq('business_id', membership.business_id).order('visited_at',{ascending:false}).limit(5000),
     supabase.from('loyalty_rewards').select('customer_id,redeemed_at').eq('business_id', membership.business_id).limit(3000),
-  ]) : [{ data: [] }, { data: [] }, { data: [] }];
+    supabase.from('campaigns').select('id,name,audience_rule,message,status,sent_at,created_at').eq('business_id', membership.business_id).order('created_at',{ascending:false}).limit(20),
+  ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
   const now = Date.now();
   const day = 86400000;
@@ -55,15 +58,15 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const recoverable = atRisk.filter((customer) => customer.daysSince !== null && customer.daysSince <= 60);
   const slipping = customers.filter((customer) => customer.frequency && customer.daysSince !== null && customer.daysSince > customer.frequency * 1.5 && customer.daysSince <= 30);
   const frequentAtRisk = atRisk.filter((customer) => customer.visits >= 3);
-  const contactableRisk = recoverable.filter((customer) => customer.phone || customer.email);
+  const contactableRisk = recoverable.filter((customer) => (customer.phone || customer.email) && customer.marketing_consent_at);
   const priorityAudience = frequentAtRisk.length ? frequentAtRisk : recoverable.length ? recoverable : frequent.length ? frequent : newCustomers;
-  const priorityContacts = priorityAudience.filter((customer) => customer.phone || customer.email);
+  const priorityContacts = priorityAudience.filter((customer) => (customer.phone || customer.email) && customer.marketing_consent_at);
   const topPriority = priorityContacts.slice(0, 5);
   const pointsCustomers = customers.filter((customer) => customer.visits >= 2);
   const riskWithHistory = frequentAtRisk.length || recoverable.filter((customer) => customer.visits >= 2).length;
   const secondVisitOpportunity = newCustomers.filter((customer) => customer.visits === 1 && customer.daysSince !== null && customer.daysSince <= 21);
   const loyaltyOpportunity = frequent.filter((customer) => customer.visits >= 4);
-  const unreachableRisk = recoverable.filter((customer) => !customer.phone && !customer.email);
+  const unreachableRisk = recoverable.filter((customer) => !(customer.phone || customer.email) || !customer.marketing_consent_at);
   const actionScore = priorityAudience.length ? Math.round((priorityContacts.length / priorityAudience.length) * 100) : 0;
   const priorityLabel = frequentAtRisk.length ? 'clientes frecuentes que se están alejando' : recoverable.length ? 'clientes que puedes recuperar' : frequent.length ? 'clientes frecuentes' : 'clientes nuevos';
   const nextBestAction = frequentAtRisk.length ? 'Recuperarlos antes de ofrecer promociones a clientes nuevos' : recoverable.length ? 'Lanzar una campaña de regreso' : frequent.length ? 'Darles un beneficio exclusivo para reforzar el hábito' : 'Provocar una segunda visita';
@@ -84,6 +87,39 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const dataCoverage = customers.length ? Math.round((customers.filter(c => c.phone || c.email).length / customers.length) * 100) : 0;
   const intelligenceScore = Math.min(100, Math.round((Math.min(customers.length, 50) / 50) * 35 + (Math.min(visits.length, 150) / 150) * 35 + (dataCoverage / 100) * 30));
   const mainAdvice = atRisk.length ? `${atRisk.length} clientes necesitan atención antes de enfriarse más.` : visits30 ? 'Tu actividad reciente es estable. Conviene reforzar a tus clientes frecuentes.' : 'Registra visitas para que Intelligence encuentre oportunidades reales.';
+  const averageTicketCents = Number(business?.average_ticket_cents ?? 0);
+  const campaigns = (campaignRows ?? []) as Campaign[];
+  const campaignStats = campaigns.filter((campaign) => campaign.status === 'sent' && campaign.sent_at).map((campaign) => {
+    const rule = campaign.audience_rule && typeof campaign.audience_rule === 'object' ? campaign.audience_rule as Record<string, unknown> : {};
+    const ids = Array.isArray(rule.customer_ids) ? rule.customer_ids.map(String) : [];
+    const sentAt = new Date(campaign.sent_at as string).getTime();
+    const windowEnd = sentAt + 30 * day;
+    const returnedIds = new Set(visits.filter((visit) => ids.includes(visit.customer_id)).filter((visit) => {
+      const visitAt = new Date(visit.visited_at).getTime();
+      return visitAt > sentAt && visitAt <= windowEnd;
+    }).map((visit) => visit.customer_id));
+    return { ...campaign, audience: ids.length, returned: returnedIds.size, rate: ids.length ? Math.round((returnedIds.size / ids.length) * 100) : 0 };
+  });
+  const latestCampaign = campaignStats[0] ?? null;
+  const latestEstimatedValueCents = latestCampaign && averageTicketCents ? latestCampaign.returned * averageTicketCents : 0;
+  const personalizedMessage = (name: string) => campaignMessage.replace('{{nombre}}', name || ''); 
+  const contactHref = (customer: typeof customers[number]) => {
+    const message = encodeURIComponent(personalizedMessage(customer.name));
+    if (customer.phone) {
+      const digits = customer.phone.replace(/\D/g, '');
+      const whatsappNumber = digits.length === 10 ? `52${digits}` : digits;
+      return `https://wa.me/${whatsappNumber}?text=${message}`;
+    }
+    if (customer.email) return `mailto:${customer.email}?subject=${encodeURIComponent(businessName)}&body=${message}`;
+    return '#';
+  };
+  const question = (params.question ?? '').trim().toLowerCase();
+  const assistantAnswer = !question ? null
+    : /riesgo|perdiendo|volver|recuper/.test(question) ? (recoverable.length ? `Yo empezaría por ${frequentAtRisk.length || recoverable.length} clientes que ya conocen tu negocio. ${priorityContacts.length} tienen contacto y consentimiento para una campaña. Mi recomendación es recuperación antes de invertir en adquisición nueva.` : 'No detecto ahora un grupo claro de recuperación. Me enfocaría en provocar segundas visitas y proteger a los frecuentes.')
+    : /frecuent|mejor|vip|leal/.test(question) ? (frequent.length ? `Tienes ${frequent.length} clientes frecuentes y ${loyaltyOpportunity.length} ya acumulan 4 o más visitas. A ellos les conviene reconocimiento o un beneficio especial, no una promoción masiva.` : 'Todavía no hay un grupo frecuente fuerte. El objetivo inmediato debería ser conseguir segundas y terceras visitas.')
+    : /campaña|promoci|mensaje/.test(question) ? `La campaña que más sentido tiene ahora es: ${recoverable.length ? 'recuperación' : frequent.length ? 'beneficio VIP' : 'segunda visita'}. Audiencia útil: ${priorityContacts.length} clientes con contacto y consentimiento.`
+    : /dinero|venta|resultado|funcion/.test(question) ? (latestCampaign ? `La campaña más reciente tiene ${latestCampaign.returned} regresos posteriores de ${latestCampaign.audience} clientes objetivo (${latestCampaign.rate}%).${averageTicketCents ? ` Con tu ticket promedio, esas visitas representan aproximadamente ${(latestEstimatedValueCents / 100).toLocaleString('es-MX')} MXN en valor estimado.` : ' Configura tu ticket promedio en Resultados para traducir esos regresos a un valor estimado.'}` : 'Todavía no hay una campaña registrada para medir. Inicia una desde Campañas y Nival comenzará a observar regresos.')
+    : `La acción que priorizaría hoy es: ${nextBestAction}. La audiencia principal es de ${priorityAudience.length} clientes y ${priorityContacts.length} están listos para contacto.`;
 
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
