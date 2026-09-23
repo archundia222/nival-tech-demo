@@ -39,7 +39,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
   const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }, { data: visitRows }, { data: rewardRows }] = available && canManage ? await Promise.all([
-    supabase.rpc('get_points_dashboard_metrics'),
+    supabase.rpc('get_points_dashboard_metrics_for', { p_business_id: membership.business_id }),
     supabase.from('points_ledger')
       .select('id,event_type,delta,reason,occurred_at,customer_id,customers(name)')
       .eq('business_id', membership.business_id)
