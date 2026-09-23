@@ -57,7 +57,7 @@ export function ProfilePublicView({
         </header>
 
         {actions.length > 0 && <section className="profileActionSection" aria-labelledby={embedded ? undefined : "profile-actions"}>
-          {!embedded && <div className="profileSectionHeading"><span>Todo lo que necesitas</span><h2 id="profile-actions">¿Qué deseas hacer?</h2></div>}
+          {!embedded && <div className="profileSectionHeading"><span>ACCESOS RÁPIDOS</span><h2 id="profile-actions">¿Qué necesitas?</h2></div>}
           <div className="profileLinks">
             {actions.map((item) => <a
               className={`profileLink${item.featured ? " featured" : ""}`}
@@ -73,7 +73,10 @@ export function ProfilePublicView({
           </div>
         </section>}
 
-        {showFooter && <footer className="profileFooter"><span>Información proporcionada por el negocio</span><b>NIVAL tech</b></footer>}
+        {showFooter && <>
+          <aside className="profileNivalPromo"><div><span>¿TIENES UN NEGOCIO?</span><strong>Tu negocio también puede tener una página así.</strong><p>Cobros, lealtad y herramientas para hacer crecer clientes frecuentes.</p></div><a href="/?from=perfil-negocio#productos">Conocer Nival Tech →</a></aside>
+          <footer className="profileFooter"><span>Información proporcionada por el negocio</span><a href="/?from=perfil-negocio"><b>NIVAL tech</b></a></footer>
+        </>}
       </article>
     </>;
 
