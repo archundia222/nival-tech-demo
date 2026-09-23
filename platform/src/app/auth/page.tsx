@@ -20,10 +20,13 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <h1>{signup ? "Crea tu acceso a Nival" : "Entra a Nival"}</h1>
         <p className="authIntro">
           {signup
-            ? "Crea tu acceso y enseguida te pediremos solo lo necesario para preparar tu negocio."
+            ? "Empieza gratis. Crea tu acceso y en menos de unos minutos podrás preparar tu primera herramienta Nival para usarla con clientes reales."
             : "Administra Nival Pay, Puntos e Intelligence desde la misma cuenta."}
         </p>
-        {signup && <div className="authPath"><span><b>1</b> Tu acceso</span><span><b>2</b> Tu negocio</span><span><b>3</b> Elige qué usar</span></div>}
+        {signup && <>
+          <div className="authPromise"><strong>No necesitas tarjeta para empezar.</strong><span>Pay, Puntos e Intelligence tienen una forma de empezar gratis.</span></div>
+          <div className="authPath"><span><b>1</b> Tu acceso</span><span><b>2</b> Tu negocio</span><span><b>3</b> Empieza gratis</span></div>
+        </>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}
         <form action={signup ? signUp : signIn} className="authForm">
