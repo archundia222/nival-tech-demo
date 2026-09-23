@@ -18,6 +18,6 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
   if (error || !data?.[0]) notFound();
 
   return <main className={`${styles.pageShell} ${dmSans.variable} ${manrope.variable}`}>
-    <PaymentPageView profile={data[0]} />
+    <PaymentPageView profile={data[0]} trackingToken={token} />
   </main>;
 }
