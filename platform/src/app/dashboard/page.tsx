@@ -9,6 +9,7 @@ import { BusinessOnboardingForm } from "./business-onboarding-form";
 import { DashboardNavigation } from "./dashboard-navigation";
 import { ProfilePublicView, type ProfileActionItem } from "@/app/p/[slug]/profile-public-view";
 import { BusinessHealthCard } from "./business-health-card";
+import { getActiveBusinessMembership } from "@/lib/active-business";
 
 interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
@@ -50,12 +51,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
 
-  const { data: memberships } = await supabase
-    .from("business_members")
-    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled)")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: true });
-  const membership = memberships?.[0];
+  const membership = await getActiveBusinessMembership(user.id);
 
   if (!membership) {
     return (
@@ -72,8 +68,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
-  const businessId = business?.id;
+  const businessId = membership.business_id;
+  const { data: business } = await supabase
+    .from("businesses")
+    .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled")
+    .eq("id", businessId)
+    .maybeSingle();
+  if (!business) throw new Error("No se pudo cargar el negocio.");
   const productLevel: 'pay' | 'intelligence' = business?.product_level === 'intelligence' ? 'intelligence' : 'pay';
   const { data: entitlementRows } = businessId ? await supabase.from('business_product_entitlements')
     .select('product_code,status').eq('business_id', businessId) : { data: [] };
