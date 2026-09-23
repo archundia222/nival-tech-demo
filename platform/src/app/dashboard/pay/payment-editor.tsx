@@ -61,8 +61,6 @@ export function PaymentEditor({
   profile: Profile | null;
   siteUrl: string;
 }) {
-  void siteUrl;
-
   const [checkoutPending, startCheckoutTransition] = useTransition();
   const [state, action, pending] = useActionState<PaymentFormState, FormData>(savePaymentProfile, {});
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -112,12 +110,6 @@ export function PaymentEditor({
   const updateSection = (id: string, patch: Partial<{ title: string; content: string; public: boolean }>) => {
     markDirty();
     setSections((current) => current.map((section) => section.id === id ? { ...section, ...patch } : section));
-  };
-
-  const editSectionField = (id: string, field: 'title' | 'content', currentValue: string) => {
-    const label = field === 'title' ? 'Nombre del apartado' : 'Link o información del apartado';
-    const nextValue = window.prompt(label, currentValue);
-    if (nextValue !== null) updateSection(id, { [field]: nextValue });
   };
 
   useEffect(() => () => {
@@ -206,6 +198,7 @@ export function PaymentEditor({
             <h2>Tu página Nival Pay</h2>
           </div>
           <div className="nivalPaySaveCluster">
+            {profile?.public_token && <a className="nivalPayPublicLink" href={siteUrl + '/pay/' + profile.public_token} target="_blank" rel="noreferrer">Ver página ↗</a>}
             <span
               className={`nivalPaySaveStatus ${state.error ? 'isError' : pending ? 'isSaving' : 'isSaved'}`}
               role={state.error ? 'alert' : 'status'}
@@ -255,6 +248,7 @@ export function PaymentEditor({
           </label>
         </div>
 
+        <div className="nivalPayFormSectionTitle"><span>DATOS PARA COBRAR</span><p>Lo esencial que tu cliente necesita para hacer una transferencia sin preguntarte nada.</p></div>
         <div className="nivalPayFieldGroup">
           <div className="nivalPayFieldHeading">
             <span>Beneficiario</span>
@@ -300,6 +294,10 @@ export function PaymentEditor({
             maxLength={23}
           />
 
+        </div>
+
+        <div className="nivalPayFormSectionTitle"><span>AYUDAS OPCIONALES</span><p>Agrega un concepto fijo o un enlace de pago si realmente le facilita el proceso al cliente.</p></div>
+        <div className="nivalPayFieldGroup">
           <div className="nivalPayFieldHeading">
             <span>Concepto <small>Opcional</small></span>
             <VisibilityControl visible={fieldVisibility.concept} onClick={() => toggleDefaultField('concept', 'Concepto')} />
@@ -334,7 +332,7 @@ export function PaymentEditor({
             </div>
 
             <label className="nivalPayField">
-              <span>Nombre del apartado <button type="button" className="nivalPayInlineLink" onClick={() => editSectionField(section.id, 'title', section.title)}>Editar</button></span>
+              <span>Nombre del apartado</span>
               <input
                 ref={section.id === newSectionId ? newSectionInput : undefined}
                 value={section.title}
@@ -345,7 +343,7 @@ export function PaymentEditor({
             </label>
 
             <label className="nivalPayField">
-              <span>Link o información <button type="button" className="nivalPayInlineLink" onClick={() => editSectionField(section.id, 'content', section.content)}>Editar</button></span>
+              <span>Link o información</span>
               <input
                 value={section.content}
                 onChange={(event) => updateSection(section.id, { content: event.target.value })}
