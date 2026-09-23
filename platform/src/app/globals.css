@@ -4127,3 +4127,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 /* Checkout: make activation path obvious */
 .checkoutSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 22px}.checkoutSteps>div{display:grid;grid-template-columns:28px 1fr;gap:2px 9px;align-items:center;padding:13px 14px;border:1px solid #d8d8d2;border-radius:13px;background:#fff}.checkoutSteps span{grid-row:1/3;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;color:#5b625f;background:#ecece7;font-size:10px;font-weight:900}.checkoutSteps .current{border-color:#c9a85c}.checkoutSteps .current span{color:#101312;background:#c9a85c}.checkoutSteps b{font-size:12px}.checkoutSteps small{color:#777d79;font-size:9px}
 @media(max-width:650px){.checkoutSteps{grid-template-columns:1fr}.checkoutSteps>div{grid-template-columns:28px 1fr}}
+
+/* Signup path */
+.authPath{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:22px 0 4px}.authPath span{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:10px}.authPath b{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;color:#0b0b0b;background:var(--accent);font-size:9px}
+@media(max-width:520px){.authPath{grid-template-columns:1fr}.authPath span{padding:8px 10px}}
