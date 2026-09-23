@@ -52,6 +52,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>
+      <a className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Pago, contacto y otros accesos del negocio</strong></span><b>→</b></a>
       <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
       {(business.phone || business.website_url) && <footer className="businessContact">
         {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
