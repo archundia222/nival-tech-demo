@@ -11,13 +11,13 @@ export default function PrivacyPage() {
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 9 DE SEPTIEMBRE DE 2026</p>
         <h1>Aviso de privacidad</h1>
-        <p>Nival Tech opera una plataforma de lealtad digital para negocios. Este aviso explica qué datos tratamos, para qué los utilizamos y cómo puedes ejercer tus derechos.</p>
+        <p>Nival Tech ofrece herramientas digitales para negocios, incluyendo páginas de cobro informativas, programas de lealtad, perfiles digitales y funciones de análisis y recomendaciones. Este aviso explica qué datos podemos tratar, para qué los utilizamos y cómo puedes ejercer tus derechos.</p>
         <h2>Datos que podemos tratar</h2>
-        <p>Nombre, teléfono, correo electrónico opcional, consentimientos, negocio asociado, visitas, puntos y datos técnicos necesarios para operar la tarjeta digital.</p>
+        <p>Dependiendo del producto utilizado, podemos tratar nombre, teléfono, correo electrónico, consentimientos, negocio asociado, visitas, puntos, recompensas, configuraciones del negocio y datos técnicos necesarios para operar el servicio. Nival Pay puede mostrar los datos de transferencia que el propio negocio decide publicar; Nival Tech no solicita NIP, CVV ni contraseñas bancarias para esa función.</p>
         <h2>Finalidades</h2>
         <ul>
-          <li>Crear y mantener tu cuenta de lealtad.</li>
-          <li>Registrar visitas, puntos y beneficios.</li>
+          <li>Crear y mantener cuentas, perfiles y configuraciones de los productos Nival.</li>
+          <li>Operar páginas de cobro informativas, registrar visitas, puntos, beneficios y actividad necesaria para las funciones contratadas.</li>
           <li>Generar y actualizar pases de Google Wallet cuando lo solicites.</li>
           <li>Brindar soporte, prevenir abuso y mantener la seguridad del servicio.</li>
           <li>Enviar promociones únicamente cuando hayas dado tu consentimiento.</li>
