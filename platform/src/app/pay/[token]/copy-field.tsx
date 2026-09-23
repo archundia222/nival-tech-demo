@@ -14,9 +14,9 @@ async function write(value:string){
   }
 }
 
-export function CopyField({label,value,variant="detail",headingId="payment-title"}:{label:string;value:string;variant?:"name"|"bank"|"clabe"|"detail";headingId?:string|null}){
+export function CopyField({label,value,variant="detail",headingId="payment-title",trackingToken}:{label:string;value:string;variant?:"name"|"bank"|"clabe"|"detail";headingId?:string|null;trackingToken?:string}){
  const [copied,setCopied]=useState(false);
- async function copy(){try{await write(value);setCopied(true);setTimeout(()=>setCopied(false),1600)}catch{}}
+ async function copy(){try{await write(value);if(variant==="clabe"&&trackingToken){void fetch(`/api/public/pay/${trackingToken}/copy`,{method:"POST",keepalive:true}).catch(()=>undefined)}setCopied(true);setTimeout(()=>setCopied(false),1600)}catch{}}
  if(variant==="name") return <div className={styles.nameLine}><h1 id={headingId ?? undefined}>{value}</h1><button className={styles.nameCopy} type="button" onClick={copy} aria-label="Copiar nombre completo"><CopyIcon/></button>{copied&&<span className={styles.inlineCopied}>Copiado</span>}</div>;
  return <button className={styles.detailRow} type="button" onClick={copy} aria-label={`Copiar ${label}`}>
    <span><span className={styles.label}>{label}</span><span className={variant==="clabe"?styles.clabeValue:variant==="bank"?styles.bankValue:styles.value}>{value}</span></span>
