@@ -96,7 +96,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="landingPainGrid">
           <article><span>01</span><h3>“¿Me mandas tu CLABE?”</h3><p>Deja de buscar capturas o dictar números. Tu cliente abre una página clara desde QR, enlace o NFC.</p><b>Nival Pay lo resuelve →</b></article>
           <article><span>02</span><h3>“Vino una vez y no volvió.”</h3><p>Registra visitas y recompensa la recurrencia para que regresar tenga una razón visible para el cliente.</p><b>Nival Puntos lo resuelve →</b></article>
-          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Nival detecta oportunidades y las convierte en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Nival Intelligence lo resuelve →</b></article>
+          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Registra una venta en segundos, carga el total del día o importa un CSV. Intelligence convierte esa actividad en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Nival Intelligence lo resuelve →</b></article>
         </div>
       </section>
 
@@ -246,7 +246,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
         <div className="payExpansionOptions">
           <article><span>APARTADO ADICIONAL</span><strong>$49 MXN</strong><p>Después de tus 3 apartados incluidos, agrega un enlace o bloque adicional a tu página de cobro.</p></article>
-          <article><span>TARJETA NFC ADICIONAL</span><strong>$99 MXN</strong><p>Una tarjeta física extra vinculada al punto de cobro que elijas.</p></article>
+          <article><span>TARJETA NFC</span><strong>Desde $99 MXN</strong><p>Programa una tarjeta para Nival Pay, Puntos, reseñas o tu perfil digital. Reverso personalizado: +$10 MXN.</p></article>
         </div>
       </section>
 

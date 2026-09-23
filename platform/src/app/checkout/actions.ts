@@ -15,8 +15,9 @@ async function currentPurchaseContext() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
   const membership = await getActiveBusinessMembership(user.id);
-  // /dashboard/pay is an allowed onboarding destination and redirects unpaid customers back to checkout.
+  // Purchases change the commercial state of the workspace, so staff cannot create them.
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
+  if (!['owner','manager'].includes(membership.role)) redirect('/dashboard?error=Solo+el+propietario+o+un+gerente+puede+realizar+compras.');
   return { user, businessId: membership.business_id, supabase };
 }
 
@@ -95,7 +96,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
+  if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId)
       .eq('product_code', NIVAL_PAY_PRODUCT)
@@ -549,7 +550,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
     const { data: program } = await admin.from('loyalty_programs').select('review_url')
       .eq('business_id', businessId).eq('active', true).limit(1).maybeSingle();
     if (!program?.review_url) redirect('/dashboard/pay/physical?error=Configura+primero+el+enlace+de+reseñas+del+negocio.');
-    return { ...details, target_payment_profile_id: null, target_url: program.review_url };
+    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/r/${business.slug}` };
   }
 
   return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/p/${business.slug}` };

@@ -241,8 +241,22 @@ export async function registerDailySalesSummary(formData: FormData) {
   if (!amountCents) redirect(captureReturn(formData, "error", "Ingresa el total vendido."));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate)) redirect(captureReturn(formData, "error", "Selecciona la fecha del resumen."));
 
-  const { error } = await supabase.from("business_sales").insert({
-    business_id: membership.business_id,
+  const dayStart = `${saleDate}T00:00:00Z`;
+  const nextDate = new Date(`${saleDate}T00:00:00Z`);
+  nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+  const dayEnd = nextDate.toISOString();
+
+  const { data: existingSummary } = await supabase.from("business_sales")
+    .select("id")
+    .eq("business_id", membership.business_id)
+    .eq("source", "summary")
+    .gte("sold_at", dayStart)
+    .lt("sold_at", dayEnd)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  const summaryPayload = {
     amount_cents: amountCents,
     payment_method: "summary",
     transactions_count: transactions,
@@ -250,7 +264,11 @@ export async function registerDailySalesSummary(formData: FormData) {
     source: "summary",
     note: "Resumen diario",
     created_by: user.id,
-  });
+  };
+
+  const { error } = existingSummary
+    ? await supabase.from("business_sales").update(summaryPayload).eq("id", existingSummary.id).eq("business_id", membership.business_id)
+    : await supabase.from("business_sales").insert({ business_id: membership.business_id, ...summaryPayload });
   if (error) redirect(captureReturn(formData, "error", "No pudimos guardar el resumen."));
   revalidatePath("/dashboard/points");
   revalidatePath("/dashboard/intelligence");
@@ -267,6 +285,7 @@ export async function importSalesCsv(formData: FormData) {
   if (entry.size > 2_000_000) redirect(captureReturn(formData, "error", "El CSV debe pesar menos de 2 MB."));
 
   const text = await entry.text();
+  const importReference = crypto.createHash("sha256").update(text).digest("hex");
   const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
   if (lines.length < 2) redirect(captureReturn(formData, "error", "El CSV no tiene filas para importar."));
 
@@ -304,11 +323,14 @@ export async function importSalesCsv(formData: FormData) {
       transactions_count: 1,
       sold_at: soldAt,
       source: "imported",
+      source_reference: importReference,
+      source_line: index,
       created_by: user.id,
     });
   }
   if (!rows.length) redirect(captureReturn(formData, "error", "No encontramos ventas válidas en el CSV."));
   const { error } = await supabase.from("business_sales").insert(rows);
+  if (error?.code === "23505") redirect(captureReturn(formData, "error", "Ese mismo archivo ya fue importado. No duplicamos las ventas."));
   if (error) redirect(captureReturn(formData, "error", "No pudimos importar las ventas."));
   revalidatePath("/dashboard/points");
   revalidatePath("/dashboard/intelligence");

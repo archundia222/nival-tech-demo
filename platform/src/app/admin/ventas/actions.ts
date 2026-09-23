@@ -41,6 +41,16 @@ export async function updatePhysicalCardFulfillment(formData: FormData) {
   if (!cardId || !allowed.has(status)) redirect('/admin/ventas?section=nival-card&error=Estado+inválido');
 
   const admin = createAdminClient();
+  const { data: card } = await admin.from('physical_card_orders')
+    .select('id, product_orders!physical_card_orders_product_order_id_fkey(status)')
+    .eq('id', cardId)
+    .maybeSingle();
+  const payment = Array.isArray(card?.product_orders) ? card?.product_orders[0] : card?.product_orders;
+  if (!card) redirect('/admin/ventas?section=nival-card&error=No+encontramos+el+pedido');
+  if (payment?.status !== 'paid' && !['new','cancelled'].includes(status)) {
+    redirect('/admin/ventas?section=nival-card&error=Confirma+el+pago+antes+de+mandar+la+tarjeta+a+producción');
+  }
+
   const { error } = await admin.from('physical_card_orders')
     .update({ fulfillment_status: status, tracking_code: trackingCode, updated_at: new Date().toISOString() })
     .eq('id', cardId);
