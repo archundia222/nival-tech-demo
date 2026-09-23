@@ -116,6 +116,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
+      <section className="nivalLoopSection scrollReveal" aria-labelledby="nival-loop-title">
+        <div className="nivalLoopIntro"><p className="landingEyebrow">CUANDO LOS CONECTAS</p><h2 id="nival-loop-title">Cada interacción puede ayudarte con la siguiente.</h2><p>Nival no busca llenarte de módulos. La idea es que cobrar, generar recurrencia y decidir qué hacer después formen un mismo ciclo.</p></div>
+        <div className="nivalLoopFlow">
+          <article><span>01 · NIVAL PAY</span><strong>El cliente paga fácil.</strong><p>NFC, QR o enlace abren la información correcta sin volver a preguntarte cómo transferir.</p></article>
+          <i aria-hidden="true">→</i>
+          <article><span>02 · NIVAL PUNTOS</span><strong>Le das una razón para volver.</strong><p>La siguiente visita deja de depender solo de que el cliente se acuerde de ti.</p></article>
+          <i aria-hidden="true">→</i>
+          <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival te dice qué hacer después.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
+        </div>
+        <small>Empieza con un producto. Agrega los demás solo cuando resuelvan un problema real de tu negocio.</small>
+      </section>
+
       <section className="landingSection landingProblem scrollReveal" id="como-funciona">
         <div className="landingSectionHeading">
           <p className="landingEyebrow">LO SIMPLE FUNCIONA</p>
