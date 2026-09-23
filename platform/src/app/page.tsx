@@ -5,7 +5,16 @@ import { LandingReveal } from "./landing-reveal";
 
 const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
+  const params = await searchParams;
+  const source = params.from === 'nival-pay' || params.from === 'nival-puntos' || params.from === 'perfil-negocio' ? params.from : null;
+  const sourceContext = source === 'nival-pay'
+    ? { eyebrow: 'LLEGASTE DESDE UNA NIVAL PAY', title: '¿Te gustó lo fácil que fue encontrar los datos para pagar?', text: 'Tu negocio puede tener la misma experiencia: NFC, QR y página editable por $199 MXN, pago único.', href: '/auth?mode=signup&next=%2Fcheckout', cta: 'Quiero una Nival Pay' }
+    : source === 'nival-puntos'
+      ? { eyebrow: 'LLEGASTE DESDE NIVAL PUNTOS', title: '¿Quieres un programa de clientes frecuentes como el que acabas de ver?', text: 'Crea tu tarjeta digital, registra visitas y entrega recompensas desde $199 MXN al mes.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpoints', cta: 'Crear mi programa' }
+      : source === 'perfil-negocio'
+        ? { eyebrow: 'LLEGASTE DESDE UNA PÁGINA NIVAL', title: 'Tu negocio también puede tener un acceso simple para cobro, puntos, contacto y enlaces.', text: 'Nival reúne herramientas pensadas para negocios locales sin obligarte a cambiar cómo trabajas.', href: '#productos', cta: 'Ver soluciones' }
+        : null;
   return (
     <main className="landing" id="inicio">
       <LandingReveal />
@@ -21,6 +30,11 @@ export default function Home() {
         </div>
         <Link className="landingLogin" href="/auth">Mi cuenta</Link>
       </nav>
+
+      {sourceContext && <section className="sourceArrival" aria-label="Conoce Nival Tech">
+        <div><span>{sourceContext.eyebrow}</span><strong>{sourceContext.title}</strong><p>{sourceContext.text}</p></div>
+        <a href={sourceContext.href}>{sourceContext.cta} <b>→</b></a>
+      </section>}
 
       <section className="landingHero">
         <div className="landingHeroCopy">
