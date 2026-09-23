@@ -16,7 +16,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fintelligence');
-  const { data: membership } = await supabase.from('business_members').select('business_id, businesses(name, product_level, average_ticket_cents)').eq('user_id', user.id).limit(1).maybeSingle();
+  const { data: membership } = await supabase.from('business_members').select('business_id, businesses(name, product_level, average_ticket_cents)').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
