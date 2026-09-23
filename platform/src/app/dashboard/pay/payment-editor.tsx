@@ -52,12 +52,14 @@ export function PaymentEditor({
   businessId,
   businessName,
   businessLogo,
+  businessBrandColor,
   profile,
   siteUrl,
 }: {
   businessId: string;
   businessName: string;
   businessLogo: string | null;
+  businessBrandColor: string | null;
   profile: Profile | null;
   siteUrl: string;
 }) {
@@ -160,6 +162,7 @@ export function PaymentEditor({
   const previewProfile = {
     business_name: businessName,
     logo_url: image,
+    brand_color: businessBrandColor,
     account_holder: holder,
     bank_name: bank,
     clabe,
