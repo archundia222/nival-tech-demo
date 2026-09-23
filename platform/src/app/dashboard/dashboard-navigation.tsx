@@ -11,7 +11,9 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
 ];
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
-  { id: 'puntos', label: 'Clientes y actividad', href: '/dashboard/points', group: 'clientes' },
+  { id: 'puntos', label: 'Resumen', href: '/dashboard/points', group: 'clientes' },
+  { id: 'puntos-clientes', label: 'Clientes y actividad', href: '/dashboard/points?view=customers', group: 'clientes' },
+  { id: 'puntos-analitica', label: 'Analítica', href: '/dashboard/points?view=analytics', group: 'clientes' },
   { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
   { id: 'puntos-canjes', label: 'Canjear recompensa', href: '/dashboard/points?view=redemptions', group: 'operacion' },
   { id: 'puntos-configuracion', label: 'Programa de lealtad', href: '/dashboard/points?view=settings', group: 'gestion' },
