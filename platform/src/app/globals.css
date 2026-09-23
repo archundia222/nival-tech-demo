@@ -4131,3 +4131,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 /* Signup path */
 .authPath{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:22px 0 4px}.authPath span{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:10px}.authPath b{width:20px;height:20px;display:grid;place-items:center;border-radius:50%;color:#0b0b0b;background:var(--accent);font-size:9px}
 @media(max-width:520px){.authPath{grid-template-columns:1fr}.authPath span{padding:8px 10px}}
+
+/* Nival Pay editor: clearer hierarchy and direct public preview */
+.nivalPayPublicLink{display:inline-flex;align-items:center;min-height:36px;padding:8px 11px;border:1px solid var(--nv-border,#303038);border-radius:9px;color:var(--nv-text-secondary,#B8B8C0);font-size:10px;font-weight:800;text-decoration:none}.nivalPayPublicLink:hover{color:var(--nv-text,#F7F7F8);border-color:rgba(200,166,90,.4)}
+.nivalPayFormSectionTitle{display:grid;gap:4px;margin:24px 0 10px;padding-top:18px;border-top:1px solid var(--nv-border,#303038)}.nivalPayFormSectionTitle span{color:var(--nv-accent,#C8A65A);font-size:9px;font-weight:900;letter-spacing:.11em}.nivalPayFormSectionTitle p{max-width:640px;margin:0;color:var(--nv-text-secondary,#B8B8C0);font-size:10px;line-height:1.5}
+@media(max-width:650px){.nivalPaySaveCluster{align-items:stretch!important}.nivalPayPublicLink{justify-content:center}}
