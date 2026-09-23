@@ -24,7 +24,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
     <main className="customerShell brandedCustomerShell" style={{ "--business-accent": business.brand_color } as CSSProperties}>
       <header className="customerBrand">
         {business.logo_url ? <img className="businessLogo" src={business.logo_url} alt={`Logo de ${business.business_name}`} /> : <span className="brandmark">N</span>}
-        <span>Programa impulsado por <b>NIVAL tech</b></span>
+        <span>Programa impulsado por <a href="/?from=nival-puntos"><b>NIVAL tech</b></a></span>
       </header>
       <section className="customerHero">
         <p className="eyebrow">PROGRAMA DE LEALTAD</p>
@@ -46,6 +46,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <button className="primaryButton" type="submit">Crear mi tarjeta</button>
           </form>
       </section>
+      <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
       {(business.phone || business.website_url) && <footer className="businessContact">
         {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
         {business.website_url && <a href={business.website_url} target="_blank" rel="noreferrer">Visitar sitio web</a>}
