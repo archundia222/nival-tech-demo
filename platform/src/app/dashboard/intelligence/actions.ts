@@ -3,21 +3,15 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 async function getContext() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fintelligence');
 
-  const { data: membership } = await supabase
-    .from('business_members')
-    .select('business_id, role')
-    .eq('user_id', user.id)
-    .in('role', ['owner', 'manager'])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect('/dashboard/intelligence?error=No+tienes+permiso+para+administrar+Intelligence.');
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/intelligence?error=No+tienes+permiso+para+administrar+Intelligence.');
   return { supabase, user, businessId: membership.business_id };
 }
 
