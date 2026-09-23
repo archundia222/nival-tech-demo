@@ -17,12 +17,13 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
       </Link>
       <section className="authCard">
         <p className="eyebrow">ACCESO PARA NEGOCIOS</p>
-        <h1>{signup ? "Crea tu cuenta" : "Bienvenido"}</h1>
+        <h1>{signup ? "Crea tu acceso a Nival" : "Entra a Nival"}</h1>
         <p className="authIntro">
           {signup
-            ? "Primero crearemos tu usuario; después configurarás tu negocio."
-            : "Ingresa a tu cuenta de Nival Tech."}
+            ? "Crea tu acceso y enseguida te pediremos solo lo necesario para preparar tu negocio."
+            : "Administra Nival Pay, Puntos e Intelligence desde la misma cuenta."}
         </p>
+        {signup && <div className="authPath"><span><b>1</b> Tu acceso</span><span><b>2</b> Tu negocio</span><span><b>3</b> Elige qué usar</span></div>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}
         <form action={signup ? signUp : signIn} className="authForm">
@@ -32,7 +33,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           )}
           <label>Correo<input type="email" name="email" required autoComplete="email" /></label>
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
-          <button className="primaryButton" type="submit">{signup ? "Crear cuenta" : "Iniciar sesión"}</button>
+          <button className="primaryButton" type="submit">{signup ? "Continuar" : "Entrar"}</button>
         </form>
 
         {!signup && (
