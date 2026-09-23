@@ -107,7 +107,7 @@ export async function createAdditionalPaymentProfile() {
 }
 
 
-export async function prepareNivalPayTrial() {
+export async function prepareFreeNivalPay() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
@@ -138,37 +138,28 @@ export async function prepareNivalPayTrial() {
     active: false,
   }).select('id').single();
 
-  if (error || !profile) redirect('/dashboard/pay?error=No+pudimos+preparar+tu+prueba.');
+  if (error || !profile) redirect('/dashboard/pay?error=No+pudimos+crear+tu+Nival+Pay+Gratis.');
   revalidatePath('/dashboard/pay');
-  redirect(`/dashboard/pay?profile=${profile.id}&trial=setup`);
+  redirect(`/dashboard/pay?profile=${profile.id}&free=setup`);
 }
 
-export async function startNivalPayTrial(formData: FormData) {
+export async function publishFreeNivalPay(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
 
   const profileId = String(formData.get('profileId') ?? '');
   const { data: membership } = await supabase.from('business_members')
-    .select('business_id, role, businesses(nival_pay_trial_started_at,nival_pay_trial_ends_at,nival_pay_trial_used)')
+    .select('business_id, role')
     .eq('user_id', user.id)
     .in('role', ['owner', 'manager'])
     .limit(1)
     .maybeSingle();
   if (!membership) redirect('/dashboard/pay?error=No+tienes+permiso.');
 
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
     .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle();
   if (paidOrder) redirect('/dashboard/pay');
-
-  const now = Date.now();
-  if (business?.nival_pay_trial_ends_at && new Date(business.nival_pay_trial_ends_at).getTime() > now) {
-    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&trial=active`);
-  }
-  if (business?.nival_pay_trial_used) {
-    redirect('/checkout?error=Tu+prueba+gratuita+ya+fue+utilizada.+Activa+Nival+Pay+para+seguir+usando+tu+QR.');
-  }
 
   const { data: profile } = await supabase.from('payment_profiles')
     .select('id,account_holder,bank_name,clabe')
@@ -177,26 +168,24 @@ export async function startNivalPayTrial(formData: FormData) {
     .maybeSingle();
 
   if (!profile || profile.account_holder.trim().length < 2 || profile.bank_name.trim().length < 2 || !isValidClabe(profile.clabe.replace(/\s/g,''))) {
-    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=Completa+beneficiario,+banco+y+una+CLABE+válida+antes+de+publicar+tu+prueba.`);
+    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=Completa+beneficiario,+banco+y+una+CLABE+válida+antes+de+publicar+tu+QR.`);
   }
 
-  const startedAt = new Date();
-  const endsAt = new Date(startedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const now = new Date().toISOString();
   const [{ error: businessError }, { error: profileError }] = await Promise.all([
     supabase.from('businesses').update({
-      nival_pay_trial_started_at: startedAt.toISOString(),
-      nival_pay_trial_ends_at: endsAt.toISOString(),
-      nival_pay_trial_used: true,
-      updated_at: startedAt.toISOString(),
+      nival_pay_free_enabled: true,
+      updated_at: now,
     }).eq('id', membership.business_id),
-    supabase.from('payment_profiles').update({ active: true, updated_at: startedAt.toISOString() })
+    supabase.from('payment_profiles').update({ active: true, updated_at: now })
       .eq('id', profile.id).eq('business_id', membership.business_id),
   ]);
 
   if (businessError || profileError) {
-    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=No+pudimos+activar+la+prueba.+Intenta+de+nuevo.`);
+    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=No+pudimos+publicar+tu+Nival+Pay+Gratis.+Intenta+de+nuevo.`);
   }
 
   revalidatePath('/dashboard/pay');
-  redirect(`/dashboard/pay?view=share&profile=${encodeURIComponent(profile.id)}&trial=started`);
+  revalidatePath('/dashboard');
+  redirect(`/dashboard/pay?view=share&profile=${encodeURIComponent(profile.id)}&free=started`);
 }
