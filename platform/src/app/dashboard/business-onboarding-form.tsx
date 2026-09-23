@@ -26,11 +26,11 @@ export function BusinessOnboardingForm({ next }: { next: string }) {
   return <form action={createBusiness} className="authForm">
     <input type="hidden" name="next" value={next} />
     <label>
-      Nombre del negocio
+      ¿Cómo se llama tu negocio?
       <input name="businessName" value={name} onChange={(event) => updateName(event.target.value)} required minLength={2} maxLength={100} placeholder="Ej. Barbería Norte" autoComplete="organization" />
     </label>
     <label>
-      Nombre para tu enlace
+      Tu enlace público
       <input
         name="businessSlug"
         value={slug}
@@ -43,9 +43,9 @@ export function BusinessOnboardingForm({ next }: { next: string }) {
         aria-describedby="business-slug-preview"
       />
       <small id="business-slug-preview" className="slugPreview">
-        Se crea automáticamente. Tu página será: <strong>nival-tech-platform.vercel.app/p/{slug || "tu-negocio"}</strong>
+        Usaremos este enlace para tus páginas públicas. Puedes dejar el sugerido: <strong>nival-tech-platform.vercel.app/p/{slug || "tu-negocio"}</strong>
       </small>
     </label>
-    <button className="primaryButton" type="submit">Crear negocio</button>
+    <button className="primaryButton" type="submit">Continuar</button>
   </form>;
 }
