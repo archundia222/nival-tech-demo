@@ -43,7 +43,14 @@ export async function enrollPointsCustomer(formData: FormData) {
     p_origin: formData.get("origin") === "nfc" ? "nfc" : "qr",
     p_privacy_notice_version: "2026-09-21",
   });
-  if (error || !data?.[0]) return { ok: false, error: error?.message ?? "No pudimos crear tu tarjeta." };
+  if (error || !data?.[0]) {
+    const message = error?.message?.includes('free_customer_limit_reached')
+      ? 'Este negocio llegó al límite de 30 clientes de Nival Puntos Gratis. El dueño puede pasar a Pro para seguir agregando clientes.'
+      : error?.message?.includes('points_program_unavailable')
+        ? 'Este programa de puntos no está disponible.'
+        : error?.message ?? 'No pudimos crear tu tarjeta.';
+    return { ok: false, error: message };
+  }
   return { ok: true, token: data[0].account_token as string };
 }
 
