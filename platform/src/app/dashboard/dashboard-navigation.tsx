@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 import styles from './dashboard-navigation.module.css';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay' },
@@ -23,6 +23,7 @@ const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: '
 const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'analisis' | 'datos' | 'asistente' }> = [
   { id: 'inteligencia', label: 'Resumen y consejos', href: '/dashboard/intelligence', group: 'analisis' },
   { id: 'inteligencia-clientes', label: 'Clientes analizados', href: '/dashboard/intelligence?view=customers', group: 'analisis' },
+  { id: 'inteligencia-oportunidades', label: 'Oportunidades', href: '/dashboard/intelligence?view=opportunities', group: 'analisis' },
   { id: 'inteligencia-importar', label: 'Importar clientes', href: '/dashboard/intelligence?view=imports', group: 'datos' },
   { id: 'inteligencia-asistente', label: 'Asistente Nival', href: '/dashboard/intelligence?view=assistant', group: 'asistente' },
 ];
