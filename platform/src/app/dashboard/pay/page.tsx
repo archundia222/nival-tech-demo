@@ -5,7 +5,7 @@ import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
-import { createAdditionalPaymentProfile } from './actions';
+import { createAdditionalPaymentProfile, prepareNivalPayTrial, startNivalPayTrial } from './actions';
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 import { SmartLinkQr } from '../smart-link-qr';
@@ -95,7 +95,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
   const { data: membership, error } = await supabase.from('business_members')
-    .select('business_id, role, businesses(name, logo_url, brand_color, subscription_status, product_level)').eq('user_id', user.id)
+    .select('business_id, role, businesses(name, logo_url, brand_color, subscription_status, product_level, nival_pay_trial_started_at, nival_pay_trial_ends_at, nival_pay_trial_used)').eq('user_id', user.id)
     .order('created_at').limit(1).maybeSingle();
   if (error) throw new Error('No se pudo cargar el negocio.');
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
@@ -189,22 +189,50 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   const profile = profiles?.find((item) => item.id === params.profile) ?? profiles?.[0] ?? null;
   const canCreateAdditional = (profiles?.length ?? 0) < 1 + (paidExtras ?? 0);
   const hasPoints = Boolean(pointsEntitlement);
-  if (!paidOrder) return <main className="dashboardApp nivalDashboard">
+  const trialEndsAt = business?.nival_pay_trial_ends_at ? new Date(business.nival_pay_trial_ends_at) : null;
+  const trialActive = !paidOrder && Boolean(trialEndsAt && trialEndsAt.getTime() > Date.now());
+  const trialExpired = !paidOrder && Boolean(business?.nival_pay_trial_used && (!trialEndsAt || trialEndsAt.getTime() <= Date.now()));
+  const trialDaysLeft = trialActive && trialEndsAt ? Math.max(1, Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000)) : 0;
+  const trialSetup = !paidOrder && Boolean(profile) && !trialActive && !trialExpired;
+
+  if (!paidOrder && !profile) return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'add' ? 'agregar-tarjetas' : currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
-      <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Sin activar</span></header>
-      <section className="dashboardHero">
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Pruébalo gratis</span></header>
+      <section className="dashboardHero trialHero">
         <div>
-          <p className="eyebrow">NIVAL PAY</p>
-          <h1>Convierte tu tarjeta NFC en una página de cobro.</h1>
-          <p>Recibe transferencias con tarjeta NFC, enlace y QR propios. Incluye 3 apartados. Los adicionales cuestan $49 MXN cada uno.</p>
-          <a className="loginLink" href="/checkout">Activar Nival Pay · $199 MXN</a>
+          <p className="eyebrow">NIVAL PAY DIGITAL · 7 DÍAS</p>
+          <h1>Prueba cómo se siente cobrar con Nival antes de comprar.</h1>
+          <p>Prepara tu página, publica tu QR y úsala con clientes reales durante 7 días. La prueba empieza cuando tú decidas publicar el QR.</p>
+          <form action={prepareNivalPayTrial}><button className="loginLink" type="submit">Preparar mi prueba gratis →</button></form>
         </div>
       </section>
-      <section className="analyticsGrid" aria-label="Qué incluye Nival Pay">
-        <article className="chartCard"><div className="chartHeading"><div><span>PÁGINA DE COBRO</span><h2>Lista para compartir</h2></div></div><p>Tu cliente abre una página simple con los datos necesarios para pagarte.</p></article>
-        <article className="chartCard"><div className="chartHeading"><div><span>NFC + QR</span><h2>Un mismo destino</h2></div></div><p>Comparte el mismo enlace desde tu tarjeta NFC o mediante código QR.</p></article>
+      <section className="analyticsGrid" aria-label="Qué incluye la prueba">
+        <article className="chartCard"><div className="chartHeading"><div><span>PRUEBA DIGITAL</span><h2>Página + QR + enlace</h2></div></div><p>Configura banco, beneficiario, CLABE, logo y un apartado. Sin tarjeta física todavía.</p></article>
+        <article className="chartCard"><div className="chartHeading"><div><span>SI TE SIRVE</span><h2>Activa la versión completa</h2></div></div><p>Conservas la misma página y QR. Al activar recibes tu tarjeta NFC física y desbloqueas las herramientas completas.</p></article>
       </section>
+    </div>
+  </main>;
+
+  if (!paidOrder && profile) return <main className="dashboardApp nivalDashboard">
+    <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
+    <div className="dashboardContent dashboardPayContent">
+      <header className="dashboardContentTopbar payTopbar">
+        <div><strong>Nival Pay Digital</strong><b>{trialActive ? `Prueba activa · ${trialDaysLeft} ${trialDaysLeft === 1 ? 'día' : 'días'} restantes` : trialExpired ? 'Prueba terminada' : 'Preparando tu prueba'}</b></div>
+        <span className={trialActive ? 'ready' : trialExpired ? 'statusPending' : 'ready'}>{trialActive ? 'En prueba' : trialExpired ? 'Activa Nival Pay' : 'Sin publicar'}</span>
+      </header>
+      {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
+      {params.trial === 'started' && <p role="status" className="formMessage successMessage">Tu prueba ya está activa. Este mismo QR y enlace se conservarán si activas Nival Pay.</p>}
+      {trialExpired && <section className="trialUpgradeCard"><div><span>TU PRUEBA TERMINÓ</span><h1>Tu QR ya demostró cómo funciona Nival Pay.</h1><p>Conserva la misma página y el mismo QR, recibe tu tarjeta NFC física y desbloquea 3 apartados y las herramientas completas.</p><div className="trialUsage"><b>{Number(profile.view_count)}</b><small>aperturas</small><b>{Number(profile.clabe_copy_count)}</b><small>copias de CLABE</small></div></div><a href="/checkout">Activar Nival Pay →</a></section>}
+      {trialActive && <section className="trialStatusCard"><div><span>PRUEBA EN CURSO</span><h1>Ya puedes usar este QR con clientes reales.</h1><p>Durante la prueba tienes página, enlace, QR, estadísticas básicas y 1 apartado. La tarjeta NFC física llega al activar Nival Pay.</p></div><a href="/checkout">Quiero la versión completa →</a></section>}
+      {trialSetup && <section className="trialStatusCard setup"><div><span>ANTES DE EMPEZAR LOS 7 DÍAS</span><h1>Configura primero. Publica cuando estés listo.</h1><p>El contador no empieza por crear tu cuenta. Empieza cuando pulses “Publicar QR e iniciar prueba”.</p></div></section>}
+
+      {currentView === 'share' && trialActive ? <><header className="payHeading shareHeading"><p className="eyebrow">TU QR DE PRUEBA</p><h1>Escanea, abre y cobra.</h1><p>Este QR apunta a tu misma página Nival Pay. Si activas el producto, no tendrás que cambiarlo.</p></header><section className="sharePagesList sharePagesRefined"><article className="sharePageItem"><h2>{profile.display_name}</h2><PaymentProfileQr businessName={business?.name ?? 'Nival Pay'} url={`${publicSiteUrl()}/pay/${profile.public_token}`} views={Number(profile.view_count)} /></article></section></> : <>
+        <header className="payHeading payManageHeading"><p className="eyebrow">{trialExpired ? 'TU PRUEBA' : 'NIVAL PAY DIGITAL'}</p><h1>{trialExpired ? 'Tu configuración sigue aquí.' : 'Deja lista tu página antes de publicarla.'}</h1><p>{trialExpired ? 'No pierdes tus datos. Activa Nival Pay para volver a hacer pública esta página.' : 'Configura banco, beneficiario, CLABE, logo y un apartado. Cuando estés listo, inicia tus 7 días.'}</p></header>
+        <section className="payValueStrip"><div><span>APERTURAS</span><strong>{Number(profile.view_count)}</strong><small>personas abrieron esta página</small></div><div><span>CLABE COPIADA</span><strong>{Number(profile.clabe_copy_count)}</strong><small>interacciones reales</small></div><div><span>PLAN</span><strong>{trialActive ? 'Prueba' : trialExpired ? 'Terminada' : 'Preparación'}</strong><small>{trialActive ? `${trialDaysLeft} días restantes` : trialExpired ? 'activa para continuar' : 'el contador aún no corre'}</small></div>{trialActive && <a href={`${publicSiteUrl()}/pay/${profile.public_token}`} target="_blank" rel="noreferrer">Ver como cliente ↗</a>}</section>
+        {['owner','manager'].includes(membership.role) && <PaymentEditor key={profile.id} businessId={membership.business_id} businessName={business?.name ?? 'Mi negocio'} businessLogo={business?.logo_url ?? null} businessBrandColor={business?.brand_color ?? null} profile={profile} siteUrl={publicSiteUrl()} trialMode />}
+        {!trialActive && !trialExpired && <form action={startNivalPayTrial} className="trialLaunchBar"><input type="hidden" name="profileId" value={profile.id}/><div><span>CUANDO YA SE VEA BIEN</span><strong>Publica tu QR y empieza los 7 días.</strong><small>El mismo enlace y QR se conservan si después activas Nival Pay.</small></div><button type="submit">Publicar QR e iniciar prueba →</button></form>}
+      </>}
     </div>
   </main>;
 
