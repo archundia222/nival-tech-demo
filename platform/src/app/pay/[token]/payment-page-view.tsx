@@ -85,9 +85,9 @@ export function PaymentPageView({
       <div>
         <span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span>
         <strong>Tu negocio también puede cobrar así.</strong>
-        <p>Nival Pay incluye tarjeta NFC, QR y una página de cobro editable por $199 MXN, pago único.</p>
+        <p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p>
       </div>
-      <a href="/?from=nival-pay#precio">Ver Nival Pay · $199 <b>→</b></a>
+      <a href="/?from=nival-pay#precio">Conocer Nival Pay <b>→</b></a>
     </aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <a href="/?from=nival-pay">Nival Tech</a>}</footer>
   </>;
