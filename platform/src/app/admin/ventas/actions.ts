@@ -20,6 +20,11 @@ export async function confirmCashPayment(formData: FormData) {
   if (error) redirect('/admin/ventas?error=No+se+pudo+confirmar');
   if (order.product_code === 'nival_pay') {
     await admin.from('businesses').update({ subscription_status: 'active', updated_at: now }).eq('id', order.business_id);
+  } else if (order.product_code.startsWith('nival_pay_physical_card')) {
+    await admin.from('physical_card_orders')
+      .update({ fulfillment_status: 'confirmed', updated_at: now })
+      .eq('product_order_id', orderId)
+      .eq('fulfillment_status', 'new');
   }
   revalidatePath('/admin/ventas');
 }

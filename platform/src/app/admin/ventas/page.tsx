@@ -19,7 +19,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
 
   const admin = createAdminClient();
   const { data: physicalCards } = await admin.from('physical_card_orders')
-    .select('id, business_id, front_template, back_style, design, design_notes, back_design_notes, back_design_url, target_url, recipient_name, phone, delivery_method, requested_delivery_date, fulfillment_status, tracking_code, created_at, businesses(name), product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
+    .select('id, product_order_id, business_id, front_template, back_style, design, design_notes, back_design_notes, back_design_url, target_url, recipient_name, phone, delivery_method, requested_delivery_date, fulfillment_status, tracking_code, created_at, businesses(name), product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .order('created_at', { ascending: false })
     .limit(250);
 
@@ -85,7 +85,10 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
         <article><span>EFECTIVO PENDIENTE</span><strong>{pendingCash}</strong><p>{pendingCash === 1 ? 'venta requiere confirmación' : 'ventas requieren confirmación'}</p></article>
       </div>}
       {currentSection === 'nival-card' && <section className="adminCardQueue">
-        <header><div><span>PRODUCCIÓN Y ENTREGA</span><h2>Pedidos de tarjetas NFC</h2><p>Cada pedido conserva el diseño, destino programado, pago y estado de producción.</p></div><strong>{(physicalCards ?? []).filter(card => !['delivered','cancelled'].includes(card.fulfillment_status)).length} pendientes</strong></header>
+        <header><div><span>PRODUCCIÓN Y ENTREGA</span><h2>Pedidos de tarjetas NFC</h2><p>Cada pedido conserva el diseño, destino programado, pago y estado de producción.</p></div><strong>{(physicalCards ?? []).filter(card => {
+          const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
+          return payment?.status !== 'cancelled' && !['delivered','cancelled'].includes(card.fulfillment_status);
+        }).length} pendientes</strong></header>
         {(physicalCards ?? []).length ? <div className="adminCardList">{physicalCards!.map(card => {
           const business = Array.isArray(card.businesses) ? card.businesses[0] : card.businesses;
           const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
