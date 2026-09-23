@@ -47,6 +47,17 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const metrics = metricRows?.[0]; // deployment sync
   const nowMs=Date.now(), dayMs=86400000;
   const customerInsights=new Map((customerRows??[]).map(customer=>{const cv=(visitRows??[]).filter(v=>v.customer_id===customer.id);const cr=(rewardRows??[]).filter(r=>r.customer_id===customer.id);const last=cv[0]?.visited_at?new Date(cv[0].visited_at).getTime():null;const first=cv.length?new Date(cv[cv.length-1].visited_at).getTime():null;const avg=cv.length>1&&first&&last?Math.round((last-first)/dayMs/(cv.length-1)):null;return [customer.id,{visits30:cv.filter(v=>nowMs-new Date(v.visited_at).getTime()<=30*dayMs).length,totalVisits:cv.length,lastVisit:last?new Date(last):null,avgDays:avg,rewardsAvailable:cr.filter(x=>!x.redeemed_at).length,rewardsRedeemed:cr.filter(x=>x.redeemed_at).length,lastReward:cr.find(x=>x.redeemed_at)?.description??null}]}));
+  const insightValues=[...customerInsights.values()];
+  const active30Customers=insightValues.filter(insight=>insight.visits30>0).length;
+  const returning30Customers=insightValues.filter(insight=>insight.visits30>0&&insight.totalVisits>=2).length;
+  const recurrence30=active30Customers?Math.round((returning30Customers/active30Customers)*100):0;
+  const availableRewardsCount=(rewardRows??[]).filter(reward=>!reward.redeemed_at).length;
+  const redeemed30=(rewardRows??[]).filter(reward=>reward.redeemed_at&&nowMs-new Date(reward.redeemed_at).getTime()<=30*dayMs).length;
+  const pointsTodayAction = Number(metrics?.new_customers_today ?? 0)>Number(metrics?.returning_customers_today ?? 0)
+    ? { title:'Convierte clientes nuevos en una segunda visita', text:'Hoy entraron más clientes nuevos que recurrentes. Asegúrate de que entiendan qué premio pueden alcanzar y cómo volver a sumar.', href:'/dashboard/points?view=share', cta:'Revisar cómo compartes el programa' }
+    : availableRewardsCount>0
+      ? { title:`Tienes ${availableRewardsCount} recompensas listas para crear una buena experiencia`, text:'Un premio bien entregado refuerza el hábito. Revisa quién puede canjear y evita que una recompensa se quede olvidada.', href:'/dashboard/points?view=redemptions', cta:'Canjear recompensas' }
+      : { title:'Haz que registrar una visita tome segundos', text:'El valor de Puntos crece cuando cada visita se registra. Mantén el QR o escáner listo para que tu equipo no se salte movimientos.', href:'/dashboard/points?view=visits', cta:'Registrar una visita' };
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!active ? "nivalPointsDark" : ""}`}>
@@ -79,7 +90,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         <section className="productUseCases"><div><span>IDEAL PARA</span><h2>Cafeterías, restaurantes, barberías, salones y negocios con clientes frecuentes.</h2></div><form action={startNivalPointsSubscription}><button className="productCta">Crear mi programa <span>→</span></button></form></section>
       </> : <>
         <section className="pointsV1Hero">
-          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Analítica de datos' : view === 'customers' ? 'Clientes' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear recompensa' : view === 'share' ? 'QR y NFC' : view === 'settings' ? 'Programa de lealtad' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Entiende qué está pasando en tu programa y toma decisiones con datos útiles.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
+          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
           {view === 'share' && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">Abrir registro ↗</a>}
         </section>
 
@@ -90,7 +101,13 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           <article><span>Premios canjeados</span><strong>{metrics?.rewards_redeemed_today ?? 0}</strong></article>
         </section>}
 
-        {view === 'overview' && <section className="pointsQuickOps"><a href="/dashboard/points?view=visits"><span>OPERACIÓN DIARIA</span><strong>Registrar visita</strong><small>Escanear QR o ingresar código →</small></a><a href="/dashboard/points?view=redemptions"><span>RECOMPENSAS</span><strong>Canjear recompensa</strong><small>Validar y confirmar entrega →</small></a><a href="/dashboard/points?view=customers"><span>CLIENTES</span><strong>Ver clientes</strong><small>Actividad, puntos y registros →</small></a></section>}
+        {canManage && view === 'overview' && <section className="pointsTodayAction"><div><span>LO MÁS ÚTIL AHORA</span><h2>{pointsTodayAction.title}</h2><p>{pointsTodayAction.text}</p></div><a href={pointsTodayAction.href}>{pointsTodayAction.cta} →</a></section>}
+
+        {view === 'overview' && <section className="pointsQuickOps"><a href="/dashboard/points?view=visits"><span>SUMAR</span><strong>Registrar visita</strong><small>Escanear QR o ingresar código →</small></a><a href="/dashboard/points?view=redemptions"><span>PREMIAR</span><strong>Canjear premio</strong><small>Validar y confirmar entrega →</small></a><a href="/dashboard/points?view=customers"><span>ENTENDER</span><strong>Ver clientes</strong><small>Quién vuelve, quién progresa y quién tiene premio →</small></a></section>}
+
+        {canManage && view === 'analytics' && <section className="pointsResultsGrid"><article><span>CLIENTES ACTIVOS · 30 DÍAS</span><strong>{active30Customers}</strong><p>Personas con al menos una visita reciente.</p></article><article><span>REGRESARON</span><strong>{returning30Customers}</strong><p>Clientes activos que ya tienen dos o más visitas registradas.</p></article><article><span>RECURRENCIA OBSERVADA</span><strong>{recurrence30}%</strong><p>Qué parte de los clientes activos ya volvió al menos una vez.</p></article><article><span>PREMIOS USADOS · 30 DÍAS</span><strong>{redeemed30}</strong><p>Recompensas que sí terminaron en una experiencia entregada.</p></article></section>}
+
+        {canManage && view === 'analytics' && <section className="pointsResultsAdvice"><span>QUÉ HACER CON ESTO</span><h2>{recurrence30>=40?'Protege lo que ya está funcionando.':recurrence30>=20?'Hay recurrencia, pero todavía puedes empujar la segunda visita.':'Tu mayor oportunidad es lograr que la primera visita no sea la última.'}</h2><p>{recurrence30>=40?'Mantén el premio fácil de entender y revisa que tus clientes frecuentes sigan sintiendo valor.':recurrence30>=20?'Haz más visible el progreso y recuérdale al cliente qué gana si vuelve.':'Simplifica el programa, comunica el premio desde la primera visita y evita que el cliente se vaya sin saber cómo regresar.'}</p><a href="/dashboard/points?view=customers">Ver clientes →</a></section>
 
                 {view === 'visits' && <PointsEmployeeScanner mode="visit" />}
 
@@ -105,7 +122,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           </article>}
         </section>}
 
-        {canManage && (view === 'overview' || view === 'customers' || view === 'analytics') && <section className="pointsHistory pointsCustomerRegistry">
+        {canManage && view === 'customers' && <section className="pointsHistory pointsCustomerRegistry">
           <div className="pointsSectionHeading"><div><span>REGISTRO DE CLIENTES</span><h2>Clientes y actividad</h2></div><p>Información de lealtad para tomar decisiones. Los puntos solo cambian mediante visitas y reglas del programa.</p></div>
           {!customerRows?.length ? <div className="pointsEmptyState">Todavía no hay clientes registrados.</div> :
             <div className="pointsHistoryList">{customerRows.map((customer) => {
