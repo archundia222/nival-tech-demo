@@ -94,6 +94,17 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
+  if ([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRODUCT].includes(product.productCode as typeof NIVAL_PAY_ADDITIONAL_PRODUCT)) {
+    const { data: baseOrder } = await admin.from('product_orders').select('id')
+      .eq('business_id', businessId)
+      .eq('product_code', NIVAL_PAY_PRODUCT)
+      .eq('status', 'paid')
+      .limit(1)
+      .maybeSingle();
+    if (!baseOrder) {
+      redirect(checkoutReturnPath('/checkout', 'error', 'Activa Nival Pay Pro antes de comprar herramientas adicionales.'));
+    }
+  }
   const { data: order, error } = await admin.from('product_orders').insert({
     business_id: businessId,
     product_code: product.productCode,
@@ -196,7 +207,7 @@ export async function startMercadoPagoCheckout() {
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_PRODUCT,
     amountCents: NIVAL_PAY_PRICE_CENTS,
-    description: 'Nival Pay · tarjeta NFC + página',
+    description: 'Nival Pay Pro · NFC + QR + página',
     returnPath: '/checkout',
   });
 }
