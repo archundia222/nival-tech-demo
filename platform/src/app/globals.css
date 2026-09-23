@@ -4064,3 +4064,18 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 /* Unified customer registry + owner analytics */
 .nivalDashboard .pointsCustomerRegistry .pointsHistoryList{gap:9px}.nivalDashboard .pointsCustomerInsightRow{display:grid!important;grid-template-columns:minmax(190px,.8fr) minmax(480px,2fr);gap:16px!important;align-items:center!important;padding:16px!important}.nivalDashboard .pointsCustomerIdentity{display:grid;gap:4px}.nivalDashboard .pointsCustomerIdentity strong{font-size:13px}.nivalDashboard .pointsCustomerIdentity span,.nivalDashboard .pointsCustomerIdentity small{color:var(--nv-text-secondary,#92929d);font-size:9px}.nivalDashboard .pointsCustomerStats{display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));gap:7px}.nivalDashboard .pointsCustomerStats>span{display:grid;gap:4px;padding:9px;background:rgba(255,255,255,.025);border:1px solid var(--nv-border,#28282f);border-radius:9px}.nivalDashboard .pointsCustomerStats small{color:var(--nv-text-secondary,#92929d);font-size:7px;text-transform:uppercase;letter-spacing:.07em}.nivalDashboard .pointsCustomerStats b{font-size:10px;font-weight:800}.nivalDashboard .pointsLastReward{grid-column:2;margin:0;color:var(--nv-text-secondary,#92929d);font-size:9px}.nivalDashboard .pointsLastReward strong{color:#c8a65a}
 @media(max-width:1050px){.nivalDashboard .pointsCustomerInsightRow{grid-template-columns:1fr}.nivalDashboard .pointsCustomerStats{grid-template-columns:repeat(3,1fr)}.nivalDashboard .pointsLastReward{grid-column:1}}@media(max-width:560px){.nivalDashboard .pointsCustomerStats{grid-template-columns:repeat(2,1fr)}}
+
+/* Nival Tech ecosystem landing */
+.nivalEcosystem{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:110px 0;border-top:1px solid var(--landing-line)}
+.nivalEcosystem .landingSectionHeading.compact{display:grid;grid-template-columns:180px minmax(0,1fr);gap:18px 48px;align-items:end}
+.nivalEcosystem .landingSectionHeading.compact>p:last-child{grid-column:2;max-width:700px;margin:0;color:var(--landing-muted);font-size:16px;line-height:1.6}
+.nivalProductCards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:46px}
+.nivalProductCards article{min-height:360px;display:flex;flex-direction:column;padding:30px;border:1px solid var(--landing-line);border-radius:24px;background:linear-gradient(145deg,#151515,#111)}
+.nivalProductCards article.featured{border-color:rgba(181,154,97,.45);background:radial-gradient(circle at 85% 10%,rgba(181,154,97,.16),transparent 36%),linear-gradient(145deg,#181713,#111)}
+.nivalProductCards article>span{color:var(--landing-accent);font-size:10px;font-weight:900;letter-spacing:.14em}
+.nivalProductCards h3{margin:16px 0 12px;font-size:30px;letter-spacing:-.04em}
+.nivalProductCards p{margin:0;color:var(--landing-muted);font-size:14px;line-height:1.65}
+.nivalProductCards article>div{display:grid;gap:3px;margin-top:auto;padding-top:30px}.nivalProductCards article>div strong{font-size:24px}.nivalProductCards article>div small{color:var(--landing-muted);font-size:11px}
+.nivalProductCards a{margin-top:22px;color:var(--landing-ink);font-size:13px;font-weight:850}.nivalProductCards a:hover{color:var(--landing-accent)}
+@media(max-width:860px){.nivalProductCards{grid-template-columns:1fr}.nivalProductCards article{min-height:280px}}
+@media(max-width:760px){.nivalEcosystem{width:min(100% - 28px,1180px);padding:80px 0}.nivalEcosystem .landingSectionHeading.compact{grid-template-columns:1fr}.nivalEcosystem .landingSectionHeading.compact>p:last-child{grid-column:1}.nivalProductCards{margin-top:34px}.nivalProductCards article{padding:24px}}
