@@ -21,9 +21,9 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
   const hasWebsiteLink = customLinks.some((link) => link.link_kind === 'website');
 
   const actions: ProfileActionItem[] = [
-    ...(payment ? [{ key: `payment-${payment.public_token}`, label: "Pago", description: "Datos para transferencia", href: `/pay/${payment.public_token}`, icon: "＄", featured: true }] : []),
-    { key: "loyalty", label: "Lealtad", description: "Puntos y recompensas", href: `/b/${business.slug}`, icon: "★" },
-    ...(business.phone ? [{ key: "contact", label: "Contacto", description: "Llamar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
+    ...(payment ? [{ key: `payment-${payment.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${payment.public_token}`, icon: "＄", featured: true }] : []),
+    { key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" },
+    ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(business.website_url && !hasWebsiteLink ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
     ...customLinks.map((link) => ({
       key: link.public_token,
