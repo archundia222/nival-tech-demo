@@ -102,7 +102,8 @@ export function PaymentEditor({
   const newSectionInput = useRef<HTMLInputElement | null>(null);
 
   const addSection = () => {
-    if (sections.length >= NIVAL_PAY_INCLUDED_SECTIONS + (profile?.extra_sections_purchased ?? 0)) return;
+    const limit = (trialMode ? 1 : NIVAL_PAY_INCLUDED_SECTIONS) + (profile?.extra_sections_purchased ?? 0);
+    if (sections.length >= limit) return;
     markDirty();
     setSections((current) => {
       const id = crypto.randomUUID();
@@ -170,12 +171,12 @@ export function PaymentEditor({
     bank_name: bank,
     clabe,
     concept,
-    payment_url: paymentUrl,
+    payment_url: trialMode ? '' : paymentUrl,
     holder_visible: fieldVisibility.holder,
     bank_visible: fieldVisibility.bank,
     clabe_visible: fieldVisibility.clabe,
     concept_visible: fieldVisibility.concept,
-    payment_url_visible: fieldVisibility.paymentUrl,
+    payment_url_visible: trialMode ? false : fieldVisibility.paymentUrl,
     custom_sections: sections,
   };
 
@@ -191,7 +192,7 @@ export function PaymentEditor({
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="profileId" value={profile?.id ?? ''} />
       <input type="hidden" name="displayName" value={displayName} />
-      <input type="hidden" name="paymentUrl" value={paymentUrl} />
+      <input type="hidden" name="paymentUrl" value={trialMode ? '' : paymentUrl} />
       <input type="hidden" name="active" value={active ? 'on' : ''} />
       <input type="hidden" name="fieldVisibility" value={JSON.stringify(fieldVisibility)} />
       <input type="hidden" name="customSections" value={JSON.stringify(sections)} />
@@ -302,7 +303,7 @@ export function PaymentEditor({
 
         </div>
 
-        <div className="nivalPayFormSectionTitle"><span>AYUDAS OPCIONALES</span><p>{trialMode ? 'Durante la prueba puedes agregar un concepto. El enlace de pago y más herramientas se desbloquean al activar Nival Pay.' : 'Agrega un concepto fijo o un enlace de pago si realmente le facilita el proceso al cliente.'}</p></div>
+        <div className="nivalPayFormSectionTitle"><span>AYUDAS OPCIONALES</span><p>{trialMode ? 'Durante la prueba puedes agregar un concepto. El enlace de pago se desbloquea al activar Nival Pay.' : 'Agrega un concepto fijo o un enlace de pago si realmente le facilita el proceso al cliente.'}</p></div>
         <div className="nivalPayFieldGroup">
           <div className="nivalPayFieldHeading">
             <span>Concepto <small>Opcional</small></span>
@@ -317,17 +318,19 @@ export function PaymentEditor({
             placeholder="Agregar concepto"
           />
 
-          {!trialMode && <><div className="nivalPayFieldHeading">
-            <span>Enlace de pago <small>Opcional</small></span>
-            <VisibilityControl visible={fieldVisibility.paymentUrl} onClick={() => toggleDefaultField('paymentUrl', 'el Enlace de pago')} />
-          </div>
-          <input
-            className="nivalPayTextInput"
-            value={paymentUrl}
-            onChange={(event) => { setPaymentUrl(event.target.value); markDirty(); }}
-            type="url"
-            placeholder="https://..."
-          />
+          {!trialMode && <>
+            <div className="nivalPayFieldHeading">
+              <span>Enlace de pago <small>Opcional</small></span>
+              <VisibilityControl visible={fieldVisibility.paymentUrl} onClick={() => toggleDefaultField('paymentUrl', 'el Enlace de pago')} />
+            </div>
+            <input
+              className="nivalPayTextInput"
+              value={paymentUrl}
+              onChange={(event) => { setPaymentUrl(event.target.value); markDirty(); }}
+              type="url"
+              placeholder="https://..."
+            />
+          </>}
         </div>
 
         {sections.map((section, index) => (
@@ -361,7 +364,7 @@ export function PaymentEditor({
         ))}
 
         <div className="nivalPaySectionsAction">
-          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>{trialMode ? 'Tu prueba incluye 1 apartado.' : <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados.</>} <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
+          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>{trialMode ? <>Tu prueba incluye <strong>1 apartado</strong>.</> : <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados. <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></>}</> : trialMode ? <>Ya usaste el apartado incluido en la prueba. Al activar Nival Pay tendrás <strong>3 apartados incluidos</strong>.</> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
           {sections.length < totalSectionLimit ? (
             <button
               key="add-available-section"
@@ -375,6 +378,8 @@ export function PaymentEditor({
             >
               Agregar apartado
             </button>
+          ) : trialMode ? (
+            <span className="nivalPayTrialLock">Más apartados al activar Nival Pay</span>
           ) : (
             <button
               key="buy-extra-section"
@@ -383,10 +388,10 @@ export function PaymentEditor({
               disabled={checkoutPending || !profile?.id}
               className="nvSecondaryButton nivalPaySecondaryAction"
             >
-              {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · $${extraSectionPriceMx} MXN`}
+              {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · ${extraSectionPriceMx} MXN`}
             </button>
           )}
-          <p className="apartadoFootnote">{freeSectionsRemaining > 0 ? '{trialMode ? 'Al activar Nival Pay tendrás 3 apartados incluidos.' : 'Los apartados incluidos se pueden editar y ocultar cuando quieras.'}' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
+          <p className="apartadoFootnote">{trialMode ? 'Tu QR y tu configuración se conservan si activas Nival Pay.' : freeSectionsRemaining > 0 ? 'Los apartados incluidos se pueden editar y ocultar cuando quieras.' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
         </div>
       </section>
 
