@@ -210,9 +210,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       : Number(paymentProfile?.view_count ?? 0) === 0
         ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link, descarga el QR o usa la tarjeta NFC. La primera apertura te confirma que el flujo ya está en la calle.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
         : hasIntelligence
-          ? { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa clientes y visitas para priorizar recuperación, recurrencia y campañas sin hacerte interpretar tablas.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
+          ? (Number(customerCount ?? 0) === 0 && Number(visitCount ?? 0) === 0
+            ? { eyebrow: "INTELLIGENCE NECESITA UNA PRIMERA SEÑAL", title: "Registra lo que ya sabes de tu negocio", text: "Empieza con un cliente, una venta, el cierre del día o un CSV. No necesitas cambiar tu forma de trabajar para que Nival empiece a aprender.", href: "/dashboard/intelligence?view=imports", cta: "Registrar datos" }
+            : { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa clientes, visitas y ventas registradas para priorizar recuperación, recurrencia y campañas sin hacerte interpretar tablas.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" })
           : hasPoints
-            ? { eyebrow: "HAZ QUE EL PROGRAMA SE USE", title: "Registra la siguiente visita en segundos", text: "Cada visita registrada hace más útil tu programa y mejora lo que puedes aprender sobre recurrencia.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
+            ? { eyebrow: "HAZ QUE EL PROGRAMA SE USE", title: "Registra lo que acaba de pasar", text: "Una visita, un cliente o una venta pueden registrarse en segundos. También puedes dejar que el cliente se dé de alta solo desde tu QR.", href: "/dashboard/points?view=register", cta: "Abrir registro rápido" }
             : { eyebrow: "TU NIVAL PAY YA ESTÁ RECIBIENDO VISITAS", title: "El siguiente paso es hacer que esas personas vuelvan", text: "Nival Puntos convierte visitas repetidas en una experiencia de lealtad sencilla para el cliente y el negocio.", href: "/dashboard/points", cta: "Conocer Nival Puntos" };
 
   return (
