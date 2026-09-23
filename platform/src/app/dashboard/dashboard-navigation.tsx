@@ -31,6 +31,7 @@ const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; gr
   { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
   { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
+  { id: 'inteligencia-importar', label: 'Registrar datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
