@@ -32,9 +32,11 @@ export type PaymentPageViewProfile = {
 export function PaymentPageView({
   profile,
   embedded = false,
+  trackingToken,
 }: {
   profile: PaymentPageViewProfile;
   embedded?: boolean;
+  trackingToken?: string;
 }) {
   const initials = profile.business_name
     .split(/\s+/)
@@ -63,7 +65,7 @@ export function PaymentPageView({
       <div className={styles.details}>
         {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="detail" />}
         {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
-        {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />}
+        {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" trackingToken={trackingToken} />}
         {profile.concept_visible && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
         {Array.isArray(profile.custom_sections) && profile.custom_sections.filter((section) => section.public !== false).map((section) =>
           section.title || section.content ? <CopyField key={section.id} label={section.title || "Información"} value={section.content || "—"} variant="detail" /> : null
@@ -79,10 +81,10 @@ export function PaymentPageView({
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
       <div>
         <span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span>
-        <strong>Cobra así con tu propia Nival Pay.</strong>
-        <p>Tarjeta NFC, QR y una página de cobro que puedes actualizar cuando quieras.</p>
+        <strong>Tu negocio también puede cobrar así.</strong>
+        <p>Nival Pay incluye tarjeta NFC, QR y una página de cobro editable por $199 MXN, pago único.</p>
       </div>
-      <a href="/?from=nival-pay#productos">Conocer Nival Tech <b>→</b></a>
+      <a href="/?from=nival-pay#precio">Ver Nival Pay · $199 <b>→</b></a>
     </aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <a href="/?from=nival-pay">Nival Tech</a>}</footer>
   </>;
