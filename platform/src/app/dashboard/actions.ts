@@ -4,10 +4,20 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
+import { getActiveBusinessMembership } from "@/lib/active-business";
+
+async function getActiveManagerContext() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth");
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !["owner", "manager"].includes(membership.role)) redirect("/dashboard?error=No+tienes+permiso+para+administrar+este+negocio.");
+  return { supabase, user, businessId: membership.business_id, role: membership.role };
+}
 
 export async function refreshRecommendations() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("refresh_current_business_recommendations");
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { data, error } = await supabase.rpc("refresh_business_recommendations_for", { p_business_id: businessId });
 
   if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
@@ -38,8 +48,9 @@ export async function createTeamInvitation(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("Selecciona un rol válido.")}`);
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("create_business_invitation", {
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { error } = await supabase.rpc("create_business_invitation_for", {
+    p_business_id: businessId,
     invitee_email: email,
     invited_role: role,
   });
@@ -109,8 +120,9 @@ export async function createSmartLink(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("create_smart_link", {
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { error } = await supabase.rpc("create_smart_link_for", {
+    p_business_id: businessId,
     link_name: name,
     link_kind: kind,
     destination_url: targetUrl,
@@ -135,8 +147,9 @@ export async function updateSmartLink(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_smart_link", {
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { error } = await supabase.rpc("update_smart_link_for", {
+    p_business_id: businessId,
     link_id: linkId,
     link_name: name,
     destination_url: targetUrl,
@@ -170,8 +183,9 @@ export async function updateBusinessProfile(formData: FormData) {
     }
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_current_business_profile", {
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { error } = await supabase.rpc("update_business_profile_for", {
+    p_business_id: businessId,
     business_name: name,
     business_phone: phone,
     business_description: description,
@@ -194,15 +208,13 @@ export async function createLoyaltyProgram(formData: FormData) {
   if (programName.length < 2 || programName.length > 80 || !Number.isInteger(pointsPerVisit) || pointsPerVisit < 1 || pointsPerVisit > 100 || !Number.isInteger(rewardThreshold) || rewardThreshold < 1 || rewardThreshold > 1000 || rewardDescription.length < 2 || rewardDescription.length > 160) {
     redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Revisa los datos del programa de lealtad.")}`);
   }
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth");
-  const { data: membership } = await supabase.from("business_members").select("business_id, role, businesses(product_level)").eq("user_id", user.id).limit(1).maybeSingle();
-  const business = Array.isArray(membership?.businesses) ? membership.businesses[0] : membership?.businesses;
-  if (!membership || !["owner","manager"].includes(membership.role) || business?.product_level !== "intelligence") redirect("/dashboard?section=resumen");
-  const { data: existing } = await supabase.from("loyalty_programs").select("id").eq("business_id", membership.business_id).eq("active", true).limit(1).maybeSingle();
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { data: business } = await supabase.from("businesses").select("product_level").eq("id", businessId).maybeSingle();
+  const { data: intelligenceEntitlement } = await supabase.from("business_product_entitlements").select("status").eq("business_id", businessId).eq("product_code", "nival_intelligence").eq("status", "active").maybeSingle();
+  if (business?.product_level !== "intelligence" && !intelligenceEntitlement) redirect("/dashboard?section=resumen");
+  const { data: existing } = await supabase.from("loyalty_programs").select("id").eq("business_id", businessId).eq("active", true).limit(1).maybeSingle();
   if (existing) redirect("/dashboard?section=configuracion");
-  const { error } = await supabase.from("loyalty_programs").insert({ business_id: membership.business_id, name: programName, points_per_visit: pointsPerVisit, reward_threshold: rewardThreshold, reward_description: rewardDescription, active: true });
+  const { error } = await supabase.from("loyalty_programs").insert({ business_id: businessId, name: programName, points_per_visit: pointsPerVisit, reward_threshold: rewardThreshold, reward_description: rewardDescription, active: true });
   if (error) redirect(`/dashboard?section=configuracion&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
   redirect(`/dashboard?section=configuracion&message=${encodeURIComponent("Programa de lealtad activado.")}`);
@@ -230,8 +242,9 @@ export async function updateLoyaltyProgram(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("La recompensa debe tener entre 2 y 160 caracteres.")}`);
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_current_loyalty_program_v2", {
+  const { supabase, businessId } = await getActiveManagerContext();
+  const { error } = await supabase.rpc("update_loyalty_program_for", {
+    p_business_id: businessId,
     program_name: programName,
     awarded_points: pointsPerVisit,
     target_reward_threshold: rewardThreshold,
