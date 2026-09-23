@@ -16,23 +16,25 @@ export default function Home() {
           <span>Nival Tech</span>
         </Link>
         <div className="landingNavLinks">
+          <a href="#productos">Productos</a>
           <a href="#como-funciona">Cómo funciona</a>
-          <a href="#precio">Precio</a>
+          <a href="#precio">Nival Pay</a>
         </div>
         <Link className="landingLogin" href="/auth">Mi cuenta</Link>
       </nav>
 
       <section className="landingHero">
         <div className="landingHeroCopy">
-          <p className="landingKicker heroReveal heroReveal1"><span /> Nival Pay ya está disponible</p>
-          <h1 className="heroReveal heroReveal2">Cobra sin volver a dictar tu CLABE.</h1>
-          <p className="landingHeroLead heroReveal heroReveal3">Acerca el celular a tu tarjeta NFC, abre tus datos de pago y copia la CLABE.</p>
+          <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para negocios locales</p>
+          <h1 className="heroReveal heroReveal2">Cobra mejor. Haz que vuelvan. Crece con lo que ya sabes de tus clientes.</h1>
+          <p className="landingHeroLead heroReveal heroReveal3">Nival Pay facilita el cobro. Nival Puntos crea recurrencia. Nival Intelligence convierte la actividad del negocio en acciones concretas.</p>
           <div className="landingPriceLine heroReveal heroReveal4">
-            <strong>$199 MXN</strong>
-            <span>pago único · tarjeta NFC + página configurada</span>
+            <strong>Empieza desde $199 MXN</strong>
+            <span>sin cambiar la forma en la que ya opera tu negocio</span>
           </div>
           <div className="landingHeroActions heroReveal heroReveal5">
-            <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay</Link>
+            <Link className="landingPrimary" href={signupUrl}>Quiero Nival Pay</Link>
+            <a className="landingSecondary" href="#productos">Ver productos</a>
           </div>
         </div>
 
@@ -65,9 +67,40 @@ export default function Home() {
       </section>
 
       <section className="landingProof scrollReveal" aria-label="Beneficios principales">
-        <p><strong>Un toque</strong><span>para abrir tus datos</span></p>
-        <p><strong>Un enlace</strong><span>para NFC y QR</span></p>
-        <p><strong>Sin mensualidad</strong><span>pagas una sola vez</span></p>
+        <p><strong>Cobrar</strong><span>sin fricción con Nival Pay</span></p>
+        <p><strong>Hacer que vuelvan</strong><span>con Nival Puntos</span></p>
+        <p><strong>Saber qué hacer</strong><span>con Nival Intelligence</span></p>
+      </section>
+
+      <section className="nivalEcosystem scrollReveal" id="productos">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">UN SISTEMA, TRES TRABAJOS</p>
+          <h2>Empieza por el problema que más te cuesta hoy.</h2>
+          <p>No necesitas comprar todo. Cada producto funciona por separado y juntos se vuelven más útiles.</p>
+        </div>
+        <div className="nivalProductCards">
+          <article>
+            <span>COBRAR</span>
+            <h3>Nival Pay</h3>
+            <p>Tu cliente abre una página limpia desde NFC o QR, copia tus datos y paga sin pedirte capturas ni volver a dictar la CLABE.</p>
+            <div><strong>$199 MXN</strong><small>pago único</small></div>
+            <Link href={signupUrl}>Crear mi Nival Pay →</Link>
+          </article>
+          <article>
+            <span>HACER QUE VUELVAN</span>
+            <h3>Nival Puntos</h3>
+            <p>Registra visitas, entrega recompensas y crea una razón sencilla para que tus clientes regresen.</p>
+            <div><strong>$199 MXN</strong><small>al mes</small></div>
+            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa →</Link>
+          </article>
+          <article className="featured">
+            <span>CRECER</span>
+            <h3>Nival Intelligence</h3>
+            <p>Detecta a quién recuperar, qué campaña hacer y qué funcionó. Menos tablas; más acciones concretas para el dueño.</p>
+            <div><strong>$399 MXN</strong><small>al mes · $449 con Puntos</small></div>
+            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Ver Intelligence →</Link>
+          </article>
+        </div>
       </section>
 
       <section className="landingSection landingProblem scrollReveal" id="como-funciona">
@@ -152,11 +185,10 @@ export default function Home() {
 
       <section className="intelligenceTeaser intelligenceSecondary scrollReveal" id="intelligence">
         <div>
-          <strong className="comingSoon">PRÓXIMAMENTE</strong>
           <p className="landingEyebrow">NIVAL INTELLIGENCE</p>
-          <h2>Nival Intelligence — Administra clientes, visitas y lealtad</h2>
-          <p>Centraliza la relación con tus clientes y convierte visitas y lealtad en información útil para tu negocio.</p>
-          <IntelligenceWaitlist />
+          <h2>No te entrega datos para que tú averigües qué hacer.</h2>
+          <p>Revisa recurrencia, riesgo, campañas y resultados para proponerte una acción concreta: a quién contactar, qué mensaje usar y qué observar después.</p>
+          <div className="landingHeroActions"><Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Conocer Intelligence</Link></div>
         </div>
       </section>
 
@@ -196,7 +228,7 @@ export default function Home() {
           <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
           <span>Nival Tech</span>
         </Link>
-        <p>Productos digitales simples para negocios locales.</p>
+        <p>Cobra, fideliza y crece con herramientas hechas para negocios locales.</p>
         <div><Link href="/support">Soporte</Link><Link href="/privacy">Privacidad</Link><Link href="/auth">Mi cuenta</Link></div>
       </footer>
     </main>
