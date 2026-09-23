@@ -4179,3 +4179,9 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .freemiumFeatureRail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.freemiumFeatureRail article{min-height:135px;padding:17px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}.freemiumFeatureRail article.locked{opacity:.82;background:linear-gradient(145deg,var(--surface),rgba(200,166,90,.04))}.freemiumFeatureRail strong{display:block;margin:8px 0 6px;font-size:13px}.freemiumFeatureRail p{margin:0;color:var(--muted);font-size:9px;line-height:1.5}
 .intelligenceFreeLock{margin-top:2px}
 @media(max-width:760px){.freemiumBanner{grid-template-columns:1fr}.freemiumBanner button,.freemiumBanner>a{width:100%;text-align:center}.freemiumFeatureRail{grid-template-columns:1fr}.freemiumPreviewRows>div{grid-template-columns:1fr auto}.freemiumPreviewRows span{grid-column:1}}
+
+.payValueStripPro{grid-template-columns:repeat(4,minmax(0,1fr)) auto}
+.payValueStrip .payLastSeen{font-size:12px;line-height:1.35}
+.payMetricNote{margin:-7px 0 16px;color:var(--muted);font-size:9px;line-height:1.45}
+@media(max-width:1050px){.payValueStripPro{grid-template-columns:repeat(2,minmax(0,1fr))}.payValueStripPro>a{grid-column:1/-1;justify-content:center}}
+@media(max-width:520px){.payValueStripPro{grid-template-columns:1fr}}
