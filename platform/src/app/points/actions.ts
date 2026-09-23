@@ -57,7 +57,7 @@ export async function getPublicLoyaltyRewards(token: string) {
 export async function getPublicLoyaltyCard(token: string) {
   await enforceRate("card", 60, 60);
   const admin = createPointsAdminClient();
-  const { data, error } = await admin.rpc("get_public_loyalty_card_v3", { p_account_token: token });
+  const { data, error } = await admin.rpc("get_public_loyalty_card_v4", { p_account_token: token });
   if (error) throw new Error(error.message);
   return data?.[0] ?? null;
 }
