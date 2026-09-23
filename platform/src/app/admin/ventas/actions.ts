@@ -12,13 +12,35 @@ export async function confirmCashPayment(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || !isNivalAdmin(user.email)) redirect('/dashboard');
   const admin = createAdminClient();
-  const { data: order } = await admin.from('product_orders').select('business_id, status, payment_method')
+  const { data: order } = await admin.from('product_orders').select('business_id, product_code, status, payment_method')
     .eq('id', orderId).maybeSingle();
   if (!order || order.payment_method !== 'cash' || order.status !== 'pending_cash_confirmation') redirect('/admin/ventas?error=Orden+inválida');
   const now = new Date().toISOString();
   const { error } = await admin.from('product_orders').update({ status: 'paid', paid_at: now, confirmed_by: user.id, updated_at: now }).eq('id', orderId);
   if (error) redirect('/admin/ventas?error=No+se+pudo+confirmar');
-  await admin.from('businesses').update({ subscription_status: 'active', updated_at: now }).eq('id', order.business_id);
+  if (order.product_code === 'nival_pay') {
+    await admin.from('businesses').update({ subscription_status: 'active', updated_at: now }).eq('id', order.business_id);
+  }
   revalidatePath('/admin/ventas');
+}
+
+export async function updatePhysicalCardFulfillment(formData: FormData) {
+  const cardId = String(formData.get('cardId') ?? '').trim();
+  const status = String(formData.get('status') ?? '').trim();
+  const trackingCode = String(formData.get('trackingCode') ?? '').trim().slice(0, 120) || null;
+  const allowed = new Set(['new','confirmed','producing','ready','shipped','delivered','cancelled']);
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || !isNivalAdmin(user.email)) redirect('/dashboard');
+  if (!cardId || !allowed.has(status)) redirect('/admin/ventas?section=nival-card&error=Estado+inválido');
+
+  const admin = createAdminClient();
+  const { error } = await admin.from('physical_card_orders')
+    .update({ fulfillment_status: status, tracking_code: trackingCode, updated_at: new Date().toISOString() })
+    .eq('id', cardId);
+  if (error) redirect('/admin/ventas?section=nival-card&error=No+se+pudo+actualizar+el+pedido');
+  revalidatePath('/admin/ventas');
+  redirect('/admin/ventas?section=nival-card');
 }
 

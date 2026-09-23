@@ -16,12 +16,12 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
   const { data: business } = await supabase.from('businesses')
-    .select('name, product_level')
+    .select('name, product_level, slug, logo_url')
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
   const admin = createAdminClient();
-  const [{ data: paidInitialOrders }, { data: claimedCards }] = await Promise.all([
+  const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }] = await Promise.all([
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', membership.business_id)
@@ -30,14 +30,20 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', membership.business_id),
+    admin.from('payment_profiles').select('id, display_name, public_token').eq('business_id', membership.business_id).eq('active', true).order('created_at', { ascending: true }),
+    admin.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').in('status', ['active','free']).maybeSingle(),
+    admin.from('loyalty_programs').select('review_url').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).filter((card) => {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
     return payment?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
+  const hasPointsDestination = Boolean(pointsEntitlement && business.slug);
+  const hasReviewDestination = Boolean(loyaltyProgram?.review_url);
+  const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
   const { data: orders } = await supabase.from('physical_card_orders')
-    .select('id, design, front_template, back_style, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
+    .select('id, design, front_template, back_style, target_url, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
 
   return <main className="dashboardApp nivalDashboard">
@@ -54,11 +60,13 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
         <section className="chartCard physicalCardSection">
           <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
-            <label><input type="radio" name="frontTemplate" value="pay" defaultChecked/><span className="templateMock"><small>PAGAR</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong></label>
-            <label><input type="radio" name="frontTemplate" value="points"/><span className="templateMock"><small>PUNTOS</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong></label>
-            <label><input type="radio" name="frontTemplate" value="reviews"/><span className="templateMock"><small>RESEÑA</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong></label>
-            <label><input type="radio" name="frontTemplate" value="profile"/><span className="templateMock"><small>NEGOCIO</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para ver nuestros enlaces</em></span><strong>Perfil digital</strong></label>
+            <label className={!primaryPaymentProfileId ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="pay" defaultChecked={Boolean(primaryPaymentProfileId)} disabled={!primaryPaymentProfileId}/><span className="templateMock"><small>PAGAR</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong>{!primaryPaymentProfileId && <small>Configura tu página primero</small>}</label>
+            <label className={!hasPointsDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="points" defaultChecked={!primaryPaymentProfileId && hasPointsDestination} disabled={!hasPointsDestination}/><span className="templateMock"><small>PUNTOS</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong>{!hasPointsDestination && <small>Activa Puntos para usarla</small>}</label>
+            <label className={!hasReviewDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="reviews" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && hasReviewDestination} disabled={!hasReviewDestination}/><span className="templateMock"><small>RESEÑA</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong>{!hasReviewDestination && <small>Configura tu enlace de reseñas</small>}</label>
+            <label><input type="radio" name="frontTemplate" value="profile" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && !hasReviewDestination}/><span className="templateMock"><small>NEGOCIO</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para ver nuestros enlaces</em></span><strong>Perfil digital</strong></label>
           </div>
+          {paymentProfiles && paymentProfiles.length > 1 ? <label>Página Nival Pay<select name="paymentProfileId" defaultValue={primaryPaymentProfileId}>{paymentProfiles.map((profile,index)=><option key={profile.id} value={profile.id}>{profile.display_name || `Nival Pay ${index+1}`}</option>)}</select></label> : <input type="hidden" name="paymentProfileId" value={primaryPaymentProfileId}/>}
+          <p className="payHelp">La tarjeta quedará programada al destino elegido. Nival valida que ese destino exista antes de registrar el pedido.</p>
           <label>Color base<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Color según mi marca</option></select></label>
           <label>Indicaciones del frente<textarea name="designNotes" maxLength={500} placeholder="Ej. usar mi logo blanco, fondo azul, nombre del negocio debajo del QR."/></label>
         </section>

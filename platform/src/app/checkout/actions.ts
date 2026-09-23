@@ -455,6 +455,8 @@ type PhysicalCardInput = {
   state: string;
   postal_code: string;
   requested_delivery_date: string | null;
+  target_payment_profile_id: string | null;
+  target_url: string | null;
 };
 
 function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
@@ -472,6 +474,7 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const postalCode = String(form.get('postalCode') ?? '').trim();
   const notes = String(form.get('designNotes') ?? '').trim();
   const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
+  const targetPaymentProfileId = String(form.get('paymentProfileId') ?? '').trim() || null;
   if (!['black','white','custom'].includes(design) || !['pay','points','reviews','profile'].includes(frontTemplate)
     || !['nival','custom'].includes(backStyle) || !['sunday_local','shipping'].includes(delivery)
     || recipient.length < 2 || phone.length < 10 || address1.length < 5 || city.length < 2
@@ -490,12 +493,47 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
     address_line1: address1.slice(0,180), address_line2: address2.slice(0,180) || null,
     city: city.slice(0,100), state: state.slice(0,100), postal_code: postalCode,
     requested_delivery_date: delivery === 'sunday_local' ? requestedDate || null : null,
+    target_payment_profile_id: targetPaymentProfileId,
+    target_url: null,
   };
 }
 
+async function resolvePhysicalCardDestination(businessId: string, details: PhysicalCardInput) {
+  const admin = createAdminClient();
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
+  const { data: business } = await admin.from('businesses').select('slug').eq('id', businessId).maybeSingle();
+  if (!business?.slug) redirect('/dashboard/pay/physical?error=No+pudimos+resolver+el+destino+de+la+tarjeta.');
+
+  if (details.front_template === 'pay') {
+    let query = admin.from('payment_profiles').select('id, public_token').eq('business_id', businessId).eq('active', true);
+    if (details.target_payment_profile_id) query = query.eq('id', details.target_payment_profile_id);
+    const { data: profile } = await query.order('created_at', { ascending: true }).limit(1).maybeSingle();
+    if (!profile?.public_token) redirect('/dashboard/pay/physical?error=Primero+configura+la+página+Nival+Pay+que+abrirá+esta+tarjeta.');
+    return { ...details, target_payment_profile_id: profile.id, target_url: `${siteUrl}/pay/${profile.public_token}` };
+  }
+
+  if (details.front_template === 'points') {
+    const { data: entitlement } = await admin.from('business_product_entitlements').select('status')
+      .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).in('status', ['active','free']).maybeSingle();
+    if (!entitlement) redirect('/dashboard/pay/physical?error=Activa+Nival+Puntos+antes+de+pedir+una+tarjeta+para+puntos.');
+    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/b/${business.slug}` };
+  }
+
+  if (details.front_template === 'reviews') {
+    const { data: program } = await admin.from('loyalty_programs').select('review_url')
+      .eq('business_id', businessId).eq('active', true).limit(1).maybeSingle();
+    if (!program?.review_url) redirect('/dashboard/pay/physical?error=Configura+primero+el+enlace+de+reseñas+del+negocio.');
+    return { ...details, target_payment_profile_id: null, target_url: program.review_url };
+  }
+
+  return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/p/${business.slug}` };
+}
+
 export async function startPhysicalCardCheckout(form: FormData) {
-  const details = readPhysicalCardInput(form);
-  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const rawDetails = readPhysicalCardInput(form);
+  if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const { businessId } = await currentPurchaseContext();
+  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
   const customBack = details.back_style === 'custom';
   return startMercadoPagoProductCheckout({
     productCode: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
@@ -507,9 +545,10 @@ export async function startPhysicalCardCheckout(form: FormData) {
 }
 
 export async function claimIncludedPhysicalCard(form: FormData) {
-  const details = readPhysicalCardInput(form);
-  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const rawDetails = readPhysicalCardInput(form);
+  if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
+  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
   const admin = createAdminClient();
   const [{ data: paidOrders, error: paidError }, { data: existingCards, error: cardsError }] = await Promise.all([
     admin.from('product_orders')
@@ -552,9 +591,10 @@ export async function claimIncludedPhysicalCard(form: FormData) {
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {
-  const details = readPhysicalCardInput(form);
-  if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const rawDetails = readPhysicalCardInput(form);
+  if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
+  const details = await resolvePhysicalCardDestination(businessId, rawDetails);
   const admin = createAdminClient();
   const customBack = details.back_style === 'custom';
   const { data: order, error } = await admin.from('product_orders').insert({
