@@ -27,7 +27,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="landingNavLinks">
           <a href="#productos">Productos</a>
           <a href="#como-funciona">Cómo funciona</a>
-          <a href="#precio">Nival Pay</a>
+          <a href="#empieza-gratis">Empieza gratis</a>
         </div>
         <Link className="landingLogin" href="/auth">Mi cuenta</Link>
       </nav>
@@ -40,15 +40,15 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingHero">
         <div className="landingHeroCopy">
           <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para negocios locales</p>
-          <h1 className="heroReveal heroReveal2">Cobra mejor. Haz que vuelvan. Crece con lo que ya sabes de tus clientes.</h1>
-          <p className="landingHeroLead heroReveal heroReveal3">Nival Pay facilita el cobro. Nival Puntos crea recurrencia. Nival Intelligence convierte la actividad del negocio en acciones concretas.</p>
+          <h1 className="heroReveal heroReveal2">Haz más fácil cobrar, lograr que tus clientes vuelvan y saber qué hacer para crecer.</h1>
+          <p className="landingHeroLead heroReveal heroReveal3">Nival convierte tres problemas cotidianos de un negocio en acciones simples: comparte cómo pagarte, crea una razón para regresar y recibe recomendaciones concretas basadas en la actividad real de tus clientes.</p>
           <div className="landingPriceLine heroReveal heroReveal4">
             <strong>Empieza gratis</strong>
             <span>usa el producto primero; paga cuando necesites más</span>
           </div>
           <div className="landingHeroActions heroReveal heroReveal5">
             <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
-            <a className="landingSecondary" href="#productos">Ver productos</a>
+            <a className="landingSecondary" href="#vida-real">Ver cómo ayuda</a>
           </div>
         </div>
 
@@ -81,9 +81,22 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       </section>
 
       <section className="landingProof scrollReveal" aria-label="Beneficios principales">
-        <p><strong>Cobrar</strong><span>sin fricción con Nival Pay</span></p>
-        <p><strong>Hacer que vuelvan</strong><span>con Nival Puntos</span></p>
-        <p><strong>Saber qué hacer</strong><span>con Nival Intelligence</span></p>
+        <p><strong>Cobrar</strong><span>sin dictar tu CLABE cada vez</span></p>
+        <p><strong>Hacer que vuelvan</strong><span>sin depender de que se acuerden</span></p>
+        <p><strong>Saber qué hacer</strong><span>sin perderte entre tablas</span></p>
+      </section>
+
+      <section className="landingPainSection scrollReveal">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">PROBLEMAS REALES, NO MÁS SOFTWARE POR TENER SOFTWARE</p>
+          <h2>Tu negocio ya tiene clientes. Nival te ayuda a aprovechar mejor cada interacción.</h2>
+          <p>Empieza por una sola necesidad. No tienes que cambiar cómo opera tu negocio ni aprender un sistema complicado.</p>
+        </div>
+        <div className="landingPainGrid">
+          <article><span>01</span><h3>“¿Me mandas tu CLABE?”</h3><p>Deja de buscar capturas o dictar números. Tu cliente abre una página clara desde QR, enlace o NFC.</p><b>Nival Pay lo resuelve →</b></article>
+          <article><span>02</span><h3>“Vino una vez y no volvió.”</h3><p>Registra visitas y recompensa la recurrencia para que regresar tenga una razón visible para el cliente.</p><b>Nival Puntos lo resuelve →</b></article>
+          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Nival detecta oportunidades y las convierte en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Nival Intelligence lo resuelve →</b></article>
+        </div>
       </section>
 
       <section className="nivalEcosystem scrollReveal" id="productos">
@@ -127,6 +140,33 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival te dice qué hacer después.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
         </div>
         <small>Los tres pueden empezar gratis. Pro aparece cuando ya necesitas más capacidad, herramientas o automatización.</small>
+      </section>
+
+      <section className="landingRealLife scrollReveal" id="vida-real">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">ASÍ SE VE EN UN NEGOCIO REAL</p>
+          <h2>Menos pasos para tu cliente. Menos cosas que recordar para ti.</h2>
+          <p>Nival está pensado para entrar en momentos que ya ocurren todos los días, no para inventarte trabajo nuevo.</p>
+        </div>
+        <div className="realLifeTimeline">
+          <article><div><span>1</span><small>AL COBRAR</small></div><section><h3>“Escanea aquí.”</h3><p>El cliente abre Nival Pay, verifica los datos y copia la CLABE. Tú no interrumpes lo que estás haciendo para buscar datos bancarios.</p><em>QR · enlace · NFC</em></section></article>
+          <article><div><span>2</span><small>DESPUÉS</small></div><section><h3>“Tu visita ya cuenta.”</h3><p>Con Nival Puntos, el cliente ve su avance y tiene una razón concreta para regresar al negocio.</p><em>visitas · puntos · recompensas</em></section></article>
+          <article><div><span>3</span><small>PARA CRECER</small></div><section><h3>“Hay 8 clientes que conviene recuperar.”</h3><p>Intelligence transforma actividad en una recomendación y, en Pro, te ayuda a ejecutarla y observar quién regresó.</p><em>detectar · actuar · medir</em></section></article>
+        </div>
+      </section>
+
+      <section className="landingFreeSection scrollReveal" id="empieza-gratis">
+        <div className="landingFreeIntro">
+          <p className="landingEyebrow">PRIMERO ÚSALO</p>
+          <h2>Empieza gratis. Paga cuando Nival ya te esté resolviendo algo.</h2>
+          <p>No queremos que compres una promesa. Los planes gratis sirven para poner Nival frente a clientes reales y descubrir si encaja en tu negocio.</p>
+          <Link className="landingPrimary" href={signupUrl}>Crear mi cuenta gratis</Link>
+        </div>
+        <div className="landingFreePlans">
+          <article><span>NIVAL PAY GRATIS</span><strong>Empieza a cobrar mejor</strong><p>Página de cobro, QR, enlace, tu marca, 1 apartado y estadísticas básicas. No caduca.</p><small>Pro agrega NFC física, 3 apartados y más herramientas.</small></article>
+          <article><span>NIVAL PUNTOS GRATIS</span><strong>Comprueba si regresan</strong><p>Programa real de visitas, puntos y recompensas para hasta 30 clientes.</p><small>Pro aumenta capacidad y desbloquea resultados y configuración.</small></article>
+          <article><span>NIVAL INTELLIGENCE GRATIS</span><strong>Descubre una oportunidad</strong><p>Nival usa la actividad disponible para mostrarte la señal principal y una recomendación.</p><small>Pro revela personas, mensajes, campañas y seguimiento.</small></article>
+        </div>
       </section>
 
       <section className="landingSection landingProblem scrollReveal" id="como-funciona">
@@ -212,9 +252,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="intelligenceTeaser intelligenceSecondary scrollReveal" id="intelligence">
         <div>
           <p className="landingEyebrow">NIVAL INTELLIGENCE</p>
-          <h2>No te entrega datos para que tú averigües qué hacer.</h2>
-          <p>Revisa recurrencia, riesgo, campañas y resultados para proponerte una acción concreta: a quién contactar, qué mensaje usar y qué observar después.</p>
-          <div className="landingHeroActions"><Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Conocer Intelligence</Link></div>
+          <h2>No abras otra gráfica preguntándote “¿y esto para qué me sirve?”.</h2>
+          <p>Intelligence busca responder una pregunta mucho más útil: <strong>¿qué conviene hacer ahora?</strong> Detecta clientes que podrías perder, clientes que vale la pena cuidar y oportunidades para provocar una siguiente visita.</p>
+          <div className="intelligenceExample"><span>NIVAL ENCONTRÓ ESTO</span><strong>8 clientes que antes regresaban podrían estar alejándose.</strong><p>Recomendación: empieza por quienes ya te conocen antes de lanzar una promoción general.</p></div>
+          <div className="landingHeroActions"><Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Probar Intelligence gratis</Link></div>
         </div>
       </section>
 
@@ -245,8 +286,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
 
       <section className="landingFinalCta scrollReveal">
         <p className="landingEyebrow">NIVAL PAY</p>
-        <h2>Tu negocio ya acepta transferencias.<br />Ahora hazlo más fácil.</h2>
-        <Link className="landingPrimary" href={signupUrl}>Quiero mi Nival Pay — $199</Link>
+        <h2>No necesitas decidir hoy si Nival vale la pena.<br />Úsalo y deja que el producto te lo demuestre.</h2>
+        <p>Empieza con Nival Pay, Puntos o Intelligence. Los tres tienen una forma de empezar gratis.</p>
+        <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
       </section>
 
       <footer className="landingFooter">
