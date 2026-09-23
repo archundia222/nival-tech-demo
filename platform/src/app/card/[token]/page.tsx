@@ -15,7 +15,7 @@ export default async function CardPage({ params }: CardPageProps) {
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
   const redeemedRewards = rewards.filter((reward: { redeemed_at: string | null }) => reward.redeemed_at);
   return <main className="pointsCustomerShell nivalDashboard">
-    <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <b>NIVAL tech</b></span></header>
+    <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <a href="/?from=nival-puntos"><b>NIVAL tech</b></a></span></header>
     <section className="pointsCustomerCard">
       <div className="pointsCustomerCardTop"><div><p className="pointsCustomerProgram">{card.program_name}</p><h1>{card.business_name}</h1></div><span className="pointsCustomerMemberBadge">MIEMBRO</span></div>
       <div className="pointsCustomerGreeting"><span>Hola, {card.customer_first_name}</span><small>Tu saldo actual</small></div>
@@ -28,5 +28,6 @@ export default async function CardPage({ params }: CardPageProps) {
     </section>
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. El QR temporal solo sirve para identificar tu cuenta en caja.</p>
+    <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Nival Puntos te ayuda a registrar visitas, premiar recurrencia y entender quién vuelve.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
   </main>;
 }
