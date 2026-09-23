@@ -29,7 +29,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
-    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders(status)').eq('business_id', membership.business_id),
+    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', membership.business_id),
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).filter((card) => {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
@@ -37,17 +37,17 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
   const { data: orders } = await supabase.from('physical_card_orders')
-    .select('id, design, front_template, back_style, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders(status, payment_method, amount_cents)')
+    .select('id, design, front_template, back_style, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
 
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="agregar-tarjetas" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent physicalCardPage">
-      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : '$99 MXN'}</span></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta física Nival Pay</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       {params.result === 'success' && <p role="status" className="formMessage">Pago recibido. Tu tarjeta entrará a producción cuando confirmemos el diseño.</p>}
       {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago.</p>}
-      {params.result === 'cash' && <p role="status" className="formMessage">Pedido registrado. Pagarás $99 en efectivo al recibirla.</p>}
+      {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
       <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Haz que la tarjeta parezca de tu negocio.</h1><p>{hasIncludedCard ? 'Tu primera tarjeta física ya está incluida. Elige qué acción tendrá al frente y cómo quieres que se vea. El reverso Nival está incluido; si quieres diseñarlo a tu gusto cuesta $10 MXN.' : 'Cada tarjeta adicional cuesta $99 MXN con reverso Nival, o $109 MXN con reverso personalizado.'}</p></header>
       <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>

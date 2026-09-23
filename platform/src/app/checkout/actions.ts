@@ -519,7 +519,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
       .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
-    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders(status)').eq('business_id', businessId),
+    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', businessId),
   ]);
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).filter((card) => {
