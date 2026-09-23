@@ -66,10 +66,10 @@ export async function startIntelligenceCampaign(formData: FormData) {
     business_id: businessId,
     name: campaignName,
     message,
-    status: 'sent',
+    status: 'approved',
     approved_by: user.id,
     approved_at: now,
-    sent_at: now,
+    sent_at: null,
     audience_rule: {
       source: 'nival_intelligence',
       segment,
@@ -82,6 +82,32 @@ export async function startIntelligenceCampaign(formData: FormData) {
   if (error) {
     console.error('[intelligence] Campaign tracking insert failed', { code: error.code });
     redirect('/dashboard/intelligence?view=campaigns&error=No+pudimos+iniciar+la+medición.');
+  }
+
+  revalidatePath('/dashboard/intelligence');
+  redirect('/dashboard/intelligence?view=campaigns&campaign=prepared');
+}
+
+export async function startIntelligenceMeasurement(formData: FormData) {
+  const { supabase, businessId } = await getContext();
+  await requireIntelligencePro(supabase, businessId);
+  const campaignId = String(formData.get('campaignId') ?? '').trim();
+
+  if (!/^[0-9a-f-]{36}$/i.test(campaignId)) {
+    redirect('/dashboard/intelligence?view=campaigns&error=No+pudimos+identificar+la+campaña.');
+  }
+
+  const now = new Date().toISOString();
+  const { data, error } = await supabase.from('campaigns')
+    .update({ status: 'sent', sent_at: now })
+    .eq('id', campaignId)
+    .eq('business_id', businessId)
+    .eq('status', 'approved')
+    .select('id')
+    .maybeSingle();
+
+  if (error || !data) {
+    redirect('/dashboard/intelligence?view=campaigns&error=No+pudimos+iniciar+la+medición+de+esta+campaña.');
   }
 
   revalidatePath('/dashboard/intelligence');

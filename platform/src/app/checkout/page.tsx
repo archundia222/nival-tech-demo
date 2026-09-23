@@ -7,6 +7,7 @@ import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -110,10 +111,13 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, businesses(name, subscription_status)').eq('user_id', user.id).limit(1).maybeSingle();
+  const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: business } = await supabase.from('businesses')
+    .select('name, subscription_status')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+  if (!business) redirect('/dashboard');
   if (params.result === 'success') await reconcileLatestOrder(membership.business_id);
   const { data: orders } = await supabase.from('product_orders')
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
@@ -121,7 +125,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const paid = orders?.find((order) => order.status === 'paid');
   const { data: paymentProfile } = paid
     ? await supabase.from('payment_profiles').select('public_token, account_holder, bank_name, clabe')
-      .eq('business_id', membership.business_id).maybeSingle()
+      .eq('business_id', membership.business_id)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
     : { data: null };
   const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
   const siteUrl = publicSiteUrl();

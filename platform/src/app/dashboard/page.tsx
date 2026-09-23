@@ -54,6 +54,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const membership = await getActiveBusinessMembership(user.id);
 
   if (!membership) {
+    const onboardingNext = ["/dashboard/pay", "/dashboard/points", "/dashboard/intelligence", "/checkout"].includes(params.next ?? "")
+      ? params.next!
+      : "/products";
     return (
       <main className="dashboardShell">
         <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
@@ -62,7 +65,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <h1>Crea tu primer negocio</h1>
           <p>Este nombre aparecerá en las páginas y productos que configures para tu negocio.</p>
           {params.error && <div className="formMessage errorMessage">{params.error}</div>}
-          <BusinessOnboardingForm next={params.next === "/dashboard/pay" ? params.next : "/products"} />
+          <BusinessOnboardingForm next={onboardingNext} />
         </section>
       </main>
     );

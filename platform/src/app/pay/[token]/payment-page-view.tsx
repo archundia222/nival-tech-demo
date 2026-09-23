@@ -52,7 +52,7 @@ export function PaymentPageView({
       <div className={styles.brandRow}>
         <span className={styles.brandMark} aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M14 2.4 24 8.2v11.6L14 25.6 4 19.8V8.2L14 2.4Z"/><path d="m9.2 16.5 3.1 3.1 6.7-8"/></svg></span>
         <span className={styles.brandName}>Nival <strong>Pay</strong></span>
-        <span className={styles.securePill}>Datos verificados</span>
+        <span className={styles.securePill}>Datos del negocio</span>
       </div>
       <div className={styles.profile}>
         <div className={styles.logoWrap}>

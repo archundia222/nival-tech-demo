@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
       <section className="legalCard">
-        <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 9 DE SEPTIEMBRE DE 2026</p>
+        <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 23 DE SEPTIEMBRE DE 2026</p>
         <h1>Aviso de privacidad</h1>
         <p>Nival Tech ofrece herramientas digitales para negocios, incluyendo páginas de cobro informativas, programas de lealtad, perfiles digitales y funciones de análisis y recomendaciones. Este aviso explica qué datos podemos tratar, para qué los utilizamos y cómo puedes ejercer tus derechos.</p>
         <h2>Datos que podemos tratar</h2>
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
           <li>Enviar promociones únicamente cuando hayas dado tu consentimiento.</li>
         </ul>
         <h2>Proveedores y transferencias</h2>
-        <p>Utilizamos proveedores tecnológicos para alojamiento, base de datos y emisión de pases, incluyendo Vercel, Supabase y Google Wallet. Compartimos únicamente la información necesaria para prestar estas funciones. No vendemos tus datos personales.</p>
+        <p>Utilizamos proveedores tecnológicos para alojamiento, base de datos, procesamiento de pagos y emisión de pases, incluyendo Vercel, Supabase, Mercado Pago y Google Wallet según la función utilizada. Compartimos únicamente la información necesaria para prestar esas funciones. No vendemos tus datos personales.</p>
         <h2>Conservación y seguridad</h2>
         <p>Conservamos la información durante el tiempo necesario para operar el programa, atender solicitudes y cumplir obligaciones aplicables. Aplicamos controles de acceso y medidas técnicas razonables para protegerla.</p>
         <h2>Tus derechos</h2>
