@@ -7,13 +7,13 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id').eq('user_id', user.id).limit(1).maybeSingle();
+  const membership = await getActiveBusinessMembership(user.id);
   // /dashboard/pay is an allowed onboarding destination and redirects unpaid customers back to checkout.
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   return { user, businessId: membership.business_id, supabase };
