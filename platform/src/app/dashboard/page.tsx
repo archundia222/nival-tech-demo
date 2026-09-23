@@ -52,7 +52,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const { data: memberships } = await supabase
     .from("business_members")
-    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level)")
+    .select("role, businesses(id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled)")
     .eq("user_id", user.id);
   const membership = memberships?.[0];
 
@@ -75,10 +75,14 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const businessId = business?.id;
   const productLevel: 'pay' | 'intelligence' = business?.product_level === 'intelligence' ? 'intelligence' : 'pay';
   const { data: entitlementRows } = businessId ? await supabase.from('business_product_entitlements')
-    .select('product_code').eq('business_id', businessId).eq('status', 'active') : { data: [] };
-  const activeProducts = new Set((entitlementRows ?? []).map((item) => item.product_code));
-  const hasIntelligence = productLevel === 'intelligence' || activeProducts.has('nival_intelligence');
-  const hasPoints = hasIntelligence || activeProducts.has('nival_points');
+    .select('product_code,status').eq('business_id', businessId) : { data: [] };
+  const entitlementMap = new Map((entitlementRows ?? []).map((item) => [item.product_code, item.status]));
+  const paidIntelligence = productLevel === 'intelligence' || entitlementMap.get('nival_intelligence') === 'active';
+  const freeIntelligence = !paidIntelligence && entitlementMap.get('nival_intelligence') === 'free';
+  const hasIntelligence = paidIntelligence || freeIntelligence;
+  const paidPoints = productLevel === 'intelligence' || entitlementMap.get('nival_points') === 'active';
+  const freePoints = !paidPoints && entitlementMap.get('nival_points') === 'free';
+  const hasPoints = paidPoints || freePoints;
   if ((!hasPoints && currentSection === 'clientes') || (!hasIntelligence && currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
   const [{ count: customerCount }, { count: visitCount }, { count: campaignCount }] = businessId
     ? await Promise.all([
@@ -136,7 +140,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .limit(1)
         .maybeSingle()
     : { data: null };
-  const hasNivalPay = Boolean(paidNivalPayOrder);
+  const paidNivalPay = Boolean(paidNivalPayOrder);
+  const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
+  const hasNivalPay = paidNivalPay || freeNivalPay;
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -178,7 +184,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
   const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
-    ...(paymentProfile ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
+    ...(paymentProfile?.active ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
     ...(hasPoints ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
@@ -193,7 +199,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
   const homeNextAction = !hasNivalPay
-    ? { eyebrow: "EMPIEZA POR COBRAR MEJOR", title: "Activa tu primera Nival Pay", text: "Configura una vez tus datos y deja de dictar la CLABE o mandar capturas cada vez que alguien te paga.", href: "/checkout", cta: "Activar Nival Pay · $199" }
+    ? { eyebrow: "EMPIEZA GRATIS", title: "Crea tu primera Nival Pay", text: "Publica un QR y enlace de cobro sin pagar. Si después quieres NFC física y más herramientas, activas la versión completa sin cambiar tu QR.", href: "/dashboard/pay", cta: "Crear Nival Pay Gratis" }
     : !payReady
       ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
       : Number(paymentProfile?.view_count ?? 0) === 0
@@ -223,19 +229,19 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       <section className="nivalProductHub" aria-label="Productos Nival">
         <article className={hasNivalPay ? "activeProduct" : ""}>
-          <div><span>COBRAR</span><b>{hasNivalPay ? "ACTIVO" : "$199 · PAGO ÚNICO"}</b></div>
+          <div><span>COBRAR</span><b>{paidNivalPay ? "COMPLETO" : freeNivalPay ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Pay</h2>
           <p>Una página de cobro clara para NFC y QR. Tu cliente abre, copia y paga sin pedirte datos por mensaje.</p>
-          <a href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar cobros →" : "Activar Nival Pay →"}</a>
+          <a href="/dashboard/pay">{hasNivalPay ? "Administrar cobros →" : "Crear gratis →"}</a>
         </article>
         <article className={hasPoints ? "activeProduct" : ""}>
-          <div><span>HACER QUE VUELVAN</span><b>{hasPoints ? "ACTIVO" : "$199/MES"}</b></div>
+          <div><span>HACER QUE VUELVAN</span><b>{paidPoints ? "PRO" : freePoints ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Puntos</h2>
           <p>Registra visitas, recompensa recurrencia y crea una razón sencilla para que tus clientes regresen.</p>
           <a href="/dashboard/points">{hasPoints ? "Abrir mi programa →" : "Conocer Nival Puntos →"}</a>
         </article>
         <article className={"intelligenceProduct " + (hasIntelligence ? "activeProduct" : "")}>
-          <div><span>CRECER</span><b>{hasIntelligence ? "ACTIVO" : "$399/MES"}</b></div>
+          <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Intelligence</h2>
           <p>Te dice a quién recuperar, qué campaña probar y qué funcionó. Menos análisis; más decisiones listas para ejecutar.</p>
           <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Intelligence →"}</a>
