@@ -4,19 +4,15 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export async function activateFreeNivalPoints() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?mode=signup&next=%2Fdashboard%2Fpoints');
 
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, role')
-    .eq('user_id', user.id)
-    .in('role', ['owner', 'manager'])
-    .limit(1)
-    .maybeSingle();
-  if (!membership) redirect('/dashboard/points?error=No+tienes+permiso+para+activar+el+programa.');
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/points?error=No+tienes+permiso+para+activar+el+programa.');
 
   const admin = createAdminClient();
   const { data: existing } = await admin.from('business_product_entitlements')
