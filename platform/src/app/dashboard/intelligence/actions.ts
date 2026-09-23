@@ -21,8 +21,21 @@ async function getContext() {
   return { supabase, user, businessId: membership.business_id };
 }
 
+async function requireIntelligencePro(supabase: Awaited<ReturnType<typeof createClient>>, businessId: string) {
+  const { data: entitlement } = await supabase.from('business_product_entitlements')
+    .select('status')
+    .eq('business_id', businessId)
+    .eq('product_code', 'nival_intelligence')
+    .maybeSingle();
+  const { data: business } = await supabase.from('businesses').select('product_level').eq('id', businessId).maybeSingle();
+  if (entitlement?.status !== 'active' && business?.product_level !== 'intelligence') {
+    redirect('/dashboard/intelligence?error=Esta+acción+requiere+Intelligence+Pro.');
+  }
+}
+
 export async function startIntelligenceCampaign(formData: FormData) {
   const { supabase, user, businessId } = await getContext();
+  await requireIntelligencePro(supabase, businessId);
   const rawIds = String(formData.get('customerIds') ?? '[]');
   const segment = String(formData.get('segment') ?? 'segmento').trim().slice(0, 60);
   const message = String(formData.get('message') ?? '').trim().slice(0, 1200);
@@ -83,6 +96,7 @@ export async function startIntelligenceCampaign(formData: FormData) {
 
 export async function saveAverageTicket(formData: FormData) {
   const { supabase, businessId } = await getContext();
+  await requireIntelligencePro(supabase, businessId);
   const raw = String(formData.get('averageTicket') ?? '').replace(/[^0-9.]/g, '');
   const pesos = Number(raw);
 
