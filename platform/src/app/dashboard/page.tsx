@@ -43,7 +43,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     inteligencia: "Nival Intelligence",
     clientes: "Clientes",
     "nival-card": "Nival Card",
-    "perfil-digital": "Perfil digital",
+    "perfil-digital": "Página del negocio",
     configuracion: "Configuración",
   };
   const supabase = await createClient();
@@ -178,9 +178,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
   const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
-    ...(paymentProfile ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pago", description: "Datos para transferencia", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
-    ...(hasPoints ? [{ key: "loyalty", label: "Lealtad", description: "Puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
-    ...(business.phone ? [{ key: "contact", label: "Contacto", description: "Llamar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
+    ...(paymentProfile ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
+    ...(hasPoints ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
+    ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
     ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
     ...(smartLinks?.some((link) => link.kind === "custom" && link.active) ? [{ key: "links", label: "Más enlaces", description: "Redes, menú y otros accesos", href: `/p/${business.slug}`, icon: "+" }] : []),
@@ -318,7 +318,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "perfil-digital" && business?.slug && <>
         <section className="profileDigitalWorkspace">
-          <header className="profileDigitalHeading"><p className="eyebrow">TU PERFIL PÚBLICO</p><h1>Así te ven tus clientes.</h1><p>Tu negocio, formas de contacto y accesos importantes en una sola página lista para compartir.</p></header>
+          <header className="profileDigitalHeading"><p className="eyebrow">TU PÁGINA DEL NEGOCIO</p><h1>Una sola liga para todo lo importante.</h1><p>Cobro, puntos, contacto, reseñas y enlaces del negocio en una página lista para compartir por QR, NFC o WhatsApp.</p></header>
           <div className="profileDashboardGrid">
             <div className="profileDashboardPreview">
               <ProfilePublicView
