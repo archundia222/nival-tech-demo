@@ -260,6 +260,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
+      <section className="landingTrust scrollReveal" aria-labelledby="trust-title">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">CONTROL Y CONFIANZA</p>
+          <h2 id="trust-title">Lo simple para el cliente no tiene que ser improvisado por detrás.</h2>
+          <p>Nival separa la experiencia pública de la administración del negocio y aplica controles distintos según quién usa cada herramienta.</p>
+        </div>
+        <div className="landingTrustGrid">
+          <article><span>01</span><strong>Espacios de trabajo separados</strong><p>Cada negocio mantiene su configuración, clientes y productos dentro de su propio contexto operativo.</p></article>
+          <article><span>02</span><strong>Roles para el equipo</strong><p>Propietarios, managers y staff pueden tener responsabilidades distintas dentro de la operación.</p></article>
+          <article><span>03</span><strong>Consentimiento para marketing</strong><p>Las acciones comerciales de Intelligence respetan el consentimiento registrado antes de incluir a una persona en una audiencia.</p></article>
+          <article><span>04</span><strong>Sin secretos bancarios</strong><p>Nival Pay muestra la información que el negocio decide compartir; no necesita NIP, CVV ni contraseñas bancarias.</p></article>
+        </div>
+      </section>
+
       <section className="enterpriseReady scrollReveal" id="empresas">
         <div className="enterpriseReadyIntro">
           <p className="landingEyebrow">DE UN NEGOCIO A MUCHAS UBICACIONES</p>
