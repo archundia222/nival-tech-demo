@@ -14,7 +14,7 @@ export default async function PaymentPage({ params }: PaymentPageProps) {
   const { token } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) notFound();
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_public_payment_profile_v2", { profile_token: token });
+  const { data, error } = await supabase.rpc("get_public_payment_profile_v3", { profile_token: token });
   if (error || !data?.[0]) notFound();
 
   return <main className={`${styles.pageShell} ${dmSans.variable} ${manrope.variable}`}>
