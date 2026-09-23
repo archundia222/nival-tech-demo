@@ -38,6 +38,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
           <button className="primaryButton" type="submit">{signup ? "Continuar" : "Entrar"}</button>
         </form>
+        {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>.</p>}
 
         {!signup && (
           <form action={resendConfirmation} className="authForm">

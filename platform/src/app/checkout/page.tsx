@@ -163,7 +163,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span></footer>
+          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></footer>
         </>}
     </div>
   </main>;

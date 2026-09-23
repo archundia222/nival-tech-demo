@@ -4,6 +4,7 @@ import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export default async function PhysicalCardOrderPage({ searchParams }: {
   searchParams: Promise<{ error?: string; result?: string }>;
@@ -12,10 +13,13 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay%2Fphysical');
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, businesses(name, product_level)').eq('user_id', user.id).limit(1).maybeSingle();
+  const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: business } = await supabase.from('businesses')
+    .select('name, product_level')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+  if (!business) redirect('/dashboard');
   const admin = createAdminClient();
   const [{ data: paidInitialOrders }, { data: claimedCards }] = await Promise.all([
     admin.from('product_orders')

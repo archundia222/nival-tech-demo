@@ -330,7 +330,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <span>Nival Tech</span>
         </Link>
         <p>Cobra, fideliza y crece con herramientas hechas para negocios locales.</p>
-        <div><Link href="/support">Soporte</Link><Link href="/privacy">Privacidad</Link><Link href="/auth">Mi cuenta</Link></div>
+        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/auth">Mi cuenta</Link></div>
       </footer>
     </main>
   );
