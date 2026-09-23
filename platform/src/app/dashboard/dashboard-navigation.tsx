@@ -6,19 +6,19 @@ import { MobileAutoCloseLink } from './mobile-auto-close-link';
 type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
-  { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay' },
-  { id: 'agregar-tarjetas', label: 'Agregar tarjetas', href: '/dashboard/pay?view=add' },
-  { id: 'compartir-paginas', label: 'Comparte tus páginas', href: '/dashboard/pay?view=share' },
+  { id: 'nival-pay', label: 'Páginas de cobro', href: '/dashboard/pay' },
+  { id: 'agregar-tarjetas', label: 'Agregar Nival Pay', href: '/dashboard/pay?view=add' },
+  { id: 'compartir-paginas', label: 'Compartir QR y links', href: '/dashboard/pay?view=share' },
 ];
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
-  { id: 'puntos', label: 'Resumen', href: '/dashboard/points', group: 'clientes' },
-  { id: 'puntos-clientes', label: 'Clientes y actividad', href: '/dashboard/points?view=customers', group: 'clientes' },
-  { id: 'puntos-analitica', label: 'Analítica', href: '/dashboard/points?view=analytics', group: 'clientes' },
+  { id: 'puntos', label: 'Hoy', href: '/dashboard/points', group: 'operacion' },
   { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
-  { id: 'puntos-canjes', label: 'Canjear recompensa', href: '/dashboard/points?view=redemptions', group: 'operacion' },
-  { id: 'puntos-configuracion', label: 'Programa de lealtad', href: '/dashboard/points?view=settings', group: 'gestion' },
-  { id: 'puntos-compartir', label: 'QR y NFC', href: '/dashboard/points?view=share', group: 'gestion' },
+  { id: 'puntos-canjes', label: 'Canjear premio', href: '/dashboard/points?view=redemptions', group: 'operacion' },
+  { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
+  { id: 'puntos-analitica', label: 'Resultados', href: '/dashboard/points?view=analytics', group: 'clientes' },
+  { id: 'puntos-compartir', label: 'Compartir programa', href: '/dashboard/points?view=share', group: 'gestion' },
+  { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings', group: 'gestion' },
 ];
 
 const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'accion' | 'resultados' | 'herramientas' }> = [
@@ -28,7 +28,6 @@ const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; gr
   { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
   { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
-  { id: 'inteligencia-importar', label: 'Datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
@@ -44,19 +43,20 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
       <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>NEGOCIO ACTUAL</small><strong>{businessName}</strong></div></div>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
-        <span className="sidebarSectionLabel">Cobros</span>
+        <span className="sidebarSectionLabel">COBRAR</span>
         <details className={styles.productGroup} open={payActive}>
           <summary className={`sidebarMainProduct ${payActive ? 'active' : ''}`}><NavIcon><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></NavIcon><span>Nival Pay</span><i aria-hidden="true">⌄</i></summary>
           <div className="sidebarSubmenu" aria-label="Opciones de Nival Pay">{payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>
         </details>
-        <span className="sidebarSectionLabel">Crecimiento</span>
+        <span className="sidebarSectionLabel">HACER QUE VUELVAN</span>
         <details className={styles.productGroup} open={pointsActive}>
           <summary className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`}><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon><span>Nival Puntos</span><i aria-hidden="true">⌄</i></summary>
-          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'OPERACIÓN' : group === 'clientes' ? 'CLIENTES Y ACTIVIDAD' : 'CONFIGURACIÓN'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'USAR' : group === 'clientes' ? 'ENTENDER' : 'PROGRAMA'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
+        <span className="sidebarSectionLabel">CRECER</span>
         <details className={styles.productGroup} open={intelligenceActive}>
           <summary className={`sidebarMainProduct ${intelligenceActive ? 'active' : ''}`}><NavIcon><path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z" /></NavIcon><span>Nival Intelligence</span><i aria-hidden="true">⌄</i></summary>
-          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Intelligence">{(['accion','resultados','herramientas'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'accion' ? 'QUÉ HACER' : group === 'resultados' ? 'QUÉ FUNCIONÓ' : 'HERRAMIENTAS'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Intelligence">{(['accion','resultados','herramientas'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'accion' ? 'ACTUAR' : group === 'resultados' ? 'MEDIR' : 'PREGUNTAR'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
         <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Perfil digital del negocio</Link>
       </nav>
