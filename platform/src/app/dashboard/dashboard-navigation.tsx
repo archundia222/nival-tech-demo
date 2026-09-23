@@ -77,6 +77,10 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
       <nav aria-label="Navegación móvil del panel">
+        {workspaceChoices.length > 1 && <form action={switchActiveBusiness} className="mobileWorkspaceSwitcher">
+          <label><span>ESPACIO DE TRABAJO</span><select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>
+          <button type="submit">Cambiar negocio</button>
+        </form>}
         <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{pointsItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         <details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Intelligence <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
