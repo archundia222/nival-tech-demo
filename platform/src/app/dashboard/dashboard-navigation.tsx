@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 import styles from './dashboard-navigation.module.css';
 import { MobileAutoCloseLink } from './mobile-auto-close-link';
+import { createClient } from '@/lib/supabase/server';
+import { getActiveBusinessMembership, getBusinessChoices } from '@/lib/active-business';
+import { switchActiveBusiness } from './workspace-actions';
 
 type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
@@ -34,14 +37,23 @@ function NavIcon({ children }: { children: React.ReactNode }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>;
 }
 
-export function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
+export async function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const [workspaceChoices, activeMembership] = user
+    ? await Promise.all([getBusinessChoices(user.id), getActiveBusinessMembership(user.id)])
+    : [[], null];
   const payActive = payItems.some((item) => item.id === active);
   const pointsActive = pointsItems.some((item) => item.id === active);
   const intelligenceActive = intelligenceItems.some((item) => item.id === active);
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
-      <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></div>
+      {workspaceChoices.length > 1 ? <form action={switchActiveBusiness} className="workspaceSwitcher workspaceSwitcherForm">
+        <span>{businessName.slice(0, 1).toUpperCase()}</span>
+        <div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong><label><span className="srOnly">Cambiar espacio de trabajo</span><select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label></div>
+        <button type="submit">Cambiar</button>
+      </form> : <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></div>}
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
         <span className="sidebarSectionLabel">COBRAR</span>
         <details className={styles.productGroup} open={payActive}>
