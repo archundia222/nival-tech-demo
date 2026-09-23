@@ -5,6 +5,7 @@ import { NIVAL_PAY_INCLUDED_SECTIONS } from '@/lib/orders';
 import { createClient } from '@/lib/supabase/server';
 import { isHttpsUrl, isValidClabe } from '@/lib/payment-profile';
 import { redirect } from 'next/navigation';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export interface PaymentFormState { error?: string; saved?: boolean; token?: string }
 
@@ -86,9 +87,8 @@ export async function createAdditionalPaymentProfile() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
-  const { data: membership } = await supabase.from('business_members').select('business_id, role')
-    .eq('user_id', user.id).in('role', ['owner', 'manager']).limit(1).maybeSingle();
-  if (!membership) redirect('/dashboard/pay?error=No+tienes+permiso.');
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
   const [{ data: profiles }, { count: paidExtras }] = await Promise.all([
     supabase.from('payment_profiles').select('id, account_holder, bank_name, clabe').eq('business_id', membership.business_id).order('created_at'),
     supabase.from('product_orders').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id).eq('product_code', 'nival_pay_additional').eq('status', 'paid'),
@@ -112,13 +112,8 @@ export async function prepareFreeNivalPay() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
 
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, role')
-    .eq('user_id', user.id)
-    .in('role', ['owner', 'manager'])
-    .limit(1)
-    .maybeSingle();
-  if (!membership) redirect('/dashboard/pay?error=No+tienes+permiso.');
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
 
   const [{ data: paidOrder }, { data: existing }] = await Promise.all([
     supabase.from('product_orders').select('id')
@@ -149,13 +144,8 @@ export async function publishFreeNivalPay(formData: FormData) {
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
 
   const profileId = String(formData.get('profileId') ?? '');
-  const { data: membership } = await supabase.from('business_members')
-    .select('business_id, role')
-    .eq('user_id', user.id)
-    .in('role', ['owner', 'manager'])
-    .limit(1)
-    .maybeSingle();
-  if (!membership) redirect('/dashboard/pay?error=No+tienes+permiso.');
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
 
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
     .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle();
