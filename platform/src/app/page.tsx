@@ -259,6 +259,24 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
+      <section className="enterpriseReady scrollReveal" id="empresas">
+        <div className="enterpriseReadyIntro">
+          <p className="landingEyebrow">DE UN NEGOCIO A MUCHAS UBICACIONES</p>
+          <h2>Nival nace simple, pero la arquitectura del producto debe poder crecer con la operación.</h2>
+          <p>Para equipos con múltiples sucursales, el valor cambia: ya no basta con una herramienta bonita. Se necesita control por ubicación, permisos, consistencia de marca, trazabilidad y una vista consolidada de lo que está funcionando.</p>
+        </div>
+        <div className="enterpriseReadyGrid">
+          <article><span>OPERACIÓN</span><strong>Una experiencia consistente en cada ubicación</strong><p>Perfiles, QR, programas y configuraciones pensados para administrarse por negocio y evolucionar hacia estructuras multi-sucursal.</p></article>
+          <article><span>CONTROL</span><strong>Roles y acceso por responsabilidad</strong><p>Propietarios, managers y staff con permisos separados para reducir errores y mantener control operativo.</p></article>
+          <article><span>DATOS</span><strong>Decisiones que bajan hasta la acción</strong><p>Intelligence está diseñado para convertir comportamiento en prioridades concretas, no para entregar otra colección de dashboards.</p></article>
+          <article><span>IMPLEMENTACIÓN</span><strong>Empieza con un piloto medible</strong><p>Una implementación grande debería comenzar con ubicaciones seleccionadas, objetivos claros y criterios de éxito antes de escalar.</p></article>
+        </div>
+        <div className="enterprisePilot">
+          <div><span>PARA EQUIPOS Y CADENAS</span><strong>¿Quieres evaluar Nival en varias ubicaciones?</strong><p>Podemos plantear un piloto alrededor de una necesidad concreta y medir adopción, recurrencia y operación antes de una expansión.</p></div>
+          <Link href="/support">Hablar sobre un piloto →</Link>
+        </div>
+      </section>
+
       <section className="landingFaq scrollReveal">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">PREGUNTAS FRECUENTES</p>
