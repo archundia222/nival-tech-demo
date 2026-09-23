@@ -77,21 +77,30 @@ export function PaymentPageView({
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
 
       {!embedded && profile.business_slug && <div className={styles.cardExtras}>
-        <a className={styles.businessHubLink} href={`/p/${profile.business_slug}`}>
-          <span>
-            <small>MÁS DE {profile.business_name.toUpperCase()}</small>
-            <strong>{profile.points_enabled ? "Contacto, puntos y otros accesos del negocio" : "Contacto y otros accesos del negocio"}</strong>
+        <div className={styles.extrasHeading}>
+          <span>CONTINÚA CON {profile.business_name.toUpperCase()}</span>
+          <small>Accesos útiles del negocio</small>
+        </div>
+
+        {profile.points_enabled && <a className={`${styles.serviceAction} ${styles.loyaltyAction}`} href={`/b/${profile.business_slug}`}>
+          <span className={styles.serviceIcon} aria-hidden="true">★</span>
+          <span className={styles.serviceCopy}>
+            <small>NIVAL PUNTOS</small>
+            <strong>Tus puntos y recompensas</strong>
+            <em>Guarda tu tarjeta digital y revisa tu avance.</em>
           </span>
-          <b>→</b>
+          <b aria-hidden="true">→</b>
+        </a>}
+
+        <a className={styles.serviceAction} href={`/p/${profile.business_slug}`}>
+          <span className={styles.serviceIcon} aria-hidden="true">+</span>
+          <span className={styles.serviceCopy}>
+            <small>MÁS DEL NEGOCIO</small>
+            <strong>Contacto y otros accesos</strong>
+            <em>Información, enlaces y formas de contactar.</em>
+          </span>
+          <b aria-hidden="true">→</b>
         </a>
-        {profile.points_enabled && <aside className={styles.loyaltyBridge}>
-          <div>
-            <span>¿VIENES SEGUIDO?</span>
-            <strong>Esta compra también puede acercarte a una recompensa.</strong>
-            <p>Abre el programa de puntos de {profile.business_name} y guarda tu tarjeta digital.</p>
-          </div>
-          <a href={`/b/${profile.business_slug}`}>Ver mis puntos <b>→</b></a>
-        </aside>}
       </div>}
     </section>
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
