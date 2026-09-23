@@ -13,6 +13,8 @@ export type PaymentPageSection = {
 
 export type PaymentPageViewProfile = {
   business_name: string;
+  business_slug?: string | null;
+  points_enabled?: boolean;
   logo_url?: string | null;
   account_holder: string;
   bank_name: string;
@@ -70,6 +72,10 @@ export function PaymentPageView({
       <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
     </section>
+    {!embedded && profile.points_enabled && profile.business_slug && <aside className={styles.loyaltyBridge}>
+      <div><span>¿VIENES SEGUIDO?</span><strong>Esta compra también puede acercarte a una recompensa.</strong><p>Abre el programa de puntos de {profile.business_name} y guarda tu tarjeta digital.</p></div>
+      <a href={`/b/${profile.business_slug}`}>Ver mis puntos <b>→</b></a>
+    </aside>}
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
       <div>
         <span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span>
