@@ -88,7 +88,7 @@ async function reconcileLatestPayOrder(businessId: string, productCode: typeof N
   if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
 }
 
-export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string; created?: string }> }) {
+export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string; created?: string; trial?: string }> }) {
   const params = await searchParams;
   const currentView = params.view === 'add' ? 'add' : params.view === 'share' ? 'share' : 'manage';
   const supabase = await createClient();
