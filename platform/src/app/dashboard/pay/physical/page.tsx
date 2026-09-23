@@ -33,7 +33,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).filter((card) => {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
-    return payment?.status !== 'cancelled';
+    return payment?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
   const { data: orders } = await supabase.from('physical_card_orders')
@@ -52,7 +52,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Haz que la tarjeta parezca de tu negocio.</h1><p>{hasIncludedCard ? 'Tu primera tarjeta física ya está incluida. Elige qué acción tendrá al frente y cómo quieres que se vea. El reverso Nival está incluido; si quieres diseñarlo a tu gusto cuesta $10 MXN.' : 'Cada tarjeta adicional cuesta $99 MXN con reverso Nival, o $109 MXN con reverso personalizado.'}</p></header>
       <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
         <section className="chartCard physicalCardSection">
-          <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con logo, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
+          <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
             <label><input type="radio" name="frontTemplate" value="pay" defaultChecked/><span className="templateMock"><small>PAGAR</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong></label>
             <label><input type="radio" name="frontTemplate" value="points"/><span className="templateMock"><small>PUNTOS</small><b>Logo</b><i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong></label>

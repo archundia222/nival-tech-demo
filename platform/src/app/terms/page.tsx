@@ -24,7 +24,10 @@ export default function TermsPage() {
         <p>Los pagos de productos o suscripciones Nival pueden procesarse mediante proveedores externos como Mercado Pago. El monto final se muestra antes de confirmar la operación. Una suscripción puede perder funciones Pro y volver al plan disponible cuando sea cancelada, pausada o deje de estar vigente conforme se sincronice su estado.</p>
 
         <h2>Tarjetas físicas</h2>
-        <p>Cuando una compra incluya o agregue una tarjeta NFC física, el usuario deberá proporcionar los datos necesarios de diseño y entrega. Los tiempos de producción y entrega pueden depender del diseño, ubicación, disponibilidad y método elegido. Si un envío requiere un costo adicional, deberá informarse antes de confirmarlo.</p>
+        <p>Cuando una compra incluya o agregue una tarjeta NFC física, el usuario deberá proporcionar los datos necesarios de diseño y entrega. El frente puede usar plantillas de Nival según el objetivo de la tarjeta. El reverso estándar puede estar incluido y, cuando se ofrezca, el reverso personalizado tendrá el cargo adicional mostrado antes de confirmar la compra. Los tiempos de producción y entrega pueden depender del diseño, ubicación, disponibilidad y método elegido. Si un envío requiere un costo adicional, deberá informarse antes de confirmarlo.</p>
+
+        <h2>Ventas y datos operativos</h2>
+        <p>El negocio puede registrar ventas individuales, resúmenes diarios o importar archivos compatibles para alimentar sus métricas. Nival solo considera como venta registrada la información que el propio negocio proporciona; no debe interpretarse como conciliación bancaria ni como ingreso verificado por Nival.</p>
 
         <h2>Clientes, campañas y consentimiento</h2>
         <p>El negocio que usa Nival es responsable de contar con las autorizaciones necesarias para recopilar información de sus clientes y realizar comunicaciones comerciales. Nival Intelligence utiliza el consentimiento registrado para limitar las audiencias de marketing dentro de las funciones disponibles.</p>

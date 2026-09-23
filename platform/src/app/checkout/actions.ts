@@ -524,7 +524,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).filter((card) => {
     const linked = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
-    return linked?.status !== 'cancelled';
+    return linked?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const includedOrder = paidOrders?.find((order) => !claimedOrderIds.has(order.id));
   if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
