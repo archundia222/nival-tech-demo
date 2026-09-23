@@ -27,14 +27,20 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
         <span>Programa impulsado por <a href="/?from=nival-puntos"><b>NIVAL tech</b></a></span>
       </header>
       <section className="customerHero">
-        <p className="eyebrow">PROGRAMA DE LEALTAD</p>
+        <p className="eyebrow">PROGRAMA DE CLIENTES FRECUENTES</p>
         <h1>{business.business_name}</h1>
-        <p>{business.description ?? "Registra tus visitas, acumula puntos y recibe beneficios del negocio."}</p>
+        <p>{business.description ?? "Cada visita te acerca a una recompensa. Regístrate una vez y guarda tu tarjeta en el celular."}</p>
+      </section>
+
+      <section className="loyaltyPromise">
+        <div><span>1</span><strong>Regístrate una vez</strong><small>Solo necesitas tu nombre y teléfono.</small></div>
+        <div><span>2</span><strong>Suma al visitar</strong><small>Muestra tu tarjeta para registrar tu visita.</small></div>
+        <div><span>3</span><strong>Recibe tu recompensa</strong><small>{pointsProgram.reward_description} al llegar a {pointsProgram.reward_threshold} puntos.</small></div>
       </section>
 
       <section className="customerFormCard">
-          <h2>Obtén tu tarjeta de puntos</h2>
-          <p>Completa tus datos una sola vez. No necesitas descargar una aplicación.</p>
+          <h2>Crea tu tarjeta gratis</h2>
+          <p>No necesitas descargar una app. Al terminar podrás abrir tu tarjeta desde este mismo celular.</p>
           {query.error && <div className="formMessage errorMessage">{query.error}</div>}
           <form action={enrollCustomer} className="authForm">
             <input type="hidden" name="slug" value={business.slug} />
@@ -43,7 +49,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
             <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el aviso de privacidad y el uso de mis datos para operar el programa.</label>
             <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
-            <button className="primaryButton" type="submit">Crear mi tarjeta</button>
+            <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>
       <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
