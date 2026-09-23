@@ -52,19 +52,23 @@ export function PaymentPageView({
         <div className={styles.logoWrap}>
           {profile.logo_url ? <Image src={profile.logo_url} alt={`Logotipo de ${profile.business_name}`} width={116} height={116} unoptimized priority={!embedded} /> : <span className={styles.monogram}>{initials || "N"}</span>}
         </div>
-        <p className={styles.eyebrow}>Realiza tu transferencia a</p>
-        {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="name" headingId={embedded ? null : "payment-title"} />}
+        <p className={styles.eyebrow}>Paga a</p>
+        <h1 className={styles.businessTitle} id={embedded ? undefined : "payment-title"}>{profile.business_name}</h1>
+        <p className={styles.paymentType}>Transferencia bancaria</p>
       </div>
+      {profile.payment_url_visible && profile.payment_url && <a className={styles.directPay} href={profile.payment_url} target="_blank" rel="noreferrer"><span>Pagar con enlace</span><b>↗</b></a>}
+      <p className={styles.copyHint}>Toca cualquier dato para copiarlo</p>
       <div className={styles.details}>
+        {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="detail" />}
         {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
         {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" />}
         {profile.concept_visible && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
-        {profile.payment_url_visible && profile.payment_url && <CopyField label="Enlace de pago" value={profile.payment_url} variant="detail" />}
         {Array.isArray(profile.custom_sections) && profile.custom_sections.filter((section) => section.public !== false).map((section) =>
           section.title || section.content ? <CopyField key={section.id} label={section.title || "Información"} value={section.content || "—"} variant="detail" /> : null
         )}
       </div>
-      <p className={styles.helpText}>Verifica que el nombre del destinatario coincida antes de transferir.</p>
+      <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
+      <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
     </section>
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
       <div>
