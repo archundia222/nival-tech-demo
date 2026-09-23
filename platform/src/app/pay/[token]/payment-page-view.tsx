@@ -87,7 +87,7 @@ export function PaymentPageView({
         <strong>Tu negocio también puede cobrar así.</strong>
         <p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p>
       </div>
-      <a href="/?from=nival-pay#precio">Conocer Nival Pay <b>→</b></a>
+      <a href="/?from=nival-pay">Conocer Nival Tech <b>→</b></a>
     </aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <a href="/?from=nival-pay">Nival Tech</a>}</footer>
   </>;
