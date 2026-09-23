@@ -28,6 +28,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <a href="#productos">Productos</a>
           <a href="#como-funciona">Cómo funciona</a>
           <a href="#empieza-gratis">Empieza gratis</a>
+          <a href="#empresas">Para equipos</a>
         </div>
         <Link className="landingLogin" href="/auth">Mi cuenta</Link>
       </nav>
