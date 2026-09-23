@@ -7,6 +7,7 @@ import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { saveAverageTicket, startIntelligenceCampaign } from './actions';
 import { activateFreeNivalIntelligence } from './free-actions';
 import styles from './intelligence-dashboard.module.css';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 type Visit = { customer_id: string; visited_at: string };
 type Campaign = { id: string; name: string; audience_rule: unknown; message: string; status: string; sent_at: string | null; created_at: string };
@@ -16,10 +17,14 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fintelligence');
-  const { data: membership } = await supabase.from('business_members').select('business_id, businesses(name, product_level, average_ticket_cents)').eq('user_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle();
+  const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
-  const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
+  const { data: business } = await supabase.from('businesses')
+    .select('name, product_level, average_ticket_cents')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+  if (!business) redirect('/dashboard');
   const { data: entitlements } = await supabase.from('business_product_entitlements').select('product_code,status').eq('business_id', membership.business_id);
   const entitlementMap = new Map((entitlements ?? []).map((item) => [item.product_code, item.status]));
   const pointsStatus = entitlementMap.get('nival_points');
