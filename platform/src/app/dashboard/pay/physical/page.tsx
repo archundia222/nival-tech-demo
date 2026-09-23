@@ -42,6 +42,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const hasPointsDestination = Boolean(pointsEntitlement && business.slug);
   const hasReviewDestination = Boolean(loyaltyProgram?.review_url);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
+  const canPurchase = membership.role === 'owner' || membership.role === 'manager';
   const { data: orders } = await supabase.from('physical_card_orders')
     .select('id, design, front_template, back_style, back_design_url, target_url, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
@@ -56,7 +57,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
       <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
-      <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
+      {!canPurchase && <p className="formMessage">Puedes revisar las tarjetas de este negocio, pero solo el propietario o un gerente puede solicitar o comprar una nueva.</p>}
+      {canPurchase && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
         <section className="chartCard physicalCardSection">
           <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
@@ -101,7 +103,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           {!hasIncludedCard && <button className="nvSecondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Registrar pago en efectivo · $99 o $109</button>}
           <p className="payHelp">El total depende únicamente del reverso: estándar $0 extra · personalizado +$10 MXN.</p>
         </div>
-      </form>
+      </form>}
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
         const payment = Array.isArray(order.product_orders) ? order.product_orders[0] : order.product_orders;
         return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}{order.back_design_url ? ' · archivo recibido' : ''}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega dominical'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;

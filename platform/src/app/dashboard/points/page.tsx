@@ -131,6 +131,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
             <div><span>REGISTRO RÁPIDO</span><h2>No cambies tu operación para usar Nival.</h2><p>Registra únicamente el dato que tengas a la mano. Puedes empezar con una visita, una venta individual, el total del día o un archivo CSV de tu sistema actual.</p></div>
             <div className="captureMiniStats"><span><b>{(sales30Cents/100).toLocaleString('es-MX',{style:'currency',currency:'MXN'})}</b>ventas registradas · 30 días</span><span><b>{transactions30}</b>operaciones registradas</span></div>
           </section>
+          {canManage && <section className="captureSelfServe"><div><span>LA FORMA MÁS FÁCIL</span><h3>Deja que el cliente se registre solo.</h3><p>Comparte el QR de Nival Puntos en caja, mesa, menú o tarjeta NFC. El cliente captura sus datos desde su celular y tú no interrumpes la operación.</p></div><a href="/dashboard/points?view=share">Abrir mi QR de registro →</a></section>}
           {canManage && <div className="captureGrid">
             <article className="captureCard">
               <span>CLIENTE NUEVO · 15 SEG</span><h3>Regístralo con lo mínimo</h3><p>Nombre y teléfono. El cliente queda listo para Nival Puntos sin llenar una ficha larga.</p>
@@ -170,7 +171,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
               <form action={importSalesCsv}>
                 <label>Archivo CSV<input name="salesFile" type="file" accept=".csv,text/csv" required/></label>
                 <label className="checkLabel"><input name="dataAuthorization" type="checkbox" required/> Confirmo que el negocio puede utilizar los datos incluidos en este archivo.</label>
-                <small className="captureFormat">Ejemplo: Fecha, Monto, Teléfono, Método</small>
+                <small className="captureFormat">Ejemplo: Fecha, Monto, Teléfono, Método · <a href="/templates/ventas-nival.csv" download>Descargar plantilla CSV</a></small>
                 <button type="submit">Importar ventas</button>
               </form>
             </article>

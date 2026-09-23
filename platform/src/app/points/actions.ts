@@ -43,7 +43,7 @@ export async function enrollPointsCustomer(formData: FormData) {
     p_customer_phone: String(formData.get("phone") ?? "").trim(),
     p_marketing_consent: formData.get("marketingConsent") === "on",
     p_origin: formData.get("origin") === "nfc" ? "nfc" : "qr",
-    p_privacy_notice_version: "2026-09-21",
+    p_privacy_notice_version: "2026-09-23",
   });
   if (error || !data?.[0]) {
     const message = error?.message?.includes('free_customer_limit_reached')
