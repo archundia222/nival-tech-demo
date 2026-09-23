@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBusinessMembership } from "@/lib/active-business";
@@ -119,6 +120,169 @@ export async function redeemPointReward(scanSessionId: string) {
   }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
+}
+
+
+function normalizeSaleAmount(value: FormDataEntryValue | null) {
+  const normalized = String(value ?? "").trim().replace(/,/g, "");
+  const amount = Number(normalized);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000) return null;
+  return Math.round(amount * 100);
+}
+
+function parseCsvLine(line: string) {
+  const cells: string[] = [];
+  let value = "";
+  let quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    if (char === '"') {
+      if (quoted && line[i + 1] === '"') { value += '"'; i += 1; }
+      else quoted = !quoted;
+    } else if (char === "," && !quoted) {
+      cells.push(value.trim()); value = "";
+    } else value += char;
+  }
+  cells.push(value.trim());
+  return cells;
+}
+
+async function activeBusinessContext() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth?next=%2Fdashboard%2Fpoints%3Fview%3Dregister");
+  const membership = await getActiveBusinessMembership(user.id);
+  if (!membership) redirect("/dashboard");
+  return { supabase, user, membership };
+}
+
+export async function registerQuickCustomer(formData: FormData) {
+  const { supabase, membership } = await activeBusinessContext();
+  const name = String(formData.get("name") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const { data, error } = await supabase.rpc("register_business_customer_quick", {
+    p_business_id: membership.business_id,
+    p_name: name,
+    p_phone: phone,
+    p_email: email || null,
+    p_marketing_consent: formData.get("marketingConsent") === "on",
+  });
+  if (error || !data?.[0]) {
+    const message = error?.message?.includes("free_customer_limit_reached") ? "Llegaste al límite de 30 clientes del plan Gratis."
+      : error?.message?.includes("invalid_phone") ? "Revisa el teléfono del cliente."
+      : error?.message?.includes("invalid_name") ? "Escribe el nombre del cliente."
+      : error?.message?.includes("points_program_unavailable") ? "Primero activa tu programa de Nival Puntos."
+      : "No pudimos registrar al cliente.";
+    redirect(`/dashboard/points?view=register&error=${encodeURIComponent(message)}`);
+  }
+  revalidatePath("/dashboard/points");
+  redirect(`/dashboard/points?view=register&saved=${data[0].already_exists ? "existing" : "customer"}`);
+}
+
+export async function registerQuickSale(formData: FormData) {
+  const { supabase, user, membership } = await activeBusinessContext();
+  const amountCents = normalizeSaleAmount(formData.get("amount"));
+  const paymentMethod = String(formData.get("paymentMethod") ?? "other");
+  const customerId = String(formData.get("customerId") ?? "").trim() || null;
+  const note = String(formData.get("note") ?? "").trim().slice(0, 200) || null;
+  if (!amountCents) redirect("/dashboard/points?view=register&error=Ingresa+un+monto+válido.");
+  if (!["cash","transfer","card","other"].includes(paymentMethod)) redirect("/dashboard/points?view=register&error=Selecciona+un+método+de+pago+válido.");
+
+  if (customerId) {
+    const { data: customer } = await supabase.from("customers").select("id")
+      .eq("id", customerId).eq("business_id", membership.business_id).maybeSingle();
+    if (!customer) redirect("/dashboard/points?view=register&error=Ese+cliente+no+pertenece+a+este+negocio.");
+  }
+
+  const { error } = await supabase.from("business_sales").insert({
+    business_id: membership.business_id,
+    customer_id: customerId,
+    amount_cents: amountCents,
+    payment_method: paymentMethod,
+    transactions_count: 1,
+    source: "manual",
+    note,
+    created_by: user.id,
+  });
+  if (error) redirect(`/dashboard/points?view=register&error=${encodeURIComponent("No pudimos guardar la venta.")}`);
+  revalidatePath("/dashboard/points");
+  revalidatePath("/dashboard/intelligence");
+  redirect("/dashboard/points?view=register&saved=sale");
+}
+
+export async function registerDailySalesSummary(formData: FormData) {
+  const { supabase, user, membership } = await activeBusinessContext();
+  const amountCents = normalizeSaleAmount(formData.get("amount"));
+  const transactions = Math.max(1, Math.min(100000, Number(formData.get("transactions") ?? 1) || 1));
+  const saleDate = String(formData.get("saleDate") ?? "").trim();
+  if (!amountCents) redirect("/dashboard/points?view=register&error=Ingresa+el+total+vendido.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(saleDate)) redirect("/dashboard/points?view=register&error=Selecciona+la+fecha+del+resumen.");
+
+  const { error } = await supabase.from("business_sales").insert({
+    business_id: membership.business_id,
+    amount_cents: amountCents,
+    payment_method: "summary",
+    transactions_count: transactions,
+    sold_at: `${saleDate}T12:00:00Z`,
+    source: "summary",
+    note: "Resumen diario",
+    created_by: user.id,
+  });
+  if (error) redirect("/dashboard/points?view=register&error=No+pudimos+guardar+el+resumen.");
+  revalidatePath("/dashboard/points");
+  revalidatePath("/dashboard/intelligence");
+  redirect("/dashboard/points?view=register&saved=summary");
+}
+
+export async function importSalesCsv(formData: FormData) {
+  const { supabase, user, membership } = await activeBusinessContext();
+  const entry = formData.get("salesFile");
+  if (!(entry instanceof File) || !entry.size) redirect("/dashboard/points?view=register&error=Selecciona+un+archivo+CSV.");
+  if (entry.size > 2_000_000) redirect("/dashboard/points?view=register&error=El+CSV+debe+pesar+menos+de+2+MB.");
+
+  const text = await entry.text();
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) redirect("/dashboard/points?view=register&error=El+CSV+no+tiene+filas+para+importar.");
+
+  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim());
+  const find = (...names: string[]) => headers.findIndex((h) => names.includes(h));
+  const amountIndex = find("monto","amount","total","venta","importe");
+  const dateIndex = find("fecha","date","sold_at");
+  const phoneIndex = find("telefono","phone","customer_phone");
+  const methodIndex = find("metodo","payment_method","forma_de_pago");
+  if (amountIndex < 0) redirect("/dashboard/points?view=register&error=El+CSV+necesita+una+columna+Monto+o+Total.");
+
+  const { data: knownCustomers } = await supabase.from("customers").select("id,phone").eq("business_id", membership.business_id).limit(5000);
+  const byPhone = new Map((knownCustomers ?? []).filter(c => c.phone).map(c => [String(c.phone).replace(/\D/g, ""), c.id]));
+  const rows = [];
+  const maxRows = Math.min(lines.length - 1, 500);
+  for (let index = 1; index <= maxRows; index += 1) {
+    const cells = parseCsvLine(lines[index]);
+    const amountCents = normalizeSaleAmount(cells[amountIndex] ?? "");
+    if (!amountCents) continue;
+    const rawDate = dateIndex >= 0 ? String(cells[dateIndex] ?? "").trim() : "";
+    const soldAt = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? `${rawDate}T12:00:00Z` : new Date().toISOString();
+    const phone = phoneIndex >= 0 ? String(cells[phoneIndex] ?? "").replace(/\D/g, "") : "";
+    const rawMethod = methodIndex >= 0 ? String(cells[methodIndex] ?? "").toLowerCase().trim() : "";
+    const paymentMethod = /efectivo|cash/.test(rawMethod) ? "cash" : /transfer/.test(rawMethod) ? "transfer" : /tarjeta|card/.test(rawMethod) ? "card" : "other";
+    rows.push({
+      business_id: membership.business_id,
+      customer_id: phone ? byPhone.get(phone) ?? null : null,
+      amount_cents: amountCents,
+      payment_method: paymentMethod,
+      transactions_count: 1,
+      sold_at: soldAt,
+      source: "imported",
+      created_by: user.id,
+    });
+  }
+  if (!rows.length) redirect("/dashboard/points?view=register&error=No+encontramos+ventas+válidas+en+el+CSV.");
+  const { error } = await supabase.from("business_sales").insert(rows);
+  if (error) redirect("/dashboard/points?view=register&error=No+pudimos+importar+las+ventas.");
+  revalidatePath("/dashboard/points");
+  revalidatePath("/dashboard/intelligence");
+  redirect(`/dashboard/points?view=register&saved=import-${rows.length}`);
 }
 
 export async function updatePointsProgram(formData: FormData) {

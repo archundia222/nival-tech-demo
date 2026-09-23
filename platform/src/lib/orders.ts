@@ -22,3 +22,8 @@ export const NIVAL_POINTS_INTELLIGENCE_PRODUCT = 'nival_points_intelligence';
 export const NIVAL_POINTS_PRICE_CENTS = 19900;
 export const NIVAL_INTELLIGENCE_PRICE_CENTS = 39900;
 export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = 44900;
+
+export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS = 10900;
+export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT = 'nival_pay_physical_card_custom';
+export const NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS = 1000;
+export const NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT = 'nival_pay_card_customization';

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getActiveBusinessMembership, getBusinessChoices } from '@/lib/active-business';
 import { switchActiveBusiness } from './workspace-actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Páginas de cobro', href: '/dashboard/pay' },
@@ -16,7 +16,7 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
   { id: 'puntos', label: 'Hoy', href: '/dashboard/points', group: 'operacion' },
-  { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
+  { id: 'puntos-registro', label: 'Registrar', href: '/dashboard/points?view=register', group: 'operacion' },
   { id: 'puntos-canjes', label: 'Canjear premio', href: '/dashboard/points?view=redemptions', group: 'operacion' },
   { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
   { id: 'puntos-analitica', label: 'Resultados', href: '/dashboard/points?view=analytics', group: 'clientes' },

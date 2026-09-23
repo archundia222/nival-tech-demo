@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
@@ -94,7 +94,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  if ([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRODUCT].includes(product.productCode as typeof NIVAL_PAY_ADDITIONAL_PRODUCT)) {
+  if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId)
       .eq('product_code', NIVAL_PAY_PRODUCT)
@@ -443,6 +443,9 @@ export async function startNivalIntelligenceSubscription() {
 type PhysicalCardInput = {
   design: 'black' | 'white' | 'custom';
   design_notes: string | null;
+  front_template: 'pay' | 'points' | 'reviews' | 'profile';
+  back_style: 'nival' | 'custom';
+  back_design_notes: string | null;
   delivery_method: 'sunday_local' | 'shipping';
   recipient_name: string;
   phone: string;
@@ -456,6 +459,9 @@ type PhysicalCardInput = {
 
 function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const design = String(form.get('design') ?? '');
+  const frontTemplate = String(form.get('frontTemplate') ?? 'pay');
+  const backStyle = String(form.get('backStyle') ?? 'nival');
+  const backDesignNotes = String(form.get('backDesignNotes') ?? '').trim();
   const delivery = String(form.get('deliveryMethod') ?? '');
   const recipient = String(form.get('recipientName') ?? '').trim();
   const phone = String(form.get('phone') ?? '').replace(/[^0-9+]/g, '');
@@ -466,15 +472,19 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const postalCode = String(form.get('postalCode') ?? '').trim();
   const notes = String(form.get('designNotes') ?? '').trim();
   const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
-  if (!['black','white','custom'].includes(design) || !['sunday_local','shipping'].includes(delivery)
+  if (!['black','white','custom'].includes(design) || !['pay','points','reviews','profile'].includes(frontTemplate)
+    || !['nival','custom'].includes(backStyle) || !['sunday_local','shipping'].includes(delivery)
     || recipient.length < 2 || phone.length < 10 || address1.length < 5 || city.length < 2
-    || state.length < 2 || !/^\d{5}$/.test(postalCode) || notes.length > 500) return null;
+    || state.length < 2 || !/^\d{5}$/.test(postalCode) || notes.length > 500 || backDesignNotes.length > 500) return null;
   if (delivery === 'sunday_local' && requestedDate) {
     const parsed = new Date(requestedDate + 'T12:00:00Z');
     if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== 0) return null;
   }
   return {
     design: design as PhysicalCardInput['design'], design_notes: notes || null,
+    front_template: frontTemplate as PhysicalCardInput['front_template'],
+    back_style: backStyle as PhysicalCardInput['back_style'],
+    back_design_notes: backStyle === 'custom' ? backDesignNotes || null : null,
     delivery_method: delivery as PhysicalCardInput['delivery_method'],
     recipient_name: recipient.slice(0,120), phone: phone.slice(0,20),
     address_line1: address1.slice(0,180), address_line2: address2.slice(0,180) || null,
@@ -486,10 +496,11 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
 export async function startPhysicalCardCheckout(form: FormData) {
   const details = readPhysicalCardInput(form);
   if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
+  const customBack = details.back_style === 'custom';
   return startMercadoPagoProductCheckout({
-    productCode: NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
-    amountCents: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
-    description: 'Nival Pay · tarjeta física NFC',
+    productCode: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
+    amountCents: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
+    description: customBack ? 'Nival Pay · tarjeta NFC + reverso personalizado' : 'Nival Pay · tarjeta física NFC',
     returnPath: '/dashboard/pay/physical',
     physicalOrder: details,
   });
@@ -508,16 +519,27 @@ export async function claimIncludedPhysicalCard(form: FormData) {
       .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
-    admin.from('physical_card_orders').select('product_order_id').eq('business_id', businessId),
+    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders(status)').eq('business_id', businessId),
   ]);
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
-  const claimedOrderIds = new Set((existingCards ?? []).map((card) => card.product_order_id));
-  const includedOrder = paidOrders?.find((order) =>
-    !claimedOrderIds.has(order.id)
-  );
+  const claimedOrderIds = new Set((existingCards ?? []).filter((card) => {
+    const linked = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
+    return linked?.status !== 'cancelled';
+  }).map((card) => card.included_base_order_id ?? card.product_order_id));
+  const includedOrder = paidOrders?.find((order) => !claimedOrderIds.has(order.id));
   if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
+  if (details.back_style === 'custom') {
+    return startMercadoPagoProductCheckout({
+      productCode: NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT,
+      amountCents: NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS,
+      description: 'Nival Pay · reverso personalizado',
+      returnPath: '/dashboard/pay/physical',
+      physicalOrder: { ...details, included_base_order_id: includedOrder.id },
+    });
+  }
   const { error } = await admin.from('physical_card_orders').insert({
     ...details,
+    included_base_order_id: includedOrder.id,
     product_order_id: includedOrder.id,
     business_id: businessId,
   });
@@ -534,9 +556,10 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
   if (!details) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
+  const customBack = details.back_style === 'custom';
   const { data: order, error } = await admin.from('product_orders').insert({
-    business_id: businessId, product_code: NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
-    amount_cents: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, payment_method: 'cash',
+    business_id: businessId, product_code: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
+    amount_cents: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, payment_method: 'cash',
     status: 'pending_cash_confirmation',
   }).select('id').single();
   if (error || !order) redirect('/dashboard/pay/physical?error=No+se+pudo+registrar+el+pedido.');

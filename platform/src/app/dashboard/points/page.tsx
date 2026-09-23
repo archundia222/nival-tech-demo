@@ -6,12 +6,12 @@ import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
-import { reversePointForm } from '@/app/points/actions';
+import { importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
-export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string }> }) {
+export default async function NivalPointsPage({ searchParams }: { searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string; saved?: string }> }) {
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -36,9 +36,9 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const available = paid || freePlan;
   const hasIntelligence = Boolean(intelligenceEntitlement);
   const view = params.view ?? 'overview';
-  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
+  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : (view === 'register' || view === 'visits') ? 'puntos-registro' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
-  const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }, { data: visitRows }, { data: rewardRows }] = available && canManage ? await Promise.all([
+  const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }, { data: visitRows }, { data: rewardRows }, { data: saleRows }] = available && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics_for', { p_business_id: membership.business_id }),
     supabase.from('points_ledger')
       .select('id,event_type,delta,reason,occurred_at,customer_id,customers(name)')
@@ -52,7 +52,8 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       .limit(100),
     supabase.from('visits').select('customer_id,visited_at').eq('business_id', membership.business_id).order('visited_at',{ascending:false}).limit(2000),
     supabase.from('loyalty_rewards').select('customer_id,description,earned_at,redeemed_at').eq('business_id', membership.business_id).order('earned_at',{ascending:false}).limit(1000),
-  ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
+    supabase.from('business_sales').select('id,customer_id,amount_cents,payment_method,transactions_count,sold_at,source').eq('business_id', membership.business_id).order('sold_at',{ascending:false}).limit(500),
+  ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
   const metrics = metricRows?.[0]; // deployment sync
   const nowMs=Date.now(), dayMs=86400000;
   const customerInsights=new Map((customerRows??[]).map(customer=>{const cv=(visitRows??[]).filter(v=>v.customer_id===customer.id);const cr=(rewardRows??[]).filter(r=>r.customer_id===customer.id);const last=cv[0]?.visited_at?new Date(cv[0].visited_at).getTime():null;const first=cv.length?new Date(cv[cv.length-1].visited_at).getTime():null;const avg=cv.length>1&&first&&last?Math.round((last-first)/dayMs/(cv.length-1)):null;return [customer.id,{visits30:cv.filter(v=>nowMs-new Date(v.visited_at).getTime()<=30*dayMs).length,totalVisits:cv.length,lastVisit:last?new Date(last):null,avgDays:avg,rewardsAvailable:cr.filter(x=>!x.redeemed_at).length,rewardsRedeemed:cr.filter(x=>x.redeemed_at).length,lastReward:cr.find(x=>x.redeemed_at)?.description??null}]}));
@@ -60,6 +61,9 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const active30Customers=insightValues.filter(insight=>insight.visits30>0).length;
   const returning30Customers=insightValues.filter(insight=>insight.visits30>0&&insight.totalVisits>=2).length;
   const recurrence30=active30Customers?Math.round((returning30Customers/active30Customers)*100):0;
+  const sales30Rows=(saleRows??[]).filter(sale=>nowMs-new Date(sale.sold_at).getTime()<=30*dayMs);
+  const sales30Cents=sales30Rows.reduce((sum,sale)=>sum+Number(sale.amount_cents??0),0);
+  const transactions30=sales30Rows.reduce((sum,sale)=>sum+Number(sale.transactions_count??1),0);
   const availableRewardsCount=(rewardRows??[]).filter(reward=>!reward.redeemed_at).length;
   const redeemed30=(rewardRows??[]).filter(reward=>reward.redeemed_at&&nowMs-new Date(reward.redeemed_at).getTime()<=30*dayMs).length;
   const pointsTodayAction = Number(metrics?.new_customers_today ?? 0)>Number(metrics?.returning_customers_today ?? 0)
@@ -73,6 +77,11 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Haz que vuelvan</b></div><span className="ready">{paid ? 'Pro' : freePlan ? 'Gratis' : 'Empieza gratis'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.saved === 'customer' && <p className="formMessage successMessage">Cliente registrado y tarjeta de puntos creada.</p>}
+      {params.saved === 'existing' && <p className="formMessage successMessage">Ese cliente ya estaba registrado. No creamos un duplicado.</p>}
+      {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada.</p>}
+      {params.saved === 'summary' && <p className="formMessage successMessage">Resumen del día registrado.</p>}
+      {params.saved?.startsWith('import-') && <p className="formMessage successMessage">Importación lista: {params.saved.replace('import-','')} ventas agregadas.</p>}
       {!available ? <>
         <section className="productShowcase pointsShowcase">
           <div className="productShowcaseCopy"><span className="productPill">NIVAL PUNTOS</span><h1>Haz que tus clientes<br/>quieran volver.</h1><p>Premia cada visita con puntos. Tus clientes ven su saldo desde el celular y tú administras todo sin tarjetas de papel.</p><ul className="productBenefits"><li>Registro con código QR</li><li>Tarjeta digital del cliente</li><li>Visitas, puntos y premios en un mismo lugar</li></ul><div className="productPrice"><strong>Gratis</strong><span>hasta 30 clientes</span></div><div className="freemiumCtas"><form action={activateFreeNivalPoints}><button className="productCta">Crear mi programa gratis <span>→</span></button></form><form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Ver Nival Puntos Pro · $199/mes</button></form></div><small>Empieza sin tarjeta. Paga cuando necesites más clientes, personalización y resultados completos.</small></div>
@@ -101,7 +110,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         {params.free === 'started' && <p className="formMessage successMessage">Nival Puntos Gratis ya está activo. Comparte tu QR y empieza a registrar clientes.</p>}
         {freePlan && <section className="freemiumBanner"><div><span>NIVAL PUNTOS GRATIS</span><strong>{Math.min(customers ?? 0,30)} de 30 clientes usados</strong><p>Tu programa funciona de verdad. Cuando necesites más capacidad, resultados completos o configuración avanzada, puedes pasar a Pro sin perder clientes ni puntos.</p></div><form action={startNivalPointsSubscription}><button type="submit">Desbloquear Pro · $199/mes →</button></form></section>}
         <section className="pointsV1Hero">
-          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
+          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'register' ? 'Registrar' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'register' ? 'Captura solo lo que ya haces: una visita, una venta, un cliente nuevo o el total del día.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
           {(view === 'share' || view === 'overview') && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">{view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}</a>}
         </section>
 
@@ -114,7 +123,58 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
 
         {canManage && view === 'overview' && <section className="pointsTodayAction"><div><span>LO MÁS ÚTIL AHORA</span><h2>{pointsTodayAction.title}</h2><p>{pointsTodayAction.text}</p></div><a href={pointsTodayAction.href}>{pointsTodayAction.cta} →</a></section>}
 
-        {view === 'overview' && <section className="pointsQuickOps"><a href="/dashboard/points?view=visits"><span>SUMAR</span><strong>Registrar visita</strong><small>Escanear QR o ingresar código →</small></a><a href="/dashboard/points?view=redemptions"><span>PREMIAR</span><strong>Canjear premio</strong><small>Validar y confirmar entrega →</small></a><a href="/dashboard/points?view=customers"><span>ENTENDER</span><strong>Ver clientes</strong><small>Quién vuelve, quién progresa y quién tiene premio →</small></a></section>}
+        {view === 'overview' && <section className="pointsQuickOps"><a href="/dashboard/points?view=register"><span>REGISTRAR</span><strong>Visita, venta o cliente</strong><small>Captura rápida sin cambiar tu forma de trabajar →</small></a><a href="/dashboard/points?view=redemptions"><span>PREMIAR</span><strong>Canjear premio</strong><small>Validar y confirmar entrega →</small></a><a href="/dashboard/points?view=customers"><span>ENTENDER</span><strong>Ver clientes</strong><small>Quién vuelve, quién progresa y quién tiene premio →</small></a></section>}
+
+
+        {view === 'register' && <>
+          <section className="captureIntro">
+            <div><span>REGISTRO RÁPIDO</span><h2>No cambies tu operación para usar Nival.</h2><p>Registra únicamente el dato que tengas a la mano. Puedes empezar con una visita, una venta individual, el total del día o un archivo CSV de tu sistema actual.</p></div>
+            <div className="captureMiniStats"><span><b>{(sales30Cents/100).toLocaleString('es-MX',{style:'currency',currency:'MXN'})}</b>ventas registradas · 30 días</span><span><b>{transactions30}</b>operaciones registradas</span></div>
+          </section>
+          {canManage && <div className="captureGrid">
+            <article className="captureCard">
+              <span>CLIENTE NUEVO · 15 SEG</span><h3>Regístralo con lo mínimo</h3><p>Nombre y teléfono. El cliente queda listo para Nival Puntos sin llenar una ficha larga.</p>
+              <form action={registerQuickCustomer}>
+                <label>Nombre<input name="name" required minLength={2} maxLength={100} placeholder="Ej. Ana López"/></label>
+                <label>Teléfono<input name="phone" required inputMode="tel" minLength={10} maxLength={18} placeholder="55 1234 5678"/></label>
+                <label>Correo <small>opcional</small><input name="email" type="email" placeholder="cliente@correo.com"/></label>
+                <label className="checkLabel"><input name="marketingConsent" type="checkbox"/> El cliente acepta recibir promociones.</label>
+                <button type="submit">Registrar cliente</button>
+              </form>
+            </article>
+
+            <article className="captureCard">
+              <span>VENTA RÁPIDA · 10 SEG</span><h3>Guarda el monto, nada más si eso es lo que tienes</h3><p>El cliente es opcional. Si lo relacionas, Intelligence podrá entender mejor su valor y recurrencia.</p>
+              <form action={registerQuickSale}>
+                <label>Monto de la venta<input name="amount" required inputMode="decimal" placeholder="185.00"/></label>
+                <label>Cliente <small>opcional</small><select name="customerId" defaultValue=""><option value="">Sin cliente identificado</option>{(customerRows??[]).map(customer=><option value={customer.id} key={customer.id}>{customer.name}</option>)}</select></label>
+                <label>Método<select name="paymentMethod" defaultValue="other"><option value="cash">Efectivo</option><option value="transfer">Transferencia</option><option value="card">Tarjeta</option><option value="other">Otro</option></select></label>
+                <label>Nota <small>opcional</small><input name="note" maxLength={200} placeholder="Ej. corte + barba"/></label>
+                <button type="submit">Guardar venta</button>
+              </form>
+            </article>
+
+            <article className="captureCard">
+              <span>SI YA LLEVAS TUS VENTAS EN OTRO LADO</span><h3>Solo sube el total del día</h3><p>No necesitas volver a capturar ticket por ticket. Esto sirve para negocios que ya usan libreta, caja o un POS.</p>
+              <form action={registerDailySalesSummary}>
+                <label>Fecha<input name="saleDate" type="date" required defaultValue={new Date().toISOString().slice(0,10)}/></label>
+                <label>Total vendido<input name="amount" required inputMode="decimal" placeholder="3450"/></label>
+                <label>Número de ventas<input name="transactions" type="number" min={1} max={100000} defaultValue={1}/></label>
+                <button type="submit">Guardar resumen</button>
+              </form>
+            </article>
+
+            <article className="captureCard">
+              <span>IMPORTAR</span><h3>Trae un CSV de tu sistema actual</h3><p>Acepta hasta 500 ventas por archivo. Solo necesitas una columna <b>Monto</b>; opcionalmente Fecha, Teléfono y Método.</p>
+              <form action={importSalesCsv}>
+                <label>Archivo CSV<input name="salesFile" type="file" accept=".csv,text/csv" required/></label>
+                <small className="captureFormat">Ejemplo: Fecha, Monto, Teléfono, Método</small>
+                <button type="submit">Importar ventas</button>
+              </form>
+            </article>
+          </div>}
+          <section className="captureScanner"><div><span>VISITA CON NIVAL PUNTOS</span><h2>Si el cliente ya tiene tarjeta, escanéala.</h2><p>El flujo de puntos sigue igual: código temporal, confirmación y registro en segundos.</p></div><PointsEmployeeScanner mode="visit" /></section>
+        </>}
 
         {canManage && view === 'overview' && !hasIntelligence && Number(customers ?? 0) > 0 && <section className="productBridge"><div><span>CUANDO QUIERAS IR MÁS ALLÁ DE LOS PUNTOS</span><h2>Ya estás registrando comportamiento. Intelligence puede convertirlo en acciones.</h2><p>Usa visitas y recurrencia para encontrar clientes en riesgo, preparar campañas y medir quién regresó después.</p></div><a href="/dashboard/intelligence">Conocer Intelligence · paquete $449/mes →</a></section>}
 
