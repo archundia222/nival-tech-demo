@@ -3,15 +3,16 @@ import Link from "next/link";
 import { PayDemo } from "./pay-demo";
 import { LandingReveal } from "./landing-reveal";
 
-const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
+const signupUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
+const payProUrl = "/auth?mode=signup&next=%2Fcheckout";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   const params = await searchParams;
   const source = params.from === 'nival-pay' || params.from === 'nival-puntos' || params.from === 'perfil-negocio' ? params.from : null;
   const sourceContext = source === 'nival-pay'
-    ? { eyebrow: 'LLEGASTE DESDE UNA NIVAL PAY', title: '¿Te gustó lo fácil que fue encontrar los datos para pagar?', text: 'Tu negocio puede tener la misma experiencia: NFC, QR y página editable por $199 MXN, pago único.', href: '/auth?mode=signup&next=%2Fcheckout', cta: 'Quiero una Nival Pay' }
+    ? { eyebrow: 'LLEGASTE DESDE UNA NIVAL PAY', title: '¿Te gustó lo fácil que fue encontrar los datos para pagar?', text: 'Tu negocio puede empezar con una Nival Pay gratis: página, QR y enlace. Si después necesitas NFC y más herramientas, puedes ampliar sin cambiar tu QR.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpay', cta: 'Crear la mía gratis' }
     : source === 'nival-puntos'
-      ? { eyebrow: 'LLEGASTE DESDE NIVAL PUNTOS', title: '¿Quieres un programa de clientes frecuentes como el que acabas de ver?', text: 'Crea tu tarjeta digital, registra visitas y entrega recompensas desde $199 MXN al mes.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpoints', cta: 'Crear mi programa' }
+      ? { eyebrow: 'LLEGASTE DESDE NIVAL PUNTOS', title: '¿Quieres un programa de clientes frecuentes como el que acabas de ver?', text: 'Puedes empezar gratis con clientes reales, puntos y recompensas. Paga cuando necesites más capacidad y herramientas.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpoints', cta: 'Crear mi programa gratis' }
       : source === 'perfil-negocio'
         ? { eyebrow: 'LLEGASTE DESDE UNA PÁGINA NIVAL', title: 'Tu negocio también puede tener un acceso simple para cobro, puntos, contacto y enlaces.', text: 'Nival reúne herramientas pensadas para negocios locales sin obligarte a cambiar cómo trabajas.', href: '#productos', cta: 'Ver soluciones' }
         : null;
@@ -42,11 +43,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <h1 className="heroReveal heroReveal2">Cobra mejor. Haz que vuelvan. Crece con lo que ya sabes de tus clientes.</h1>
           <p className="landingHeroLead heroReveal heroReveal3">Nival Pay facilita el cobro. Nival Puntos crea recurrencia. Nival Intelligence convierte la actividad del negocio en acciones concretas.</p>
           <div className="landingPriceLine heroReveal heroReveal4">
-            <strong>Empieza desde $199 MXN</strong>
-            <span>sin cambiar la forma en la que ya opera tu negocio</span>
+            <strong>Empieza gratis</strong>
+            <span>usa el producto primero; paga cuando necesites más</span>
           </div>
           <div className="landingHeroActions heroReveal heroReveal5">
-            <Link className="landingPrimary" href={signupUrl}>Quiero Nival Pay</Link>
+            <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
             <a className="landingSecondary" href="#productos">Ver productos</a>
           </div>
         </div>
@@ -89,29 +90,29 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">UN SISTEMA, TRES TRABAJOS</p>
           <h2>Empieza por el problema que más te cuesta hoy.</h2>
-          <p>No necesitas comprar todo. Cada producto funciona por separado y juntos se vuelven más útiles.</p>
+          <p>No necesitas comprar para empezar. Usa la versión gratis, comprueba el valor y amplía solo cuando el negocio lo necesite.</p>
         </div>
         <div className="nivalProductCards">
           <article>
             <span>COBRAR</span>
             <h3>Nival Pay</h3>
-            <p>Tu cliente abre una página limpia desde NFC o QR, copia tus datos y paga sin pedirte capturas ni volver a dictar la CLABE.</p>
-            <div><strong>$199 MXN</strong><small>pago único</small></div>
-            <Link href={signupUrl}>Crear mi Nival Pay →</Link>
+            <p>Empieza con una página de cobro, QR, enlace, tu marca y estadísticas básicas. Mantén el mismo QR si después activas NFC y más herramientas.</p>
+            <div><strong>Gratis</strong><small>Completo: $199 MXN pago único</small></div>
+            <Link href={signupUrl}>Crear mi Nival Pay gratis →</Link>
           </article>
           <article>
             <span>HACER QUE VUELVAN</span>
             <h3>Nival Puntos</h3>
-            <p>Registra visitas, entrega recompensas y crea una razón sencilla para que tus clientes regresen.</p>
-            <div><strong>$199 MXN</strong><small>al mes</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa →</Link>
+            <p>Crea un programa real, registra visitas y entrega recompensas. El plan gratis llega hasta 30 clientes para que puedas comprobar si lo usan.</p>
+            <div><strong>Gratis</strong><small>Pro: $199 MXN al mes</small></div>
+            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis →</Link>
           </article>
           <article className="featured">
             <span>CRECER</span>
             <h3>Nival Intelligence</h3>
-            <p>Detecta a quién recuperar, qué campaña hacer y qué funcionó. Menos tablas; más acciones concretas para el dueño.</p>
-            <div><strong>$399 MXN</strong><small>al mes · $449 con Puntos</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Ver Intelligence →</Link>
+            <p>Gratis te muestra la oportunidad principal. Pro desbloquea personas concretas, mensajes, campañas, medición y la siguiente acción.</p>
+            <div><strong>Gratis</strong><small>Pro: $399 MXN · $449 con Puntos Pro</small></div>
+            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Activar Intelligence gratis →</Link>
           </article>
         </div>
       </section>
@@ -125,7 +126,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <i aria-hidden="true">→</i>
           <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival te dice qué hacer después.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
         </div>
-        <small>Empieza con un producto. Agrega los demás solo cuando resuelvan un problema real de tu negocio.</small>
+        <small>Los tres pueden empezar gratis. Pro aparece cuando ya necesitas más capacidad, herramientas o automatización.</small>
       </section>
 
       <section className="landingSection landingProblem scrollReveal" id="como-funciona">
@@ -136,18 +137,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="stepsGrid">
           <article>
             <span>01</span>
-            <h3>Configura tu página</h3>
-            <p>Agrega el nombre de tu negocio, banco, titular, CLABE, concepto, imagen y un enlace de pago opcional.</p>
+            <h3>Crea tu Nival Pay gratis</h3>
+            <p>Agrega negocio, banco, titular y CLABE. Obtienes una página, enlace y QR permanente.</p>
           </article>
           <article>
             <span>02</span>
-            <h3>Recibe tu tarjeta</h3>
-            <p>La entregamos programada con una liga única para tu negocio. También obtienes un código QR.</p>
+            <h3>Úsala con clientes reales</h3>
+            <p>Comparte el enlace o imprime el QR. Puedes ver aperturas y copias de CLABE antes de pagar nada.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Empieza a cobrar</h3>
-            <p>Tu cliente acerca su celular, verifica los datos y copia la CLABE sin errores ni capturas viejas.</p>
+            <h3>Amplía cuando tenga sentido</h3>
+            <p>Activa Nival Pay completo para recibir la tarjeta NFC física, 3 apartados y las herramientas adicionales sin cambiar tu QR.</p>
           </article>
         </div>
       </section>
@@ -176,9 +177,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
 
       <section className="landingPriceSection scrollReveal" id="precio">
         <div className="pricePitch">
-          <p className="landingEyebrow">PRECIO DE LANZAMIENTO</p>
+          <p className="landingEyebrow">NIVAL PAY COMPLETO</p>
           <h2>Más fácil de pagar.<br />Más fácil de vender.</h2>
-          <p>Hecho para puestos, locales, profesionales independientes y negocios que reciben transferencias todos los días.</p>
+          <p>Empieza gratis con QR y enlace. Cuando quieras llevar Nival Pay físicamente a tu negocio, activa la versión completa.</p>
         </div>
         <article className="priceCard">
           <p>NIVAL PAY</p>
@@ -191,8 +192,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
             <li>3 apartados incluidos; adicionales por $49 MXN</li>
             <li>Datos editables sin cambiar la tarjeta</li>
           </ul>
-          <Link className="landingPrimary dark" href={signupUrl}>Empezar mi configuración</Link>
-          <small>El pago y la entrega de la tarjeta se confirman después de configurar tu página.</small>
+          <Link className="landingPrimary dark" href={payProUrl}>Activar Nival Pay completo</Link>
+          <small>Tu página, enlace y QR pueden empezar gratis. Al activar, conservas el mismo QR y agregas la tarjeta NFC física.</small>
         </article>
       </section>
 
