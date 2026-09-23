@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PayDemo } from "./pay-demo";
-import { IntelligenceWaitlist } from "./intelligence-waitlist";
 import { LandingReveal } from "./landing-reveal";
 
 const signupUrl = "/auth?mode=signup&next=%2Fcheckout";
