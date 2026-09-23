@@ -4214,3 +4214,13 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .mobileWorkspaceSwitcher label>span{font-size:8px;font-weight:900;letter-spacing:.12em;color:var(--muted)}
 .mobileWorkspaceSwitcher select{width:100%;padding:10px 11px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#151515;color:inherit}
 .mobileWorkspaceSwitcher button{padding:9px 11px;border:1px solid rgba(255,255,255,.1);border-radius:9px;background:#202020;color:inherit;font-size:9px;font-weight:800}
+
+/* Public trust layer */
+.landingTrust{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:92px 0;border-top:1px solid var(--landing-line)}
+.landingTrustGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:32px}
+.landingTrustGrid article{min-height:170px;padding:22px;border:1px solid var(--landing-line);border-radius:17px;background:linear-gradient(180deg,#141414,#101010)}
+.landingTrustGrid article>span{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid rgba(181,154,97,.32);border-radius:50%;color:var(--landing-accent);font-size:8px;font-weight:900}
+.landingTrustGrid strong{display:block;margin:18px 0 8px;font-size:15px;line-height:1.25}
+.landingTrustGrid p{margin:0;color:var(--landing-muted);font-size:10px;line-height:1.62}
+@media(max-width:900px){.landingTrustGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.landingTrust{width:min(100% - 28px,1180px);padding:72px 0}.landingTrustGrid{grid-template-columns:1fr}}
