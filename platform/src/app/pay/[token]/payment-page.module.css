@@ -19,3 +19,20 @@
 .cardExtras .businessHubLink{background:#f8f6f1;border-color:#e7e2d8}
 .cardExtras .loyaltyBridge{background:linear-gradient(145deg,#fff9ec,#fff);border-color:rgba(184,154,90,.28)}
 @media(max-width:470px){.cardExtras{gap:9px;margin-top:18px;padding-top:16px}}
+
+/* Compact in-card actions for public Nival Pay */
+.cardExtras{display:grid;gap:8px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.extrasHeading{display:flex;align-items:end;justify-content:space-between;gap:14px;padding:0 2px 3px}
+.extrasHeading>span{color:#9b7b3e;font-size:.62rem;font-weight:900;letter-spacing:.12em}
+.extrasHeading>small{color:var(--muted);font-size:.64rem}
+.serviceAction{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 14px;border:1px solid #e9e4db;border-radius:15px;color:var(--navy);background:#faf9f6;text-decoration:none;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.serviceAction:hover{transform:translateY(-1px);border-color:#d7c79f;background:#fff}
+.serviceIcon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;color:#171717;background:#efebe2;font-size:.9rem;font-weight:900}
+.serviceCopy{min-width:0;display:grid;gap:2px}
+.serviceCopy small{color:#9b7b3e;font-size:.58rem;font-weight:900;letter-spacing:.1em}
+.serviceCopy strong{font-size:.84rem;line-height:1.25}
+.serviceCopy em{color:var(--muted);font-size:.68rem;font-style:normal;line-height:1.35}
+.serviceAction>b{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;color:#fff;background:#171717;font-size:.82rem}
+.loyaltyAction{background:linear-gradient(135deg,#fffaf0,#faf7f0);border-color:rgba(184,154,90,.28)}
+.loyaltyAction .serviceIcon{color:#8d6e31;background:#efe1bd}
+@media(max-width:470px){.cardExtras{margin-top:18px;padding-top:16px}.extrasHeading{align-items:start;flex-direction:column;gap:2px}.serviceAction{padding:12px}.serviceCopy em{font-size:.66rem}}
