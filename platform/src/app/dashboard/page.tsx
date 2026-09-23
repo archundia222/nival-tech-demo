@@ -191,6 +191,18 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=nival-card", action: "Conecta tu enlace de reseñas" },
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
+  const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
+  const homeNextAction = !hasNivalPay
+    ? { eyebrow: "EMPIEZA POR COBRAR MEJOR", title: "Activa tu primera Nival Pay", text: "Configura una vez tus datos y deja de dictar la CLABE o mandar capturas cada vez que alguien te paga.", href: "/checkout", cta: "Activar Nival Pay · $199" }
+    : !payReady
+      ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
+      : Number(paymentProfile?.view_count ?? 0) === 0
+        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link, descarga el QR o usa la tarjeta NFC. La primera apertura te confirma que el flujo ya está en la calle.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
+        : hasIntelligence
+          ? { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa clientes y visitas para priorizar recuperación, recurrencia y campañas sin hacerte interpretar tablas.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
+          : hasPoints
+            ? { eyebrow: "HAZ QUE EL PROGRAMA SE USE", title: "Registra la siguiente visita en segundos", text: "Cada visita registrada hace más útil tu programa y mejora lo que puedes aprender sobre recurrencia.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
+            : { eyebrow: "TU NIVAL PAY YA ESTÁ RECIBIENDO VISITAS", title: "El siguiente paso es hacer que esas personas vuelvan", text: "Nival Puntos convierte visitas repetidas en una experiencia de lealtad sencilla para el cliente y el negocio.", href: "/dashboard/points", cta: "Conocer Nival Puntos" };
 
   return (
     <main className="dashboardApp">
@@ -204,6 +216,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <h1>{business?.name ?? "Tu negocio"}</h1>
           <p>Cobra, haz que tus clientes vuelvan y decide qué hacer después desde un solo lugar.</p>
         </div>
+      </section>
+      <section className="nivalTodayCard">
+        <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
+        <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
       </section>
       <section className="nivalProductHub" aria-label="Productos Nival">
         <article className={hasNivalPay ? "activeProduct" : ""}>
