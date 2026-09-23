@@ -140,11 +140,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
           ? <ActiveCard businessName={business?.name ?? 'Tu negocio'} url={`${siteUrl}/pay/${paymentProfile.public_token}`} />
           : <BankSetupForm businessName={business?.name ?? 'Tu negocio'} siteUrl={siteUrl} />
         : <>
-          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY</p><h1>Deja lista tu forma de cobrar.</h1><p>Un pago único incluye tu página, QR, primera tarjeta NFC y 3 apartados configurables.</p></section>
-          <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa</b><small>Paga Nival Pay</small></div><div><span>2</span><b>Configura</b><small>Agrega banco, CLABE y logo</small></div><div><span>3</span><b>Comparte</b><small>Usa NFC, QR o enlace</small></div></section>
+          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único desbloquea la tarjeta NFC física, 3 apartados y las herramientas Pro.</p></section>
+          <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
-              <div><span>Pago único</span><strong>{money(NIVAL_PAY_PRICE_CENTS)}</strong><small>MXN · Sin mensualidad</small></div>
+              <div><span>Nival Pay Pro · pago único</span><strong>{money(NIVAL_PAY_PRICE_CENTS)}</strong><small>MXN · Sin mensualidad</small></div>
               <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>3 apartados incluidos</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
@@ -156,7 +156,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Activación automática al acreditarse</span><span>Sin mensualidad para Nival Pay</span></footer>
+          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span></footer>
         </>}
     </div>
   </main>;
