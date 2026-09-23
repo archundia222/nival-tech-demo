@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { signOut } from '@/app/auth/actions';
 import styles from './dashboard-navigation.module.css';
+import { MobileAutoCloseLink } from './mobile-auto-close-link';
 
 type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
@@ -62,10 +63,10 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
       <nav aria-label="Navegación móvil del panel">
-        <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div></details>
-        <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{pointsItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div></details>
-        <details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Intelligence <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <Link key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div></details>
-        <Link href="/dashboard?section=perfil-digital">Perfil digital del negocio</Link><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
+        <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
+        <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{pointsItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
+        <details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Intelligence <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
+        <MobileAutoCloseLink href="/dashboard?section=perfil-digital">Perfil digital del negocio</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
   </>;
