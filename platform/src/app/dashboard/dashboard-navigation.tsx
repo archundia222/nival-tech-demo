@@ -41,7 +41,7 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
-      <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>NEGOCIO ACTUAL</small><strong>{businessName}</strong></div></div>
+      <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></div>
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
         <span className="sidebarSectionLabel">COBRAR</span>
         <details className={styles.productGroup} open={payActive}>
@@ -60,7 +60,7 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
         </details>
         <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Página del negocio</Link>
       </nav>
-      <div className="sidebarFooter professionalFooter"><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
+      <div className="sidebarFooter professionalFooter"><Link href="/support">Ayuda</Link><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i /><i /><i /></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
