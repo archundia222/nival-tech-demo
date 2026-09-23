@@ -22,13 +22,13 @@ const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: '
 ];
 
 const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'accion' | 'resultados' | 'herramientas' }> = [
-  { id: 'inteligencia', label: 'Qué hacer hoy', href: '/dashboard/intelligence', group: 'accion' },
+  { id: 'inteligencia', label: 'Hoy', href: '/dashboard/intelligence', group: 'accion' },
   { id: 'inteligencia-riesgo', label: 'Recuperar clientes', href: '/dashboard/intelligence?view=risk', group: 'accion' },
-  { id: 'inteligencia-recurrentes', label: 'Fidelizar recurrentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
-  { id: 'inteligencia-campanas', label: 'Campañas recomendadas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
-  { id: 'inteligencia-impacto', label: 'Resultados e impacto', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
+  { id: 'inteligencia-recurrentes', label: 'Clientes frecuentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
+  { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
+  { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
-  { id: 'inteligencia-importar', label: 'Agregar datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
+  { id: 'inteligencia-importar', label: 'Datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
