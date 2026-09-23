@@ -19,13 +19,15 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   if (!membership) redirect('/dashboard');
   if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
-  const [{ data: entitlement }, { count: customers }, { count: visits }, { data: program }] = await Promise.all([
+  const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: customers }, { count: visits }, { data: program }] = await Promise.all([
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').eq('status', 'active').maybeSingle(),
+    supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_intelligence').eq('status', 'active').maybeSingle(),
     supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('visits').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap, review_url, review_request_visit').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const active = Boolean(entitlement);
+  const hasIntelligence = Boolean(intelligenceEntitlement);
   const view = params.view ?? 'overview';
   const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'visits' ? 'puntos-visitas' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
@@ -104,6 +106,8 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         {canManage && view === 'overview' && <section className="pointsTodayAction"><div><span>LO MÁS ÚTIL AHORA</span><h2>{pointsTodayAction.title}</h2><p>{pointsTodayAction.text}</p></div><a href={pointsTodayAction.href}>{pointsTodayAction.cta} →</a></section>}
 
         {view === 'overview' && <section className="pointsQuickOps"><a href="/dashboard/points?view=visits"><span>SUMAR</span><strong>Registrar visita</strong><small>Escanear QR o ingresar código →</small></a><a href="/dashboard/points?view=redemptions"><span>PREMIAR</span><strong>Canjear premio</strong><small>Validar y confirmar entrega →</small></a><a href="/dashboard/points?view=customers"><span>ENTENDER</span><strong>Ver clientes</strong><small>Quién vuelve, quién progresa y quién tiene premio →</small></a></section>}
+
+        {canManage && view === 'overview' && !hasIntelligence && Number(customers ?? 0) > 0 && <section className="productBridge"><div><span>CUANDO QUIERAS IR MÁS ALLÁ DE LOS PUNTOS</span><h2>Ya estás registrando comportamiento. Intelligence puede convertirlo en acciones.</h2><p>Usa visitas y recurrencia para encontrar clientes en riesgo, preparar campañas y medir quién regresó después.</p></div><a href="/dashboard/intelligence">Conocer Intelligence · paquete $449/mes →</a></section>}
 
         {canManage && view === 'analytics' && <section className="pointsResultsGrid"><article><span>CLIENTES ACTIVOS · 30 DÍAS</span><strong>{active30Customers}</strong><p>Personas con al menos una visita reciente.</p></article><article><span>REGRESARON</span><strong>{returning30Customers}</strong><p>Clientes activos que ya tienen dos o más visitas registradas.</p></article><article><span>RECURRENCIA OBSERVADA</span><strong>{recurrence30}%</strong><p>Qué parte de los clientes activos ya volvió al menos una vez.</p></article><article><span>PREMIOS USADOS · 30 DÍAS</span><strong>{redeemed30}</strong><p>Recompensas que sí terminaron en una experiencia entregada.</p></article></section>}
 
