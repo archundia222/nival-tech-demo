@@ -55,6 +55,7 @@ export function PaymentEditor({
   businessBrandColor,
   profile,
   siteUrl,
+  trialMode = false,
 }: {
   businessId: string;
   businessName: string;
@@ -62,6 +63,7 @@ export function PaymentEditor({
   businessBrandColor: string | null;
   profile: Profile | null;
   siteUrl: string;
+  trialMode?: boolean;
 }) {
   const [checkoutPending, startCheckoutTransition] = useTransition();
   const [state, action, pending] = useActionState<PaymentFormState, FormData>(savePaymentProfile, {});
@@ -142,8 +144,9 @@ export function PaymentEditor({
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
   const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
   const extraSectionPriceMx = NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS / 100;
-  const totalSectionLimit = NIVAL_PAY_INCLUDED_SECTIONS + purchasedSectionLimit;
-  const freeSectionsRemaining = Math.max(0, NIVAL_PAY_INCLUDED_SECTIONS - sections.length);
+  const includedSectionLimit = trialMode ? 1 : NIVAL_PAY_INCLUDED_SECTIONS;
+  const totalSectionLimit = includedSectionLimit + purchasedSectionLimit;
+  const freeSectionsRemaining = Math.max(0, includedSectionLimit - sections.length);
 
   const buyExtraSection = () => {
     if (!profile?.id) return;
@@ -201,7 +204,7 @@ export function PaymentEditor({
             <h2>Tu página Nival Pay</h2>
           </div>
           <div className="nivalPaySaveCluster">
-            {profile?.public_token && <a className="nivalPayPublicLink" href={siteUrl + '/pay/' + profile.public_token} target="_blank" rel="noreferrer">Ver página ↗</a>}
+            {profile?.public_token && profile.active && <a className="nivalPayPublicLink" href={siteUrl + '/pay/' + profile.public_token} target="_blank" rel="noreferrer">Ver página ↗</a>}
             <span
               className={`nivalPaySaveStatus ${state.error ? 'isError' : pending ? 'isSaving' : 'isSaved'}`}
               role={state.error ? 'alert' : 'status'}
@@ -299,7 +302,7 @@ export function PaymentEditor({
 
         </div>
 
-        <div className="nivalPayFormSectionTitle"><span>AYUDAS OPCIONALES</span><p>Agrega un concepto fijo o un enlace de pago si realmente le facilita el proceso al cliente.</p></div>
+        <div className="nivalPayFormSectionTitle"><span>AYUDAS OPCIONALES</span><p>{trialMode ? 'Durante la prueba puedes agregar un concepto. El enlace de pago y más herramientas se desbloquean al activar Nival Pay.' : 'Agrega un concepto fijo o un enlace de pago si realmente le facilita el proceso al cliente.'}</p></div>
         <div className="nivalPayFieldGroup">
           <div className="nivalPayFieldHeading">
             <span>Concepto <small>Opcional</small></span>
@@ -314,7 +317,7 @@ export function PaymentEditor({
             placeholder="Agregar concepto"
           />
 
-          <div className="nivalPayFieldHeading">
+          {!trialMode && <><div className="nivalPayFieldHeading">
             <span>Enlace de pago <small>Opcional</small></span>
             <VisibilityControl visible={fieldVisibility.paymentUrl} onClick={() => toggleDefaultField('paymentUrl', 'el Enlace de pago')} />
           </div>
@@ -358,7 +361,7 @@ export function PaymentEditor({
         ))}
 
         <div className="nivalPaySectionsAction">
-          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados. <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
+          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>{trialMode ? 'Tu prueba incluye 1 apartado.' : <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados.</>} <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
           {sections.length < totalSectionLimit ? (
             <button
               key="add-available-section"
@@ -383,7 +386,7 @@ export function PaymentEditor({
               {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · $${extraSectionPriceMx} MXN`}
             </button>
           )}
-          <p className="apartadoFootnote">{freeSectionsRemaining > 0 ? 'Los apartados incluidos se pueden editar y ocultar cuando quieras.' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
+          <p className="apartadoFootnote">{freeSectionsRemaining > 0 ? '{trialMode ? 'Al activar Nival Pay tendrás 3 apartados incluidos.' : 'Los apartados incluidos se pueden editar y ocultar cuando quieras.'}' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
         </div>
       </section>
 
