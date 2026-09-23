@@ -3,7 +3,7 @@ import { signOut } from '@/app/auth/actions';
 import styles from './dashboard-navigation.module.css';
 import { MobileAutoCloseLink } from './mobile-auto-close-link';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Tus tarjetas', href: '/dashboard/pay' },
@@ -21,12 +21,14 @@ const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: '
   { id: 'puntos-compartir', label: 'QR y NFC', href: '/dashboard/points?view=share', group: 'gestion' },
 ];
 
-const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'analisis' | 'datos' | 'asistente' }> = [
-  { id: 'inteligencia', label: 'Resumen y consejos', href: '/dashboard/intelligence', group: 'analisis' },
-  { id: 'inteligencia-clientes', label: 'Clientes analizados', href: '/dashboard/intelligence?view=customers', group: 'analisis' },
-  { id: 'inteligencia-oportunidades', label: 'Oportunidades', href: '/dashboard/intelligence?view=opportunities', group: 'analisis' },
-  { id: 'inteligencia-importar', label: 'Importar clientes', href: '/dashboard/intelligence?view=imports', group: 'datos' },
-  { id: 'inteligencia-asistente', label: 'Asistente Nival', href: '/dashboard/intelligence?view=assistant', group: 'asistente' },
+const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'accion' | 'resultados' | 'herramientas' }> = [
+  { id: 'inteligencia', label: 'Qué hacer hoy', href: '/dashboard/intelligence', group: 'accion' },
+  { id: 'inteligencia-riesgo', label: 'Recuperar clientes', href: '/dashboard/intelligence?view=risk', group: 'accion' },
+  { id: 'inteligencia-recurrentes', label: 'Fidelizar recurrentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
+  { id: 'inteligencia-campanas', label: 'Campañas recomendadas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
+  { id: 'inteligencia-impacto', label: 'Resultados e impacto', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
+  { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
+  { id: 'inteligencia-importar', label: 'Agregar datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
@@ -54,7 +56,7 @@ export function DashboardNavigation({ businessName, active }: { businessName: st
         </details>
         <details className={styles.productGroup} open={intelligenceActive}>
           <summary className={`sidebarMainProduct ${intelligenceActive ? 'active' : ''}`}><NavIcon><path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z" /></NavIcon><span>Nival Intelligence</span><i aria-hidden="true">⌄</i></summary>
-          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Intelligence">{(['analisis','datos','asistente'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'analisis' ? 'ANÁLISIS' : group === 'datos' ? 'DATOS' : 'ASISTENTE'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Intelligence">{(['accion','resultados','herramientas'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'accion' ? 'QUÉ HACER' : group === 'resultados' ? 'QUÉ FUNCIONÓ' : 'HERRAMIENTAS'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
         <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Perfil digital del negocio</Link>
       </nav>
