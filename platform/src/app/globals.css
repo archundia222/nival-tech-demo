@@ -4288,3 +4288,10 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .subscriptionConsentForm .checkLabel{display:grid;grid-template-columns:18px 1fr;align-items:start;gap:9px;font-size:12px;line-height:1.45}
 .subscriptionConsentForm .checkLabel input{width:18px;height:18px;margin-top:1px}
 .subscriptionConsentForm .checkLabel a{text-decoration:underline;text-underline-offset:2px}
+
+.subscriptionManage{margin:12px 0 20px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft)}
+.subscriptionManage summary{cursor:pointer;font-size:13px;font-weight:800}
+.subscriptionManage form{display:grid;gap:12px;margin-top:14px}
+.subscriptionManage .checkLabel{display:grid;grid-template-columns:18px 1fr;gap:9px;align-items:start;font-size:12px;line-height:1.5}
+.subscriptionManage .checkLabel input{width:18px;height:18px;margin-top:1px}
+.subscriptionManage button{justify-self:start}
