@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createBusiness } from "@/app/auth/actions";
+import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
 
 function toSlug(value: string) {
   return value
@@ -46,6 +47,6 @@ export function BusinessOnboardingForm({ next }: { next: string }) {
         Usaremos este enlace para tus páginas públicas. Puedes dejar el sugerido: <strong>nival-tech-platform.vercel.app/p/{slug || "tu-negocio"}</strong>
       </small>
     </label>
-    <button className="primaryButton" type="submit">Continuar</button>
+    <CheckoutSubmitButton className="primaryButton" pendingLabel="Creando tu negocio…">Continuar</CheckoutSubmitButton>
   </form>;
 }

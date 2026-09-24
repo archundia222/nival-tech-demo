@@ -148,7 +148,7 @@ export default async function NivalPointsPage({
       </header>
 
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription && <p className="formMessage">{paid ? 'Suscripción confirmada. Nival Puntos Pro ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>}
 
       {!available ? <>
         <section className="productShowcase pointsShowcase">

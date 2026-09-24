@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requestPasswordReset, resendConfirmation, signIn, signUp } from "./actions";
+import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
 
 export const metadata = { robots: { index: false, follow: false } };
 
@@ -45,7 +46,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           )}
           <label>Correo<input type="email" name="email" required autoComplete="email" /></label>
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
-          <button className="primaryButton" type="submit">{signup ? "Continuar" : "Entrar"}</button>
+          <CheckoutSubmitButton className="primaryButton" pendingLabel={signup ? "Creando tu cuenta…" : "Entrando…"}>{signup ? "Continuar" : "Entrar"}</CheckoutSubmitButton>
         </form>
         {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>.</p>}
 
@@ -57,7 +58,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
                 Correo de tu cuenta
                 <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
               </label>
-              <button className="primaryButton" type="submit">Enviar enlace de recuperación</button>
+              <CheckoutSubmitButton className="primaryButton" pendingLabel="Enviando enlace…">Enviar enlace de recuperación</CheckoutSubmitButton>
             </form>
           </details>
           <details className="authHelp">
@@ -68,7 +69,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
                 Escribe el correo de tu cuenta
                 <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
               </label>
-              <button className="primaryButton" type="submit">Reenviar confirmación</button>
+              <CheckoutSubmitButton className="primaryButton" pendingLabel="Reenviando…">Reenviar confirmación</CheckoutSubmitButton>
             </form>
           </details>
         </>}

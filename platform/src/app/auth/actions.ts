@@ -108,7 +108,12 @@ export async function createBusiness(formData: FormData) {
     business_slug: businessSlug,
   });
 
-  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  if (error) {
+    const message = error.code === "23505"
+      ? "Ese enlace público ya está ocupado. Prueba una variante, por ejemplo agregando tu colonia o una palabra corta."
+      : "No pudimos crear tu negocio. Revisa el nombre y el enlace e inténtalo de nuevo.";
+    redirect(`/dashboard?error=${encodeURIComponent(message)}`);
+  }
   redirect(safeNext(formData));
 }
 

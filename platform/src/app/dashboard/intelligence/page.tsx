@@ -170,7 +170,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     <div className={`dashboardContent ${!available ? 'nivalIntelligenceDark' : ''}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Herramienta incluida en Nival Growth</b></div><span className="ready">{paid ? 'Growth activo' : trialActive ? `Prueba · ${trialDaysLeft}d` : freePlan ? 'Vista gratis' : 'Desde Puntos'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription && <p className="formMessage">{paid ? 'Suscripción confirmada. Nival Growth ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>
       {!hasPoints ? <>
         <section className="productShowcase intelligenceShowcase">
           <div className="productShowcaseCopy">
