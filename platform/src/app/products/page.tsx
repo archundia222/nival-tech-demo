@@ -1,41 +1,44 @@
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./products-premium.module.css";
+import styles from "../landing-premium.module.css";
 
 export const metadata = {
   title: "Productos | Nival Tech",
-  description: "Nival Pay, Nival Puntos e Intelligence para negocios locales.",
+  description: "Cobra, crea recurrencia y convierte actividad en acciones para tu negocio.",
 };
 
 const products = [
   {
+    number: "01",
     job: "COBRAR",
-    name: "Nival Pay",
-    price: "$199",
-    cadence: "MXN · pago único",
-    intro: "Comparte tus datos de cobro con una experiencia clara y editable desde QR, enlace o NFC.",
-    features: ["Empieza gratis con página, QR y enlace", "Pro incluye tarjeta NFC física", "3 apartados incluidos en Pro"],
-    href: "/auth?mode=signup&next=%2Fdashboard%2Fpay",
+    title: "Nival Pay",
+    description: "Página de cobro editable con QR y enlace. En Pro agregas NFC física para que el cliente encuentre y copie tus datos sin pedir capturas ni volver a dictar la CLABE.",
+    price: "Gratis",
+    detail: "Pro · $199 MXN pago único",
+    bullets: ["Página, QR y enlace para empezar", "Tarjeta NFC física en Pro", "3 apartados incluidos en Pro"],
+    href: "/dashboard/pay",
     cta: "Crear Nival Pay",
   },
   {
+    number: "02",
     job: "HACER QUE VUELVAN",
-    name: "Nival Puntos",
-    price: "$199",
-    cadence: "MXN · al mes",
-    intro: "Registra visitas, muestra progreso y entrega recompensas sin meter fricción extra en la operación.",
-    features: ["Gratis hasta 30 clientes", "Registro del cliente por QR", "Visitas, puntos y recompensas"],
-    href: "/auth?mode=signup&next=%2Fdashboard%2Fpoints",
+    title: "Nival Puntos",
+    description: "Programa digital para registrar visitas y recompensas, con una experiencia visible para el cliente y operación simple para el negocio.",
+    price: "Gratis",
+    detail: "Pro · $199 MXN / mes",
+    bullets: ["Hasta 30 clientes gratis", "Registro por QR", "Visitas, puntos y recompensas"],
+    href: "/dashboard/points",
     cta: "Crear programa",
   },
   {
-    job: "DECIDIR QUÉ HACER",
-    name: "Nival Intelligence",
-    price: "Desde $399",
-    cadence: "MXN · al mes",
-    intro: "Convierte señales de actividad y recurrencia en una siguiente acción que puedas probar y medir.",
-    features: ["Versión gratis para explorar", "Audiencias y campañas en Pro", "Bundle con Puntos Pro: $449/mes"],
-    href: "/auth?mode=signup&next=%2Fdashboard%2Fintelligence",
+    number: "03",
+    job: "DECIDIR",
+    title: "Nival Intelligence",
+    description: "Convierte actividad disponible en señales y siguientes acciones: a quién recuperar, qué campaña probar y qué resultado observar después.",
+    price: "Gratis",
+    detail: "Pro desde $399 MXN / mes",
+    bullets: ["Señal principal en la versión gratis", "Audiencias y campañas en Pro", "Seguimiento de resultados"],
+    href: "/dashboard/intelligence",
     cta: "Probar Intelligence",
   },
 ];
@@ -43,69 +46,89 @@ const products = [
 export default function Products() {
   return (
     <main className={styles.page}>
-      <nav className={styles.nav}>
-        <Link className={styles.brand} href="/">
-          <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
+      <nav className={styles.nav} aria-label="Navegación de productos">
+        <Link className={styles.brand} href="/" aria-label="Nival Tech, inicio">
+          <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} priority />
           <span>Nival Tech</span>
         </Link>
-        <div>
-          <Link href="/">Inicio</Link>
-          <Link className={styles.navCta} href="/auth">Mi cuenta</Link>
+        <div className={styles.navLinks}>
+          <Link href="/#productos">Productos</Link>
+          <Link href="/#sistema">Cómo funciona</Link>
+          <Link href="/#planes">Planes</Link>
+          <Link href="/#confianza">Confianza</Link>
+        </div>
+        <div className={styles.navActions}>
+          <Link className={styles.loginLink} href="/auth">Mi cuenta</Link>
+          <Link className={styles.navCta} href="/auth?mode=signup&next=%2Fdashboard%2Fpay">Empezar gratis</Link>
         </div>
       </nav>
 
-      <header className={styles.hero}>
-        <p>PRODUCTOS NIVAL TECH</p>
-        <h1>Empieza por el trabajo que quieres hacer mejor.</h1>
+      <section className={styles.sectionIntro} style={{ paddingTop: 92 }}>
+        <p className={styles.sectionEyebrow}>PRODUCTOS NIVAL TECH</p>
         <div>
-          <p>No necesitas adoptar todo el sistema de golpe. Cada producto resuelve una tarea concreta y puede conectarse con los demás cuando tenga sentido.</p>
-          <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpay">Empezar gratis <span aria-hidden="true">↗</span></Link>
+          <h1 style={{ margin: 0, fontSize: "clamp(44px,6vw,76px)", lineHeight: .96, letterSpacing: "-.06em" }}>Empieza por el problema que quieres resolver.</h1>
+          <p>No necesitas adoptar todo el sistema ni pagar antes de probar. Elige una necesidad concreta y amplía cuando la herramienta ya tenga un lugar en tu operación.</p>
         </div>
-      </header>
+      </section>
 
-      <section className={styles.grid} aria-label="Productos Nival">
-        {products.map((product, index) => (
-          <article key={product.name} className={index === 2 ? styles.featured : undefined}>
-            <div className={styles.cardTop}><span>0{index + 1}</span><small>{product.job}</small></div>
-            <h2>{product.name}</h2>
-            <p>{product.intro}</p>
-            <div className={styles.price}><strong>{product.price}</strong><span>{product.cadence}</span></div>
-            <ul>{product.features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
-            <Link href={product.href}>{product.cta}<span aria-hidden="true">↗</span></Link>
+      <section className={styles.productGrid}>
+        {products.map((product) => (
+          <article key={product.number} className={styles.productCard}>
+            <div className={styles.productCardTop}>
+              <span>{product.number}</span>
+              <small>{product.job}</small>
+            </div>
+            <h3>{product.title}</h3>
+            <p>{product.description}</p>
+            <div className={styles.productPrice}>
+              <strong>{product.price}</strong>
+              <span>{product.detail}</span>
+            </div>
+            <ul style={{ display: "grid", gap: 9, margin: "0 0 24px", padding: 0, listStyle: "none" }}>
+              {product.bullets.map((item) => <li key={item} style={{ color: "#9ea3ab", fontSize: 11, lineHeight: 1.45 }}>• {item}</li>)}
+            </ul>
+            <Link href={product.href}>{product.cta} <span aria-hidden="true">↗</span></Link>
           </article>
         ))}
       </section>
 
-      <section className={styles.cardSection}>
-        <div>
-          <p>NIVAL CARD</p>
-          <h2>Una tarjeta física. La acción que tú elijas.</h2>
-          <span>Programa una tarjeta para Pay, Puntos, reseñas o tu perfil digital. Elige destino, plantilla y personalización sin convertir la tarjeta en otro sistema distinto.</span>
+      <section className={styles.systemSection}>
+        <div className={styles.systemCopy}>
+          <p className={styles.sectionEyebrow}>NIVAL CARD</p>
+          <h2>Una tarjeta física. Distintos destinos.</h2>
+          <p>Programa una tarjeta para Nival Pay, Nival Puntos, reseñas o tu perfil digital. Elige el destino y personaliza la presentación según el producto.</p>
+          <Link className={styles.textLink} href="/dashboard/pay/physical">Diseñar una tarjeta <span aria-hidden="true">↗</span></Link>
         </div>
-        <div className={styles.cardMock}>
-          <div><b>N</b><small>NIVAL CARD</small></div>
-          <strong>Acerca tu celular<br />o escanea el QR</strong>
-          <em>NFC · QR · TU MARCA</em>
+        <div className={styles.systemFlow}>
+          <article><div><span>01</span><small>PAY</small></div><strong>Cobro</strong><p>Lleva al cliente a tu página de transferencia o pago.</p></article>
+          <div className={styles.flowConnector}><span>→</span><small>NFC</small></div>
+          <article><div><span>02</span><small>PUNTOS</small></div><strong>Lealtad</strong><p>Abre el registro o la tarjeta del programa del negocio.</p></article>
+          <div className={styles.flowConnector}><span>→</span><small>QR</small></div>
+          <article><div><span>03</span><small>PERFIL</small></div><strong>Negocio</strong><p>Conecta contacto, enlaces, reseñas y otros accesos.</p></article>
         </div>
-        <aside>
-          <strong>Desde $99 MXN</strong>
-          <span>La primera tarjeta de Nival Pay Pro ya está incluida.</span>
-          <Link href="/dashboard/pay/physical">Diseñar tarjeta <b aria-hidden="true">↗</b></Link>
-        </aside>
       </section>
 
-      <section className={styles.bundle}>
+      <section className={styles.finalCta}>
         <div>
-          <p>UN MISMO NEGOCIO</p>
-          <h2>Conecta productos sin volver a empezar desde cero.</h2>
-          <span>Cuando amplías, el objetivo es conservar la operación, los accesos y la información que ya estás usando.</span>
+          <p className={styles.sectionEyebrow}>CRECE SIN CAMBIAR DE SISTEMA</p>
+          <h2>Empieza gratis. Pasa a Pro cuando ya lo uses.</h2>
+          <p>Los datos y clientes se conservan al ampliar. Si usas Puntos Pro + Intelligence Pro, el paquete cuesta $449 MXN al mes.</p>
         </div>
-        <Link href="/auth?mode=signup&next=%2Fdashboard">Crear mi cuenta <span aria-hidden="true">↗</span></Link>
+        <Link className={styles.finalButton} href="/dashboard">Ir a mi negocio <span aria-hidden="true">↗</span></Link>
       </section>
 
       <footer className={styles.footer}>
-        <div><Image src="/wallet/nival-logo.svg" alt="" width={28} height={28} /><strong>Nival Tech</strong></div>
-        <div><Link href="/privacy">Privacidad</Link><Link href="/terms">Términos</Link><Link href="/support">Soporte</Link></div>
+        <div className={styles.footerBrand}>
+          <Image src="/wallet/nival-logo.svg" alt="" width={30} height={30} />
+          <div><strong>Nival Tech</strong><span>Tecnología para negocios locales.</span></div>
+        </div>
+        <div className={styles.footerLinks}>
+          <Link href="/">Inicio</Link>
+          <Link href="/support">Soporte</Link>
+          <Link href="/privacy">Privacidad</Link>
+          <Link href="/terms">Términos</Link>
+        </div>
+        <p>© 2026 Nival Tech. Los ejemplos visuales y cifras demostrativas no representan resultados garantizados.</p>
       </footer>
     </main>
   );
