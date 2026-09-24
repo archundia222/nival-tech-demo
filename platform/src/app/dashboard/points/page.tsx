@@ -6,7 +6,7 @@ import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
-import { importCustomersCsv, importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
+import { deleteBusinessSale, importCustomersCsv, importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
@@ -83,6 +83,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       {params.saved === 'summary' && <p className="formMessage successMessage">Resumen del día registrado.</p>}
       {params.saved?.startsWith('import-') && <p className="formMessage successMessage">Importación lista: {params.saved.replace('import-','')} ventas agregadas.</p>}
       {params.saved?.startsWith('customers-') && (() => { const [, imported='0', attached='0'] = params.saved.split('-'); return <p className="formMessage successMessage">Base importada: {imported} clientes nuevos. {Number(attached) > 0 ? `${attached} quedaron conectados a Nival Puntos.` : 'Los duplicados se omitieron.'}</p>; })()}
+      {params.saved === 'deleted-sale' && <p className="formMessage successMessage">Registro eliminado. Las métricas se actualizaron.</p>}
       {!available ? <>
         <section className="productShowcase pointsShowcase">
           <div className="productShowcaseCopy"><span className="productPill">NIVAL PUNTOS</span><h1>Haz que tus clientes<br/>quieran volver.</h1><p>Premia cada visita con puntos. Tus clientes ven su saldo desde el celular y tú administras todo sin tarjetas de papel.</p><ul className="productBenefits"><li>Registro con código QR</li><li>Tarjeta digital del cliente</li><li>Visitas, puntos y premios en un mismo lugar</li></ul><div className="productPrice"><strong>Gratis</strong><span>hasta 30 clientes</span></div><div className="freemiumCtas"><form action={activateFreeNivalPoints}><button className="productCta">Crear mi programa gratis <span>→</span></button></form><form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Ver Nival Puntos Pro · $199/mes</button></form></div><small>Empieza sin tarjeta. Paga cuando necesites más clientes, personalización y resultados completos.</small></div>
@@ -188,6 +189,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
             </article>
           </div>}
           <section className="captureScanner"><div><span>VISITA CON NIVAL PUNTOS</span><h2>Si el cliente ya tiene tarjeta, escanéala.</h2><p>El flujo de puntos sigue igual: código temporal, confirmación y registro en segundos.</p></div><PointsEmployeeScanner mode="visit" /></section>
+          {!!saleRows?.length && <section className="captureRecent">
+            <div className="pointsSectionHeading"><div><span>CORREGIR SI HACE FALTA</span><h2>Últimos registros de venta</h2></div><p>Si capturaste algo por error, elimínalo aquí. Nival recalcula las métricas con los registros restantes.</p></div>
+            <div className="captureRecentList">{saleRows.slice(0,6).map((sale) => <article key={sale.id}><div><strong>{(Number(sale.amount_cents)/100).toLocaleString('es-MX',{style:'currency',currency:'MXN'})}</strong><span>{sale.source === 'summary' ? `Resumen · ${sale.transactions_count} ventas` : sale.source === 'imported' ? 'Importada' : 'Venta manual'} · {new Intl.DateTimeFormat('es-MX',{dateStyle:'medium',timeZone:'America/Mexico_City'}).format(new Date(sale.sold_at))}</span></div><form action={deleteBusinessSale}><input type="hidden" name="saleId" value={sale.id}/><input type="hidden" name="returnTo" value="/dashboard/points?view=register"/><button type="submit">Eliminar</button></form></article>)}</div>
+          </section>}
         </>}
 
         {canManage && view === 'overview' && !hasIntelligence && Number(loyaltyCustomers ?? 0) > 0 && <section className="productBridge"><div><span>CUANDO QUIERAS IR MÁS ALLÁ DE LOS PUNTOS</span><h2>Ya estás registrando comportamiento. Intelligence puede convertirlo en acciones.</h2><p>Usa visitas y recurrencia para encontrar clientes en riesgo, preparar campañas y medir quién regresó después.</p></div><a href="/dashboard/intelligence">Conocer Intelligence · paquete $449/mes →</a></section>}

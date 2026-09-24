@@ -276,6 +276,27 @@ export async function registerDailySalesSummary(formData: FormData) {
 }
 
 
+
+export async function deleteBusinessSale(formData: FormData) {
+  const { supabase, membership } = await activeBusinessContext();
+  if (!["owner","manager"].includes(membership.role)) {
+    redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede corregir ventas registradas."));
+  }
+  const saleId = String(formData.get("saleId") ?? "").trim();
+  if (!/^[0-9a-f-]{36}$/i.test(saleId)) redirect(captureReturn(formData, "error", "No pudimos identificar ese registro."));
+
+  const { error } = await supabase.from("business_sales")
+    .delete()
+    .eq("id", saleId)
+    .eq("business_id", membership.business_id);
+  if (error) redirect(captureReturn(formData, "error", "No pudimos eliminar ese registro."));
+
+  revalidatePath("/dashboard/points");
+  revalidatePath("/dashboard/intelligence");
+  revalidatePath("/dashboard");
+  redirect(captureReturn(formData, "saved", "deleted-sale"));
+}
+
 export async function importCustomersCsv(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
   if (!["owner","manager"].includes(membership.role)) {
