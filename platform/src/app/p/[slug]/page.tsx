@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ProfilePublicView, type ProfileActionItem } from "./profile-public-view";
 
 interface DigitalProfilePageProps { params: Promise<{ slug: string }> }
@@ -8,7 +8,7 @@ type PublicLink = { link_name: string; link_kind: 'google_review' | 'website' | 
 
 export default async function DigitalProfilePage({ params }: DigitalProfilePageProps) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const [{ data: businesses, error }, { data: links }, { data: payments }] = await Promise.all([
     supabase.rpc("get_public_business_v3", { business_slug: slug }),
     supabase.rpc("get_public_profile_links", { business_slug: slug }),
