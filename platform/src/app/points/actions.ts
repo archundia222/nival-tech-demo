@@ -179,6 +179,9 @@ function normalizedPhoneKeys(value: string | null | undefined) {
 
 export async function registerQuickCustomer(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
+  if (!privacyDisclosuresReady()) {
+    redirect(captureReturn(formData, "error", "No se pueden registrar clientes nuevos hasta completar el aviso de privacidad."));
+  }
   if (formData.get("privacyAcknowledged") !== "on") {
     redirect(captureReturn(formData, "error", "Confirma que informaste al cliente sobre el uso de sus datos."));
   }
@@ -302,6 +305,9 @@ export async function deleteBusinessSale(formData: FormData) {
 
 export async function importCustomersCsv(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
+  if (!privacyDisclosuresReady()) {
+    redirect(captureReturn(formData, "error", "No se pueden importar clientes hasta completar el aviso de privacidad."));
+  }
   if (!["owner","manager"].includes(membership.role)) {
     redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede importar una base de clientes."));
   }
