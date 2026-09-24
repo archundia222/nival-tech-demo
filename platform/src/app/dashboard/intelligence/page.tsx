@@ -10,6 +10,7 @@ import { getActiveBusinessMembership } from '@/lib/active-business';
 import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
 import { startNivalGrowthSubscription } from '@/app/checkout/actions';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
+import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
 
 type Visit = { customer_id: string; visited_at: string };
 type Campaign = { id: string; name: string; audience_rule: unknown; message: string; status: string; sent_at: string | null; created_at: string };
@@ -166,6 +167,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     : `La acción que priorizaría hoy es: ${nextBestAction}. La audiencia principal es de ${priorityAudience.length} clientes y ${priorityContacts.length} están listos para contacto.`;
 
   return <main className="dashboardApp nivalDashboard">
+    <PaymentStatusPoller active={params.subscription === 'return' && !paid} />
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalIntelligenceDark' : ''}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Herramienta incluida en Nival Growth</b></div><span className="ready">{paid ? 'Growth activo' : trialActive ? `Prueba · ${trialDaysLeft}d` : freePlan ? 'Vista gratis' : 'Desde Puntos'}</span></header>
@@ -195,7 +197,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
         {params.free === 'started' && <p className="formMessage successMessage">La prueba de Intelligence ya está activa. Nival usará los clientes y visitas registrados en Puntos.</p>}
         <section className="freemiumBanner">
           <div><span>VISTA GRATUITA DE INTELLIGENCE</span><strong>Nival te muestra la oportunidad principal. Growth te ayuda a actuar.</strong><p>El plan gratuito conserva la lectura básica. Nival Growth reúne Puntos + Intelligence con audiencias, mensajes, campañas, seguimiento y resultados.</p></div>
-          <a href="/products#growth">Ver Nival Growth · {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes →</a>
+          <form action={startNivalGrowthSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">{growthCheckoutLabel} →</CheckoutSubmitButton></form>
         </section>
         <section className={styles.solutionHero}>
           <div><span className={styles.eyebrow}>NIVAL ENCONTRÓ ESTO</span><h1>{recoverable.length ? `${recoverable.length} clientes podrían estar alejándose.` : frequent.length ? `${frequent.length} clientes ya muestran recurrencia.` : secondVisitOpportunity.length ? `${secondVisitOpportunity.length} clientes están a tiempo de una segunda visita.` : 'Todavía necesitamos más actividad para detectar un patrón fuerte.'}</h1><p>{recoverable.length ? 'Recuperar clientes que ya te conocen suele ser una oportunidad más clara que empezar desde cero.' : frequent.length ? 'Tus clientes frecuentes son una base que conviene proteger antes de lanzar promociones generales.' : 'Sigue registrando visitas: Intelligence se vuelve más útil conforme entiende el comportamiento real.'}</p><div className={styles.decisionLine}><span>RECOMENDACIÓN GRATIS</span><strong>{nextBestAction}</strong><small>Nival actualiza esta lectura conforme cambian tus clientes y visitas.</small></div></div>

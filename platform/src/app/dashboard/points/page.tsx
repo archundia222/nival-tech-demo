@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalPointsSubscription } from '@/app/checkout/actions';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
+import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
@@ -140,6 +141,7 @@ export default async function NivalPointsPage({
                   : 'Un programa sencillo: registro, tarjeta digital, visitas y recompensa.';
 
   return <main className="dashboardApp nivalDashboard">
+    <PaymentStatusPoller active={params.subscription === 'return' && !paid} />
     <DashboardNavigation businessName={business.name} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalPointsDark' : ''}`}>
       <header className="dashboardContentTopbar">
@@ -279,7 +281,7 @@ export default async function NivalPointsPage({
             <span>PROMOCIONES PRO</span>
             <h2>Envía una promoción general a quienes aceptaron recibirla.</h2>
             <p>La selección inteligente de audiencias, recuperación de clientes y campañas medidas pertenece a Nival Intelligence.</p>
-            <form action={startNivalPointsSubscription}><button type="submit">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
+            <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
           </section>}
 
         {canManage && view === 'promotions' && proAccess &&
@@ -303,7 +305,7 @@ export default async function NivalPointsPage({
             <span>CONFIGURACIÓN PRO</span>
             <h2>El plan gratis usa una regla simple para que puedas empezar rápido.</h2>
             <p>Pro te deja cambiar la meta, el premio, límites, tiempos de espera y estrategia de reseñas.</p>
-            <form action={startNivalPointsSubscription}><button type="submit">Desbloquear configuración →</button></form>
+            <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear configuración · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
           </section>}
 
         {canManage && program && view === 'settings' && proAccess &&

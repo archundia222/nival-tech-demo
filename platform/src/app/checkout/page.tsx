@@ -6,6 +6,7 @@ import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
+import { PaymentStatusPoller } from './payment-status-poller';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
@@ -137,8 +138,8 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Compra segura</small></header>
     <div className="checkoutFrame">
       {params.error && <p className="checkoutStatus errorMessage" role="alert">{params.error}</p>}
-      {params.result === 'success' && !paid && <p className="checkoutStatus">Estamos confirmando tu pago. Actualiza esta página en unos segundos.</p>}
-      {params.result === 'pending' && <p className="checkoutStatus">Tu pago está pendiente. La activación será automática cuando Mercado Pago lo apruebe.</p>}
+      {params.result === 'success' && !paid && <><p className="checkoutStatus">Estamos confirmando tu pago. Esta pantalla se actualizará sola.</p><PaymentStatusPoller active /></>}
+      {params.result === 'pending' && <><p className="checkoutStatus">Tu pago está pendiente. La activación será automática cuando Mercado Pago lo apruebe.</p><PaymentStatusPoller active /></>}
       {params.result === 'failure' && <p className="checkoutStatus errorMessage">El pago no se completó. Puedes intentarlo nuevamente.</p>}
       {params.result === 'cash' && <p className="checkoutStatus">Pago en efectivo registrado. Se activará cuando el vendedor confirme la recepción.</p>}
 

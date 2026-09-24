@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
+import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export default async function PhysicalCardOrderPage({ searchParams }: {
@@ -58,6 +59,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
 
   return <main className="dashboardApp nivalDashboard">
+    <PaymentStatusPoller active={params.result === 'success' || params.result === 'pending'} />
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="nival-card" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent physicalCardPage">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta NFC Nival</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>

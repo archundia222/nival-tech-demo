@@ -121,10 +121,12 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       : existingQuery.is('payment_profile_id', null);
 
     const { data: existingOrder } = await existingQuery.maybeSingle();
-    if (existingOrder?.checkout_url) {
-      const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
-      if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
-        redirect(existingOrder.checkout_url);
+    if (existingOrder) {
+      if (existingOrder.checkout_url) {
+        const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
+        if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+          redirect(existingOrder.checkout_url);
+        }
       }
       await admin.from('product_orders')
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
