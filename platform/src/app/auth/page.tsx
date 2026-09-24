@@ -9,6 +9,13 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const signup = params.mode === "signup";
   const next = params.next ?? "/dashboard";
+  const signupContext = next.includes("/dashboard/points")
+    ? { label: "NIVAL PUNTOS", title: "Crea tu programa de clientes frecuentes", text: "Después de confirmar tu correo, crea tu negocio y podrás compartir tu QR, registrar visitas y mostrar la tarjeta digital del cliente." }
+    : next.includes("/dashboard/intelligence")
+      ? { label: "NIVAL INTELLIGENCE", title: "Prepara Nival para entender a tus clientes", text: "Intelligence funciona sobre Nival Puntos. Si todavía no lo tienes activo, primero te guiaremos para crear tu programa de fidelización." }
+      : next.includes("/checkout") || next.includes("/dashboard/pay")
+        ? { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y podrás preparar tu página de cobro, QR y enlace." }
+        : { label: "NIVAL TECH", title: "Crea tu acceso a Nival", text: "Crea tu negocio una sola vez y desde ahí activa las herramientas que necesites." };
 
   return (
     <main className="authShell">
@@ -16,16 +23,16 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <span className="brandmark">N</span>NIVAL tech
       </Link>
       <section className="authCard">
-        <p className="eyebrow">ACCESO PARA NEGOCIOS</p>
-        <h1>{signup ? "Crea tu acceso a Nival" : "Entra a Nival"}</h1>
+        <p className="eyebrow">{signup ? signupContext.label : "ACCESO PARA NEGOCIOS"}</p>
+        <h1>{signup ? signupContext.title : "Entra a Nival"}</h1>
         <p className="authIntro">
           {signup
-            ? "Empieza gratis. Crea tu acceso y en menos de unos minutos podrás preparar tu primera herramienta Nival para usarla con clientes reales."
+            ? signupContext.text
             : "Administra Nival Pay, Puntos e Intelligence desde la misma cuenta."}
         </p>
         {signup && <>
-          <div className="authPromise"><strong>No necesitas tarjeta para empezar.</strong><span>Pay, Puntos e Intelligence tienen una forma de empezar gratis.</span></div>
-          <div className="authPath"><span><b>1</b> Tu acceso</span><span><b>2</b> Tu negocio</span><span><b>3</b> Empieza gratis</span></div>
+          <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay y Puntos pueden empezar gratis; Intelligence crece a partir de Puntos.</span></div>
+          <div className="authPath"><span><b>1</b> Crea tu acceso</span><span><b>2</b> Confirma tu correo</span><span><b>3</b> Configura tu negocio</span></div>
         </>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}
@@ -41,14 +48,17 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>.</p>}
 
         {!signup && (
-          <form action={resendConfirmation} className="authForm">
-            <input type="hidden" name="next" value={next} />
-            <label>
-              ¿No pudiste confirmar tu correo?
-              <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
-            </label>
-            <button className="primaryButton" type="submit">Reenviar confirmación</button>
-          </form>
+          <details className="authHelp">
+            <summary>¿No pudiste confirmar tu correo?</summary>
+            <form action={resendConfirmation} className="authForm">
+              <input type="hidden" name="next" value={next} />
+              <label>
+                Escribe el correo de tu cuenta
+                <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
+              </label>
+              <button className="primaryButton" type="submit">Reenviar confirmación</button>
+            </form>
+          </details>
         )}
 
         <p className="authSwitch">
