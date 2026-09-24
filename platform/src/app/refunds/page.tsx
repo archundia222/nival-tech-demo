@@ -6,8 +6,8 @@ export const metadata = {
   description: "Política de cancelaciones, devoluciones y reembolsos de Nival Tech.",
 };
 
-export default function RefundsPage() {
-  const business = legalBusinessInfo();
+export default async function RefundsPage() {
+  const business = await legalBusinessInfo();
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
