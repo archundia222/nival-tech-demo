@@ -485,17 +485,66 @@ export async function updatePointsProgram(formData: FormData) {
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership || !["owner", "manager"].includes(membership.role)) return { ok: false, error: "No tienes permiso para editar este programa." };
 
-  const { error } = await supabase.rpc("update_points_program_for", {
+  const name = String(formData.get("name") ?? "").trim();
+  const threshold = Number(formData.get("threshold"));
+  const reward = String(formData.get("reward") ?? "").trim();
+  const cooldown = Number(formData.get("cooldown"));
+  const dailyCap = Number(formData.get("dailyCap"));
+  const reviewUrl = String(formData.get("reviewUrl") ?? "").trim();
+  const reviewVisit = Number(formData.get("reviewVisit") ?? 2);
+
+  const payload = {
     p_business_id: membership.business_id,
-    p_name: String(formData.get("name") ?? "").trim(),
-    p_reward_threshold: Number(formData.get("threshold")),
-    p_reward_description: String(formData.get("reward") ?? "").trim(),
-    p_cooldown_minutes: Number(formData.get("cooldown")),
-    p_daily_cap: Number(formData.get("dailyCap")),
-    p_review_url: String(formData.get("reviewUrl") ?? "").trim(),
-    p_review_request_visit: Number(formData.get("reviewVisit") ?? 2),
-  });
-  if (error) return { ok: false, error: error.message };
+    p_name: name,
+    p_reward_threshold: threshold,
+    p_reward_description: reward,
+    p_cooldown_minutes: cooldown,
+    p_daily_cap: dailyCap,
+    p_review_url: reviewUrl,
+    p_review_request_visit: reviewVisit,
+  };
+
+  const { error } = await supabase.rpc("update_points_program_for", payload);
+  if (error && !error.message.includes("points_not_active")) return { ok: false, error: error.message };
+
+  if (error?.message.includes("points_not_active")) {
+    const admin = createPointsAdminClient();
+    const { data: entitlement } = await admin.from("business_product_entitlements")
+      .select("status,current_period_end")
+      .eq("business_id", membership.business_id)
+      .eq("product_code", "nival_points")
+      .maybeSingle();
+    const trialActive = entitlement?.status === "free"
+      && Boolean(entitlement.current_period_end)
+      && new Date(entitlement.current_period_end as string).getTime() > Date.now();
+
+    const valid = name.length >= 2 && name.length <= 80
+      && Number.isInteger(threshold) && threshold >= 1 && threshold <= 1000
+      && reward.length >= 2 && reward.length <= 160
+      && Number.isInteger(cooldown) && cooldown >= 0 && cooldown <= 1440
+      && Number.isInteger(dailyCap) && dailyCap >= 0 && dailyCap <= 100
+      && Number.isInteger(reviewVisit) && reviewVisit >= 1 && reviewVisit <= 20
+      && (!reviewUrl || reviewUrl.startsWith("https://"));
+
+    if (!trialActive) return { ok: false, error: "Esta configuración requiere Nival Puntos Pro." };
+    if (!valid) return { ok: false, error: "Revisa los datos del programa." };
+
+    const { error: trialUpdateError } = await admin.from("loyalty_programs")
+      .update({
+        name,
+        reward_threshold: threshold,
+        reward_description: reward,
+        point_cooldown_minutes: cooldown,
+        daily_points_cap: dailyCap,
+        review_url: reviewUrl || null,
+        review_request_visit: reviewVisit,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("business_id", membership.business_id)
+      .eq("active", true);
+    if (trialUpdateError) return { ok: false, error: "No pudimos guardar la configuración del trial." };
+  }
+
   revalidatePath("/dashboard/points");
   return { ok: true };
 }

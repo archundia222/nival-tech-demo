@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { trialEndsAt } from '@/lib/commercial';
 
 export async function activateFreeNivalPoints() {
   const supabase = await createClient();
@@ -16,23 +17,23 @@ export async function activateFreeNivalPoints() {
 
   const admin = createAdminClient();
   const { data: existing } = await admin.from('business_product_entitlements')
-    .select('status')
+    .select('status,current_period_end')
     .eq('business_id', membership.business_id)
     .eq('product_code', 'nival_points')
     .maybeSingle();
 
-  if (existing?.status !== 'active') {
+  if (existing?.status !== 'active' && (!existing || !existing.current_period_end)) {
     const { error: entitlementError } = await admin.from('business_product_entitlements').upsert({
       business_id: membership.business_id,
       product_code: 'nival_points',
       status: 'free',
-      current_period_end: null,
+      current_period_end: trialEndsAt(),
       updated_at: new Date().toISOString(),
     }, { onConflict: 'business_id,product_code' });
 
     if (entitlementError) {
       console.error('[points-free] entitlement failed', { code: entitlementError.code });
-      redirect('/dashboard/points?error=No+pudimos+activar+Nival+Puntos+Gratis.');
+      redirect('/dashboard/points?error=No+pudimos+activar+la+prueba+de+Nival+Puntos.');
     }
   }
 

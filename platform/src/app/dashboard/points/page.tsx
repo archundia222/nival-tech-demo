@@ -11,6 +11,7 @@ import { PointsShareTools } from './points-share-tools';
 import { PointsPromotionsPanel } from './points-promotions';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
 
 export default async function NivalPointsPage({
   searchParams,
@@ -34,7 +35,7 @@ export default async function NivalPointsPage({
   if (!business) redirect('/dashboard');
 
   const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: loyaltyCustomers }, { data: program }] = await Promise.all([
-    supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').maybeSingle(),
+    supabase.from('business_product_entitlements').select('status,current_period_end').eq('business_id', membership.business_id).eq('product_code', 'nival_points').maybeSingle(),
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_intelligence').maybeSingle(),
     supabase.from('loyalty_accounts').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('loyalty_programs')
@@ -47,6 +48,13 @@ export default async function NivalPointsPage({
 
   const paid = entitlement?.status === 'active';
   const freePlan = entitlement?.status === 'free';
+  // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot for trial countdown.
+  const now = Date.now();
+  const trialEnd = freePlan && entitlement?.current_period_end ? new Date(entitlement.current_period_end).getTime() : 0;
+  const trialActive = freePlan && trialEnd > now;
+  const trialDaysLeft = trialActive ? Math.max(1, Math.ceil((trialEnd - now) / 86400000)) : 0;
+  const proAccess = paid || trialActive;
+  const baseFree = freePlan && !trialActive;
   const available = paid || freePlan;
   const hasIntelligence = intelligenceEntitlement?.status === 'active' || intelligenceEntitlement?.status === 'free' || business.product_level === 'intelligence';
   const view = params.view ?? 'overview';
@@ -135,7 +143,7 @@ export default async function NivalPointsPage({
     <div className={`dashboardContent ${!available ? 'nivalPointsDark' : ''}`}>
       <header className="dashboardContentTopbar">
         <div><span>Nival Puntos</span><b>Fidelización sin complicaciones</b></div>
-        <span className="ready">{paid ? 'Pro' : freePlan ? 'Gratis' : 'Empieza gratis'}</span>
+        <span className="ready">{paid ? 'Pro' : trialActive ? `Prueba Pro · ${trialDaysLeft}d` : freePlan ? 'Gratis' : 'Empieza gratis'}</span>
       </header>
 
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
@@ -152,12 +160,12 @@ export default async function NivalPointsPage({
               <li>Tarjeta digital y Google Wallet</li>
               <li>Meta configurable, puntos y recompensas</li>
             </ul>
-            <div className="productPrice"><strong>Gratis</strong><span>hasta 30 clientes</span></div>
+            <div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después puedes seguir gratis hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes</span></div>
             <div className="freemiumCtas">
-              <form action={activateFreeNivalPoints}><button className="productCta">Crear mi programa gratis <span>→</span></button></form>
-              <form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Ver Nival Puntos Pro · $199/mes</button></form>
+              <form action={activateFreeNivalPoints}><button className="productCta">Probar Pro {NIVAL_TRIAL_DAYS} días <span>→</span></button></form>
+              <form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Precio fundador · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</button></form>
             </div>
-            <small>No necesitas capturar ventas ni llenar bases de datos. El cliente se registra solo.</small>
+            <small>Sin tarjeta para empezar. Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes.</small>
           </div>
           <div className="pointsVisual">
             <div className="walletCard walletCardBack"><span>NIVAL</span></div>
@@ -178,15 +186,23 @@ export default async function NivalPointsPage({
         </section>
         <ProductInteractiveDemo mode="points" />
       </> : <>
-        {params.free === 'started' && <p className="formMessage successMessage">Nival Puntos Gratis ya está activo. Comparte tu QR y empieza a registrar clientes.</p>}
+        {params.free === 'started' && <p className="formMessage successMessage">Tu prueba de herramientas Pro ya está activa. Comparte tu QR y empieza a registrar clientes.</p>}
 
-        {freePlan && <section className="freemiumBanner">
+        {trialActive && <section className="freemiumBanner">
+          <div>
+            <span>PRUEBA PRO · {trialDaysLeft} {trialDaysLeft === 1 ? 'DÍA' : 'DÍAS'} RESTANTES</span>
+            <strong>Usa configuración y promociones Pro antes de decidir.</strong>
+            <p>Si no pagas al terminar, conservas tu programa y bajas al plan Gratis de hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes. No borramos tu información.</p>
+          </div>
+          <form action={startNivalPointsSubscription}><button type="submit">Conservar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
+        </section>}
+        {baseFree && <section className="freemiumBanner">
           <div>
             <span>NIVAL PUNTOS GRATIS</span>
-            <strong>{Math.min(loyaltyCustomers ?? 0, 30)} de 30 clientes usados</strong>
-            <p>Tu programa de fidelización funciona completo. Pro aumenta capacidad y desbloquea configuración y promociones avanzadas.</p>
+            <strong>{Math.min(loyaltyCustomers ?? 0, NIVAL_POINTS_FREE_CUSTOMER_LIMIT)} de {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes usados</strong>
+            <p>Tu programa, tarjetas, puntos y recompensas siguen funcionando. Pro aumenta capacidad y recupera configuración y promociones.</p>
           </div>
-          <form action={startNivalPointsSubscription}><button type="submit">Desbloquear Pro · $199/mes →</button></form>
+          <form action={startNivalPointsSubscription}><button type="submit">Volver a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
         </section>}
 
         <section className="pointsV1Hero">
@@ -257,15 +273,15 @@ export default async function NivalPointsPage({
             })}</div>}
         </section>}
 
-        {canManage && view === 'promotions' && freePlan &&
+        {canManage && view === 'promotions' && baseFree &&
           <section className="freemiumLocked">
             <span>PROMOCIONES PRO</span>
             <h2>Envía una promoción general a quienes aceptaron recibirla.</h2>
             <p>La selección inteligente de audiencias, recuperación de clientes y campañas medidas pertenece a Nival Intelligence.</p>
-            <form action={startNivalPointsSubscription}><button type="submit">Desbloquear promociones · $199/mes →</button></form>
+            <form action={startNivalPointsSubscription}><button type="submit">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
           </section>}
 
-        {canManage && view === 'promotions' && paid &&
+        {canManage && view === 'promotions' && proAccess &&
           <PointsPromotionsPanel
             businessName={business.name}
             customers={(customerRows ?? []).map((customer) => ({
@@ -281,7 +297,7 @@ export default async function NivalPointsPage({
         {view === 'share' && business.slug &&
           <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
-        {canManage && program && view === 'settings' && freePlan &&
+        {canManage && program && view === 'settings' && baseFree &&
           <section className="freemiumLocked">
             <span>CONFIGURACIÓN PRO</span>
             <h2>El plan gratis usa una regla simple para que puedas empezar rápido.</h2>
@@ -289,7 +305,7 @@ export default async function NivalPointsPage({
             <form action={startNivalPointsSubscription}><button type="submit">Desbloquear configuración →</button></form>
           </section>}
 
-        {canManage && program && view === 'settings' && paid &&
+        {canManage && program && view === 'settings' && proAccess &&
           <section className="pointsAdminGrid">
             <article className="pointsPanel">
               <div className="pointsSectionHeading"><div><span>CONFIGURACIÓN</span><h2>Programa</h2></div><p>Define la experiencia de fidelización, no un sistema de analítica.</p></div>

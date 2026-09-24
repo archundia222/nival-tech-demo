@@ -26,12 +26,15 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
 
   const { data: entitlement } = await supabase
     .from("business_product_entitlements")
-    .select("status")
+    .select("status,current_period_end")
     .eq("business_id", membership.business_id)
     .eq("product_code", "nival_points")
     .maybeSingle();
 
-  if (entitlement?.status !== "active") {
+  const trialActive = entitlement?.status === "free"
+    && Boolean(entitlement.current_period_end)
+    && new Date(entitlement.current_period_end as string).getTime() > Date.now();
+  if (entitlement?.status !== "active" && !trialActive) {
     return { ok: false, sent: 0, failed: 0, error: "Las promociones por Wallet son una función de Nival Puntos Pro." };
   }
 
