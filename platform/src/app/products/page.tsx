@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
-export const metadata = { title: 'Productos | Nival Tech', description: 'Cobra, crea recurrencia y convierte actividad en acciones para tu negocio.' };
+export const metadata = { title: 'Productos | Nival Tech', description: 'Nival Pay para cobrar, Nival Puntos para fidelizar y Nival Intelligence para actuar sobre la actividad de tus clientes.' };
 
 export default function Products() {
   return <main className="payWorkspace nivalProductsPage">
     <nav className="payNav"><Link href="/" className="brand">NIVAL tech</Link><Link href="/dashboard">Mi cuenta</Link></nav>
-    <header className="payHeading nivalProductsHeading"><p className="eyebrow">PRODUCTOS NIVAL TECH</p><h1>Empieza por el problema que quieres resolver.</h1><p>No necesitas pagar para empezar. Prueba cada producto con un plan gratis y amplía solo cuando necesites más capacidad o herramientas.</p></header>
+    <header className="payHeading nivalProductsHeading"><p className="eyebrow">PRODUCTOS NIVAL TECH</p><h1>Empieza por el problema que quieres resolver.</h1><p>Pay y Puntos pueden empezar gratis. Intelligence se conecta a los clientes y visitas que Nival Puntos genera conforme usas el programa.</p></header>
     <div className="payProductGrid nivalProductsGrid">
       <article className="payProduct">
         <div className="productJob">COBRAR</div>
@@ -18,18 +18,18 @@ export default function Products() {
       <article className="payProduct">
         <div className="productJob">HACER QUE VUELVAN</div>
         <h2>Nival Puntos</h2>
-        <p>Programa digital para registrar visitas, entregar recompensas y convertir una primera compra en una razón para regresar.</p>
+        <p>Programa de fidelización para que el cliente se registre desde QR o NFC, lleve su tarjeta digital y avance hacia una recompensa con cada visita.</p>
         <div className="productSimplePrice"><strong>Gratis</strong><span>hasta 30 clientes · Pro $199/mes</span></div>
-        <ul><li>El cliente puede registrarse solo desde QR</li><li>Tarjeta digital y recompensas reales</li><li>Captura rápida de visitas y clientes</li></ul>
+        <ul><li>Registro del cliente desde QR o NFC</li><li>Tarjeta digital y Google Wallet cuando esté disponible</li><li>Visitas, puntos y recompensas sin capturar una base manual</li></ul>
         <Link className="payButton" href="/dashboard/points">Crear programa gratis</Link>
       </article>
       <article className="payProduct intelligenceProductCard">
         <div className="productJob">CRECER</div>
         <h2>Nival Intelligence</h2>
-        <p>Revisa el comportamiento de tus clientes y lo convierte en acciones: a quién recuperar, qué campaña probar y qué resultado observar.</p>
-        <div className="productSimplePrice"><strong>Gratis</strong><span>1 oportunidad principal · Pro $399/mes</span></div>
-        <ul><li>Registra una venta, el cierre del día o importa CSV</li><li>Gratis: señal y recomendación principal</li><li>Pro: personas, mensajes, campañas y resultados</li></ul>
-        <Link className="payButton" href="/dashboard/intelligence">Activar Intelligence gratis</Link>
+        <p>Analiza los clientes y visitas de Nival Puntos y los convierte en acciones: a quién recuperar, qué campaña probar y qué resultado observar.</p>
+        <div className="productSimplePrice"><strong>Desde Puntos</strong><span>Intelligence Pro $399/mes · bundle $449/mes</span></div>
+        <ul><li>Usa automáticamente la actividad de Nival Puntos</li><li>Detecta frecuentes, riesgo y oportunidades de segunda visita</li><li>Pro: personas, mensajes, campañas y resultados</li></ul>
+        <Link className="payButton" href="/dashboard/points">Empezar con Nival Puntos</Link>
       </article>
     </div>
     <section className="productsAccessory">
