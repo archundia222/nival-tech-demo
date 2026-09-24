@@ -35,6 +35,7 @@ export async function getPublicPointsProgram(slug: string) {
 
 export async function enrollPointsCustomer(formData: FormData) {
   await enforceRate("enroll", 8, 60);
+  if (formData.get("privacyConsent") !== "on") return { ok: false, error: "Debes aceptar el aviso de privacidad para crear la tarjeta." };
   const slug = String(formData.get("slug") ?? "").trim();
   const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("enroll_points_customer", {
@@ -43,7 +44,7 @@ export async function enrollPointsCustomer(formData: FormData) {
     p_customer_phone: String(formData.get("phone") ?? "").trim(),
     p_marketing_consent: formData.get("marketingConsent") === "on",
     p_origin: formData.get("origin") === "nfc" ? "nfc" : "qr",
-    p_privacy_notice_version: "2026-09-23",
+    p_privacy_notice_version: "2026-09-24",
   });
   if (error || !data?.[0]) {
     const message = error?.message?.includes('free_customer_limit_reached')
