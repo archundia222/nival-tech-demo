@@ -4433,3 +4433,43 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .legalIdentity span{color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.14em}
 .legalIdentity strong{font-size:17px}
 .legalIdentity p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+
+/* Products page contrast hardening */
+.nivalProductsPage .nivalPricingPrinciple > div {
+  color: #f7f6f2;
+}
+.nivalProductsPage .nivalPricingPrinciple strong {
+  color: #ffffff;
+}
+.nivalProductsPage .nivalPricingPrinciple p {
+  color: #d4d1c9;
+}
+.nivalProductsPage .intelligenceProductCard {
+  color: #f7f6f2;
+}
+.nivalProductsPage .intelligenceProductCard h2,
+.nivalProductsPage .intelligenceProductCard .productSimplePrice strong {
+  color: #ffffff;
+}
+.nivalProductsPage .intelligenceProductCard > p,
+.nivalProductsPage .intelligenceProductCard .productSimplePrice span,
+.nivalProductsPage .intelligenceProductCard .founderPriceNote span,
+.nivalProductsPage .intelligenceProductCard ul {
+  color: #d7d4cc;
+}
+.nivalProductsPage .intelligenceProductCard .payButton {
+  background: #f3f0e7;
+  color: #111318;
+}
+.nivalProductsPage .productsBundle {
+  color: #f7f6f2;
+}
+.nivalProductsPage .productsBundle h2 {
+  color: #ffffff;
+}
+.nivalProductsPage .productsBundle p {
+  color: #d4d1c9;
+}
+.nivalProductsPage .productsBundle > a {
+  color: #f0cf82;
+}
