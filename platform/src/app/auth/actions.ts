@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { privacyDisclosuresReady } from "@/lib/legal";
 
 function value(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -36,6 +37,9 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const next = safeNext(formData);
+  if (!privacyDisclosuresReady()) {
+    redirect(`/auth?mode=signup&error=${encodeURIComponent("El registro está temporalmente deshabilitado hasta completar el aviso de privacidad.")}&next=${encodeURIComponent(next)}`);
+  }
   if (formData.get("legalConsent") !== "on") {
     redirect(`/auth?mode=signup&error=${encodeURIComponent("Debes aceptar los Términos y confirmar que recibiste el Aviso de privacidad.")}&next=${encodeURIComponent(next)}`);
   }
