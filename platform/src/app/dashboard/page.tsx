@@ -71,6 +71,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
+  if (currentSection === "inteligencia") redirect('/dashboard/intelligence');
+  if (currentSection === "clientes") redirect('/dashboard/points?view=customers');
+
   const businessId = membership.business_id;
   const { data: business } = await supabase
     .from("businesses")
