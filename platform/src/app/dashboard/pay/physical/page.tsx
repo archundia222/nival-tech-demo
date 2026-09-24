@@ -3,7 +3,9 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
+import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
+import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export default async function PhysicalCardOrderPage({ searchParams }: {
@@ -20,6 +22,13 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
+  if (params.result === 'success') {
+    await reconcileLatestMercadoPagoProductOrder(membership.business_id, {
+      [NIVAL_PAY_PHYSICAL_CARD_PRODUCT]: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
+      [NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT]: NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS,
+      [NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]: NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS,
+    });
+  }
   const admin = createAdminClient();
   const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }, { data: reviewSmartLink }] = await Promise.all([
     admin.from('product_orders')
@@ -54,7 +63,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta NFC Nival</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       {params.result === 'success' && <p role="status" className="formMessage">Regresaste de Mercado Pago. Estamos confirmando el pago; cuando quede acreditado, tu tarjeta podrá pasar a producción.</p>}
-      {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago.</p>}
+      {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago. No necesitas volver a comprar.</p>}
+      {params.result === 'failure' && <p role="alert" className="formMessage errorMessage">El pago no se completó. Tu pedido no se activó y puedes intentarlo otra vez.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
       <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
@@ -105,7 +115,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <label>Código postal<input name="postalCode" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5}/></label>
         </section>
         <div className="checkoutActions">
-          <button className="nvPrimaryButton" type="submit">{hasIncludedCard ? 'Solicitar tarjeta / continuar si elegí reverso +$10' : 'Continuar al pago · $99 o $109'}</button>
+          <CheckoutSubmitButton className="nvPrimaryButton" pendingLabel={hasIncludedCard ? 'Procesando tarjeta…' : 'Abriendo Mercado Pago…'}>{hasIncludedCard ? 'Solicitar tarjeta / continuar si elegí reverso +$10' : 'Continuar al pago · $99 o $109'}</CheckoutSubmitButton>
           {!hasIncludedCard && <button className="nvSecondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Registrar pago en efectivo · $99 o $109</button>}
           <p className="payHelp">El total depende únicamente del reverso: estándar $0 extra · personalizado +$10 MXN.</p>
         </div>
