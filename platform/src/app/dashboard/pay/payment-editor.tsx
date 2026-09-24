@@ -278,6 +278,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="Banco"
             name="bankName"
             value={bank}
             onChange={(event) => { setBank(event.target.value); markDirty(); }}
@@ -292,6 +293,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="CLABE interbancaria"
             name="clabe"
             value={clabe}
             onChange={(event) => { setClabe(event.target.value); markDirty(); }}
@@ -311,6 +313,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="Concepto opcional"
             name="concept"
             value={concept}
             onChange={(event) => { setConcept(event.target.value); markDirty(); }}
@@ -325,6 +328,7 @@ export function PaymentEditor({
             </div>
             <input
               className="nivalPayTextInput"
+              aria-label="Enlace de pago opcional"
               value={paymentUrl}
               onChange={(event) => { setPaymentUrl(event.target.value); markDirty(); }}
               type="url"
@@ -344,6 +348,7 @@ export function PaymentEditor({
               <span>Nombre del apartado</span>
               <input
                 ref={section.id === newSectionId ? newSectionInput : undefined}
+                aria-label={`Nombre del apartado ${index + 1}`}
                 value={section.title}
                 onChange={(event) => updateSection(section.id, { title: event.target.value })}
                 maxLength={80}
@@ -354,6 +359,7 @@ export function PaymentEditor({
             <label className="nivalPayField">
               <span>Link o información</span>
               <input
+                aria-label={`Contenido del apartado ${index + 1}`}
                 value={section.content}
                 onChange={(event) => updateSection(section.id, { content: event.target.value })}
                 maxLength={200}
