@@ -6,8 +6,8 @@ export const metadata = {
   description: "Información sobre las cookies y tecnologías similares utilizadas por Nival Tech.",
 };
 
-export default function CookiesPage() {
-  const business = legalBusinessInfo();
+export default async function CookiesPage() {
+  const business = await legalBusinessInfo();
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
