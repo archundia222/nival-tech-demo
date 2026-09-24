@@ -13,7 +13,7 @@ export default function Products() {
         <p>Página de cobro editable con QR y enlace. En Pro agregas NFC física para que tu cliente abra, copie tus datos y pague sin pedirte capturas ni volver a dictar la CLABE.</p>
         <div className="productSimplePrice"><strong>Gratis</strong><span>QR + enlace · Pro $199 pago único</span></div>
         <ul><li>Gratis: página, QR, enlace y 1 apartado</li><li>Pro: tarjeta NFC física + 3 apartados</li><li>Mismo QR cuando actualizas</li></ul>
-        <Link className="payButton" href="/dashboard/pay">Crear Nival Pay gratis</Link>
+        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpay">Crear Nival Pay gratis</Link>
       </article>
       <article className="payProduct">
         <div className="productJob">HACER QUE VUELVAN</div>
@@ -21,7 +21,7 @@ export default function Products() {
         <p>Programa de fidelización para que el cliente se registre desde QR o NFC, lleve su tarjeta digital y avance hacia una recompensa con cada visita.</p>
         <div className="productSimplePrice"><strong>Gratis</strong><span>hasta 30 clientes · Pro $199/mes</span></div>
         <ul><li>Registro del cliente desde QR o NFC</li><li>Tarjeta digital y Google Wallet cuando esté disponible</li><li>Visitas, puntos y recompensas sin capturar una base manual</li></ul>
-        <Link className="payButton" href="/dashboard/points">Crear programa gratis</Link>
+        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear programa gratis</Link>
       </article>
       <article className="payProduct intelligenceProductCard">
         <div className="productJob">CRECER</div>
@@ -29,12 +29,12 @@ export default function Products() {
         <p>Analiza los clientes y visitas de Nival Puntos y los convierte en acciones: a quién recuperar, qué campaña probar y qué resultado observar.</p>
         <div className="productSimplePrice"><strong>Desde Puntos</strong><span>Intelligence Pro $399/mes · bundle $449/mes</span></div>
         <ul><li>Usa automáticamente la actividad de Nival Puntos</li><li>Detecta frecuentes, riesgo y oportunidades de segunda visita</li><li>Pro: personas, mensajes, campañas y resultados</li></ul>
-        <Link className="payButton" href="/dashboard/points">Empezar con Nival Puntos</Link>
+        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Empezar con Nival Puntos</Link>
       </article>
     </div>
     <section className="productsAccessory">
       <div><span>NIVAL CARD</span><h2>Una tarjeta NFC para la acción que necesites.</h2><p>Programa una tarjeta para Nival Pay, Nival Puntos, reseñas o tu perfil digital. Elige plantilla, color y destino; el reverso personalizado cuesta $10 MXN extra.</p></div>
-      <div><strong>Desde $99 MXN</strong><small>La primera tarjeta de Nival Pay Pro ya está incluida.</small><Link href="/dashboard/pay/physical">Diseñar una tarjeta →</Link></div>
+      <div><strong>Desde $99 MXN</strong><small>La primera tarjeta de Nival Pay Pro ya está incluida.</small><Link href="/auth?mode=signup&next=%2Fdashboard%2Fpay%2Fphysical">Diseñar una tarjeta →</Link></div>
     </section>
     <section className="productsBundle"><div><span>CRECE SIN CAMBIAR DE SISTEMA</span><h2>Empieza gratis. Pasa a Pro cuando ya lo uses.</h2><p>Los datos y clientes se conservan al ampliar. Si usas Puntos Pro + Intelligence Pro, el paquete cuesta $449 MXN al mes.</p></div><Link href="/dashboard">Ir a mi negocio →</Link></section>
   </main>;
