@@ -676,13 +676,26 @@ export async function claimIncludedPhysicalCard(form: FormData) {
       .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
-    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', businessId),
+    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at)').eq('business_id', businessId),
   ]);
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).filter((card) => {
     const linked = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
     return linked?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
+
+  const recentPendingIncluded = (existingCards ?? []).find((card) => {
+    const linked = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
+    const baseOrderId = card.included_base_order_id ?? card.product_order_id;
+    if (linked?.status !== 'pending' || !paidOrders?.some((order) => order.id === baseOrderId)) return false;
+    const createdAt = linked?.created_at ?? card.created_at;
+    const ageMs = createdAt ? Date.now() - new Date(createdAt).getTime() : Number.POSITIVE_INFINITY;
+    return Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000;
+  });
+  if (recentPendingIncluded) {
+    redirect('/dashboard/pay/physical?result=pending');
+  }
+
   const includedOrder = paidOrders?.find((order) => !claimedOrderIds.has(order.id));
   if (!includedOrder) redirect('/dashboard/pay/physical?error=No+encontramos+una+tarjeta+incluida+pendiente.');
   if (details.back_style === 'custom') {
