@@ -67,7 +67,7 @@ The public-RPC lockdown is intentionally a two-phase rollout because production 
 1. Confirm the server-only `site_legal_settings` record is complete. This was completed for the current Nival deployment on 24 September 2026.
 2. Deploy the application changes that read legal identity from server-only settings and route public RPCs through the Supabase service role.
 3. Smoke-test login plus the public Nival Pay, Nival Puntos, digital-profile, smart-link and invitation routes.
-4. Apply `20260924065929_revoke_legacy_public_rpc_execute_20260924.sql`.
+4. Apply `20260924072500_server_only_rpc_lockdown.sql`.
 5. Re-run Supabase security advisors and confirm the anonymous `SECURITY DEFINER` findings are removed/reduced as expected.
 6. Re-test the same public routes and authenticated dashboard actions.
 7. Only after a real five-day renewal-notice mechanism exists and has been tested, set `NIVAL_RENEWAL_NOTICE_READY=true`.
