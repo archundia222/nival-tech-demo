@@ -47,6 +47,6 @@ export default async function CardPage({ params }: CardPageProps) {
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. El QR temporal solo sirve para identificar tu cuenta en caja.</p>
     {card.business_slug && <Link className="publicBusinessHub" href={`/p/${card.business_slug}`}><span><small>MÁS DE {card.business_name.toUpperCase()}</small><strong>Pagar, contactar o ver otros accesos del negocio</strong></span><b>→</b></Link>}
-    <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Nival Puntos te ayuda a registrar visitas, premiar recurrencia y entender quién vuelve.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
+    <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Nival Puntos te ayuda a registrar visitas y premiar la recurrencia con una tarjeta digital sencilla.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
   </main>;
 }
