@@ -14,7 +14,16 @@ export function legalBusinessInfo() {
   };
 }
 
+export function commerceDisclosuresReady() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_NIVAL_LEGAL_NAME?.trim()
+    && process.env.NEXT_PUBLIC_NIVAL_LEGAL_ADDRESS?.trim()
+    && process.env.NEXT_PUBLIC_NIVAL_PHONE?.trim()
+    && SUPPORT_EMAIL
+  );
+}
+
 export function legalBusinessInfoComplete() {
   const info = legalBusinessInfo();
-  return Boolean(info.legalName && info.rfc && info.address && info.phone);
+  return commerceDisclosuresReady() && Boolean(info.rfc);
 }
