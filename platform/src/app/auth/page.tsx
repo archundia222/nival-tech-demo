@@ -43,7 +43,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           {signup && <label className="checkLabel authConsent"><input name="legalConsent" type="checkbox" required /> <span>Confirmo que leí y acepto los <Link href="/terms" target="_blank">Términos y condiciones</Link> y que recibí el <Link href="/privacy" target="_blank">Aviso de privacidad</Link>.</span></label>}
           <button className="primaryButton" type="submit">{signup ? "Crear mi cuenta" : "Entrar"}</button>
         </fieldset></form>
-        {signup && <p className="authLegal"><strong>Aviso simplificado:</strong> {legal.legalName} tratará tu nombre, correo y datos de autenticación para crear, proteger y operar tu cuenta Nival. No usaremos este consentimiento para publicidad. Consulta el <Link href="/privacy">Aviso de privacidad integral</Link> para finalidades, derechos ARCO y contacto.</p>}
+        {signup && <p className="authLegal"><strong>Aviso simplificado:</strong> responsable: {legal.legalName}, domicilio {legal.address}. Datos tratados: nombre, correo y datos de autenticación/cuenta. Finalidad necesaria: crear, proteger y operar tu cuenta y los servicios Nival que elijas. No usamos este consentimiento para publicidad. Para limitar el uso o divulgación, revocar un consentimiento o ejercer derechos ARCO escribe a <a href={`mailto:${legal.supportEmail}`}>{legal.supportEmail}</a>. Consulta el <Link href="/privacy">Aviso de privacidad integral</Link>.</p>}
 
         {!signup && (
           <form action={resendConfirmation} className="authForm">
