@@ -18,13 +18,12 @@ export function LandingExperience() {
 
   return (
     <div className={styles.experienceShell}>
-      <div className={styles.experienceTabs} role="tablist" aria-label="Productos Nival">
+      <div className={styles.experienceTabs} role="group" aria-label="Cambiar vista de producto">
         {products.map((product) => (
           <button
             key={product.id}
             type="button"
-            role="tab"
-            aria-selected={active === product.id}
+            aria-pressed={active === product.id}
             className={active === product.id ? styles.experienceTabActive : styles.experienceTab}
             onClick={() => setActive(product.id)}
           >
@@ -34,7 +33,7 @@ export function LandingExperience() {
         ))}
       </div>
 
-      <div className={styles.experienceCanvas}>
+      <div className={styles.experienceCanvas} aria-label={"Vista de " + current.label}>
         <div className={styles.experienceCopy}>
           {active === "pay" && <>
             <span className={styles.microLabel}>NIVAL PAY · EXPERIENCIA DEL CLIENTE</span>
@@ -97,7 +96,7 @@ function PayPreview() {
           <div><dt>Banco</dt><dd>Banco Ejemplo</dd></div>
           <div><dt>CLABE</dt><dd>012 180 015022688507</dd></div>
         </dl>
-        <button type="button" tabIndex={-1}>Copiar CLABE</button>
+        <div className={styles.previewButton}>Copiar CLABE</div>
       </div>
       <div className={styles.sceneMetric}><span>HOY</span><strong>18</strong><small>aperturas de página</small></div>
     </div>
@@ -143,7 +142,7 @@ function IntelligencePreview() {
           <span>ACCIÓN SUGERIDA</span>
           <strong>Campaña de regreso</strong>
           <p>Empieza por clientes que ya conocían el negocio y redujeron su frecuencia.</p>
-          <button type="button" tabIndex={-1}>Preparar campaña</button>
+          <div className={styles.previewButton}>Preparar campaña</div>
         </div>
       </div>
       <div className={styles.signalBars} aria-hidden="true">
