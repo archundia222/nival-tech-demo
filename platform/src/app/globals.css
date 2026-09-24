@@ -4383,3 +4383,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .supportContactGrid strong{font-size:17px;overflow-wrap:anywhere}
 .supportContactGrid small{color:var(--muted);font-size:12px;line-height:1.5}
 @media(max-width:650px){.supportContactGrid{grid-template-columns:1fr}}
+
+.pointsWalletSaveActions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.pointsCardSaveButton{border:1px solid #d9dce2;border-radius:11px;padding:12px 15px;background:#fff;color:#17191e;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.pointsWalletSaveActions>a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#111318;color:#fff;border-radius:11px;padding:12px 15px;font-weight:800;white-space:nowrap}
+@media(max-width:640px){.pointsWalletSaveActions{width:100%;justify-content:stretch}.pointsWalletSaveActions>a,.pointsCardSaveButton{width:100%}}
