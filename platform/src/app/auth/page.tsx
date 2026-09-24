@@ -36,9 +36,10 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           )}
           <label>Correo<input type="email" name="email" required autoComplete="email" /></label>
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
-          <button className="primaryButton" type="submit">{signup ? "Continuar" : "Entrar"}</button>
+          {signup && <label className="checkLabel authConsent"><input name="legalConsent" type="checkbox" required /> <span>Confirmo que leí y acepto los <Link href="/terms" target="_blank">Términos y condiciones</Link> y que recibí el <Link href="/privacy" target="_blank">Aviso de privacidad</Link>.</span></label>}
+          <button className="primaryButton" type="submit">{signup ? "Crear mi cuenta" : "Entrar"}</button>
         </form>
-        {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>.</p>}
+        {signup && <p className="authLegal">Usaremos tu nombre, correo y datos de autenticación para crear y operar tu cuenta. El marketing no forma parte de este consentimiento.</p>}
 
         {!signup && (
           <form action={resendConfirmation} className="authForm">
