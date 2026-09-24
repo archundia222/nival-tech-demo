@@ -612,6 +612,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
     included_base_order_id: includedOrder.id,
     product_order_id: includedOrder.id,
     business_id: businessId,
+    fulfillment_status: 'confirmed',
   });
   if (error) {
     if (error.code === '23505') redirect('/dashboard/pay/physical?result=included');
