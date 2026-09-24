@@ -73,6 +73,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   if (currentSection === "inteligencia") redirect('/dashboard/intelligence');
   if (currentSection === "clientes") redirect('/dashboard/points?view=customers');
+  // Keep the legacy render union wide below while old sections remain in this file.
+  // The redirects above make these branches unreachable at runtime.
+  const legacySection = currentSection as DashboardSection;
 
   const businessId = membership.business_id;
   const { data: business } = await supabase
@@ -91,7 +94,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const paidPoints = productLevel === 'intelligence' || entitlementMap.get('nival_points') === 'active';
   const freePoints = !paidPoints && entitlementMap.get('nival_points') === 'free';
   const hasPoints = paidPoints || freePoints;
-  if ((!hasPoints && currentSection === 'clientes') || (!hasIntelligence && currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
+  if ((!hasPoints && legacySection === 'clientes') || (!hasIntelligence && legacySection === 'inteligencia')) redirect('/dashboard?section=resumen');
   const [{ count: customerCount }, { count: loyaltyCustomerCount }, { count: visitCount }] = businessId
     ? await Promise.all([
         supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
@@ -261,7 +264,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       <BusinessHealthCard items={businessHealthItems} />
       </>}
-      {currentSection === "inteligencia" && <>
+      {legacySection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
       <section className="intelligenceCard" id="inteligencia">
         <div className="intelligenceHeading">
@@ -465,7 +468,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </section>
       )}
       </>}
-      {currentSection === "clientes" && <>
+      {legacySection === "clientes" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">CLIENTES</p><h1>Configura tu programa de lealtad</h1><p>Antes de registrar clientes, visitas y puntos, configura y activa el programa de lealtad de este workspace.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <section className="customerTableCard" id="clientes">
         <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
         {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
@@ -487,7 +490,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         )}
       </section>}
       </>}
-      {currentSection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
+      {legacySection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>
           <h2>Premios entregados</h2>
