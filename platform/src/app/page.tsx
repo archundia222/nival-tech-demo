@@ -329,8 +329,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
           <span>Nival Tech</span>
         </Link>
-        <p>Cobra, fideliza y crece con herramientas hechas para negocios locales.</p>
-        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/auth">Mi cuenta</Link></div>
+        <p>Herramientas para cobrar, administrar recurrencia y entender actividad de clientes. Los resultados dependen del uso, operación y contexto de cada negocio.</p>
+        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/refunds">Reembolsos</Link><Link href="/auth">Mi cuenta</Link></div>
       </footer>
     </main>
   );
