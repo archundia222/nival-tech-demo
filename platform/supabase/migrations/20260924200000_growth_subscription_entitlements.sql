@@ -1,3 +1,18 @@
+alter table public.product_subscriptions
+  drop constraint if exists product_subscriptions_amount_cents_check,
+  drop constraint if exists product_subscriptions_product_code_check;
+
+alter table public.product_subscriptions
+  add constraint product_subscriptions_amount_cents_check
+    check (amount_cents = any(array[100,1000,19900,25000,39900,44900])),
+  add constraint product_subscriptions_product_code_check
+    check (product_code = any(array[
+      'nival_points'::text,
+      'nival_intelligence'::text,
+      'nival_points_intelligence'::text,
+      'nival_growth_upgrade'::text
+    ]));
+
 create or replace function public.sync_nival_product_subscription(
   p_subscription_id uuid,
   p_provider_subscription_id text,
