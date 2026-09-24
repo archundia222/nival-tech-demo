@@ -4098,6 +4098,44 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 @media(max-width:800px){.nivalDashboard .pointsResultsGrid{grid-template-columns:repeat(2,1fr)}.nivalDashboard .pointsTodayAction{align-items:flex-start;flex-direction:column}}
 @media(max-width:520px){.nivalDashboard .pointsResultsGrid{grid-template-columns:1fr}}
 
+
+/* Customer loyalty card: keep the Nival promo light, compact and readable */
+.pointsCustomerShell .publicNivalPromo{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  margin-top:18px;
+  padding:22px 24px;
+  border:1px solid #e6dcc5;
+  border-radius:20px;
+  background:#fffdf8;
+  box-shadow:0 14px 34px rgba(28,24,18,.06);
+  color:#171717;
+}
+.pointsCustomerShell .publicNivalPromo span{color:#9a7837;font-size:10px;letter-spacing:.13em}
+.pointsCustomerShell .publicNivalPromo strong{color:#171717;font-size:18px;line-height:1.25}
+.pointsCustomerShell .publicNivalPromo p{max-width:540px;color:#716c63;font-size:13px;line-height:1.55}
+.pointsCustomerShell .publicNivalPromo>a{
+  align-self:center;
+  padding:12px 16px;
+  border-radius:12px;
+  background:#171717;
+  color:#fff;
+  font-size:12px;
+}
+.pointsDataSourceNote{
+  margin:14px 0 0;
+  padding:12px 14px;
+  border:1px solid var(--nv-border,#303038);
+  border-radius:12px;
+  color:var(--nv-text-secondary,#8a8f9b);
+  font-size:12px;
+  line-height:1.5;
+}
+@media(max-width:560px){
+  .pointsCustomerShell .publicNivalPromo{grid-template-columns:1fr;padding:20px;margin-top:16px}
+  .pointsCustomerShell .publicNivalPromo>a{width:100%;text-align:center}
+}
+
 /* Public Nival discovery cards */
 .publicNivalPromo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-top:22px;padding:18px;border:1px solid rgba(181,154,97,.28);border-radius:16px;background:linear-gradient(145deg,rgba(181,154,97,.055),var(--surface,#151515))}
 .publicNivalPromo>div{min-width:0}.publicNivalPromo span{display:block;margin-bottom:5px;color:var(--accent,#b59a61);font-size:9px;font-weight:900;letter-spacing:.11em}.publicNivalPromo strong{display:block;font-size:15px}.publicNivalPromo p{margin:5px 0 0;color:var(--muted,#aaa69d);font-size:11px;line-height:1.5}.publicNivalPromo>a{padding:11px 13px;border-radius:10px;color:#111;background:var(--accent,#b59a61);font-size:10px;font-weight:900;text-decoration:none;white-space:nowrap}.pointsCustomerBrand a,.customerBrand a{color:inherit;text-decoration:none}.pointsCustomerBrand a:hover,.customerBrand a:hover{text-decoration:underline}
