@@ -205,7 +205,10 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   redirect(result.checkout_url!);
 }
 
-export async function startMercadoPagoCheckout() {
+export async function startMercadoPagoCheckout(formData: FormData) {
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/checkout?error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+pagar.');
+  }
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_PRODUCT,
     amountCents: NIVAL_PAY_PRICE_CENTS,
@@ -222,7 +225,10 @@ export async function startAdditionalNivalPayCheckout() {
   });
 }
 
-export async function requestCashPayment() {
+export async function requestCashPayment(formData: FormData) {
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/checkout?error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+registrar+el+pago.');
+  }
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { error } = await admin.from('product_orders').insert({
