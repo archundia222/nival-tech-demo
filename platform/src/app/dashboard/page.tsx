@@ -292,28 +292,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       </>}
       {currentSection === "nival-card" && <>
-      <section className="nivalAssetsIntro">
-        <div className="assetsHeading"><p className="eyebrow">ENLACES Y RESEÑAS</p><h1>Destinos que puedes reutilizar</h1><p>Configura enlaces estables para reseñas, tu sitio y otros accesos. Las tarjetas NFC pueden apuntar a estos destinos sin quedar amarradas para siempre a una URL externa.</p></div>
-        <div className="nivalProductShelf">
-          <article className="nivalProductItem">
-            <div className="productItemHeading"><div><small>TU TARJETA</small><h2>Nival Pay</h2></div><span className={hasNivalPay ? "productActive" : "productInactive"}>{hasNivalPay ? "Activa" : "Sin activar"}</span></div>
-            <a className="nivalCardPedestal" href={hasNivalPay ? "/dashboard/pay" : "/checkout"} aria-label={hasNivalPay ? "Administrar Nival Pay" : "Activar Nival Pay"}>
-              <div className="nivalPhysicalCard" aria-label="Representación de tarjeta Nival Pay">
-                <div className="nivalCardMark">N</div>
-                <div className="nivalCardCopy"><strong>NIVAL</strong><span>PAY</span></div>
-                <small>NFC · PÁGINA DE COBRO</small>
-              </div>
-              <div className="nivalCardBase" aria-hidden="true" />
-            </a>
-            <p>Página de cobro, QR y tarjeta NFC principal. <a className="productManageLink" href={hasNivalPay ? "/dashboard/pay" : "/checkout"}>{hasNivalPay ? "Administrar" : "Activar"} →</a></p>
-          </article>
-          <article className="nivalAddProduct">
-            <span className="nivalAddIcon" aria-hidden="true">+</span>
-            <div><h2>Agregar Nival Pay</h2><p>Otra página de cobro independiente</p><strong>$49 MXN</strong><a className="nivalProductAction" href="/dashboard/pay?new=1">Crear otra</a></div>
-            <div className="nivalAddDivider" />
-            <div><p>Tarjeta NFC física adicional</p><strong>$99 MXN</strong><a className="nivalProductAction secondary" href="/dashboard/pay/physical">Agregar tarjeta</a></div>
-          </article>
-        </div>
+      <section className="profileDigitalHeading compactSectionHeading">
+        <p className="eyebrow">ENLACES Y RESEÑAS</p>
+        <h1>Configura destinos que puedas reutilizar.</h1>
+        <p>Crea un enlace estable para reseñas, tu sitio o cualquier acción externa. Después puedes usarlo en tu perfil público, códigos QR y tarjetas NFC sin perder el control del destino.</p>
+        <a className="nvSecondaryButton" href="/dashboard/pay/physical">Diseñar una tarjeta NFC →</a>
       </section>
       {canManageProgram && (
         <section className="settingsCard" id="nival-card">

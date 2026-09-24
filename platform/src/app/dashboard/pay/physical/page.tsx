@@ -70,6 +70,11 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           </div>
           {paymentProfiles && paymentProfiles.length > 1 ? <label>Página Nival Pay<select name="paymentProfileId" defaultValue={primaryPaymentProfileId}>{paymentProfiles.map((profile,index)=><option key={profile.id} value={profile.id}>{profile.display_name || `Nival Pay ${index+1}`}</option>)}</select></label> : <input type="hidden" name="paymentProfileId" value={primaryPaymentProfileId}/>}
           <p className="payHelp">La tarjeta quedará programada al destino elegido. Nival valida que ese destino exista antes de registrar el pedido.</p>
+          {(!primaryPaymentProfileId || !hasPointsDestination || !hasReviewDestination) && <div className="templateSetupLinks">
+            {!primaryPaymentProfileId && <a href="/dashboard/pay">Configurar Nival Pay →</a>}
+            {!hasPointsDestination && <a href="/dashboard/points">Activar Nival Puntos →</a>}
+            {!hasReviewDestination && <a href="/dashboard?section=nival-card#nival-card">Configurar reseñas →</a>}
+          </div>}
           <label>Color base<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Color según mi marca</option></select></label>
           <label>Indicaciones del frente<textarea name="designNotes" maxLength={500} placeholder="Ej. usar mi logo blanco, fondo azul, nombre del negocio debajo del QR."/></label>
         </section>

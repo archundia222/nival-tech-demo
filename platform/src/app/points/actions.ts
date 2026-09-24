@@ -275,6 +275,124 @@ export async function registerDailySalesSummary(formData: FormData) {
   redirect(captureReturn(formData, "saved", "summary"));
 }
 
+
+export async function importCustomersCsv(formData: FormData) {
+  const { supabase, membership } = await activeBusinessContext();
+  if (!["owner","manager"].includes(membership.role)) {
+    redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede importar una base de clientes."));
+  }
+  if (formData.get("dataAuthorization") !== "on") {
+    redirect(captureReturn(formData, "error", "Confirma que el negocio puede utilizar los datos incluidos en este archivo."));
+  }
+
+  const entry = formData.get("customersFile");
+  if (!(entry instanceof File) || !entry.size) redirect(captureReturn(formData, "error", "Selecciona un archivo CSV de clientes."));
+  if (entry.size > 2_000_000) redirect(captureReturn(formData, "error", "El CSV debe pesar menos de 2 MB."));
+
+  const text = await entry.text();
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) redirect(captureReturn(formData, "error", "El CSV no tiene clientes para importar."));
+
+  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim());
+  const find = (...names: string[]) => headers.findIndex((h) => names.includes(h));
+  const nameIndex = find("nombre","name","cliente","customer");
+  const phoneIndex = find("telefono","phone","celular","movil");
+  const emailIndex = find("correo","email","e-mail");
+  const consentIndex = find("consentimiento","marketing_consent","promociones");
+  if (nameIndex < 0 || (phoneIndex < 0 && emailIndex < 0)) {
+    redirect(captureReturn(formData, "error", "El CSV necesita Nombre y al menos Teléfono o Correo."));
+  }
+
+  const { data: existingCustomers } = await supabase.from("customers")
+    .select("id,phone,email")
+    .eq("business_id", membership.business_id)
+    .limit(5000);
+
+  const knownPhones = new Set<string>();
+  const knownEmails = new Set<string>();
+  for (const customer of existingCustomers ?? []) {
+    for (const key of normalizedPhoneKeys(customer.phone)) knownPhones.add(key);
+    if (customer.email) knownEmails.add(String(customer.email).trim().toLowerCase());
+  }
+
+  const rows: Array<Record<string, unknown>> = [];
+  const filePhones = new Set<string>();
+  const fileEmails = new Set<string>();
+  const maxRows = Math.min(lines.length - 1, 500);
+  for (let index = 1; index <= maxRows; index += 1) {
+    const cells = parseCsvLine(lines[index]);
+    const name = String(cells[nameIndex] ?? "").trim().slice(0,100);
+    const rawPhone = phoneIndex >= 0 ? String(cells[phoneIndex] ?? "").trim() : "";
+    const phoneDigits = rawPhone.replace(/\D/g, "");
+    const phone = phoneDigits.length >= 10 && phoneDigits.length <= 16 ? phoneDigits : null;
+    const email = emailIndex >= 0 ? String(cells[emailIndex] ?? "").trim().toLowerCase() : "";
+    const validEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
+    if (name.length < 2 || (!phone && !validEmail)) continue;
+
+    const phoneKeys = normalizedPhoneKeys(phone);
+    const duplicate = phoneKeys.some((key) => knownPhones.has(key) || filePhones.has(key))
+      || Boolean(validEmail && (knownEmails.has(validEmail) || fileEmails.has(validEmail)));
+    if (duplicate) continue;
+
+    const consentValue = consentIndex >= 0 ? String(cells[consentIndex] ?? "").trim().toLowerCase() : "";
+    const consent = /^(si|sí|yes|true|1|acepto|aceptado)$/.test(consentValue);
+    rows.push({
+      business_id: membership.business_id,
+      name,
+      phone,
+      email: validEmail,
+      marketing_consent_at: consent ? new Date().toISOString() : null,
+      privacy_notice_version: "imported-business-provided-2026-09-23",
+      origin: "imported",
+    });
+    for (const key of phoneKeys) filePhones.add(key);
+    if (validEmail) fileEmails.add(validEmail);
+  }
+
+  if (!rows.length) redirect(captureReturn(formData, "error", "No encontramos clientes nuevos válidos. Los duplicados no se vuelven a crear."));
+
+  const { data: inserted, error } = await supabase.from("customers")
+    .insert(rows)
+    .select("id");
+  if (error || !inserted?.length) redirect(captureReturn(formData, "error", "No pudimos importar la base de clientes."));
+
+  const [{ data: pointsEntitlement }, { data: program }, { count: currentAccounts }] = await Promise.all([
+    supabase.from("business_product_entitlements").select("status")
+      .eq("business_id", membership.business_id)
+      .eq("product_code", "nival_points")
+      .in("status", ["active","free"])
+      .maybeSingle(),
+    supabase.from("loyalty_programs").select("id")
+      .eq("business_id", membership.business_id)
+      .eq("active", true)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabase.from("loyalty_accounts").select("id", { count: "exact", head: true })
+      .eq("business_id", membership.business_id),
+  ]);
+
+  if (pointsEntitlement && program) {
+    const capacity = pointsEntitlement.status === "free"
+      ? Math.max(0, 30 - Number(currentAccounts ?? 0))
+      : inserted.length;
+    const accountRows = inserted.slice(0, capacity).map((customer) => ({
+      business_id: membership.business_id,
+      program_id: program.id,
+      customer_id: customer.id,
+    }));
+    if (accountRows.length) {
+      const { error: accountError } = await supabase.from("loyalty_accounts").insert(accountRows);
+      if (accountError) console.error("[customer-import] Could not attach some imported customers to Puntos", accountError.code);
+    }
+  }
+
+  revalidatePath("/dashboard/points");
+  revalidatePath("/dashboard/intelligence");
+  revalidatePath("/dashboard");
+  redirect(captureReturn(formData, "saved", `customers-${inserted.length}`));
+}
+
 export async function importSalesCsv(formData: FormData) {
   const { supabase, user, membership } = await activeBusinessContext();
   if (formData.get("dataAuthorization") !== "on") {

@@ -6,7 +6,7 @@ import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
-import { importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
+import { importCustomersCsv, importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
@@ -82,6 +82,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada.</p>}
       {params.saved === 'summary' && <p className="formMessage successMessage">Resumen del día registrado.</p>}
       {params.saved?.startsWith('import-') && <p className="formMessage successMessage">Importación lista: {params.saved.replace('import-','')} ventas agregadas.</p>}
+      {params.saved?.startsWith('customers-') && <p className="formMessage successMessage">Base importada: {params.saved.replace('customers-','')} clientes nuevos. Los duplicados se omitieron.</p>}
       {!available ? <>
         <section className="productShowcase pointsShowcase">
           <div className="productShowcaseCopy"><span className="productPill">NIVAL PUNTOS</span><h1>Haz que tus clientes<br/>quieran volver.</h1><p>Premia cada visita con puntos. Tus clientes ven su saldo desde el celular y tú administras todo sin tarjetas de papel.</p><ul className="productBenefits"><li>Registro con código QR</li><li>Tarjeta digital del cliente</li><li>Visitas, puntos y premios en un mismo lugar</li></ul><div className="productPrice"><strong>Gratis</strong><span>hasta 30 clientes</span></div><div className="freemiumCtas"><form action={activateFreeNivalPoints}><button className="productCta">Crear mi programa gratis <span>→</span></button></form><form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Ver Nival Puntos Pro · $199/mes</button></form></div><small>Empieza sin tarjeta. Paga cuando necesites más clientes, personalización y resultados completos.</small></div>
@@ -167,7 +168,17 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
             </article>
 
             <article className="captureCard">
-              <span>IMPORTAR</span><h3>Trae un CSV de tu sistema actual</h3><p>Acepta hasta 500 ventas por archivo. Solo necesitas una columna <b>Monto</b>; opcionalmente Fecha, Teléfono y Método.</p>
+              <span>IMPORTAR CLIENTES</span><h3>Trae la lista que ya tienes</h3><p>No vuelvas a capturar una base existente. Nival omite duplicados por teléfono o correo y solo marca consentimiento comercial cuando el archivo lo indica expresamente.</p>
+              <form action={importCustomersCsv}>
+                <label>Archivo CSV<input name="customersFile" type="file" accept=".csv,text/csv" required/></label>
+                <label className="checkLabel"><input name="dataAuthorization" type="checkbox" required/> Confirmo que el negocio puede utilizar los datos incluidos en este archivo.</label>
+                <small className="captureFormat">Requerido: Nombre + Teléfono o Correo · <a href="/templates/clientes-nival.csv" download>Descargar plantilla CSV</a></small>
+                <button type="submit">Importar clientes</button>
+              </form>
+            </article>
+
+            <article className="captureCard">
+              <span>IMPORTAR VENTAS</span><h3>Trae un CSV de tu sistema actual</h3><p>Acepta hasta 500 ventas por archivo. Solo necesitas una columna <b>Monto</b>; opcionalmente Fecha, Teléfono y Método.</p>
               <form action={importSalesCsv}>
                 <label>Archivo CSV<input name="salesFile" type="file" accept=".csv,text/csv" required/></label>
                 <label className="checkLabel"><input name="dataAuthorization" type="checkbox" required/> Confirmo que el negocio puede utilizar los datos incluidos en este archivo.</label>
