@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import { getPublicLoyaltyCard, getPublicLoyaltyRewards } from "@/app/points/actions";
 import { CustomerPointsActions } from "./customer-points-actions";
+import { CardSaveActions } from "./card-save-actions";
 
 interface CardPageProps { params: Promise<{ token: string }>; }
 
@@ -15,6 +17,8 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const progress = Math.min(100, Math.round((Number(card.points_balance) / Number(card.reward_threshold)) * 100));
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
+  const userAgent = (await headers()).get("user-agent") ?? "";
+  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
   const googleWalletReady = Boolean(
     process.env.GOOGLE_WALLET_ISSUER_ID &&
     process.env.GOOGLE_WALLET_CLASS_SUFFIX &&
@@ -33,7 +37,13 @@ export default async function CardPage({ params }: CardPageProps) {
       </div>
       {availableRewards.length > 0 && <div className="pointsAvailableNotice"><span>✓</span><div><strong>{availableRewards.length} {availableRewards.length === 1 ? "recompensa disponible" : "recompensas disponibles"}</strong><small>Ya puedes canjear {availableRewards.length === 1 ? "tu premio" : "tus premios"} en caja.</small></div></div>}
     </section>
-    {googleWalletReady && <section className="pointsWalletSaveCard"><div><span>TU TARJETA EN EL CELULAR</span><strong>Guárdala en Google Wallet</strong><p>Así llevas tus puntos contigo y puedes recibir actualizaciones del programa directamente en tu teléfono.</p></div><a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a></section>}
+    <section className="pointsWalletSaveCard">
+      <div><span>TU TARJETA EN EL CELULAR</span><strong>{googleWalletReady && !isIOS ? "Guárdala en Google Wallet" : "Tenla siempre a la mano"}</strong><p>{googleWalletReady && !isIOS ? "Lleva tus puntos contigo y recibe actualizaciones del programa directamente en tu teléfono." : "Guarda o comparte este acceso para volver a abrir tu tarjeta cuando quieras."}</p></div>
+      <div className="pointsWalletSaveActions">
+        {googleWalletReady && !isIOS && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
+        <CardSaveActions />
+      </div>
+    </section>
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. El QR temporal solo sirve para identificar tu cuenta en caja.</p>
     {card.business_slug && <Link className="publicBusinessHub" href={`/p/${card.business_slug}`}><span><small>MÁS DE {card.business_name.toUpperCase()}</small><strong>Pagar, contactar o ver otros accesos del negocio</strong></span><b>→</b></Link>}
