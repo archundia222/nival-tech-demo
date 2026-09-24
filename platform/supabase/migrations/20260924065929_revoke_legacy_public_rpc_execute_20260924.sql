@@ -10,6 +10,18 @@ revoke execute on function public.get_public_payment_profile_v2(uuid) from publi
 revoke execute on function public.get_public_payment_profile_v3(uuid) from public, anon, authenticated;
 revoke execute on function public.track_public_payment_copy(uuid) from public, anon, authenticated;
 
+-- Legacy authenticated wrappers superseded by workspace-scoped/current implementations.
+-- The active app uses the newer functions listed in the application actions/pages.
+revoke execute on function public.claim_customer_scan_token(text) from public, anon, authenticated;
+revoke execute on function public.create_business_invitation(text, public.business_role) from public, anon, authenticated;
+revoke execute on function public.create_smart_link(text, text, text) from public, anon, authenticated;
+revoke execute on function public.get_current_business_segments() from public, anon, authenticated;
+revoke execute on function public.get_current_business_team() from public, anon, authenticated;
+revoke execute on function public.get_points_dashboard_metrics() from public, anon, authenticated;
+revoke execute on function public.refresh_current_business_recommendations() from public, anon, authenticated;
+revoke execute on function public.update_current_business_profile(text, text, text, text, text, text) from public, anon, authenticated;
+revoke execute on function public.update_smart_link(uuid, text, text, boolean) from public, anon, authenticated;
+
 -- Current public-facing RPCs are now invoked only from trusted server code.
 revoke execute on function public.get_business_invitation(uuid) from public, anon, authenticated;
 revoke execute on function public.get_public_business_v3(text) from public, anon, authenticated;
