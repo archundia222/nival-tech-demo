@@ -49,7 +49,14 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
     return payment?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
-  const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
+  const pendingIncludedOrderIds = new Set((claimedCards ?? []).filter((card) => {
+    const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
+    return payment?.status === 'pending' && Boolean(card.included_base_order_id);
+  }).map((card) => card.included_base_order_id as string));
+  const hasPendingIncludedCard = Boolean(paidInitialOrders?.some((order) => pendingIncludedOrderIds.has(order.id)));
+  const hasIncludedCard = Boolean(paidInitialOrders?.some((order) =>
+    !claimedOrderIds.has(order.id) && !pendingIncludedOrderIds.has(order.id)
+  ));
   const hasPointsDestination = Boolean(pointsEntitlement && loyaltyProgram && business.slug);
   const hasReviewDestination = Boolean(reviewSmartLink || loyaltyProgram?.review_url);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
@@ -65,16 +72,17 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     <PaymentStatusPoller active={(params.result === 'success' || params.result === 'pending') && latestPhysicalPayment?.status !== 'paid'} />
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="nival-card" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent physicalCardPage">
-      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta NFC Nival</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>
+      <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta NFC Nival</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : hasPendingIncludedCard ? 'Pago pendiente' : 'Desde $99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       {params.result === 'success' && <p role="status" className="formMessage">{latestPhysicalPayment?.status === 'paid' ? 'Pago confirmado. Tu pedido de tarjeta quedó registrado correctamente.' : 'Regresaste de Mercado Pago. Estamos confirmando el pago; esta pantalla se actualizará sola.'}</p>}
       {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago. No necesitas volver a comprar.</p>}
       {params.result === 'failure' && <p role="alert" className="formMessage errorMessage">El pago no se completó. Tu pedido no se activó y puedes intentarlo otra vez.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
-      <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
+      <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : hasPendingIncludedCard ? 'Ya hay una personalización de tu tarjeta incluida esperando confirmación de Mercado Pago. No necesitas volver a pagar.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
       {!canPurchase && <p className="formMessage">Puedes revisar las tarjetas de este negocio, pero solo el propietario o un gerente puede solicitar o comprar una nueva.</p>}
-      {canPurchase && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
+      {canPurchase && hasPendingIncludedCard && !hasIncludedCard && <p className="formMessage">Tu solicitud ya está en proceso. Esta pantalla se actualizará cuando Mercado Pago confirme el cobro.</p>}
+      {canPurchase && (!hasPendingIncludedCard || hasIncludedCard) && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
         <section className="chartCard physicalCardSection">
           <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
