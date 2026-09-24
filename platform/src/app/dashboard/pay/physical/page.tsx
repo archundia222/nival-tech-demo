@@ -57,14 +57,17 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const { data: orders } = await supabase.from('physical_card_orders')
     .select('id, design, front_template, back_style, back_design_url, target_url, delivery_method, fulfillment_status, requested_delivery_date, tracking_code, created_at, product_orders!physical_card_orders_product_order_id_fkey(status, payment_method, amount_cents)')
     .eq('business_id', membership.business_id).order('created_at', { ascending: false }).limit(5);
+  const latestPhysicalPayment = orders?.[0]
+    ? (Array.isArray(orders[0].product_orders) ? orders[0].product_orders[0] : orders[0].product_orders)
+    : null;
 
   return <main className="dashboardApp nivalDashboard">
-    <PaymentStatusPoller active={params.result === 'success' || params.result === 'pending'} />
+    <PaymentStatusPoller active={(params.result === 'success' || params.result === 'pending') && latestPhysicalPayment?.status !== 'paid'} />
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active="nival-card" productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent physicalCardPage">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Tarjeta NFC Nival</strong></div><span className="ready">{hasIncludedCard ? 'Incluida en tu compra' : 'Desde $99 MXN'}</span></header>
       {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
-      {params.result === 'success' && <p role="status" className="formMessage">Regresaste de Mercado Pago. Estamos confirmando el pago; cuando quede acreditado, tu tarjeta podrá pasar a producción.</p>}
+      {params.result === 'success' && <p role="status" className="formMessage">{latestPhysicalPayment?.status === 'paid' ? 'Pago confirmado. Tu pedido de tarjeta quedó registrado correctamente.' : 'Regresaste de Mercado Pago. Estamos confirmando el pago; esta pantalla se actualizará sola.'}</p>}
       {params.result === 'pending' && <p role="status" className="formMessage">Mercado Pago está confirmando tu pago. No necesitas volver a comprar.</p>}
       {params.result === 'failure' && <p role="alert" className="formMessage errorMessage">El pago no se completó. Tu pedido no se activó y puedes intentarlo otra vez.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}

@@ -50,7 +50,7 @@ export default function Products() {
         <div className="productSimplePrice"><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><span>Puntos + Intelligence</span></div>
         <div className="founderPriceNote"><b>EXPANSIÓN</b><span>Intelligence no se vende como sistema aislado: usa la actividad real de Puntos.</span></div>
         <ul><li>Todo Nival Puntos Pro</li><li>Clientes frecuentes, riesgo y oportunidades</li><li>Audiencias, mensajes, campañas y medición</li><li>Si ya pagas Puntos Pro ($199/mes), subir a Growth agrega $250/mes: total $449/mes</li></ul>
-        <Link className="payButton" href="/dashboard/intelligence">Probar Nival Growth</Link>
+        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Probar Nival Growth</Link>
       </article>
     </div>
 

@@ -54,9 +54,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const membership = await getActiveBusinessMembership(user.id);
 
   if (!membership) {
-    const onboardingNext = ["/dashboard/pay", "/dashboard/points", "/dashboard/intelligence", "/checkout"].includes(params.next ?? "")
-      ? params.next!
-      : "/dashboard";
+    const requestedNext = params.next ?? "";
+    const allowedProductDestinations = ["/dashboard/pay", "/dashboard/points", "/dashboard/intelligence", "/checkout"];
+    const onboardingNext = allowedProductDestinations.some((prefix) =>
+      requestedNext === prefix || requestedNext.startsWith(prefix + "/") || requestedNext.startsWith(prefix + "?")
+    ) ? requestedNext : "/dashboard";
     return (
       <main className="dashboardShell">
         <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
