@@ -21,7 +21,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .maybeSingle();
   if (!business) redirect('/dashboard');
   const admin = createAdminClient();
-  const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }] = await Promise.all([
+  const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }, { data: reviewSmartLink }] = await Promise.all([
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', membership.business_id)
@@ -33,6 +33,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     admin.from('payment_profiles').select('id, display_name, public_token').eq('business_id', membership.business_id).eq('active', true).order('created_at', { ascending: true }),
     admin.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').in('status', ['active','free']).maybeSingle(),
     admin.from('loyalty_programs').select('review_url').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
+    admin.from('smart_links').select('id').eq('business_id', membership.business_id).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).filter((card) => {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
@@ -40,7 +41,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
   const hasPointsDestination = Boolean(pointsEntitlement && business.slug);
-  const hasReviewDestination = Boolean(loyaltyProgram?.review_url);
+  const hasReviewDestination = Boolean(reviewSmartLink || loyaltyProgram?.review_url);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
   const canPurchase = membership.role === 'owner' || membership.role === 'manager';
   const { data: orders } = await supabase.from('physical_card_orders')
@@ -64,7 +65,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <div className="cardTemplateChoiceGrid">
             <label className={!primaryPaymentProfileId ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="pay" defaultChecked={Boolean(primaryPaymentProfileId)} disabled={!primaryPaymentProfileId}/><span className="templateMock"><small>PAGAR</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong>{!primaryPaymentProfileId && <small>Configura tu página primero</small>}</label>
             <label className={!hasPointsDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="points" defaultChecked={!primaryPaymentProfileId && hasPointsDestination} disabled={!hasPointsDestination}/><span className="templateMock"><small>PUNTOS</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong>{!hasPointsDestination && <small>Activa Puntos para usarla</small>}</label>
-            <label className={!hasReviewDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="reviews" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && hasReviewDestination} disabled={!hasReviewDestination}/><span className="templateMock"><small>RESEÑA</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong>{!hasReviewDestination && <small>Configura tu enlace de reseñas</small>}</label>
+            <label className={!hasReviewDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="reviews" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && hasReviewDestination} disabled={!hasReviewDestination}/><span className="templateMock"><small>RESEÑA</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong>{!hasReviewDestination && <small>Configura tu enlace de reseñas desde Página del negocio</small>}</label>
             <label><input type="radio" name="frontTemplate" value="profile" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && !hasReviewDestination}/><span className="templateMock"><small>NEGOCIO</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para ver nuestros enlaces</em></span><strong>Perfil digital</strong></label>
           </div>
           {paymentProfiles && paymentProfiles.length > 1 ? <label>Página Nival Pay<select name="paymentProfileId" defaultValue={primaryPaymentProfileId}>{paymentProfiles.map((profile,index)=><option key={profile.id} value={profile.id}>{profile.display_name || `Nival Pay ${index+1}`}</option>)}</select></label> : <input type="hidden" name="paymentProfileId" value={primaryPaymentProfileId}/>}

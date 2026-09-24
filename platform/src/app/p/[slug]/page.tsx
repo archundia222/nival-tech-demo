@@ -10,7 +10,7 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
   const { slug } = await params;
   const supabase = await createClient();
   const [{ data: businesses, error }, { data: links }, { data: payments }] = await Promise.all([
-    supabase.rpc("get_public_business_v2", { business_slug: slug }),
+    supabase.rpc("get_public_business_v3", { business_slug: slug }),
     supabase.rpc("get_public_profile_links", { business_slug: slug }),
     supabase.rpc("get_public_profile_payment", { business_slug: slug }),
   ]);
@@ -22,7 +22,7 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
 
   const actions: ProfileActionItem[] = [
     ...(payment ? [{ key: `payment-${payment.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${payment.public_token}`, icon: "＄", featured: true }] : []),
-    { key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" },
+    ...(business.points_enabled ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(business.website_url && !hasWebsiteLink ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
     ...customLinks.map((link) => ({

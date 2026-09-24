@@ -43,7 +43,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     resumen: "Resumen general",
     inteligencia: "Nival Intelligence",
     clientes: "Clientes",
-    "nival-card": "Nival Card",
+    "nival-card": "Enlaces y reseñas",
     "perfil-digital": "Página del negocio",
     configuracion: "Configuración",
   };
@@ -199,7 +199,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const businessHealthItems = [
     { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },
     { label: "Perfil del negocio", complete: Boolean(business?.description && business?.phone && business?.logo_url), href: "/dashboard?section=perfil-digital", action: "Agrega descripción, teléfono y logotipo" },
-    { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=nival-card", action: "Conecta tu enlace de reseñas" },
+    { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=nival-card#nival-card", action: "Conecta tu enlace de reseñas" },
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
@@ -293,7 +293,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "nival-card" && <>
       <section className="nivalAssetsIntro">
-        <div className="assetsHeading"><p className="eyebrow">TARJETAS Y LINKS</p><h1>Tus puntos de cobro</h1><p>Tu Nival Pay principal y todo lo que puedes agregar, presentado como productos reales.</p></div>
+        <div className="assetsHeading"><p className="eyebrow">ENLACES Y RESEÑAS</p><h1>Destinos que puedes reutilizar</h1><p>Configura enlaces estables para reseñas, tu sitio y otros accesos. Las tarjetas NFC pueden apuntar a estos destinos sin quedar amarradas para siempre a una URL externa.</p></div>
         <div className="nivalProductShelf">
           <article className="nivalProductItem">
             <div className="productItemHeading"><div><small>TU TARJETA</small><h2>Nival Pay</h2></div><span className={hasNivalPay ? "productActive" : "productInactive"}>{hasNivalPay ? "Activa" : "Sin activar"}</span></div>

@@ -547,9 +547,11 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
   }
 
   if (details.front_template === 'reviews') {
-    const { data: program } = await admin.from('loyalty_programs').select('review_url')
-      .eq('business_id', businessId).eq('active', true).limit(1).maybeSingle();
-    if (!program?.review_url) redirect('/dashboard/pay/physical?error=Configura+primero+el+enlace+de+reseñas+del+negocio.');
+    const [{ data: reviewLink }, { data: program }] = await Promise.all([
+      admin.from('smart_links').select('id').eq('business_id', businessId).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
+      admin.from('loyalty_programs').select('review_url').eq('business_id', businessId).eq('active', true).limit(1).maybeSingle(),
+    ]);
+    if (!reviewLink && !program?.review_url) redirect('/dashboard/pay/physical?error=Configura+primero+el+enlace+de+reseñas+del+negocio.');
     return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/r/${business.slug}` };
   }
 
