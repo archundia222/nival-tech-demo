@@ -9,12 +9,12 @@ export const metadata: Metadata = {
     default: "Nival Tech | Cobra, haz que vuelvan y crece",
     template: "%s | Nival Tech",
   },
-  description: "Herramientas simples para negocios: cobra mejor con Nival Pay, crea recurrencia con Nival Puntos y convierte actividad de clientes en acciones con Nival Intelligence.",
+  description: "Tecnología simple para negocios locales: cobra con Nival Pay, fideliza con Nival Puntos y convierte visitas de clientes en acciones con Nival Intelligence.",
   applicationName: "Nival Tech",
   icons: { icon: "/wallet/nival-logo.svg" },
   openGraph: {
     title: "Nival Tech | Cobra, haz que vuelvan y crece",
-    description: "Nival ayuda a negocios a cobrar mejor, crear recurrencia y decidir qué hacer para crecer.",
+    description: "Nival ayuda a negocios locales a cobrar, fidelizar clientes y convertir visitas reales en acciones para crecer.",
     siteName: "Nival Tech",
     locale: "es_MX",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Nival Tech | Cobra, haz que vuelvan y crece",
-    description: "Cobra mejor, haz que tus clientes vuelvan y convierte actividad en acciones.",
+    description: "Cobra más fácil, haz que tus clientes vuelvan y convierte visitas reales en acciones.",
   },
 };
 
