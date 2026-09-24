@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
       {
         token,
         businessName: card.business_name,
-        customerName: card.customer_name,
+        customerName: String(card.customer_name ?? 'Cliente').trim().split(/\s+/)[0] || 'Cliente',
         points: Number(card.points_balance),
         visits: Number(card.visit_count),
       },
