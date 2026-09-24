@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getActiveBusinessMembership, getBusinessChoices } from '@/lib/active-business';
 import { switchActiveBusiness } from './workspace-actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'web-ia' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Páginas de cobro', href: '/dashboard/pay' },
@@ -72,6 +72,8 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
           <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Intelligence">{(['accion','resultados','herramientas'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'accion' ? 'ACTUAR' : group === 'resultados' ? 'MEDIR' : 'PREGUNTAR'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
         <Link className={active === 'nival-card' ? 'active' : undefined} aria-current={active === 'nival-card' ? 'page' : undefined} href="/dashboard/pay/physical"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M16 10c1.5 1.1 1.5 2.9 0 4M18.5 8c3 2.1 3 5.9 0 8"/></NavIcon>Tarjeta NFC</Link>
+        <span className="sidebarSectionLabel">SERVICIOS</span>
+        <Link className={active === 'web-ia' ? 'active' : undefined} aria-current={active === 'web-ia' ? 'page' : undefined} href="/dashboard/web-ia"><NavIcon><path d="M4 5h16v14H4z"/><path d="M4 9h16M8 5v4M12 14l1.2 2.6L16 18l-2.8 1.2L12 22l-1.2-2.8L8 18l2.8-1.4L12 14z"/></NavIcon>Página web con IA</Link>
         <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Página del negocio</Link>
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/support">Ayuda</Link><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
@@ -86,7 +88,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{pointsItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         <details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Intelligence <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        <MobileAutoCloseLink href="/dashboard/pay/physical">Tarjeta NFC</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Página del negocio</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
+        <MobileAutoCloseLink href="/dashboard/pay/physical">Tarjeta NFC</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/web-ia">Página web con IA</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Página del negocio</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
   </>;
