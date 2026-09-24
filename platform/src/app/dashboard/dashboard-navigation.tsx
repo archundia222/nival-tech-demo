@@ -16,10 +16,9 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
 
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
   { id: 'puntos', label: 'Hoy', href: '/dashboard/points', group: 'operacion' },
-  { id: 'puntos-registro', label: 'Registrar', href: '/dashboard/points?view=register', group: 'operacion' },
+  { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
   { id: 'puntos-canjes', label: 'Canjear premio', href: '/dashboard/points?view=redemptions', group: 'operacion' },
   { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
-  { id: 'puntos-analitica', label: 'Resultados', href: '/dashboard/points?view=analytics', group: 'clientes' },
   { id: 'puntos-promociones', label: 'Promociones', href: '/dashboard/points?view=promotions', group: 'clientes' },
   { id: 'puntos-compartir', label: 'Compartir programa', href: '/dashboard/points?view=share', group: 'gestion' },
   { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings', group: 'gestion' },
@@ -32,7 +31,6 @@ const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; gr
   { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
   { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
-  { id: 'inteligencia-importar', label: 'Registrar datos', href: '/dashboard/intelligence?view=imports', group: 'herramientas' },
 ];
 
 function NavIcon({ children }: { children: React.ReactNode }) {
@@ -65,7 +63,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         <span className="sidebarSectionLabel">HACER QUE VUELVAN</span>
         <details className={styles.productGroup} open={pointsActive}>
           <summary className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`}><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon><span>Nival Puntos</span><i aria-hidden="true">⌄</i></summary>
-          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'USAR' : group === 'clientes' ? 'ENTENDER' : 'PROGRAMA'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'USAR' : group === 'clientes' ? 'CLIENTES' : 'PROGRAMA'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
         <span className="sidebarSectionLabel">CRECER</span>
         <details className={styles.productGroup} open={intelligenceActive}>
