@@ -56,7 +56,8 @@ export default async function PrivacyPage() {
         <p>Puedes negarte a comunicaciones promocionales desde el momento de registro cuando exista esa opción o solicitar posteriormente que se detengan por el canal de privacidad. La negativa a finalidades opcionales no impide usar funciones esenciales del servicio.</p>
 
         <h2>Clientes de negocios que usan Nival</h2>
-        <p>Cuando un negocio introduce o importa datos de sus propios clientes, ese negocio debe contar con una base legítima y los avisos o autorizaciones que correspondan. Nival trata esa información para prestar las funciones contratadas y no la reutiliza para marketing propio. En los formularios públicos de Nival Puntos se presenta un aviso y el consentimiento de marketing es independiente.</p>
+        <p>Cuando un negocio introduce o importa datos de sus propios clientes, ese negocio debe contar con una base legítima y los avisos o autorizaciones que correspondan. Nival trata esa información para prestar las funciones contratadas y no la reutiliza para marketing propio.</p>
+        <p>Cuando una persona se registra directamente mediante un formulario público alojado por Nival, Nival recopila los datos indicados en el aviso simplificado para crear y operar la cuenta o tarjeta solicitada y los pone a disposición del negocio participante para prestar ese programa. El negocio es responsable de cualquier uso posterior que haga para sus propios fines. El envío de promociones del negocio permanece separado y requiere la elección opcional correspondiente.</p>
 
         <h2>Cambios al aviso</h2>
         <p>Publicaremos en esta misma dirección cualquier cambio material y actualizaremos la fecha y versión. Si una nueva finalidad requiere consentimiento adicional, lo solicitaremos antes de usar los datos para esa finalidad.</p>
