@@ -130,3 +130,33 @@ export async function syncGoogleWalletObject(card: LoyaltyCard) {
   );
   if (!response.ok) throw new Error(`Google Wallet sync failed with status ${response.status}`);
 }
+
+
+export async function sendGoogleWalletNotification(token: string, header: string, body: string) {
+  const accessToken = await googleAccessToken();
+  const id = objectId(token);
+  const response = await fetch(
+    `https://walletobjects.googleapis.com/walletobjects/v1/loyaltyObject/${encodeURIComponent(id)}/addMessage`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        message: {
+          header,
+          body,
+          id: `promo_${Date.now()}`,
+          messageType: "TEXT_AND_NOTIFY",
+        },
+      }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.text().catch(() => "");
+    throw new Error(`Google Wallet notification failed with status ${response.status}: ${error.slice(0, 180)}`);
+  }
+}
