@@ -4375,3 +4375,11 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .authHelp summary:after{content:"＋";float:right;color:var(--accent)}
 .authHelp[open] summary:after{content:"−"}
 .authHelp .authForm{margin-top:16px}
+
+.supportContactGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:26px 0 30px}
+.supportContactGrid>a{display:grid;gap:7px;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface);transition:.2s ease}
+.supportContactGrid>a:hover{border-color:rgba(181,154,97,.45);transform:translateY(-1px)}
+.supportContactGrid span{color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.12em}
+.supportContactGrid strong{font-size:17px;overflow-wrap:anywhere}
+.supportContactGrid small{color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:650px){.supportContactGrid{grid-template-columns:1fr}}
