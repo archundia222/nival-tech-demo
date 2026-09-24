@@ -384,6 +384,27 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
 
   const admin = createAdminClient();
+  const { data: existingSubscription } = await admin.from('product_subscriptions')
+    .select('id,status,checkout_url,created_at')
+    .eq('business_id', businessId)
+    .eq('product_code', product.productCode)
+    .in('status', ['pending','authorized'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingSubscription?.status === 'authorized') {
+    redirect(`${returnPath}?subscription=active`);
+  }
+  if (existingSubscription?.status === 'pending' && existingSubscription.checkout_url) {
+    const ageMs = Date.now() - new Date(existingSubscription.created_at).getTime();
+    if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) redirect(existingSubscription.checkout_url);
+    await admin.from('product_subscriptions')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', existingSubscription.id)
+      .eq('status', 'pending');
+  }
+
   const { data: subscription, error: insertError } = await admin.from('product_subscriptions').insert({
     business_id: businessId,
     product_code: product.productCode,
@@ -434,14 +455,22 @@ export async function startNivalPointsSubscription() {
 export async function startNivalGrowthSubscription() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  const { data: points } = await admin.from('business_product_entitlements').select('status')
-    .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle();
+  const [{ data: points }, { data: paidPointsSubscription }] = await Promise.all([
+    admin.from('business_product_entitlements').select('status')
+      .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle(),
+    admin.from('product_subscriptions').select('id')
+      .eq('business_id', businessId)
+      .eq('product_code', NIVAL_POINTS_PRODUCT)
+      .eq('status', 'authorized')
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   if (!points || !['free', 'active'].includes(points.status)) {
     redirect('/dashboard/points?error=Activa+Nival+Puntos+primero.+Growth+incluye+Puntos+e+Intelligence.');
   }
 
-  return startMercadoPagoSubscription(points.status === 'active'
+  return startMercadoPagoSubscription(paidPointsSubscription
     ? {
         productCode: NIVAL_GROWTH_UPGRADE_PRODUCT,
         amountCents: NIVAL_GROWTH_UPGRADE_PRICE_CENTS,
