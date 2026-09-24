@@ -133,8 +133,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     : { data: null };
   const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
   const siteUrl = publicSiteUrl();
-  const commerceReady = commerceDisclosuresReady();
-  const legal = legalBusinessInfo();
+  const [commerceReady, legal] = await Promise.all([commerceDisclosuresReady(), legalBusinessInfo()]);
 
   return <main className="checkoutExperience">
     <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Pago procesado por Mercado Pago</small></header>
