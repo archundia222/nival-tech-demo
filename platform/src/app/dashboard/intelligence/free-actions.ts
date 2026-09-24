@@ -15,6 +15,16 @@ export async function activateFreeNivalIntelligence() {
   if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/intelligence?error=No+tienes+permiso+para+activar+Intelligence.');
 
   const admin = createAdminClient();
+  const { data: points } = await admin.from('business_product_entitlements')
+    .select('status')
+    .eq('business_id', membership.business_id)
+    .eq('product_code', 'nival_points')
+    .maybeSingle();
+
+  if (!points || !['free', 'active'].includes(points.status)) {
+    redirect('/dashboard/intelligence?error=Activa+Nival+Puntos+primero.+Intelligence+usa+los+clientes+y+visitas+de+tu+programa.');
+  }
+
   const { data: existing } = await admin.from('business_product_entitlements')
     .select('status')
     .eq('business_id', membership.business_id)
