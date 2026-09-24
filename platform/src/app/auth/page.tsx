@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { resendConfirmation, signIn, signUp } from "./actions";
+import { legalBusinessInfo, privacyDisclosuresReady } from "@/lib/legal";
 
 interface AuthPageProps {
   searchParams: Promise<{ mode?: string; error?: string; message?: string; next?: string }>;
@@ -9,6 +10,8 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const signup = params.mode === "signup";
   const next = params.next ?? "/dashboard";
+  const privacyReady = privacyDisclosuresReady();
+  const legal = legalBusinessInfo();
 
   return (
     <main className="authShell">
@@ -29,7 +32,9 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         </>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}
         {params.message && <div className="formMessage successMessage">{params.message}</div>}
+        {signup && !privacyReady && <div className="formMessage errorMessage" role="alert">El registro está temporalmente deshabilitado hasta publicar la identidad legal y domicilio del responsable del tratamiento.</div>}
         <form action={signup ? signUp : signIn} className="authForm">
+          <fieldset disabled={signup && !privacyReady}>
           <input type="hidden" name="next" value={next} />
           {signup && (
             <label>Nombre completo<input name="fullName" required minLength={2} autoComplete="name" /></label>
@@ -38,8 +43,8 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
           {signup && <label className="checkLabel authConsent"><input name="legalConsent" type="checkbox" required /> <span>Confirmo que leí y acepto los <Link href="/terms" target="_blank">Términos y condiciones</Link> y que recibí el <Link href="/privacy" target="_blank">Aviso de privacidad</Link>.</span></label>}
           <button className="primaryButton" type="submit">{signup ? "Crear mi cuenta" : "Entrar"}</button>
-        </form>
-        {signup && <p className="authLegal">Usaremos tu nombre, correo y datos de autenticación para crear y operar tu cuenta. El marketing no forma parte de este consentimiento.</p>}
+        </fieldset></form>
+        {signup && <p className="authLegal"><strong>Aviso simplificado:</strong> {legal.legalName} tratará tu nombre, correo y datos de autenticación para crear, proteger y operar tu cuenta Nival. No usaremos este consentimiento para publicidad. Consulta el <Link href="/privacy">Aviso de privacidad integral</Link> para finalidades, derechos ARCO y contacto.</p>}
 
         {!signup && (
           <form action={resendConfirmation} className="authForm">
