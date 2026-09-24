@@ -8,7 +8,7 @@ import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
 import { getActiveBusinessMembership } from '@/lib/active-business';
-import { commerceDisclosuresReady } from '@/lib/legal';
+import { commerceDisclosuresReady, legalBusinessInfo } from '@/lib/legal';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -134,11 +134,18 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
   const siteUrl = publicSiteUrl();
   const commerceReady = commerceDisclosuresReady();
+  const legal = legalBusinessInfo();
 
   return <main className="checkoutExperience">
     <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Pago procesado por Mercado Pago</small></header>
     <div className="checkoutFrame">
       {!commerceReady && <p className="checkoutStatus errorMessage" role="alert">Las compras están temporalmente deshabilitadas hasta completar en la configuración legal de Nival el nombre del proveedor, domicilio físico y teléfono para reclamaciones.</p>}
+      {commerceReady && <section className="checkoutSeller" aria-label="Datos del proveedor">
+        <strong>Proveedor: {legal.legalName}</strong>
+        <span>Domicilio: {legal.address}</span>
+        <span>Teléfono: {legal.phone}</span>
+        <a href={`mailto:${legal.supportEmail}`}>Aclaraciones y reclamaciones: {legal.supportEmail}</a>
+      </section>}
       {params.error && <p className="checkoutStatus errorMessage" role="alert">{params.error}</p>}
       {params.result === 'success' && !paid && <p className="checkoutStatus">Estamos confirmando tu pago. Actualiza esta página en unos segundos.</p>}
       {params.result === 'pending' && <p className="checkoutStatus">Tu pago está pendiente. La activación será automática cuando Mercado Pago lo apruebe.</p>}
