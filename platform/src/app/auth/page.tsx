@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { resendConfirmation, signIn, signUp } from "./actions";
+import { requestPasswordReset, resendConfirmation, signIn, signUp } from "./actions";
 
 export const metadata = { robots: { index: false, follow: false } };
 
@@ -49,7 +49,17 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         </form>
         {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>.</p>}
 
-        {!signup && (
+        {!signup && <>
+          <details className="authHelp">
+            <summary>¿Olvidaste tu contraseña?</summary>
+            <form action={requestPasswordReset} className="authForm">
+              <label>
+                Correo de tu cuenta
+                <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
+              </label>
+              <button className="primaryButton" type="submit">Enviar enlace de recuperación</button>
+            </form>
+          </details>
           <details className="authHelp">
             <summary>¿No pudiste confirmar tu correo?</summary>
             <form action={resendConfirmation} className="authForm">
@@ -61,7 +71,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
               <button className="primaryButton" type="submit">Reenviar confirmación</button>
             </form>
           </details>
-        )}
+        </>}
 
         <p className="authSwitch">
           {signup ? "¿Ya tienes cuenta?" : "¿Aún no tienes cuenta?"}{" "}

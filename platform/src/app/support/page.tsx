@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata = {
-  title: "Soporte | Nival Tech",
+  title: "Soporte",
   description: "Ayuda y contacto para usuarios de Nival Tech.",
 };
 
@@ -35,7 +35,7 @@ export default async function SupportPage() {
         </ul>
 
         <h2>¿Estás evaluando Nival para tu negocio?</h2>
-        <p>Cuéntanos si te interesa Nival Pay, Nival Puntos, Intelligence, una página web con IA o una implementación para varias ubicaciones. Podemos empezar por una necesidad concreta.</p>
+        <p>Cuéntanos si te interesa Nival Pay, Nival Puntos, Nival Growth (Puntos + Intelligence), una página web con IA o una implementación para varias ubicaciones. Podemos empezar por una necesidad concreta.</p>
         <p>También puedes solicitar acceso, corrección o eliminación de tus datos personales por estos mismos medios.</p>
         <a className="textLink" href="/privacy">Consultar aviso de privacidad</a>
       </section>
