@@ -1,0 +1,42 @@
+name: Platform quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-quality.yml"
+  pull_request:
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-quality.yml"
+
+concurrency:
+  group: platform-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: platform/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
