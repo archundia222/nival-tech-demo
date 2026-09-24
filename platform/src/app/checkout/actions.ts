@@ -434,9 +434,14 @@ export async function startNivalPointsSubscription() {
 export async function startNivalIntelligenceSubscription() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  const { data: points } = await admin.from('business_product_entitlements').select('business_id')
-    .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).eq('status', 'active').maybeSingle();
-  return startMercadoPagoSubscription(points
+  const { data: points } = await admin.from('business_product_entitlements').select('status')
+    .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle();
+
+  if (!points || !['free', 'active'].includes(points.status)) {
+    redirect('/dashboard/intelligence?error=Activa+Nival+Puntos+primero.+Intelligence+se+alimenta+de+los+clientes+y+visitas+de+tu+programa.');
+  }
+
+  return startMercadoPagoSubscription(points.status === 'active'
     ? { productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Puntos + Intelligence · plan mensual' }
     : { productCode: NIVAL_INTELLIGENCE_PRODUCT, amountCents: NIVAL_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Intelligence · plan mensual' });
 }
