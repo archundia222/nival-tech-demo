@@ -6,9 +6,8 @@ export const metadata = {
   description: "Aviso de privacidad integral de Nival Tech.",
 };
 
-export default function PrivacyPage() {
-  const business = legalBusinessInfo();
-  const privacyReady = privacyDisclosuresReady();
+export default async function PrivacyPage() {
+  const [business, privacyReady] = await Promise.all([legalBusinessInfo(), privacyDisclosuresReady()]);
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
