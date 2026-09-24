@@ -36,7 +36,7 @@ export async function getPublicPointsProgram(slug: string) {
 
 export async function enrollPointsCustomer(formData: FormData) {
   await enforceRate("enroll", 8, 60);
-  if (!privacyDisclosuresReady()) return { ok: false, error: "El registro está temporalmente deshabilitado hasta completar el aviso de privacidad." };
+  if (!(await privacyDisclosuresReady())) return { ok: false, error: "El registro está temporalmente deshabilitado hasta completar el aviso de privacidad." };
   if (formData.get("privacyConsent") !== "on") return { ok: false, error: "Debes aceptar el aviso de privacidad para crear la tarjeta." };
   const slug = String(formData.get("slug") ?? "").trim();
   const admin = createPointsAdminClient();
@@ -179,7 +179,7 @@ function normalizedPhoneKeys(value: string | null | undefined) {
 
 export async function registerQuickCustomer(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
-  if (!privacyDisclosuresReady()) {
+  if (!(await privacyDisclosuresReady())) {
     redirect(captureReturn(formData, "error", "No se pueden registrar clientes nuevos hasta completar el aviso de privacidad."));
   }
   if (formData.get("privacyAcknowledged") !== "on") {
@@ -305,7 +305,7 @@ export async function deleteBusinessSale(formData: FormData) {
 
 export async function importCustomersCsv(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
-  if (!privacyDisclosuresReady()) {
+  if (!(await privacyDisclosuresReady())) {
     redirect(captureReturn(formData, "error", "No se pueden importar clientes hasta completar el aviso de privacidad."));
   }
   if (!["owner","manager"].includes(membership.role)) {
