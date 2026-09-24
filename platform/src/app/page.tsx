@@ -1,336 +1,346 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PayDemo } from "./pay-demo";
 import { LandingReveal } from "./landing-reveal";
+import { LandingExperience } from "./landing-experience";
+import styles from "./landing-premium.module.css";
 
 const signupUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
+const pointsUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints";
+const intelligenceUrl = "/auth?mode=signup&next=%2Fdashboard%2Fintelligence";
 const payProUrl = "/auth?mode=signup&next=%2Fcheckout";
+
+const productSummary = [
+  {
+    number: "01",
+    label: "COBRAR",
+    title: "Nival Pay",
+    text: "Presenta tus datos de cobro en una página clara, compártela por QR, enlace o NFC y actualízala sin volver a imprimir nada.",
+    price: "Gratis para empezar",
+    detail: "Pro · $199 MXN pago único",
+    href: signupUrl,
+  },
+  {
+    number: "02",
+    label: "HACER QUE VUELVAN",
+    title: "Nival Puntos",
+    text: "Haz visible el progreso del cliente con visitas, puntos y recompensas. Empieza con capacidad limitada y amplía cuando ya lo estés usando.",
+    price: "Gratis hasta 30 clientes",
+    detail: "Pro · $199 MXN / mes",
+    href: pointsUrl,
+  },
+  {
+    number: "03",
+    label: "DECIDIR QUÉ HACER",
+    title: "Nival Intelligence",
+    text: "Organiza señales de actividad, recurrencia y riesgo para convertir datos del negocio en una siguiente acción que puedas ejecutar y medir.",
+    price: "Gratis para explorar",
+    detail: "Pro desde $399 MXN / mes",
+    href: intelligenceUrl,
+  },
+];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   const params = await searchParams;
-  const source = params.from === 'nival-pay' || params.from === 'nival-puntos' || params.from === 'perfil-negocio' ? params.from : null;
-  const sourceContext = source === 'nival-pay'
-    ? { eyebrow: 'LLEGASTE DESDE UNA NIVAL PAY', title: '¿Te gustó lo fácil que fue encontrar los datos para pagar?', text: 'Tu negocio puede empezar con una Nival Pay gratis: página, QR y enlace. Si después necesitas NFC y más herramientas, puedes ampliar sin cambiar tu QR.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpay', cta: 'Crear la mía gratis' }
-    : source === 'nival-puntos'
-      ? { eyebrow: 'LLEGASTE DESDE NIVAL PUNTOS', title: '¿Quieres un programa de clientes frecuentes como el que acabas de ver?', text: 'Puedes empezar gratis con clientes reales, puntos y recompensas. Paga cuando necesites más capacidad y herramientas.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpoints', cta: 'Crear mi programa gratis' }
-      : source === 'perfil-negocio'
-        ? { eyebrow: 'LLEGASTE DESDE UNA PÁGINA NIVAL', title: 'Tu negocio también puede tener un acceso simple para cobro, puntos, contacto y enlaces.', text: 'Nival reúne herramientas pensadas para negocios locales sin obligarte a cambiar cómo trabajas.', href: '#productos', cta: 'Ver soluciones' }
+  const source = params.from === "nival-pay" || params.from === "nival-puntos" || params.from === "perfil-negocio" ? params.from : null;
+  const sourceContext = source === "nival-pay"
+    ? { eyebrow: "VIENES DESDE UNA NIVAL PAY", title: "Eso que acabas de usar también puede vivir en tu negocio.", text: "Empieza con página, QR y enlace. Si después quieres NFC física y más herramientas, amplías sin cambiar el acceso que ya compartiste.", href: signupUrl, cta: "Crear la mía" }
+    : source === "nival-puntos"
+      ? { eyebrow: "VIENES DESDE NIVAL PUNTOS", title: "Tu negocio también puede convertir visitas en una experiencia que se entiende.", text: "Crea el programa, pruébalo con clientes reales y decide si necesitas más capacidad después.", href: pointsUrl, cta: "Crear mi programa" }
+      : source === "perfil-negocio"
+        ? { eyebrow: "VIENES DESDE UNA PÁGINA NIVAL", title: "Cobro, lealtad y enlaces pueden sentirse como una sola experiencia.", text: "Nival reúne herramientas simples para negocios locales sin obligarte a cambiar toda tu operación.", href: "#productos", cta: "Ver el sistema" }
         : null;
+
   return (
-    <main className="landing" id="inicio">
+    <main className={styles.page} id="inicio">
       <LandingReveal />
-      <nav className="landingNav" aria-label="Navegación principal">
-        <Link className="landingBrand" href="#inicio" aria-label="Nival Tech, inicio">
-          <Image src="/wallet/nival-logo.svg" alt="" width={38} height={38} priority />
+
+      <nav className={styles.nav} aria-label="Navegación principal">
+        <Link className={styles.brand} href="#inicio" aria-label="Nival Tech, inicio">
+          <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} priority />
           <span>Nival Tech</span>
         </Link>
-        <div className="landingNavLinks">
+        <div className={styles.navLinks}>
           <a href="#productos">Productos</a>
-          <a href="#como-funciona">Cómo funciona</a>
-          <a href="#empieza-gratis">Empieza gratis</a>
-          <a href="#empresas">Para equipos</a>
+          <a href="#sistema">Cómo funciona</a>
+          <a href="#planes">Planes</a>
+          <a href="#confianza">Confianza</a>
         </div>
-        <Link className="landingLogin" href="/auth">Mi cuenta</Link>
+        <div className={styles.navActions}>
+          <Link className={styles.loginLink} href="/auth">Mi cuenta</Link>
+          <Link className={styles.navCta} href={signupUrl}>Empezar gratis</Link>
+        </div>
       </nav>
 
-      {sourceContext && <section className="sourceArrival" aria-label="Conoce Nival Tech">
-        <div><span>{sourceContext.eyebrow}</span><strong>{sourceContext.title}</strong><p>{sourceContext.text}</p></div>
-        <a href={sourceContext.href}>{sourceContext.cta} <b>→</b></a>
-      </section>}
-
-      <section className="landingHero">
-        <div className="landingHeroCopy">
-          <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para negocios locales</p>
-          <h1 className="heroReveal heroReveal2">Haz más fácil cobrar, lograr que tus clientes vuelvan y saber qué hacer para crecer.</h1>
-          <p className="landingHeroLead heroReveal heroReveal3">Nival convierte tres problemas cotidianos de un negocio en acciones simples: comparte cómo pagarte, crea una razón para regresar y recibe recomendaciones concretas basadas en la actividad real de tus clientes.</p>
-          <div className="landingPriceLine heroReveal heroReveal4">
-            <strong>Empieza gratis</strong>
-            <span>usa el producto primero; paga cuando necesites más</span>
+      {sourceContext && (
+        <section className={styles.sourceArrival} aria-label="Contexto de llegada">
+          <div>
+            <span>{sourceContext.eyebrow}</span>
+            <strong>{sourceContext.title}</strong>
+            <p>{sourceContext.text}</p>
           </div>
-          <div className="landingHeroActions heroReveal heroReveal5">
-            <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
-            <a className="landingSecondary" href="#vida-real">Ver cómo ayuda</a>
+          <a href={sourceContext.href}>{sourceContext.cta}<b aria-hidden="true">↗</b></a>
+        </section>
+      )}
+
+      <section className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <div className={styles.eyebrowRow}>
+            <span className={styles.liveDot} />
+            <p>TECNOLOGÍA PARA NEGOCIOS LOCALES</p>
+          </div>
+          <h1>
+            Tu negocio no necesita
+            <em> más software.</em>
+            <span>Necesita menos fricción.</span>
+          </h1>
+          <p className={styles.heroLead}>
+            Nival convierte momentos que ya ocurren todos los días —cobrar, hacer que un cliente vuelva y decidir qué hacer después— en experiencias simples para el cliente y accionables para el negocio.
+          </p>
+          <div className={styles.heroActions}>
+            <Link className={styles.primaryCta} href={signupUrl}>Crear mi cuenta gratis <span aria-hidden="true">↗</span></Link>
+            <a className={styles.secondaryCta} href="#productos">Ver el producto <span aria-hidden="true">↓</span></a>
+          </div>
+          <div className={styles.heroFinePrint}>
+            <span>Empieza sin tarjeta</span>
+            <i />
+            <span>Prueba con clientes reales</span>
+            <i />
+            <span>Amplía cuando tenga sentido</span>
           </div>
         </div>
 
-        <div className="landingProductVisual heroVisualReveal" aria-label="Vista previa de Nival Pay">
-          <div className="nfcCardMockup">
-            <div className="nfcCardTop">
-              <span className="nfcMonogram">N</span>
-              <span className="nfcSignal" aria-hidden="true">)))</span>
+        <div className={styles.heroStage} aria-label="Vista previa del ecosistema Nival">
+          <div className={styles.heroGlow} />
+          <div className={styles.heroDashboard}>
+            <div className={styles.dashboardTop}>
+              <div><span className={styles.dashboardLogo}>N</span><strong>Resumen del negocio</strong></div>
+              <span className={styles.dashboardStatus}>HOY</span>
             </div>
-            <div>
-              <small>NIVAL PAY</small>
-              <strong>Acerca tu celular<br />para pagar</strong>
+            <div className={styles.dashboardMetrics}>
+              <article><span>CLIENTES ACTIVOS</span><strong>24</strong><small>actividad registrada</small></article>
+              <article><span>RECURRENCIA</span><strong>38%</strong><small>2+ visitas</small></article>
+              <article><span>SEÑAL</span><strong>8</strong><small>clientes en riesgo</small></article>
+            </div>
+            <div className={styles.dashboardInsight}>
+              <div>
+                <span>PRÓXIMA ACCIÓN</span>
+                <strong>Empieza por quienes ya te conocen.</strong>
+                <p>Hay clientes frecuentes que redujeron su ritmo de visita.</p>
+              </div>
+              <b aria-hidden="true">↗</b>
             </div>
           </div>
-          <div className="phoneMockup">
-            <div className="phoneSpeaker" />
-            <div className="phoneScreen">
-              <div className="demoAvatar">CN</div>
-              <small>DATOS PARA TRANSFERENCIA</small>
-              <h2>Café Nival</h2>
-              <div className="phoneField"><span>Titular</span><b>Café Nival Demo</b></div>
-              <div className="phoneField"><span>Banco</span><b>Banco Ejemplo</b></div>
-              <div className="phoneField"><span>CLABE</span><b>012 180 015022688507</b></div>
-              <div className="phoneField"><span>Concepto</span><b>Pago de consumo</b></div>
-              <div className="phoneCopy">Copiar CLABE</div>
-            </div>
+
+          <div className={styles.heroPhone}>
+            <div className={styles.phoneCap} />
+            <span className={styles.phoneTag}>NIVAL PAY</span>
+            <div className={styles.phoneAvatar}>CN</div>
+            <h2>Café Nival</h2>
+            <p>Datos para transferencia</p>
+            <dl>
+              <div><dt>Banco</dt><dd>Banco Ejemplo</dd></div>
+              <div><dt>CLABE</dt><dd>012 180 015022688507</dd></div>
+            </dl>
+            <div className={styles.phoneButton}>Copiar CLABE</div>
           </div>
-          <p className="landingVisualNote">No guardamos NIP, CVV ni contraseñas.</p>
+
+          <div className={styles.heroNfc}>
+            <div><span>N</span><small>NIVAL PAY</small></div>
+            <strong>Acerca tu celular<br />para pagar</strong>
+            <em>NFC · QR · ENLACE</em>
+          </div>
+
+          <div className={styles.heroSignal}>
+            <small>ACTIVIDAD</small>
+            <strong>+6</strong>
+            <span>visitas registradas</span>
+          </div>
         </div>
       </section>
 
-      <section className="landingProof scrollReveal" aria-label="Beneficios principales">
-        <p><strong>Cobrar</strong><span>sin dictar tu CLABE cada vez</span></p>
-        <p><strong>Hacer que vuelvan</strong><span>sin depender de que se acuerden</span></p>
-        <p><strong>Saber qué hacer</strong><span>sin perderte entre tablas</span></p>
+      <section className={styles.valueRail + " scrollReveal"} aria-label="Principios de Nival">
+        <div><span>01</span><strong>Menos pasos</strong><p>El cliente entiende qué hacer sin que tú tengas que explicarlo cada vez.</p></div>
+        <div><span>02</span><strong>Una sola lógica</strong><p>Pay, Puntos e Intelligence comparten la misma experiencia y el mismo negocio.</p></div>
+        <div><span>03</span><strong>Datos con contexto</strong><p>Las cifras se presentan como señales operativas, no como promesas de resultados.</p></div>
       </section>
 
-      <section className="landingPainSection scrollReveal">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PROBLEMAS REALES, NO MÁS SOFTWARE POR TENER SOFTWARE</p>
-          <h2>Tu negocio ya tiene clientes. Nival te ayuda a aprovechar mejor cada interacción.</h2>
-          <p>Empieza por una sola necesidad. No tienes que cambiar cómo opera tu negocio ni aprender un sistema complicado.</p>
-        </div>
-        <div className="landingPainGrid">
-          <article><span>01</span><h3>“¿Me mandas tu CLABE?”</h3><p>Deja de buscar capturas o dictar números. Tu cliente abre una página clara desde QR, enlace o NFC.</p><b>Ver Nival Pay →</b></article>
-          <article><span>02</span><h3>“Vino una vez y no volvió.”</h3><p>Registra visitas y recompensa la recurrencia para que regresar tenga una razón visible para el cliente.</p><b>Ver Nival Puntos →</b></article>
-          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Registra una venta en segundos, carga el total del día o importa un CSV. Intelligence convierte esa actividad en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Ver Nival Intelligence →</b></article>
-        </div>
-      </section>
-
-      <section className="nivalEcosystem scrollReveal" id="productos">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">UN SISTEMA, TRES TRABAJOS</p>
-          <h2>Empieza por el problema que más te cuesta hoy.</h2>
-          <p>No necesitas comprar para empezar. Usa la versión gratis, comprueba el valor y amplía solo cuando el negocio lo necesite.</p>
-        </div>
-        <div className="nivalProductCards">
-          <article>
-            <span>COBRAR</span>
-            <h3>Nival Pay</h3>
-            <p>Empieza con una página de cobro, QR, enlace, tu marca y estadísticas básicas. Mantén el mismo QR si después activas NFC y más herramientas.</p>
-            <div><strong>Gratis</strong><small>Completo: $199 MXN pago único</small></div>
-            <Link href={signupUrl}>Crear mi Nival Pay gratis →</Link>
-          </article>
-          <article>
-            <span>HACER QUE VUELVAN</span>
-            <h3>Nival Puntos</h3>
-            <p>Crea un programa real, registra visitas y entrega recompensas. El plan gratis llega hasta 30 clientes para que puedas comprobar si lo usan.</p>
-            <div><strong>Gratis</strong><small>Pro: $199 MXN al mes</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis →</Link>
-          </article>
-          <article className="featured">
-            <span>CRECER</span>
-            <h3>Nival Intelligence</h3>
-            <p>Gratis te muestra la oportunidad principal. Pro desbloquea personas concretas, mensajes, campañas, medición y la siguiente acción.</p>
-            <div><strong>Gratis</strong><small>Pro: $399 MXN · $449 con Puntos Pro</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Activar Intelligence gratis →</Link>
-          </article>
-        </div>
-      </section>
-
-      <section className="nivalLoopSection scrollReveal" aria-labelledby="nival-loop-title">
-        <div className="nivalLoopIntro"><p className="landingEyebrow">CUANDO LOS CONECTAS</p><h2 id="nival-loop-title">Cada interacción puede ayudarte con la siguiente.</h2><p>Nival no busca llenarte de módulos. La idea es que cobrar, generar recurrencia y decidir qué hacer después formen un mismo ciclo.</p></div>
-        <div className="nivalLoopFlow">
-          <article><span>01 · NIVAL PAY</span><strong>El cliente encuentra tus datos de cobro.</strong><p>NFC, QR o enlace abren la información correcta sin volver a preguntarte cómo transferir.</p></article>
-          <i aria-hidden="true">→</i>
-          <article><span>02 · NIVAL PUNTOS</span><strong>Le das una razón para volver.</strong><p>La siguiente visita deja de depender solo de que el cliente se acuerde de ti.</p></article>
-          <i aria-hidden="true">→</i>
-          <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival organiza una siguiente acción sugerida.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
-        </div>
-        <small>Los tres pueden empezar gratis. Pro aparece cuando ya necesitas más capacidad, herramientas o automatización.</small>
-      </section>
-
-      <section className="landingRealLife scrollReveal" id="vida-real">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">ASÍ SE VE EN UN NEGOCIO REAL</p>
-          <h2>Menos pasos para tu cliente. Menos cosas que recordar para ti.</h2>
-          <p>Nival está pensado para entrar en momentos que ya ocurren todos los días, no para inventarte trabajo nuevo.</p>
-        </div>
-        <div className="realLifeTimeline">
-          <article><div><span>1</span><small>AL COBRAR</small></div><section><h3>“Escanea aquí.”</h3><p>El cliente abre Nival Pay, verifica los datos y copia la CLABE. Tú no interrumpes lo que estás haciendo para buscar datos bancarios.</p><em>QR · enlace · NFC</em></section></article>
-          <article><div><span>2</span><small>DESPUÉS</small></div><section><h3>“Tu visita ya cuenta.”</h3><p>Con Nival Puntos, el cliente ve su avance y tiene una razón concreta para regresar al negocio.</p><em>visitas · puntos · recompensas</em></section></article>
-          <article><div><span>3</span><small>PARA CRECER</small></div><section><h3>“Hay 8 clientes que conviene recuperar.”</h3><p>Intelligence transforma actividad en una recomendación y, en Pro, te ayuda a ejecutarla y observar quién regresó.</p><em>detectar · actuar · medir</em></section></article>
-        </div>
-      </section>
-
-      <section className="landingFreeSection scrollReveal" id="empieza-gratis">
-        <div className="landingFreeIntro">
-          <p className="landingEyebrow">PRIMERO ÚSALO</p>
-          <h2>Empieza gratis. Paga cuando Nival ya te esté resolviendo algo.</h2>
-          <p>No queremos que compres una promesa. Los planes gratis sirven para poner Nival frente a clientes reales y descubrir si encaja en tu negocio.</p>
-          <Link className="landingPrimary" href={signupUrl}>Crear mi cuenta gratis</Link>
-        </div>
-        <div className="landingFreePlans">
-          <article><span>NIVAL PAY GRATIS</span><strong>Empieza a cobrar mejor</strong><p>Página de cobro, QR, enlace, tu marca, 1 apartado y estadísticas básicas. No caduca.</p><small>Pro agrega NFC física, 3 apartados y más herramientas.</small></article>
-          <article><span>NIVAL PUNTOS GRATIS</span><strong>Comprueba si regresan</strong><p>Programa real de visitas, puntos y recompensas para hasta 30 clientes.</p><small>Pro aumenta capacidad y desbloquea resultados y configuración.</small></article>
-          <article><span>NIVAL INTELLIGENCE GRATIS</span><strong>Descubre una oportunidad</strong><p>Nival usa la actividad disponible para mostrarte la señal principal y una recomendación.</p><small>Pro revela personas, mensajes, campañas y seguimiento.</small></article>
-        </div>
-      </section>
-
-      <section className="landingSection landingProblem scrollReveal" id="como-funciona">
-        <div className="landingSectionHeading">
-          <p className="landingEyebrow">LO SIMPLE FUNCIONA</p>
-          <h2>Del “te dicto mi CLABE” a cobrar con un toque.</h2>
-        </div>
-        <div className="stepsGrid">
-          <article>
-            <span>01</span>
-            <h3>Crea tu Nival Pay gratis</h3>
-            <p>Agrega negocio, banco, titular y CLABE. Obtienes una página, enlace y QR permanente.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Úsala con clientes reales</h3>
-            <p>Comparte el enlace o imprime el QR. Puedes ver aperturas y copias de CLABE antes de pagar nada.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Amplía cuando tenga sentido</h3>
-            <p>Activa Nival Pay completo para recibir la tarjeta NFC física, 3 apartados y las herramientas adicionales sin cambiar tu QR.</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="landingDemoSection scrollReveal" id="demostracion">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PRUÉBALO</p>
-          <h2>Así lo verá tu cliente.</h2>
-          <p>Los siguientes datos son ficticios. Toca cualquier campo para probar la experiencia.</p>
-        </div>
-        <PayDemo />
-      </section>
-
-      <section className="landingSection landingIncludes scrollReveal">
-        <div className="landingSectionHeading">
-          <p className="landingEyebrow">TODO LO NECESARIO</p>
-          <h2>Una sola tarjeta.<br />Una página que sí puedes actualizar.</h2>
-        </div>
-        <div className="includesList">
-          <div><span>01</span><p><strong>Tarjeta NFC física</strong> programada y lista para usar.</p></div>
-          <div><span>02</span><p><strong>Página de pago personalizada</strong> con tu identidad y datos bancarios.</p></div>
-          <div><span>03</span><p><strong>Código QR descargable</strong> para mostrador, menú o redes.</p></div>
-          <div><span>04</span><p><strong>Enlace permanente</strong> que no cambia aunque actualices tus datos.</p></div>
-        </div>
-      </section>
-
-      <section className="landingPriceSection scrollReveal" id="precio">
-        <div className="pricePitch">
-          <p className="landingEyebrow">NIVAL PAY COMPLETO</p>
-          <h2>Más fácil de pagar.<br />Más fácil de vender.</h2>
-          <p>Empieza gratis con QR y enlace. Cuando quieras llevar Nival Pay físicamente a tu negocio, activa la versión completa.</p>
-        </div>
-        <article className="priceCard">
-          <p>NIVAL PAY</p>
-          <div className="priceAmount"><span>$</span><strong>199</strong><small>MXN</small></div>
-          <p className="priceFrequency">Pago único. Sin mensualidad.</p>
-          <ul>
-            <li>1 tarjeta NFC personalizada</li>
-            <li>Página de pago configurada</li>
-            <li>Código QR del negocio</li>
-            <li>3 apartados incluidos; adicionales por $49 MXN</li>
-            <li>Datos editables sin cambiar la tarjeta</li>
-          </ul>
-          <Link className="landingPrimary dark" href={payProUrl}>Activar Nival Pay completo</Link>
-          <small>Tu página, enlace y QR pueden empezar gratis. Al activar, conservas el mismo QR y agregas la tarjeta NFC física.</small>
-        </article>
-      </section>
-
-      <section className="payExpansion scrollReveal" aria-labelledby="crece-con-pay">
-        <div className="payExpansionCopy">
-          <p className="landingEyebrow">CRECE CUANDO LO NECESITES</p>
-          <h2 id="crece-con-pay">Un Nival Pay. Más puntos para cobrar.</h2>
-          <p>Empieza con tu página, QR y tarjeta. Incluye 3 apartados para organizar tus cobros. Si necesitas más, agrega apartados adicionales por $49 MXN cada uno.</p>
-        </div>
-        <div className="payExpansionOptions">
-          <article><span>APARTADO ADICIONAL</span><strong>$49 MXN</strong><p>Después de tus 3 apartados incluidos, agrega un enlace o bloque adicional a tu página de cobro.</p></article>
-          <article><span>TARJETA NFC</span><strong>Desde $99 MXN</strong><p>Programa una tarjeta para Nival Pay, Puntos, reseñas o tu perfil digital. Reverso personalizado: +$10 MXN.</p></article>
-        </div>
-      </section>
-
-      <section className="intelligenceTeaser intelligenceSecondary scrollReveal" id="intelligence">
+      <section className={styles.sectionIntro + " scrollReveal"} id="productos">
+        <p className={styles.sectionEyebrow}>TRES PRODUCTOS. TRES TRABAJOS CONCRETOS.</p>
         <div>
-          <p className="landingEyebrow">NIVAL INTELLIGENCE</p>
-          <h2>No abras otra gráfica preguntándote “¿y esto para qué me sirve?”.</h2>
-          <p>Intelligence busca responder una pregunta mucho más útil: <strong>¿qué conviene hacer ahora?</strong> Detecta clientes que podrías perder, clientes que vale la pena cuidar y oportunidades para provocar una siguiente visita.</p>
-          <div className="intelligenceExample"><span>NIVAL ENCONTRÓ ESTO</span><strong>8 clientes que antes regresaban podrían estar alejándose.</strong><p>Recomendación: empieza por quienes ya te conocen antes de lanzar una promoción general.</p></div>
-          <div className="landingHeroActions"><Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Probar Intelligence gratis</Link></div>
+          <h2>Empieza por el problema que más fricción te genera hoy.</h2>
+          <p>No necesitas adoptar una plataforma enorme. Entra por una necesidad concreta y conecta el resto solo si aporta valor.</p>
         </div>
       </section>
 
-      <section className="landingTrust scrollReveal" aria-labelledby="trust-title">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">CONTROL Y CONFIANZA</p>
-          <h2 id="trust-title">Lo simple para el cliente no tiene que ser improvisado por detrás.</h2>
-          <p>Nival separa la experiencia pública de la administración del negocio y aplica controles distintos según quién usa cada herramienta.</p>
+      <section className={styles.productGrid + " scrollReveal"}>
+        {productSummary.map((product) => (
+          <article key={product.number} className={styles.productCard}>
+            <div className={styles.productCardTop}>
+              <span>{product.number}</span>
+              <small>{product.label}</small>
+            </div>
+            <h3>{product.title}</h3>
+            <p>{product.text}</p>
+            <div className={styles.productPrice}>
+              <strong>{product.price}</strong>
+              <span>{product.detail}</span>
+            </div>
+            <Link href={product.href}>Probar {product.title} <span aria-hidden="true">↗</span></Link>
+          </article>
+        ))}
+      </section>
+
+      <section className={styles.experienceSection + " scrollReveal"}>
+        <div className={styles.sectionIntroCompact}>
+          <p className={styles.sectionEyebrow}>NO TE LO IMAGINES. MÍRALO FUNCIONAR.</p>
+          <h2>La experiencia cambia según el momento, no según el menú.</h2>
+          <p>Explora cómo se ve cada producto desde el lado de quien realmente lo usa.</p>
         </div>
-        <div className="landingTrustGrid">
-          <article><span>01</span><strong>Espacios de trabajo separados</strong><p>Cada negocio mantiene su configuración, clientes y productos dentro de su propio contexto operativo.</p></article>
-          <article><span>02</span><strong>Roles para el equipo</strong><p>Propietarios, managers y staff pueden tener responsabilidades distintas dentro de la operación.</p></article>
-          <article><span>03</span><strong>Consentimiento para marketing</strong><p>Las acciones comerciales de Intelligence respetan el consentimiento registrado antes de incluir a una persona en una audiencia.</p></article>
-          <article><span>04</span><strong>Sin secretos bancarios</strong><p>Nival Pay muestra la información que el negocio decide compartir; no necesita NIP, CVV ni contraseñas bancarias.</p></article>
+        <LandingExperience />
+      </section>
+
+      <section className={styles.systemSection + " scrollReveal"} id="sistema">
+        <div className={styles.systemCopy}>
+          <p className={styles.sectionEyebrow}>EL SISTEMA NIVAL</p>
+          <h2>Una interacción alimenta la siguiente.</h2>
+          <p>La intención no es llenarte de paneles. Es construir un ciclo donde cada momento del negocio deje una señal útil para el siguiente.</p>
+          <Link className={styles.textLink} href={intelligenceUrl}>Ver Nival Intelligence <span aria-hidden="true">↗</span></Link>
+        </div>
+
+        <div className={styles.systemFlow}>
+          <article>
+            <div><span>01</span><small>COBRAR</small></div>
+            <strong>Nival Pay</strong>
+            <p>El cliente encuentra los datos correctos y el negocio evita repetir el mismo proceso manual.</p>
+          </article>
+          <div className={styles.flowConnector}><span>→</span><small>actividad</small></div>
+          <article>
+            <div><span>02</span><small>VOLVER</small></div>
+            <strong>Nival Puntos</strong>
+            <p>Las visitas y recompensas crean una señal visible de recurrencia.</p>
+          </article>
+          <div className={styles.flowConnector}><span>→</span><small>señales</small></div>
+          <article>
+            <div><span>03</span><small>DECIDIR</small></div>
+            <strong>Intelligence</strong>
+            <p>La actividad disponible se organiza para sugerir qué conviene probar o medir después.</p>
+          </article>
         </div>
       </section>
 
-      <section className="enterpriseReady scrollReveal" id="empresas">
-        <div className="enterpriseReadyIntro">
-          <p className="landingEyebrow">DE UN NEGOCIO A MUCHAS UBICACIONES</p>
-          <h2>Nival nace simple, pero la arquitectura del producto debe poder crecer con la operación.</h2>
-          <p>Para equipos con múltiples sucursales, el valor cambia: ya no basta con una herramienta bonita. Se necesita control por ubicación, permisos, consistencia de marca, trazabilidad y una vista consolidada de lo que está funcionando.</p>
+      <section className={styles.realLifeSection + " scrollReveal"}>
+        <div className={styles.sectionIntroCompact}>
+          <p className={styles.sectionEyebrow}>DISEÑADO PARA LA VIDA REAL</p>
+          <h2>El producto aparece justo donde ya ocurre el trabajo.</h2>
         </div>
-        <div className="enterpriseReadyGrid">
-          <article><span>OPERACIÓN</span><strong>Una experiencia consistente en cada ubicación</strong><p>Perfiles, QR, programas y configuraciones pensados para administrarse por negocio y evolucionar hacia estructuras multi-sucursal.</p></article>
-          <article><span>CONTROL</span><strong>Roles y acceso por responsabilidad</strong><p>Propietarios, managers y staff con permisos separados para reducir errores y mantener control operativo.</p></article>
-          <article><span>DATOS</span><strong>Decisiones que bajan hasta la acción</strong><p>Intelligence está diseñado para convertir comportamiento en prioridades concretas, no para entregar otra colección de dashboards.</p></article>
-          <article><span>IMPLEMENTACIÓN</span><strong>Empieza con un piloto medible</strong><p>Una implementación grande debería comenzar con ubicaciones seleccionadas, objetivos claros y criterios de éxito antes de escalar.</p></article>
-        </div>
-        <div className="enterprisePilot">
-          <div><span>PARA EQUIPOS Y CADENAS</span><strong>¿Quieres evaluar Nival en varias ubicaciones?</strong><p>Podemos plantear un piloto alrededor de una necesidad concreta y medir adopción, recurrencia y operación antes de una expansión.</p></div>
-          <Link href="/support">Hablar sobre un piloto →</Link>
-        </div>
-      </section>
-
-      <section className="landingFaq scrollReveal">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PREGUNTAS FRECUENTES</p>
-          <h2>Antes de empezar.</h2>
-        </div>
-        <div className="faqList">
-          <details>
-            <summary>¿Necesito descargar una aplicación?</summary>
-            <p>No. La página se abre en el navegador del celular al acercarlo a la tarjeta NFC o escanear el QR.</p>
-          </details>
-          <details>
-            <summary>¿La tarjeta guarda mis datos bancarios?</summary>
-            <p>No. La tarjeta solo contiene una liga. Tus datos viven en tu página y puedes actualizarlos sin reprogramar la tarjeta.</p>
-          </details>
-          <details>
-            <summary>¿Nival Tech procesa el dinero?</summary>
-            <p>No. Nival Pay muestra tus datos para que el cliente haga la transferencia directamente desde su banco.</p>
-          </details>
-          <details>
-            <summary>¿Puedo cambiar mi CLABE después?</summary>
-            <p>Sí. El enlace de tu tarjeta y QR permanece igual aunque actualices el banco, titular o CLABE.</p>
-          </details>
+        <div className={styles.realLifeGrid}>
+          <article>
+            <span>EN EL MOSTRADOR</span>
+            <h3>“Escanea aquí.”</h3>
+            <p>El cliente abre Pay o Puntos desde QR o NFC. No necesita aprender un sistema para completar una acción simple.</p>
+            <div className={styles.realLifeChipRow}><i>QR</i><i>NFC</i><i>ENLACE</i></div>
+          </article>
+          <article>
+            <span>AL CERRAR EL DÍA</span>
+            <h3>“Registra solo lo que ya sabes.”</h3>
+            <p>Guarda una venta, el total del día o importa un CSV. Nival distingue datos capturados de resultados atribuidos.</p>
+            <div className={styles.miniLedger}>
+              <div><b>$1,840</b><small>total registrado</small></div>
+              <div><b>12</b><small>operaciones</small></div>
+            </div>
+          </article>
+          <article>
+            <span>ANTES DE PROMOCIONAR</span>
+            <h3>“¿A quién sí vale la pena contactar?”</h3>
+            <p>Intelligence prioriza personas con señales observables y respeta el consentimiento registrado para comunicaciones comerciales.</p>
+            <div className={styles.priorityStack}><i /><i /><i /><span>5 contactables</span></div>
+          </article>
         </div>
       </section>
 
-      <section className="landingFinalCta scrollReveal">
-        <p className="landingEyebrow">NIVAL PAY</p>
-        <h2>No necesitas decidir hoy si Nival vale la pena.<br />Úsalo y deja que el producto te lo demuestre.</h2>
-        <p>Empieza con Nival Pay, Puntos o Intelligence. Los tres tienen una forma de empezar gratis.</p>
-        <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
+      <section className={styles.plansSection + " scrollReveal"} id="planes">
+        <div className={styles.plansIntro}>
+          <p className={styles.sectionEyebrow}>EMPIEZA PEQUEÑO</p>
+          <h2>Paga cuando la herramienta ya tenga un lugar en tu operación.</h2>
+          <p>Los planes gratis existen para que pruebes el flujo antes de ampliar capacidad o activar hardware y funciones Pro.</p>
+        </div>
+        <div className={styles.plansGrid}>
+          <article>
+            <div><span>NIVAL PAY</span><b>Pago único</b></div>
+            <h3>$199 <small>MXN</small></h3>
+            <p>La versión completa incluye tarjeta NFC física, página editable, QR y 3 apartados.</p>
+            <ul>
+              <li>Empieza gratis con página, QR y enlace</li>
+              <li>Sin mensualidad para Nival Pay</li>
+              <li>Apartados adicionales por $49 MXN</li>
+            </ul>
+            <Link href={payProUrl}>Activar Nival Pay <span aria-hidden="true">↗</span></Link>
+          </article>
+          <article>
+            <div><span>NIVAL PUNTOS</span><b>Mensual</b></div>
+            <h3>$199 <small>MXN / mes</small></h3>
+            <p>Programa de lealtad con más capacidad, configuración y herramientas de operación.</p>
+            <ul>
+              <li>Gratis hasta 30 clientes</li>
+              <li>Visitas, puntos y recompensas</li>
+              <li>Tarjeta para Wallet cuando corresponda</li>
+            </ul>
+            <Link href={pointsUrl}>Probar Nival Puntos <span aria-hidden="true">↗</span></Link>
+          </article>
+          <article className={styles.planFeatured}>
+            <div><span>NIVAL INTELLIGENCE</span><b>Mensual</b></div>
+            <h3>Desde $399 <small>MXN / mes</small></h3>
+            <p>Señales, audiencias y acciones recomendadas a partir de la actividad disponible del negocio.</p>
+            <ul>
+              <li>Versión gratis para explorar la oportunidad principal</li>
+              <li>Pro desbloquea personas, campañas y seguimiento</li>
+              <li>Bundle con Puntos Pro: $449 MXN / mes</li>
+            </ul>
+            <Link href={intelligenceUrl}>Probar Intelligence <span aria-hidden="true">↗</span></Link>
+          </article>
+        </div>
+        <p className={styles.planFootnote}>Las suscripciones recurrentes solo se habilitan cuando el flujo de aviso previo y cancelación cumple los controles legales implementados por Nival.</p>
       </section>
 
-      <footer className="landingFooter">
-        <Link className="landingBrand" href="#inicio">
-          <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
-          <span>Nival Tech</span>
-        </Link>
-        <p>Herramientas para cobrar, administrar recurrencia y entender actividad de clientes. Los resultados dependen del uso, operación y contexto de cada negocio.</p>
-        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/refunds">Reembolsos</Link><Link href="/auth">Mi cuenta</Link></div>
+      <section className={styles.trustSection + " scrollReveal"} id="confianza">
+        <div className={styles.trustHeader}>
+          <div>
+            <p className={styles.sectionEyebrow}>DISEÑADO CON CONTROL</p>
+            <h2>Una interfaz elegante también tiene que explicar qué pasa por detrás.</h2>
+          </div>
+          <p>Nival separa experiencia pública, administración y procesamiento de pagos; documenta los datos que usa y limita afirmaciones a lo que el producto puede respaldar.</p>
+        </div>
+        <div className={styles.trustGrid}>
+          <article><span>01</span><strong>Privacidad visible</strong><p>Avisos y consentimientos aparecen donde se recaban o publican datos.</p></article>
+          <article><span>02</span><strong>Pagos por terceros</strong><p>Mercado Pago procesa las operaciones habilitadas; Nival concilia el estado para activar productos.</p></article>
+          <article><span>03</span><strong>Roles y espacios</strong><p>La información operativa se organiza por negocio y por los permisos definidos para su equipo.</p></article>
+          <article><span>04</span><strong>Accesibilidad base</strong><p>Foco visible, navegación por teclado, etiquetas claras, contraste revisado y movimiento reducido.</p></article>
+        </div>
+      </section>
+
+      <section className={styles.finalCta + " scrollReveal"}>
+        <div>
+          <p className={styles.sectionEyebrow}>NIVAL TECH</p>
+          <h2>Haz que lo cotidiano se sienta mejor diseñado.</h2>
+          <p>Empieza con una sola herramienta. Si encaja en tu negocio, conecta la siguiente.</p>
+        </div>
+        <Link className={styles.finalButton} href={signupUrl}>Empezar gratis <span aria-hidden="true">↗</span></Link>
+      </section>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerBrand}>
+          <Image src="/wallet/nival-logo.svg" alt="" width={30} height={30} />
+          <div><strong>Nival Tech</strong><span>Tecnología para negocios locales.</span></div>
+        </div>
+        <div className={styles.footerLinks}>
+          <Link href="/products">Productos</Link>
+          <Link href="/support">Soporte</Link>
+          <Link href="/privacy">Privacidad</Link>
+          <Link href="/terms">Términos</Link>
+          <Link href="/cookies">Cookies</Link>
+          <Link href="/refunds">Reembolsos</Link>
+        </div>
+        <p>© 2026 Nival Tech. Los ejemplos visuales y cifras demostrativas no representan resultados garantizados.</p>
       </footer>
     </main>
   );
