@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body><a className="skipLink" href="#main-content">Saltar al contenido principal</a>{children}<EssentialCookieNotice /></body>
+      <body><a className="skipLink" href="#main-content">Saltar al contenido principal</a><div id="main-content" tabIndex={-1}>{children}</div><EssentialCookieNotice /></body>
     </html>
   );
 }
