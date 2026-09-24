@@ -1,13 +1,13 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
-import { startNivalIntelligenceSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { saveAverageTicket, startIntelligenceCampaign, startIntelligenceMeasurement } from './actions';
 import { activateFreeNivalIntelligence } from './free-actions';
 import styles from './intelligence-dashboard.module.css';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
 
 type Visit = { customer_id: string; visited_at: string };
 type Campaign = { id: string; name: string; audience_rule: unknown; message: string; status: string; sent_at: string | null; created_at: string };
@@ -25,14 +25,22 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
-  const { data: entitlements } = await supabase.from('business_product_entitlements').select('product_code,status').eq('business_id', membership.business_id);
-  const entitlementMap = new Map((entitlements ?? []).map((item) => [item.product_code, item.status]));
-  const pointsStatus = entitlementMap.get('nival_points');
-  const intelligenceStatus = entitlementMap.get('nival_intelligence');
+  const { data: entitlements } = await supabase.from('business_product_entitlements').select('product_code,status,current_period_end').eq('business_id', membership.business_id);
+  const entitlementMap = new Map((entitlements ?? []).map((item) => [item.product_code, item]));
+  const pointsEntitlement = entitlementMap.get('nival_points');
+  const intelligenceEntitlement = entitlementMap.get('nival_intelligence');
+  const pointsStatus = pointsEntitlement?.status;
+  const intelligenceStatus = intelligenceEntitlement?.status;
   const hasPoints = pointsStatus === 'active' || pointsStatus === 'free' || business?.product_level === 'intelligence';
   const hasPaidPoints = pointsStatus === 'active' || business?.product_level === 'intelligence';
   const paid = intelligenceStatus === 'active' || business?.product_level === 'intelligence';
   const freePlan = !paid && intelligenceStatus === 'free';
+  // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot for trial countdown and analysis.
+  const now = Date.now();
+  const trialEnd = freePlan && intelligenceEntitlement?.current_period_end ? new Date(intelligenceEntitlement.current_period_end).getTime() : 0;
+  const trialActive = freePlan && trialEnd > now;
+  const trialDaysLeft = trialActive ? Math.max(1, Math.ceil((trialEnd - now) / 86400000)) : 0;
+  const baseFree = freePlan && !trialActive;
   const available = paid || freePlan;
   const view = params.view ?? 'overview';
   if (view === 'imports') redirect('/dashboard/intelligence');
@@ -45,8 +53,6 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     supabase.from('campaigns').select('id,name,audience_rule,message,status,sent_at,created_at').eq('business_id', membership.business_id).order('created_at',{ascending:false}).limit(20),
   ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
-  // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot used for age calculations.
-  const now = Date.now();
   const day = 86400000;
   const visits = (visitRows ?? []) as Visit[];
   const visitsByCustomer = new Map<string, Visit[]>();
@@ -155,7 +161,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   return <main className="dashboardApp nivalDashboard">
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalIntelligenceDark' : ''}`}>
-      <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Qué hacer para crecer</b></div><span className="ready">{paid ? 'Pro' : freePlan ? 'Gratis' : 'Empieza gratis'}</span></header>
+      <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Qué hacer para crecer</b></div><span className="ready">{paid ? 'Growth' : trialActive ? `Prueba Pro · ${trialDaysLeft}d` : freePlan ? 'Vista gratis' : 'Desde Puntos'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
       {!hasPoints ? <>
@@ -175,22 +181,23 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
         </section>
         <section className="productFeatureStrip darkFeatureStrip"><article><span>01</span><div><b>Puntos registra</b><p>El cliente se da de alta solo y cada visita queda guardada.</p></div></article><article><span>02</span><div><b>Intelligence entiende</b><p>Compara hábitos y detecta cambios sin pedirte capturas adicionales.</p></div></article><article><span>03</span><div><b>Tú actúas</b><p>Recibes audiencias, mensajes y acciones concretas para hacer que vuelvan.</p></div></article></section>
       </> : !available ? <>
-        <section className="productShowcase intelligenceShowcase"><div className="productShowcaseCopy"><span className="productPill">NIVAL INTELLIGENCE</span><h1>Puntos registra.<br/>Intelligence decide.</h1><p>Nival analiza automáticamente a los clientes y visitas de tu programa de fidelización para convertirlos en una acción concreta: a quién contactar, qué decir y qué medir después.</p><ul className="productBenefits"><li>Detecta clientes frecuentes y personas que se están alejando</li><li>Propone campañas según el comportamiento de Nival Puntos</li><li>Mide quién regresó y aprende del resultado</li></ul><div className="productPrice"><strong>Gratis</strong><span>para descubrir oportunidades</span></div><div className="freemiumCtas"><form action={activateFreeNivalIntelligence}><button className="productCta">Activar Intelligence Gratis <span>→</span></button></form><form action={startNivalIntelligenceSubscription}><button className="nvSecondaryButton">{hasPaidPoints ? 'Desbloquear Puntos + Intelligence · $449/mes' : 'Ver Intelligence Pro · $399/mes'}</button></form></div><small>Sin importar clientes ni registrar ventas para empezar: la fuente principal es Nival Puntos.</small></div><div className="intelligenceVisual"><div className="aiGlow"/><div className="aiPanel"><div className="aiPanelTop"><b>NIVAL <em>INTELLIGENCE</em></b><span>HOY</span></div><div className="aiInsight"><small>HAZ ESTO PRIMERO</small><strong>Recupera a 8 clientes que antes regresaban seguido.</strong><p>Nival ya eligió la audiencia y preparó un mensaje de regreso.</p><button type="button">Abrir campaña →</button></div><div className="aiMiniGrid"><div><small>PUEDES CONTACTAR</small><b>6</b><i>ahora</i></div><div><small>OBJETIVO</small><b>Volver</b><i>30 días</i></div></div></div></div></section>
+        <section className="productShowcase intelligenceShowcase"><div className="productShowcaseCopy"><span className="productPill">NIVAL INTELLIGENCE</span><h1>Puntos registra.<br/>Intelligence decide.</h1><p>Nival analiza automáticamente a los clientes y visitas de tu programa de fidelización para convertirlos en una acción concreta: a quién contactar, qué decir y qué medir después.</p><ul className="productBenefits"><li>Detecta clientes frecuentes y personas que se están alejando</li><li>Propone campañas según el comportamiento de Nival Puntos</li><li>Mide quién regresó y aprende del resultado</li></ul><div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después queda una vista gratuita de oportunidades</span></div><div className="freemiumCtas"><form action={activateFreeNivalIntelligence}><button className="productCta">Probar Intelligence {NIVAL_TRIAL_DAYS} días <span>→</span></button></form><a className="nvSecondaryButton" href="/products#growth">Ver Nival Growth · {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</a></div><small>Intelligence no se vende como producto aislado: crece encima de Nival Puntos.</small></div><div className="intelligenceVisual"><div className="aiGlow"/><div className="aiPanel"><div className="aiPanelTop"><b>NIVAL <em>INTELLIGENCE</em></b><span>HOY</span></div><div className="aiInsight"><small>HAZ ESTO PRIMERO</small><strong>Recupera a 8 clientes que antes regresaban seguido.</strong><p>Nival ya eligió la audiencia y preparó un mensaje de regreso.</p><button type="button">Abrir campaña →</button></div><div className="aiMiniGrid"><div><small>PUEDES CONTACTAR</small><b>6</b><i>ahora</i></div><div><small>OBJETIVO</small><b>Volver</b><i>30 días</i></div></div></div></div></section>
         <section className="productFeatureStrip darkFeatureStrip"><article><span>01</span><div><b>Detecta</b><p>Nival encuentra clientes que se están alejando, hábitos que cambiaron y oportunidades de segunda visita.</p></div></article><article><span>02</span><div><b>Actúa</b><p>Te dice con quién empezar y prepara una estrategia lista para ejecutar.</p></div></article><article><span>03</span><div><b>Aprende</b><p>Mide quién volvió después y usa el resultado para recomendar la siguiente acción.</p></div></article></section>
         <ProductInteractiveDemo mode="intelligence" />
-      </> : freePlan ? <div className={styles.shell}>
-        {params.free === 'started' && <p className="formMessage successMessage">Intelligence Gratis ya está activo. Nival empezará a detectar oportunidades con los clientes y visitas registrados en Nival Puntos.</p>}
+      </> : baseFree ? <div className={styles.shell}>
+        {params.free === 'started' && <p className="formMessage successMessage">La prueba de Intelligence ya está activa. Nival usará los clientes y visitas registrados en Puntos.</p>}
         <section className="freemiumBanner">
-          <div><span>NIVAL INTELLIGENCE GRATIS</span><strong>Nival te muestra qué está pasando. Pro te ayuda a actuar.</strong><p>La versión gratis interpreta la actividad de Nival Puntos y detecta una oportunidad principal. Pro desbloquea personas concretas, mensajes, campañas, seguimiento y resultados.</p></div>
-          <form action={startNivalIntelligenceSubscription}><button type="submit">{hasPaidPoints ? 'Desbloquear bundle · $449/mes →' : 'Desbloquear Pro · $399/mes →'}</button></form>
+          <div><span>VISTA GRATUITA DE INTELLIGENCE</span><strong>Nival te muestra la oportunidad principal. Growth te ayuda a actuar.</strong><p>El plan gratuito conserva la lectura básica. Nival Growth reúne Puntos + Intelligence con audiencias, mensajes, campañas, seguimiento y resultados.</p></div>
+          <a href="/products#growth">Ver Nival Growth · {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes →</a>
         </section>
         <section className={styles.solutionHero}>
           <div><span className={styles.eyebrow}>NIVAL ENCONTRÓ ESTO</span><h1>{recoverable.length ? `${recoverable.length} clientes podrían estar alejándose.` : frequent.length ? `${frequent.length} clientes ya muestran recurrencia.` : secondVisitOpportunity.length ? `${secondVisitOpportunity.length} clientes están a tiempo de una segunda visita.` : 'Todavía necesitamos más actividad para detectar un patrón fuerte.'}</h1><p>{recoverable.length ? 'Recuperar clientes que ya te conocen suele ser una oportunidad más clara que empezar desde cero.' : frequent.length ? 'Tus clientes frecuentes son una base que conviene proteger antes de lanzar promociones generales.' : 'Sigue registrando visitas: Intelligence se vuelve más útil conforme entiende el comportamiento real.'}</p><div className={styles.decisionLine}><span>RECOMENDACIÓN GRATIS</span><strong>{nextBestAction}</strong><small>Nival actualiza esta lectura conforme cambian tus clientes y visitas.</small></div></div>
           <div className={styles.solutionImpact}><small>SEÑAL PRINCIPAL</small><strong>{recoverable.length || frequent.length || secondVisitOpportunity.length}</strong><span>{priorityLabel}</span></div>
         </section>
         <section className={styles.valuePromise}><div><small>CLIENTES</small><strong>{customers.length}</strong><span>registrados en Puntos</span></div><div><small>VISITAS · 30 DÍAS</small><strong>{visits30}</strong><span>actividad reciente</span></div><div><small>RECURRENCIA</small><strong>{retention}%</strong><span>han vuelto al menos una vez</span></div></section>
-        <section className="freemiumLocked intelligenceFreeLock"><span>INTELLIGENCE PRO</span><h2>Nival ya sabe qué grupo revisar. Pro te dice exactamente con quién empezar.</h2><p>Desbloquea nombres, prioridad por cliente, mensajes personalizados, WhatsApp, campañas medibles, resultados e impacto estimado.</p><div className="freemiumPreviewRows"><div><b>Cliente prioritario</b><span>••••••••</span><em>🔒</em></div><div><b>Mensaje recomendado</b><span>Personalizado según recurrencia</span><em>🔒</em></div><div><b>Resultado de campaña</b><span>Quién volvió después</span><em>🔒</em></div></div><form action={startNivalIntelligenceSubscription}><button type="submit">Desbloquear acciones completas →</button></form></section>
+        <section className="freemiumLocked intelligenceFreeLock"><span>INTELLIGENCE PRO</span><h2>Nival ya sabe qué grupo revisar. Pro te dice exactamente con quién empezar.</h2><p>Desbloquea nombres, prioridad por cliente, mensajes personalizados, WhatsApp, campañas medibles, resultados e impacto estimado.</p><div className="freemiumPreviewRows"><div><b>Cliente prioritario</b><span>••••••••</span><em>🔒</em></div><div><b>Mensaje recomendado</b><span>Personalizado según recurrencia</span><em>🔒</em></div><div><b>Resultado de campaña</b><span>Quién volvió después</span><em>🔒</em></div></div><a className="nvPrimaryLink" href="/products#growth">Ver Nival Growth · {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes →</a></section>
       </div> : <div className={styles.shell}>
+        {trialActive && <section className="freemiumBanner"><div><span>PRUEBA INTELLIGENCE PRO · {trialDaysLeft} {trialDaysLeft === 1 ? 'DÍA' : 'DÍAS'}</span><strong>Usa la experiencia completa antes de decidir.</strong><p>Al terminar, conservarás una vista gratuita. El plan de pago será Nival Growth: Puntos + Intelligence.</p></div><a href="/products#growth">Ver Growth · {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes →</a></section>}
         {view === 'overview' && <>
           <section className={styles.solutionHero}><div><span className={styles.eyebrow}>HOY EN TU NEGOCIO</span><h1>{recoverable.length ? `Hoy puedes intentar recuperar ${recoverable.length} clientes.` : frequent.length ? `Hoy puedes fortalecer a ${frequent.length} clientes frecuentes.` : 'Hoy toca convertir visitas en clientes que regresan.'}</h1><p>Ya revisamos lo importante por ti. Esta es la acción que más sentido tiene hacer ahora.</p><div className={styles.decisionLine}><span>HAZ ESTO PRIMERO</span><strong>{nextBestAction}</strong><small>{priorityContacts.length} de {priorityAudience.length} clientes objetivo tienen contacto disponible</small></div></div><div className={styles.solutionImpact}><small>OBJETIVO</small><strong>{recoverable.length ? 'Recuperar' : frequent.length ? 'Fidelizar' : 'Repetir'}</strong><span>{recoverable.length || frequent.length || newCustomers.length} clientes detectados</span></div></section>
           <section className={styles.valuePromise}><div><small>OPORTUNIDAD DE HOY</small><strong>{priorityAudience.length}</strong><span>{priorityLabel}</span></div><div><small>PUEDES ACTUAR AHORA</small><strong>{priorityContacts.length}</strong><span>tienen forma de contacto</span></div><div><small>LISTO PARA ACCIÓN</small><strong>{actionScore}%</strong><span>de la audiencia puede contactarse</span></div></section>

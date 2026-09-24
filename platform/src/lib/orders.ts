@@ -1,5 +1,7 @@
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS } from './commercial';
+
 // Production catalog prices.
-export const NIVAL_PAY_PRICE_CENTS = 19900;
+export const NIVAL_PAY_PRICE_CENTS = NIVAL_PAY_FOUNDER_PRICE_CENTS;
 export const NIVAL_PAY_PRODUCT = 'nival_pay';
 
 export function money(amountCents: number) {
@@ -19,9 +21,10 @@ export const NIVAL_PAY_PHYSICAL_CARD_PRODUCT = 'nival_pay_physical_card';
 export const NIVAL_POINTS_PRODUCT = 'nival_points';
 export const NIVAL_INTELLIGENCE_PRODUCT = 'nival_intelligence';
 export const NIVAL_POINTS_INTELLIGENCE_PRODUCT = 'nival_points_intelligence';
-export const NIVAL_POINTS_PRICE_CENTS = 19900;
+export const NIVAL_POINTS_PRICE_CENTS = NIVAL_POINTS_FOUNDER_PRICE_CENTS;
+// Legacy direct-Intelligence checkout. Public pricing now positions Intelligence inside Nival Growth.
 export const NIVAL_INTELLIGENCE_PRICE_CENTS = 39900;
-export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = 44900;
+export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = NIVAL_GROWTH_PRICE_CENTS;
 
 export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS = 10900;
 export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT = 'nival_pay_physical_card_custom';

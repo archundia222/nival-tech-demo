@@ -211,12 +211,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         : !hasPoints
           ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de fidelización que el cliente entienda en segundos", text: "Nival Puntos permite que el cliente se registre desde QR o NFC, lleve su tarjeta en el celular y avance hacia una recompensa.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
           : Number(loyaltyCustomerCount ?? 0) === 0
-            ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo. Esa primera alta empieza a construir la base que después puede usar Nival Intelligence.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
+            ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo. Esa primera alta empieza a construir la base que después puede aprovechar Nival Growth.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
             : Number(visitCount ?? 0) === 0
-              ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita agrega señal real al programa. Con el tiempo, Intelligence podrá detectar recurrencia y clientes que se están alejando.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
+              ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita agrega señal real al programa. Con el tiempo, Growth podrá detectar recurrencia y clientes que se están alejando.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
               : hasIntelligence
-                ? { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
-                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Activa Intelligence para detectar clientes frecuentes, personas que se están alejando y oportunidades de campaña a partir de tu programa.", href: "/dashboard/intelligence", cta: "Conocer Intelligence" };
+                ? { eyebrow: "NIVAL GROWTH YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
+                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Prueba Intelligence sobre tu actividad de Puntos y, si te sirve, Nival Growth reúne ambos productos en un solo plan.", href: "/dashboard/intelligence", cta: "Probar Intelligence" };
 
   return (
     <main className="dashboardApp">
@@ -252,9 +252,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </article>
         <article className={"intelligenceProduct " + (hasIntelligence ? "activeProduct" : "")}>
           <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : hasPoints ? "DESDE PUNTOS" : "REQUIERE PUNTOS"}</b></div>
-          <h2>Nival Intelligence</h2>
-          <p>Analiza los clientes y visitas de Nival Puntos para decirte a quién recuperar, qué campaña probar y qué funcionó.</p>
-          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Intelligence →"}</a>
+          <h2>Nival Growth</h2>
+          <p>Combina Puntos + Intelligence para decirte a quién recuperar, qué campaña probar y qué funcionó.</p>
+          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Probar Intelligence →"}</a>
         </article>
       </section>
       <section className="nivalSignals">

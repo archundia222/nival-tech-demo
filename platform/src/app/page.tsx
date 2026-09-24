@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PayDemo } from "./pay-demo";
 import { LandingReveal } from "./landing-reveal";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_PAY_REGULAR_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from "@/lib/commercial";
 
 const signupUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
 const payProUrl = "/auth?mode=signup&next=%2Fcheckout";
@@ -120,29 +121,29 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">UN SISTEMA, TRES TRABAJOS</p>
           <h2>Empieza por el problema que más te cuesta hoy.</h2>
-          <p>No necesitas comprar para empezar. Usa la versión gratis, comprueba el valor y amplía solo cuando el negocio lo necesite.</p>
+          <p>La entrada gratuita reduce el riesgo. El negocio paga después de comprobar valor real y puede ampliar a Growth cuando la actividad ya permite tomar mejores decisiones.</p>
         </div>
         <div className="nivalProductCards">
           <article>
             <span>COBRAR</span>
             <h3>Nival Pay</h3>
             <p>Empieza con una página de cobro, QR, enlace, tu marca y estadísticas básicas. Mantén el mismo QR si después activas NFC y más herramientas.</p>
-            <div><strong>Gratis</strong><small>Completo: $199 MXN pago único</small></div>
+            <div><strong>Gratis digital</strong><small>Pro fundador: {mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)} pago único</small></div>
             <Link href={signupUrl}>Crear mi Nival Pay gratis →</Link>
           </article>
           <article>
             <span>HACER QUE VUELVAN</span>
             <h3>Nival Puntos</h3>
             <p>El cliente escanea, se registra y lleva su tarjeta digital en el celular. Cada visita suma hasta desbloquear la recompensa que tú defines.</p>
-            <div><strong>Gratis</strong><small>Pro: $199 MXN al mes</small></div>
+            <div><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><small>Fundador: {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</small></div>
             <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis →</Link>
           </article>
           <article className="featured">
             <span>CRECER</span>
-            <h3>Nival Intelligence</h3>
-            <p>Se conecta a Nival Puntos para detectar clientes frecuentes, personas que se están alejando y oportunidades de campaña sin volver a capturar una base.</p>
-            <div><strong>Desde Puntos</strong><small>Pro: $399 MXN · $449 con Puntos Pro</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Empezar con Nival Puntos →</Link>
+            <h3>Nival Growth</h3>
+            <p>Combina Nival Puntos + Intelligence para detectar clientes frecuentes, personas que se están alejando y oportunidades de campaña sin volver a capturar una base.</p>
+            <div><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><small>Puntos + Intelligence</small></div>
+            <Link href="/products#growth">Conocer Nival Growth →</Link>
           </article>
         </div>
       </section>
@@ -168,7 +169,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <i aria-hidden="true">→</i>
           <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival te dice qué hacer después.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
         </div>
-        <small>Pay y Puntos pueden empezar gratis. Intelligence se activa sobre la actividad que Nival Puntos va generando.</small>
+        <small>Pay puede quedarse gratis en digital. Puntos prueba herramientas Pro durante {NIVAL_TRIAL_DAYS} días y después puede seguir en Free. Intelligence forma parte de Nival Growth.</small>
       </section>
 
       <section className="landingRealLife scrollReveal" id="vida-real">
@@ -187,14 +188,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingFreeSection scrollReveal" id="empieza-gratis">
         <div className="landingFreeIntro">
           <p className="landingEyebrow">PRIMERO ÚSALO</p>
-          <h2>Empieza gratis. Paga cuando Nival ya te esté resolviendo algo.</h2>
-          <p>No queremos que compres una promesa. Los planes gratis sirven para poner Nival frente a clientes reales y descubrir si encaja en tu negocio.</p>
+          <h2>Primero úsalo. Después decide si vale pagar.</h2>
+          <p>Nival está diseñado para llegar al primer resultado antes de pedir un compromiso grande: Pay puede quedarse gratis y Puntos te deja probar herramientas Pro antes de bajar al plan Free.</p>
           <Link className="landingPrimary" href={signupUrl}>Crear mi cuenta gratis</Link>
         </div>
         <div className="landingFreePlans">
           <article><span>NIVAL PAY GRATIS</span><strong>Empieza a cobrar mejor</strong><p>Página de cobro, QR, enlace, tu marca, 1 apartado y estadísticas básicas. No caduca.</p><small>Pro agrega NFC física, 3 apartados y más herramientas.</small></article>
-          <article><span>NIVAL PUNTOS GRATIS</span><strong>Lanza tu programa</strong><p>Registro por QR/NFC, tarjeta digital, puntos y recompensas para hasta 30 clientes.</p><small>Pro aumenta capacidad y desbloquea configuración y promociones.</small></article>
-          <article><span>NIVAL INTELLIGENCE</span><strong>Haz más con los clientes de Puntos</strong><p>Cuando ya existe actividad en tu programa, Intelligence detecta recurrencia, riesgo y oportunidades.</p><small>No requiere volver a registrar a tus clientes.</small></article>
+          <article><span>NIVAL PUNTOS · REVERSE TRIAL</span><strong>Prueba Pro por {NIVAL_TRIAL_DAYS} días</strong><p>Usa configuración y promociones Pro. Si no pagas, mantienes el programa gratis hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><small>Precio fundador Pro: {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes.</small></article>
+          <article><span>NIVAL GROWTH</span><strong>Haz más con los clientes de Puntos</strong><p>Cuando ya existe actividad, Intelligence detecta recurrencia, riesgo y oportunidades y te ayuda a actuar.</p><small>Puntos + Intelligence: {mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes.</small></article>
         </div>
       </section>
 
@@ -269,6 +270,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
+      <section className="landingBusinessPlans scrollReveal" aria-labelledby="planes-title">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">PRECIOS PENSADOS PARA CRECER</p>
+          <h2 id="planes-title">Free adquiere. Pro monetiza. Growth expande.</h2>
+          <p>La oferta de lanzamiento mantiene bajo el riesgo para los primeros negocios y nos permite validar retención antes de subir a precios regulares.</p>
+        </div>
+        <div className="landingBusinessPlanGrid">
+          <article><span>NIVAL PAY</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único · fundador</small><p>Digital gratis para siempre. Pro agrega NFC física y 3 apartados.</p><em>Regular previsto: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</em></article>
+          <article className="featured"><span>NIVAL PUNTOS PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · fundador</small><p>{NIVAL_TRIAL_DAYS} días de herramientas Pro. Después puedes seguir Free hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><em>Regular previsto: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</em></article>
+          <article><span>NIVAL GROWTH</span><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}</strong><small>al mes</small><p>Puntos Pro + Intelligence para recuperar, segmentar, lanzar campañas y medir resultados.</p><em>La expansión natural cuando Puntos ya genera actividad.</em></article>
+        </div>
+        <Link className="landingPrimary" href="/products">Comparar planes →</Link>
+      </section>
+
       <section className="landingPriceSection scrollReveal" id="precio">
         <div className="pricePitch">
           <p className="landingEyebrow">NIVAL PAY COMPLETO</p>
@@ -276,9 +291,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <p>Empieza gratis con QR y enlace. Cuando quieras llevar Nival Pay físicamente a tu negocio, activa la versión completa.</p>
         </div>
         <article className="priceCard">
-          <p>NIVAL PAY</p>
-          <div className="priceAmount"><span>$</span><strong>199</strong><small>MXN</small></div>
-          <p className="priceFrequency">Pago único. Sin mensualidad.</p>
+          <p>NIVAL PAY · PRECIO FUNDADOR</p>
+          <div className="priceAmount"><span>$</span><strong>{NIVAL_PAY_FOUNDER_PRICE_CENTS / 100}</strong><small>MXN</small></div>
+          <p className="priceFrequency">Pago único · regular previsto {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)} después del lanzamiento.</p>
           <ul>
             <li>1 tarjeta NFC personalizada</li>
             <li>Página de pago configurada</li>
@@ -287,7 +302,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
             <li>Datos editables sin cambiar la tarjeta</li>
           </ul>
           <Link className="landingPrimary dark" href={payProUrl}>Activar Nival Pay completo</Link>
-          <small>Tu página, enlace y QR pueden empezar gratis. Al activar, conservas el mismo QR y agregas la tarjeta NFC física.</small>
+          <small>Tu página, enlace y QR pueden quedarse gratis. El precio fundador existe durante esta etapa de lanzamiento y validación; al cerrarla, la referencia regular será {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}.</small>
         </article>
       </section>
 
@@ -381,7 +396,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingFinalCta scrollReveal">
         <p className="landingEyebrow">EMPIEZA POR UN PROBLEMA</p>
         <h2>No necesitas comprar todo.<br />Empieza por lo que tu negocio necesita hoy.</h2>
-        <p>Pay si quieres cobrar más fácil. Puntos si quieres que regresen. Intelligence cuando Puntos ya esté generando actividad que puedas aprovechar.</p>
+        <p>Pay si quieres cobrar más fácil. Puntos si quieres que regresen. Growth cuando Puntos ya esté generando actividad que puedas convertir en decisiones y campañas.</p>
         <div className="landingHeroActions">
           <Link className="landingPrimary" href={signupUrl}>Crear mi cuenta gratis</Link>
           <a className="landingSecondary" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Hablar con Nival</a>

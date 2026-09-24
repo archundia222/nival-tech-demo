@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { trialEndsAt } from '@/lib/commercial';
 
 export async function activateFreeNivalIntelligence() {
   const supabase = await createClient();
@@ -26,22 +27,22 @@ export async function activateFreeNivalIntelligence() {
   }
 
   const { data: existing } = await admin.from('business_product_entitlements')
-    .select('status')
+    .select('status,current_period_end')
     .eq('business_id', membership.business_id)
     .eq('product_code', 'nival_intelligence')
     .maybeSingle();
 
-  if (existing?.status !== 'active') {
+  if (existing?.status !== 'active' && (!existing || !existing.current_period_end)) {
     const { error } = await admin.from('business_product_entitlements').upsert({
       business_id: membership.business_id,
       product_code: 'nival_intelligence',
       status: 'free',
-      current_period_end: null,
+      current_period_end: trialEndsAt(),
       updated_at: new Date().toISOString(),
     }, { onConflict: 'business_id,product_code' });
     if (error) {
       console.error('[intelligence-free] entitlement failed', { code: error.code });
-      redirect('/dashboard/intelligence?error=No+pudimos+activar+Intelligence+Gratis.');
+      redirect('/dashboard/intelligence?error=No+pudimos+activar+la+prueba+de+Intelligence.');
     }
   }
 

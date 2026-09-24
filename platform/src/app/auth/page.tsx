@@ -33,7 +33,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
             : "Administra Nival Pay, Puntos e Intelligence desde la misma cuenta."}
         </p>
         {signup && <>
-          <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay y Puntos pueden empezar gratis; Intelligence crece a partir de Puntos.</span></div>
+          <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay puede quedarse gratis. Puntos empieza con prueba Pro y después puede seguir en Free; Growth se construye sobre Puntos.</span></div>
           <div className="authPath"><span><b>1</b> Crea tu acceso</span><span><b>2</b> Confirma tu correo</span><span><b>3</b> Configura tu negocio</span></div>
         </>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}

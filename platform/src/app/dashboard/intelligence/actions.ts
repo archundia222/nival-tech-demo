@@ -17,12 +17,15 @@ async function getContext() {
 
 async function requireIntelligencePro(supabase: Awaited<ReturnType<typeof createClient>>, businessId: string) {
   const { data: entitlement } = await supabase.from('business_product_entitlements')
-    .select('status')
+    .select('status,current_period_end')
     .eq('business_id', businessId)
     .eq('product_code', 'nival_intelligence')
     .maybeSingle();
   const { data: business } = await supabase.from('businesses').select('product_level').eq('id', businessId).maybeSingle();
-  if (entitlement?.status !== 'active' && business?.product_level !== 'intelligence') {
+  const trialActive = entitlement?.status === 'free'
+    && Boolean(entitlement.current_period_end)
+    && new Date(entitlement.current_period_end as string).getTime() > Date.now();
+  if (entitlement?.status !== 'active' && !trialActive && business?.product_level !== 'intelligence') {
     redirect('/dashboard/intelligence?error=Esta+acción+requiere+Intelligence+Pro.');
   }
 }

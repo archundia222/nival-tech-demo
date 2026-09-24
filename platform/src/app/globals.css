@@ -4407,3 +4407,24 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .landingWalletBadge{display:block;margin:14px 4px 0;color:#8d929c;font-size:10px;text-align:center;letter-spacing:.03em}
 @media(max-width:900px){.landingPointsShowcase{grid-template-columns:1fr}.landingPointsPhone{max-width:560px}}
 @media(max-width:560px){.landingPointsShowcase{width:calc(100% - 28px);margin:54px auto;gap:30px}.landingPointsFlow{grid-template-columns:1fr}.landingPointsPhone{padding:14px}.landingPointsCard{padding:20px}.landingPointsButtons{grid-template-columns:1fr}.landingPointsCopy>p{font-size:15px}}
+
+/* Investor-ready pricing */
+.landingBusinessPlans{width:min(1180px,calc(100% - 40px));margin:32px auto;padding:52px 0}
+.landingBusinessPlanGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:28px 0 24px}
+.landingBusinessPlanGrid article{display:flex;min-height:290px;flex-direction:column;padding:28px;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:#121316}
+.landingBusinessPlanGrid article.featured{border-color:rgba(201,171,107,.45);background:radial-gradient(circle at 90% 0,rgba(201,171,107,.14),transparent 15rem),#151513}
+.landingBusinessPlanGrid span,.founderPriceNote b,.nivalPricingPrinciple span{font-size:10px;font-weight:900;letter-spacing:.14em;color:#c9ab6b}
+.landingBusinessPlanGrid strong{margin-top:18px;font-size:38px;letter-spacing:-.04em}
+.landingBusinessPlanGrid small{margin-top:3px;color:#8f949d;font-size:12px}
+.landingBusinessPlanGrid p{margin:22px 0;color:#a6aab2;line-height:1.6}
+.landingBusinessPlanGrid em{margin-top:auto;color:#d0c6ae;font-size:12px;font-style:normal}
+.founderPriceNote{display:grid;gap:5px;margin:14px 0;padding:12px 13px;border:1px solid rgba(201,171,107,.22);border-radius:12px;background:rgba(201,171,107,.06)}
+.founderPriceNote span{color:var(--muted,#8f949d);font-size:11px;line-height:1.45}
+.featuredPricingCard{border-color:rgba(201,171,107,.42)!important}
+.nivalPricingPrinciple{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;overflow:hidden;margin:0 0 26px;border:1px solid var(--line,#25272b);border-radius:18px;background:var(--line,#25272b)}
+.nivalPricingPrinciple>div{display:grid;gap:7px;padding:18px;background:#111214}
+.nivalPricingPrinciple strong{font-size:15px}
+.nivalPricingPrinciple p{margin:0;color:#8f949d;font-size:12px;line-height:1.5}
+.nvPrimaryLink{display:inline-flex;align-items:center;justify-content:center;padding:13px 16px;border-radius:12px;background:#f3f0e7;color:#111318;font-size:13px;font-weight:900;text-decoration:none}
+@media(max-width:850px){.landingBusinessPlanGrid,.nivalPricingPrinciple{grid-template-columns:1fr}}
+@media(max-width:520px){.landingBusinessPlans{width:calc(100% - 28px);padding:36px 0}.landingBusinessPlanGrid article{min-height:0;padding:22px}.landingBusinessPlanGrid strong{font-size:32px}}
