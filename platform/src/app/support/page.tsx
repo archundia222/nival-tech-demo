@@ -5,8 +5,8 @@ export const metadata = {
   description: "Ayuda y contacto para usuarios de Nival Tech.",
 };
 
-export default function SupportPage() {
-  const business = legalBusinessInfo();
+export default async function SupportPage() {
+  const business = await legalBusinessInfo();
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
