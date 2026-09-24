@@ -94,9 +94,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <p>Empieza por una sola necesidad. No tienes que cambiar cómo opera tu negocio ni aprender un sistema complicado.</p>
         </div>
         <div className="landingPainGrid">
-          <article><span>01</span><h3>“¿Me mandas tu CLABE?”</h3><p>Deja de buscar capturas o dictar números. Tu cliente abre una página clara desde QR, enlace o NFC.</p><b>Nival Pay lo resuelve →</b></article>
-          <article><span>02</span><h3>“Vino una vez y no volvió.”</h3><p>Registra visitas y recompensa la recurrencia para que regresar tenga una razón visible para el cliente.</p><b>Nival Puntos lo resuelve →</b></article>
-          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Registra una venta en segundos, carga el total del día o importa un CSV. Intelligence convierte esa actividad en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Nival Intelligence lo resuelve →</b></article>
+          <article><span>01</span><h3>“¿Me mandas tu CLABE?”</h3><p>Deja de buscar capturas o dictar números. Tu cliente abre una página clara desde QR, enlace o NFC.</p><b>Ver Nival Pay →</b></article>
+          <article><span>02</span><h3>“Vino una vez y no volvió.”</h3><p>Registra visitas y recompensa la recurrencia para que regresar tenga una razón visible para el cliente.</p><b>Ver Nival Puntos →</b></article>
+          <article><span>03</span><h3>“Tengo datos, ¿y ahora qué hago?”</h3><p>Registra una venta en segundos, carga el total del día o importa un CSV. Intelligence convierte esa actividad en una acción: a quién contactar, qué hacer y qué medir después.</p><b>Ver Nival Intelligence →</b></article>
         </div>
       </section>
 
@@ -134,11 +134,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="nivalLoopSection scrollReveal" aria-labelledby="nival-loop-title">
         <div className="nivalLoopIntro"><p className="landingEyebrow">CUANDO LOS CONECTAS</p><h2 id="nival-loop-title">Cada interacción puede ayudarte con la siguiente.</h2><p>Nival no busca llenarte de módulos. La idea es que cobrar, generar recurrencia y decidir qué hacer después formen un mismo ciclo.</p></div>
         <div className="nivalLoopFlow">
-          <article><span>01 · NIVAL PAY</span><strong>El cliente paga fácil.</strong><p>NFC, QR o enlace abren la información correcta sin volver a preguntarte cómo transferir.</p></article>
+          <article><span>01 · NIVAL PAY</span><strong>El cliente encuentra tus datos de cobro.</strong><p>NFC, QR o enlace abren la información correcta sin volver a preguntarte cómo transferir.</p></article>
           <i aria-hidden="true">→</i>
           <article><span>02 · NIVAL PUNTOS</span><strong>Le das una razón para volver.</strong><p>La siguiente visita deja de depender solo de que el cliente se acuerde de ti.</p></article>
           <i aria-hidden="true">→</i>
-          <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival te dice qué hacer después.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
+          <article><span>03 · NIVAL INTELLIGENCE</span><strong>Nival organiza una siguiente acción sugerida.</strong><p>Detecta riesgo, recurrencia y campañas para convertir actividad en acciones concretas.</p></article>
         </div>
         <small>Los tres pueden empezar gratis. Pro aparece cuando ya necesitas más capacidad, herramientas o automatización.</small>
       </section>
