@@ -4295,3 +4295,17 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .subscriptionManage .checkLabel{display:grid;grid-template-columns:18px 1fr;gap:9px;align-items:start;font-size:12px;line-height:1.5}
 .subscriptionManage .checkLabel input{width:18px;height:18px;margin-top:1px}
 .subscriptionManage button{justify-self:start}
+
+.authForm>fieldset,.checkoutConsentForm>fieldset{border:0;padding:0;margin:0;min-inline-size:0;display:grid;gap:14px}
+.checkoutConsentForm>fieldset:disabled{opacity:.72}
+.checkoutSeller{display:grid;gap:5px;margin:0 0 18px;padding:14px 16px;border:1px solid #d8d9dc;border-radius:12px;background:#f7f7f8;color:#22252a;font-size:13px;line-height:1.45}
+.checkoutSeller a{color:#30343a;text-decoration:underline;text-underline-offset:2px}
+.compactPurchaseConsent{display:grid;gap:10px}
+.compactPurchaseConsent.checkLabel,.compactPurchaseConsent .checkLabel{grid-template-columns:18px 1fr;align-items:start;font-size:12px;line-height:1.45}
+.compactPurchaseConsent input[type=checkbox],.compactPurchaseConsent .checkLabel input{width:18px;height:18px;margin-top:1px}
+.formPrivacyNotice,.legalWarning{padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.55}
+.formPrivacyNotice{background:rgba(181,154,97,.08);border:1px solid rgba(181,154,97,.24)}
+.legalWarning{background:rgba(255,168,0,.09);border:1px solid rgba(255,168,0,.28)}
+.subscriptionManage{margin:12px 0 22px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.subscriptionManage summary{cursor:pointer;font-weight:800}
+.subscriptionManage form{display:grid;gap:12px;margin-top:12px}
