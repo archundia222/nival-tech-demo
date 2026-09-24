@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
-import { startNivalPointsSubscription } from '@/app/checkout/actions';
+import { startNivalPointsSubscription, cancelNivalSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
@@ -75,8 +75,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!available ? "nivalPointsDark" : ""}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Puntos</span><b>Haz que vuelvan</b></div><span className="ready">{paid ? 'Pro' : freePlan ? 'Gratis' : 'Empieza gratis'}</span></header>
+      {paid && <details className="subscriptionManage"><summary>Administrar suscripción mensual</summary><form action={cancelNivalSubscription}><input type="hidden" name="scope" value="points" /><label className="checkLabel"><input type="checkbox" name="cancelConsent" required /><span>Confirmo que quiero cancelar esta suscripción recurrente y detener futuros cobros automáticos.</span></label><button type="submit" className="nvSecondaryButton">Cancelar suscripción mensual</button></form></details>}
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription === 'return' && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription === 'cancelled' && <p className="formMessage successMessage">Suscripción cancelada. No se crearán nuevos cobros recurrentes desde Nival para esta suscripción.</p>}
       {params.saved === 'customer' && <p className="formMessage successMessage">Cliente registrado y tarjeta de puntos creada.</p>}
       {params.saved === 'existing' && <p className="formMessage successMessage">Ese cliente ya estaba registrado. No creamos un duplicado.</p>}
       {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada.</p>}
