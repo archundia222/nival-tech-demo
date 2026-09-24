@@ -8,6 +8,7 @@ import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { commerceDisclosuresReady, legalBusinessInfo } from '@/lib/legal';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -132,10 +133,18 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     : { data: null };
   const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
   const siteUrl = publicSiteUrl();
+  const [commerceReady, legal] = await Promise.all([commerceDisclosuresReady(), legalBusinessInfo()]);
 
   return <main className="checkoutExperience">
-    <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Compra segura</small></header>
+    <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Pago procesado por Mercado Pago</small></header>
     <div className="checkoutFrame">
+      {!commerceReady && <p className="checkoutStatus errorMessage" role="alert">Las compras están temporalmente deshabilitadas hasta completar en la configuración legal de Nival el nombre del proveedor, domicilio físico y teléfono para reclamaciones.</p>}
+      {commerceReady && <section className="checkoutSeller" aria-label="Datos del proveedor">
+        <strong>Proveedor: {legal.legalName}</strong>
+        <span>Domicilio: {legal.address}</span>
+        <span>Teléfono: {legal.phone}</span>
+        <a href={`mailto:${legal.supportEmail}`}>Aclaraciones y reclamaciones: {legal.supportEmail}</a>
+      </section>}
       {params.error && <p className="checkoutStatus errorMessage" role="alert">{params.error}</p>}
       {params.result === 'success' && !paid && <p className="checkoutStatus">Estamos confirmando tu pago. Actualiza esta página en unos segundos.</p>}
       {params.result === 'pending' && <p className="checkoutStatus">Tu pago está pendiente. La activación será automática cuando Mercado Pago lo apruebe.</p>}
@@ -155,15 +164,15 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>3 apartados incluidos</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
-              <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>
-                <form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="checkoutPrimaryButton" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form>
+              <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Mercado Pago procesa el pago con los métodos que tenga disponibles para esta operación.</p>
+                <form action={startMercadoPagoCheckout} className="checkoutConsentForm"><fieldset disabled={!commerceReady}><label className="checkLabel"><input name="purchaseConsent" type="checkbox" required /><span>Confirmo el pago único mostrado y acepto los <Link href="/terms" target="_blank">Términos</Link> y la <Link href="/refunds" target="_blank">política de reembolsos</Link>.</span></label><CheckoutSubmitButton className="checkoutPrimaryButton" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></fieldset></form>
               </article>
               <article className="checkoutMethodCash"><div><h2>Pago en efectivo</h2><p>Para ventas presenciales. Requiere confirmación manual del vendedor.</p></div>
-                <form action={requestCashPayment}><CheckoutSubmitButton className="checkoutCashButton" pendingLabel="Registrando…">Registrar efectivo</CheckoutSubmitButton></form>
+                <form action={requestCashPayment} className="checkoutConsentForm"><fieldset disabled={!commerceReady}><label className="checkLabel"><input name="purchaseConsent" type="checkbox" required /><span>Confirmo el total mostrado y acepto los <Link href="/terms" target="_blank">Términos</Link> y la <Link href="/refunds" target="_blank">política de reembolsos</Link>.</span></label><CheckoutSubmitButton className="checkoutCashButton" pendingLabel="Registrando…">Registrar pago en efectivo</CheckoutSubmitButton></fieldset></form>
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></footer>
+          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/refunds">Reembolsos</Link></footer>
         </>}
     </div>
   </main>;

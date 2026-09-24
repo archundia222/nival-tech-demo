@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { DM_Sans, Manrope } from "next/font/google";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { PaymentPageView } from "./payment-page-view";
 import styles from "./payment-page.module.css";
 
@@ -13,7 +13,7 @@ interface PaymentPageProps { params: Promise<{ token: string }>; }
 export default async function PaymentPage({ params }: PaymentPageProps) {
   const { token } = await params;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(token)) notFound();
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("get_public_payment_profile_v4", { profile_token: token });
   if (error || !data?.[0]) notFound();
 

@@ -51,11 +51,12 @@ export function BankSetupForm({ businessName, siteUrl }: { businessName: string;
           placeholder="18 dígitos" />
         <small>{clabe.length}/18 dígitos</small>
       </label>
+      <label className="checkLabel checkoutFieldWide"><input name="financialDataConsent" type="checkbox" required /> <span>Autorizo expresamente que Nival guarde y publique en mi página Nival Pay el titular, banco y CLABE que estoy proporcionando para que mis clientes puedan realizar transferencias. Puedo ocultarlos o actualizarlos después.</span></label>
       {state.error && <p className="checkoutFormError" role="alert">{state.error}</p>}
       <button className="checkoutPrimaryButton checkoutFieldWide" disabled={pending || clabe.length !== 18}>
         {pending ? 'Guardando…' : 'Continuar'}
       </button>
-      <p className="checkoutPrivacy checkoutFieldWide">Solo mostraremos estos datos en tu página de cobro. Nunca solicitaremos NIP, CVV ni contraseñas.</p>
+      <p className="checkoutPrivacy checkoutFieldWide">Estos datos se publicarán en tu página de cobro únicamente con tu autorización. Nunca solicitamos NIP, CVV ni contraseñas. Consulta el Aviso de privacidad.</p>
     </form>
   </section>;
 }

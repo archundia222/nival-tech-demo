@@ -104,6 +104,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <label>Estado<input name="state" required minLength={2} maxLength={100}/></label>
           <label>Código postal<input name="postalCode" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5}/></label>
         </section>
+        <label className="checkLabel physicalOrderConsent"><input name="orderConsent" type="checkbox" required /><span>Confirmo los datos de entrega y que tengo autorización para usar los diseños que suba. Autorizo a Nival a tratar estos datos para producir y entregar el pedido, y acepto los <a href="/terms" target="_blank" rel="noreferrer">Términos</a>, el <a href="/privacy" target="_blank" rel="noreferrer">Aviso de privacidad</a> y la <a href="/refunds" target="_blank" rel="noreferrer">política de reembolsos</a>.</span></label>
         <div className="checkoutActions">
           <button className="nvPrimaryButton" type="submit">{hasIncludedCard ? 'Solicitar tarjeta / continuar si elegí reverso +$10' : 'Continuar al pago · $99 o $109'}</button>
           {!hasIncludedCard && <button className="nvSecondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Registrar pago en efectivo · $99 o $109</button>}

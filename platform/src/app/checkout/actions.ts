@@ -9,6 +9,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { commerceDisclosuresReady } from '@/lib/legal';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
@@ -85,6 +86,12 @@ type CheckoutProduct = {
   physicalOrder?: Record<string, string | null>;
 };
 
+async function assertCommerceDisclosures(returnPath: string) {
+  if (!(await commerceDisclosuresReady())) {
+    redirect(checkoutReturnPath(returnPath, 'error', 'Las compras están temporalmente deshabilitadas hasta completar el nombre legal, domicilio físico y teléfono del proveedor.'));
+  }
+}
+
 function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: string) {
   const url = new URL(returnPath, 'https://nival-tech-platform.vercel.app');
   url.searchParams.set(key, value);
@@ -92,6 +99,7 @@ function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: 
 }
 
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
+  await assertCommerceDisclosures(product.returnPath);
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
@@ -205,7 +213,10 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   redirect(result.checkout_url!);
 }
 
-export async function startMercadoPagoCheckout() {
+export async function startMercadoPagoCheckout(formData: FormData) {
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/checkout?error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+pagar.');
+  }
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_PRODUCT,
     amountCents: NIVAL_PAY_PRICE_CENTS,
@@ -213,7 +224,10 @@ export async function startMercadoPagoCheckout() {
     returnPath: '/checkout',
   });
 }
-export async function startAdditionalNivalPayCheckout() {
+export async function startAdditionalNivalPayCheckout(formData: FormData) {
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/dashboard/pay?view=add&error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+pagar.');
+  }
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_ADDITIONAL_PRODUCT,
     amountCents: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
@@ -222,7 +236,11 @@ export async function startAdditionalNivalPayCheckout() {
   });
 }
 
-export async function requestCashPayment() {
+export async function requestCashPayment(formData: FormData) {
+  await assertCommerceDisclosures('/checkout');
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/checkout?error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+registrar+el+pago.');
+  }
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { error } = await admin.from('product_orders').insert({
@@ -250,6 +268,9 @@ export async function completeCheckoutBankProfile(
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\D/g, '');
+  if (form.get('financialDataConsent') !== 'on') {
+    return { error: 'Necesitamos tu autorización expresa para publicar los datos de transferencia.' };
+  }
 
   if (holder.length < 2 || holder.length > 120) {
     return { error: 'Escribe el nombre completo del titular.' };
@@ -366,7 +387,10 @@ export async function startExtraSectionCheckout(formData?: FormData) {
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
-export async function startExtraSectionCheckoutForProfile(paymentProfileId: string) {
+export async function startExtraSectionCheckoutForProfile(paymentProfileId: string, purchaseConsent: boolean) {
+  if (!purchaseConsent) {
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}&error=Confirma+las+condiciones+de+la+compra.`);
+  }
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
@@ -377,9 +401,13 @@ type SubscriptionProduct = {
 };
 
 async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
+  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
+  await assertCommerceDisclosures(returnPath);
+  if (process.env.NIVAL_RENEWAL_NOTICE_READY !== 'true') {
+    redirect(`${returnPath}?error=Las+suscripciones+mensuales+están+temporalmente+deshabilitadas+hasta+activar+un+aviso+de+renovación+con+al+menos+5+días+de+anticipación.`);
+  }
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const { user, businessId } = await currentPurchaseContext();
-  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
   if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
   if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
 
@@ -427,11 +455,17 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   redirect(result.init_point);
 }
 
-export async function startNivalPointsSubscription() {
+export async function startNivalPointsSubscription(formData: FormData) {
+  if (formData.get('subscriptionConsent') !== 'on') {
+    redirect('/dashboard/points?error=Confirma+el+cobro+mensual+recurrente+antes+de+continuar.');
+  }
   return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
 }
 
-export async function startNivalIntelligenceSubscription() {
+export async function startNivalIntelligenceSubscription(formData: FormData) {
+  if (formData.get('subscriptionConsent') !== 'on') {
+    redirect('/dashboard/intelligence?error=Confirma+el+cobro+mensual+recurrente+antes+de+continuar.');
+  }
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: points } = await admin.from('business_product_entitlements').select('business_id')
@@ -439,6 +473,65 @@ export async function startNivalIntelligenceSubscription() {
   return startMercadoPagoSubscription(points
     ? { productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Puntos + Intelligence · plan mensual' }
     : { productCode: NIVAL_INTELLIGENCE_PRODUCT, amountCents: NIVAL_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Intelligence · plan mensual' });
+}
+
+
+export async function cancelNivalSubscription(formData: FormData) {
+  const scope = String(formData.get('scope') ?? '');
+  const returnPath = scope === 'points' ? '/dashboard/points' : scope === 'intelligence' ? '/dashboard/intelligence' : '/dashboard';
+  if (formData.get('cancelConsent') !== 'on') {
+    redirect(`${returnPath}?error=Confirma+que+quieres+cancelar+la+suscripción.`);
+  }
+
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
+
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const productCodes = scope === 'points'
+    ? [NIVAL_POINTS_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT]
+    : [NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT];
+
+  const { data: subscription, error } = await admin.from('product_subscriptions')
+    .select('id, provider_subscription_id, product_code, status')
+    .eq('business_id', businessId)
+    .in('product_code', productCodes)
+    .in('status', ['authorized', 'active', 'pending'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !subscription?.provider_subscription_id) {
+    redirect(`${returnPath}?error=No+encontramos+una+suscripción+activa+para+cancelar.`);
+  }
+
+  const response = await fetch(`https://api.mercadopago.com/preapproval/${encodeURIComponent(subscription.provider_subscription_id)}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'canceled' }),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({})) as { message?: string };
+    console.error('[subscriptions] Mercado Pago cancellation failed', { status: response.status, message: result.message ?? null });
+    redirect(`${returnPath}?error=No+se+pudo+cancelar+la+suscripción.+Intenta+de+nuevo.`);
+  }
+
+  const { error: syncError } = await admin.rpc('sync_nival_product_subscription', {
+    p_subscription_id: subscription.id,
+    p_provider_subscription_id: subscription.provider_subscription_id,
+    p_status: 'cancelled',
+    p_current_period_end: null,
+  });
+  if (syncError) {
+    console.error('[subscriptions] Local cancellation sync failed', { subscriptionId: subscription.id, code: syncError.code });
+    redirect(`${returnPath}?error=Mercado+Pago+canceló+la+suscripción,+pero+no+pudimos+actualizar+el+panel.+Contacta+soporte.`);
+  }
+
+  revalidatePath('/dashboard/points');
+  revalidatePath('/dashboard/intelligence');
+  redirect(`${returnPath}?subscription=cancelled`);
 }
 
 
@@ -564,6 +657,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
 }
 
 export async function startPhysicalCardCheckout(form: FormData) {
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -580,6 +674,7 @@ export async function startPhysicalCardCheckout(form: FormData) {
 }
 
 export async function claimIncludedPhysicalCard(form: FormData) {
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -628,6 +723,8 @@ export async function claimIncludedPhysicalCard(form: FormData) {
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {
+  await assertCommerceDisclosures('/dashboard/pay/physical');
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();

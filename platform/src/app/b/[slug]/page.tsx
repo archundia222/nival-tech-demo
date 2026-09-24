@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { enrollCustomer } from "./actions";
 import { getPublicPointsProgram } from "@/app/points/actions";
+import { legalBusinessInfo } from "@/lib/legal";
 
 interface BusinessPageProps {
   params: Promise<{ slug: string }>;
@@ -13,10 +14,11 @@ interface BusinessPageProps {
 export default async function BusinessPage({ params, searchParams }: BusinessPageProps) {
   const { slug } = await params;
   const query = await searchParams;
-  const supabase = await createClient();
-  const [{ data, error }, pointsProgram] = await Promise.all([
+  const supabase = createAdminClient();
+  const [{ data, error }, pointsProgram, legal] = await Promise.all([
     supabase.rpc("get_public_business_v3", { business_slug: slug }),
     getPublicPointsProgram(slug).catch(() => null),
+    legalBusinessInfo(),
   ]);
   if (error || !data?.[0] || !data[0].points_enabled || !pointsProgram) notFound();
   const business = data[0];
@@ -48,8 +50,9 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <input type="hidden" name="origin" value={query.from === "nfc" ? "nfc" : "qr"} />
             <label>Nombre<input name="name" required minLength={2} maxLength={100} autoComplete="name" /></label>
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
-            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el <Link href="/privacy" target="_blank" rel="noreferrer">aviso de privacidad</Link> y el uso de mis datos para operar el programa.</label>
-            <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
+            <p className="formPrivacyNotice"><strong>Aviso simplificado:</strong> responsable de la recopilación en esta plataforma: {legal.legalName}, domicilio {legal.address}. Datos: nombre, teléfono y actividad del programa (visitas, puntos y recompensas). Finalidad necesaria: crear y administrar tu tarjeta de lealtad y poner esa actividad a disposición de {business.business_name} para operar el programa. La finalidad promocional es opcional y solo se activa si marcas la casilla correspondiente. Para limitar uso/divulgación, revocar consentimiento o ejercer derechos ARCO escribe a <a href={`mailto:${legal.supportEmail}`}>{legal.supportEmail}</a>. Consulta el <Link href="/privacy" target="_blank" rel="noreferrer">Aviso de privacidad integral</Link>.</p>
+            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Confirmo que recibí el aviso de privacidad y autorizo el tratamiento necesario para operar mi tarjeta de puntos.</label>
+            <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Opcional: quiero recibir promociones de este negocio. Puedo negarme y seguir usando mi tarjeta de puntos.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>

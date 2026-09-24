@@ -78,7 +78,7 @@ export async function reconcileLatestSubscription(businessId: string) {
 
   const status = provider.status === 'authorized' ? 'authorized'
     : provider.status === 'paused' ? 'paused'
-    : provider.status === 'cancelled' ? 'cancelled'
+    : (provider.status === 'cancelled' || provider.status === 'canceled') ? 'cancelled'
     : 'pending';
   const { error } = await admin.rpc('sync_nival_product_subscription', {
     p_subscription_id: subscription.id,

@@ -66,6 +66,7 @@ export function PaymentEditor({
   trialMode?: boolean;
 }) {
   const [checkoutPending, startCheckoutTransition] = useTransition();
+  const [extraPurchaseConsent, setExtraPurchaseConsent] = useState(false);
   const [state, action, pending] = useActionState<PaymentFormState, FormData>(savePaymentProfile, {});
   const formRef = useRef<HTMLFormElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -150,8 +151,8 @@ export function PaymentEditor({
   const freeSectionsRemaining = Math.max(0, includedSectionLimit - sections.length);
 
   const buyExtraSection = () => {
-    if (!profile?.id) return;
-    startCheckoutTransition(() => startExtraSectionCheckoutForProfile(profile.id));
+    if (!profile?.id || !extraPurchaseConsent) return;
+    startCheckoutTransition(() => startExtraSectionCheckoutForProfile(profile.id, true));
   };
 
   const hasPendingChanges = revision > savedRevision;
@@ -278,6 +279,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="Banco"
             name="bankName"
             value={bank}
             onChange={(event) => { setBank(event.target.value); markDirty(); }}
@@ -292,6 +294,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="CLABE interbancaria"
             name="clabe"
             value={clabe}
             onChange={(event) => { setClabe(event.target.value); markDirty(); }}
@@ -311,6 +314,7 @@ export function PaymentEditor({
           </div>
           <input
             className="nivalPayTextInput"
+            aria-label="Concepto opcional"
             name="concept"
             value={concept}
             onChange={(event) => { setConcept(event.target.value); markDirty(); }}
@@ -325,6 +329,7 @@ export function PaymentEditor({
             </div>
             <input
               className="nivalPayTextInput"
+              aria-label="Enlace de pago opcional"
               value={paymentUrl}
               onChange={(event) => { setPaymentUrl(event.target.value); markDirty(); }}
               type="url"
@@ -344,6 +349,7 @@ export function PaymentEditor({
               <span>Nombre del apartado</span>
               <input
                 ref={section.id === newSectionId ? newSectionInput : undefined}
+                aria-label={`Nombre del apartado ${index + 1}`}
                 value={section.title}
                 onChange={(event) => updateSection(section.id, { title: event.target.value })}
                 maxLength={80}
@@ -354,6 +360,7 @@ export function PaymentEditor({
             <label className="nivalPayField">
               <span>Link o información</span>
               <input
+                aria-label={`Contenido del apartado ${index + 1}`}
                 value={section.content}
                 onChange={(event) => updateSection(section.id, { content: event.target.value })}
                 maxLength={200}
@@ -381,15 +388,21 @@ export function PaymentEditor({
           ) : trialMode ? (
             <span className="nivalPayTrialLock">Más apartados al activar Nival Pay</span>
           ) : (
+            <>
+            <label className="checkLabel compactPurchaseConsent">
+              <input type="checkbox" checked={extraPurchaseConsent} onChange={(event) => setExtraPurchaseConsent(event.target.checked)} />
+              <span>Confirmo la compra de un apartado adicional por {extraSectionPriceMx} MXN y acepto los <a href="/terms" target="_blank" rel="noreferrer">Términos</a> y la <a href="/refunds" target="_blank" rel="noreferrer">política de reembolsos</a>.</span>
+            </label>
             <button
               key="buy-extra-section"
               type="button"
               onClick={buyExtraSection}
-              disabled={checkoutPending || !profile?.id}
+              disabled={checkoutPending || !profile?.id || !extraPurchaseConsent}
               className="nvSecondaryButton nivalPaySecondaryAction"
             >
               {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · ${extraSectionPriceMx} MXN`}
             </button>
+            </>
           )}
           <p className="apartadoFootnote">{trialMode ? 'Tu QR y tu configuración se conservan si activas Nival Pay.' : freeSectionsRemaining > 0 ? 'Los apartados incluidos se pueden editar y ocultar cuando quieras.' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
         </div>

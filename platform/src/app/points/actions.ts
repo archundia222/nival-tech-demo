@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
+import { privacyDisclosuresReady } from "@/lib/legal";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
@@ -35,6 +36,8 @@ export async function getPublicPointsProgram(slug: string) {
 
 export async function enrollPointsCustomer(formData: FormData) {
   await enforceRate("enroll", 8, 60);
+  if (!(await privacyDisclosuresReady())) return { ok: false, error: "El registro está temporalmente deshabilitado hasta completar el aviso de privacidad." };
+  if (formData.get("privacyConsent") !== "on") return { ok: false, error: "Debes aceptar el aviso de privacidad para crear la tarjeta." };
   const slug = String(formData.get("slug") ?? "").trim();
   const admin = createPointsAdminClient();
   const { data, error } = await admin.rpc("enroll_points_customer", {
@@ -43,7 +46,7 @@ export async function enrollPointsCustomer(formData: FormData) {
     p_customer_phone: String(formData.get("phone") ?? "").trim(),
     p_marketing_consent: formData.get("marketingConsent") === "on",
     p_origin: formData.get("origin") === "nfc" ? "nfc" : "qr",
-    p_privacy_notice_version: "2026-09-23",
+    p_privacy_notice_version: "2026-09-24",
   });
   if (error || !data?.[0]) {
     const message = error?.message?.includes('free_customer_limit_reached')
@@ -176,6 +179,9 @@ function normalizedPhoneKeys(value: string | null | undefined) {
 
 export async function registerQuickCustomer(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
+  if (!(await privacyDisclosuresReady())) {
+    redirect(captureReturn(formData, "error", "No se pueden registrar clientes nuevos hasta completar el aviso de privacidad."));
+  }
   if (formData.get("privacyAcknowledged") !== "on") {
     redirect(captureReturn(formData, "error", "Confirma que informaste al cliente sobre el uso de sus datos."));
   }
@@ -299,6 +305,9 @@ export async function deleteBusinessSale(formData: FormData) {
 
 export async function importCustomersCsv(formData: FormData) {
   const { supabase, membership } = await activeBusinessContext();
+  if (!(await privacyDisclosuresReady())) {
+    redirect(captureReturn(formData, "error", "No se pueden importar clientes hasta completar el aviso de privacidad."));
+  }
   if (!["owner","manager"].includes(membership.role)) {
     redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede importar una base de clientes."));
   }

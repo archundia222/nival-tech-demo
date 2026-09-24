@@ -30,7 +30,7 @@ export function PayDemo() {
       </header>
       <div className="payDemoIntro">
         <p className="landingEyebrow">DATOS PARA TRANSFERENCIA</p>
-        <h3>Paga en segundos.</h3>
+        <h3>Copia los datos para pagar.</h3>
         <p>Verifica el nombre del titular antes de confirmar tu transferencia.</p>
       </div>
       <div className="payDemoFields">

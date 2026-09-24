@@ -380,7 +380,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .checkoutBankForm label { display:grid;gap:8px;color:#30343a;font-size:14px;font-weight:750; }
 .checkoutBankForm input,.checkoutBankForm select { width:100%;min-height:50px;padding:12px 14px;border:1px solid #cfd1d5;border-radius:11px;background:#fff;color:#111214;font:inherit;outline:none; }
 .checkoutBankForm input:focus,.checkoutBankForm select:focus { border-color:#73777e;box-shadow:0 0 0 3px rgba(17,18,20,.08); }
-.checkoutBankForm small { color:#7a7f86;font-size:12px;font-weight:500;text-align:right; }
+.checkoutBankForm small { color:#6c7178;font-size:12px;font-weight:500;text-align:right; }
 .checkoutFieldWide,.checkoutFormError,.checkoutPrivacy { grid-column:1/-1; }
 .checkoutFormError { margin:0;padding:12px 14px;border-radius:10px;background:#fff0ef;color:#9a2720;font-size:14px; }
 .checkoutPrivacy { margin:0;color:#777c83;font-size:12px;line-height:1.5;text-align:center; }
@@ -4263,3 +4263,49 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 
 /* Capture corrections */
 .captureRecent{display:grid;gap:12px;margin-top:14px;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:#101013}.captureRecentList{display:grid;gap:7px}.captureRecentList article{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 11px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#151518}.captureRecentList article>div{display:grid;gap:2px}.captureRecentList strong{font-size:10px}.captureRecentList span{color:var(--muted);font-size:8px}.captureRecentList button{padding:7px 9px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:transparent;color:#c9c9cf;font-size:8px;font-weight:800;cursor:pointer}.captureRecentList button:hover{border-color:rgba(220,100,100,.45);color:#efb2b2}@media(max-width:560px){.captureRecentList article{align-items:flex-start;flex-direction:column}.captureRecentList form,.captureRecentList button{width:100%}}
+
+
+/* Compliance and accessibility pass — 2026-09-24 */
+.skipLink{position:fixed;left:16px;top:12px;z-index:10000;transform:translateY(-160%);padding:10px 14px;border-radius:9px;background:#fff;color:#111;font-weight:800;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+.skipLink:focus{transform:translateY(0)}
+:where(a,button,input,select,textarea,summary,[tabindex]):focus-visible{outline:3px solid #d5b768!important;outline-offset:3px!important}
+#main-content:focus{outline:none}
+.legalLinks{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+.legalLinks a{text-decoration:underline;text-underline-offset:3px}
+.cookieNotice{position:fixed;z-index:9999;left:50%;bottom:18px;transform:translateX(-50%);width:min(720px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;border:1px solid #d9d9d9;border-radius:16px;background:#fff;color:#17191c;box-shadow:0 18px 60px rgba(0,0,0,.2);color-scheme:light}
+.cookieNotice p{margin:4px 0 0;color:#50545a;font-size:13px;line-height:1.5}
+.cookieNoticeActions{display:flex;flex:0 0 auto;align-items:center;gap:10px}
+.cookieNoticeActions a{color:#30343a;text-decoration:underline;text-underline-offset:3px;font-size:13px;font-weight:700}
+.cookieNoticeActions button{min-height:42px;padding:0 16px;border:0;border-radius:10px;background:#17191c;color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.authConsent,.physicalOrderConsent,.checkoutConsentForm .checkLabel{align-items:start;line-height:1.5}
+.authConsent input,.physicalOrderConsent input,.checkoutConsentForm .checkLabel input{width:18px;height:18px;margin-top:2px;flex:0 0 auto}
+.checkoutConsentForm{display:grid;gap:14px}
+.physicalOrderConsent{margin:20px 0}
+@media(max-width:640px){.cookieNotice{align-items:stretch;flex-direction:column}.cookieNoticeActions{justify-content:space-between}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.subscriptionConsentForm{display:grid;gap:10px}
+.subscriptionConsentForm .checkLabel{display:grid;grid-template-columns:18px 1fr;align-items:start;gap:9px;font-size:12px;line-height:1.45}
+.subscriptionConsentForm .checkLabel input{width:18px;height:18px;margin-top:1px}
+.subscriptionConsentForm .checkLabel a{text-decoration:underline;text-underline-offset:2px}
+
+.subscriptionManage{margin:12px 0 20px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-soft)}
+.subscriptionManage summary{cursor:pointer;font-size:13px;font-weight:800}
+.subscriptionManage form{display:grid;gap:12px;margin-top:14px}
+.subscriptionManage .checkLabel{display:grid;grid-template-columns:18px 1fr;gap:9px;align-items:start;font-size:12px;line-height:1.5}
+.subscriptionManage .checkLabel input{width:18px;height:18px;margin-top:1px}
+.subscriptionManage button{justify-self:start}
+
+.authForm>fieldset,.checkoutConsentForm>fieldset{border:0;padding:0;margin:0;min-inline-size:0;display:grid;gap:14px}
+.checkoutConsentForm>fieldset:disabled{opacity:.72}
+.checkoutSeller{display:grid;gap:5px;margin:0 0 18px;padding:14px 16px;border:1px solid #d8d9dc;border-radius:12px;background:#f7f7f8;color:#22252a;font-size:13px;line-height:1.45}
+.checkoutSeller a{color:#30343a;text-decoration:underline;text-underline-offset:2px}
+.compactPurchaseConsent{display:grid;gap:10px}
+.compactPurchaseConsent.checkLabel,.compactPurchaseConsent .checkLabel{grid-template-columns:18px 1fr;align-items:start;font-size:12px;line-height:1.45}
+.compactPurchaseConsent input[type=checkbox],.compactPurchaseConsent .checkLabel input{width:18px;height:18px;margin-top:1px}
+.formPrivacyNotice,.legalWarning{padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.55}
+.formPrivacyNotice{background:rgba(181,154,97,.08);border:1px solid rgba(181,154,97,.24)}
+.legalWarning{background:rgba(255,168,0,.09);border:1px solid rgba(255,168,0,.28)}
+.subscriptionManage{margin:12px 0 22px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.subscriptionManage summary{cursor:pointer;font-weight:800}
+.subscriptionManage form{display:grid;gap:12px;margin-top:12px}
