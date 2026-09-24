@@ -89,12 +89,13 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const freePoints = !paidPoints && entitlementMap.get('nival_points') === 'free';
   const hasPoints = paidPoints || freePoints;
   if ((!hasPoints && currentSection === 'clientes') || (!hasIntelligence && currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
-  const [{ count: customerCount }, { count: visitCount }] = businessId
+  const [{ count: customerCount }, { count: loyaltyCustomerCount }, { count: visitCount }] = businessId
     ? await Promise.all([
         supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
+        supabase.from("loyalty_accounts").select("id", { count: "exact", head: true }).eq("business_id", businessId),
         supabase.from("visits").select("id", { count: "exact", head: true }).eq("business_id", businessId),
       ])
-    : [{ count: 0 }, { count: 0 }];
+    : [{ count: 0 }, { count: 0 }, { count: 0 }];
   const { data: loyaltyPrograms } = businessId
     ? await supabase
         .from("loyalty_programs")
@@ -250,7 +251,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       <section className="nivalSignals">
         <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
-        <div><span>Clientes registrados</span><strong>{customerCount ?? 0}</strong><small>{hasPoints ? "dentro de tu programa" : "disponibles al activar lealtad"}</small></div>
+        <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>
         <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
       </section>
       <BusinessHealthCard items={businessHealthItems} />
