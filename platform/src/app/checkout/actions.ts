@@ -573,6 +573,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
 }
 
 export async function startPhysicalCardCheckout(form: FormData) {
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -589,6 +590,7 @@ export async function startPhysicalCardCheckout(form: FormData) {
 }
 
 export async function claimIncludedPhysicalCard(form: FormData) {
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -637,6 +639,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {
+  if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
