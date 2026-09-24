@@ -10,8 +10,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const signup = params.mode === "signup";
   const next = params.next ?? "/dashboard";
-  const privacyReady = privacyDisclosuresReady();
-  const legal = legalBusinessInfo();
+  const [privacyReady, legal] = await Promise.all([privacyDisclosuresReady(), legalBusinessInfo()]);
 
   return (
     <main className="authShell">
