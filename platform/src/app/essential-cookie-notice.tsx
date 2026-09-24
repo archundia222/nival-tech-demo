@@ -9,11 +9,14 @@ export function EssentialCookieNotice() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      setVisible(window.localStorage.getItem(STORAGE_KEY) !== "dismissed");
-    } catch {
-      setVisible(true);
-    }
+    const frame = window.requestAnimationFrame(() => {
+      try {
+        setVisible(window.localStorage.getItem(STORAGE_KEY) !== "dismissed");
+      } catch {
+        setVisible(true);
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   if (!visible) return null;
