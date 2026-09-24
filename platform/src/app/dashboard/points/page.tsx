@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
 import { startNivalPointsSubscription } from '@/app/checkout/actions';
+import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { PointsEmployeeScanner } from './points-employee-scanner';
@@ -162,8 +163,8 @@ export default async function NivalPointsPage({
             </ul>
             <div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después puedes seguir gratis hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes</span></div>
             <div className="freemiumCtas">
-              <form action={activateFreeNivalPoints}><button className="productCta">Probar Pro {NIVAL_TRIAL_DAYS} días <span>→</span></button></form>
-              <form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Precio fundador · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</button></form>
+              <form action={activateFreeNivalPoints}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Pro {NIVAL_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>
+              <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvSecondaryButton" pendingLabel="Abriendo Mercado Pago…">Precio fundador · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>
             </div>
             <small>Sin tarjeta para empezar. Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes.</small>
           </div>
@@ -194,7 +195,7 @@ export default async function NivalPointsPage({
             <strong>Usa configuración y promociones Pro antes de decidir.</strong>
             <p>Si no pagas al terminar, conservas tu programa y bajas al plan Gratis de hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes. No borramos tu información.</p>
           </div>
-          <form action={startNivalPointsSubscription}><button type="submit">Conservar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
+          <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conservar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
         </section>}
         {baseFree && <section className="freemiumBanner">
           <div>
@@ -202,7 +203,7 @@ export default async function NivalPointsPage({
             <strong>{Math.min(loyaltyCustomers ?? 0, NIVAL_POINTS_FREE_CUSTOMER_LIMIT)} de {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes usados</strong>
             <p>Tu programa, tarjetas, puntos y recompensas siguen funcionando. Pro aumenta capacidad y recupera configuración y promociones.</p>
           </div>
-          <form action={startNivalPointsSubscription}><button type="submit">Volver a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</button></form>
+          <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Volver a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
         </section>}
 
         <section className="pointsV1Hero">

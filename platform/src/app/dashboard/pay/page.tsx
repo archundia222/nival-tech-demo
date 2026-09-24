@@ -232,7 +232,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
       {params.free === 'started' && <p role="status" className="formMessage successMessage">Tu Nival Pay Gratis ya está publicada. Este mismo QR y enlace se conservarán si activas la versión completa.</p>}
       <section className="freemiumBanner">
         <div><span>NIVAL PAY GRATIS</span><strong>{freeEnabled ? 'Tu QR puede seguir funcionando gratis.' : 'Configura primero y publícalo cuando esté listo.'}</strong><p>Gratis incluye 1 página, QR, enlace, 1 apartado y estadísticas básicas. La versión completa agrega tarjeta NFC física, 3 apartados, enlace de pago y más herramientas.</p></div>
-        <a href="/checkout">Ver Nival Pay completo · $199 →</a>
+        <a href="/checkout">Activar Nival Pay Pro · $199 →</a>
       </section>
 
       {currentView === 'share' && freeEnabled ? <><header className="payHeading shareHeading"><p className="eyebrow">TU QR</p><h1>Escanea, abre y cobra.</h1><p>Este QR es permanente. Si activas Nival Pay completo, no tendrás que cambiarlo.</p></header><section className="sharePagesList sharePagesRefined"><article className="sharePageItem"><h2>{profile.display_name}</h2><PaymentProfileQr businessName={business?.name ?? 'Nival Pay'} url={`${publicSiteUrl()}/pay/${profile.public_token}`} views={Number(profile.view_count)} /></article></section></> : <>

@@ -14,7 +14,7 @@ export function CheckoutSubmitButton({
   const { pending } = useFormStatus();
 
   return (
-    <button className={className} disabled={pending} aria-disabled={pending}>
+    <button type="submit" className={className} disabled={pending} aria-disabled={pending} aria-live="polite">
       {pending ? pendingLabel : children}
     </button>
   );

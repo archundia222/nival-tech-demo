@@ -25,6 +25,8 @@ export const NIVAL_POINTS_PRICE_CENTS = NIVAL_POINTS_FOUNDER_PRICE_CENTS;
 // Legacy direct-Intelligence checkout. Public pricing now positions Intelligence inside Nival Growth.
 export const NIVAL_INTELLIGENCE_PRICE_CENTS = 39900;
 export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = NIVAL_GROWTH_PRICE_CENTS;
+export const NIVAL_GROWTH_UPGRADE_PRODUCT = 'nival_growth_upgrade';
+export const NIVAL_GROWTH_UPGRADE_PRICE_CENTS = NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS - NIVAL_POINTS_PRICE_CENTS;
 
 export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS = 10900;
 export const NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT = 'nival_pay_physical_card_custom';

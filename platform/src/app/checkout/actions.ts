@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
@@ -371,7 +371,7 @@ export async function startExtraSectionCheckoutForProfile(paymentProfileId: stri
 }
 
 type SubscriptionProduct = {
-  productCode: typeof NIVAL_POINTS_PRODUCT | typeof NIVAL_INTELLIGENCE_PRODUCT | typeof NIVAL_POINTS_INTELLIGENCE_PRODUCT;
+  productCode: typeof NIVAL_POINTS_PRODUCT | typeof NIVAL_INTELLIGENCE_PRODUCT | typeof NIVAL_POINTS_INTELLIGENCE_PRODUCT | typeof NIVAL_GROWTH_UPGRADE_PRODUCT;
   amountCents: number;
   reason: string;
 };
@@ -431,19 +431,31 @@ export async function startNivalPointsSubscription() {
   return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
 }
 
-export async function startNivalIntelligenceSubscription() {
+export async function startNivalGrowthSubscription() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: points } = await admin.from('business_product_entitlements').select('status')
     .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle();
 
   if (!points || !['free', 'active'].includes(points.status)) {
-    redirect('/dashboard/intelligence?error=Activa+Nival+Puntos+primero.+Intelligence+se+alimenta+de+los+clientes+y+visitas+de+tu+programa.');
+    redirect('/dashboard/points?error=Activa+Nival+Puntos+primero.+Growth+incluye+Puntos+e+Intelligence.');
   }
 
   return startMercadoPagoSubscription(points.status === 'active'
-    ? { productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Puntos + Intelligence · plan mensual' }
-    : { productCode: NIVAL_INTELLIGENCE_PRODUCT, amountCents: NIVAL_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Intelligence · plan mensual' });
+    ? {
+        productCode: NIVAL_GROWTH_UPGRADE_PRODUCT,
+        amountCents: NIVAL_GROWTH_UPGRADE_PRICE_CENTS,
+        reason: 'Nival Growth · complemento Intelligence para Nival Puntos Pro',
+      }
+    : {
+        productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT,
+        amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS,
+        reason: 'Nival Growth · Nival Puntos Pro + Intelligence',
+      });
+}
+
+export async function startNivalIntelligenceSubscription() {
+  return startNivalGrowthSubscription();
 }
 
 
