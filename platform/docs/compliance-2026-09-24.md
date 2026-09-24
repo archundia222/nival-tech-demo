@@ -4,13 +4,9 @@ This document records the technical safeguards added during the September 2026 l
 
 ## Production gates
 
-New personal-data collection stays disabled until these variables are configured with real, verifiable information:
+New personal-data collection and paid commerce stay disabled until the server-only `site_legal_settings` record contains the real provider name, legal/contact address, phone and support email.
 
-- `NEXT_PUBLIC_NIVAL_LEGAL_NAME`
-- `NEXT_PUBLIC_NIVAL_LEGAL_ADDRESS`
-- `NEXT_PUBLIC_NIVAL_PHONE`
-
-Paid commerce also requires the same provider disclosures. Do not use placeholders or a personal address/phone unless that is actually the lawful provider contact information intended for consumers.
+The application reads this record with the Supabase service role; the real address and phone are intentionally not committed to the public GitHub repository. Environment variables remain only as a fallback for deployments that do not have the server-side record. Do not use placeholders.
 
 Recurring subscriptions additionally require:
 
@@ -68,8 +64,8 @@ Review was based on the current Mexican Federal Consumer Protection Law, includi
 
 The public-RPC lockdown is intentionally a two-phase rollout because production on `main` still calls some public RPCs directly.
 
-1. Configure the real provider/privacy variables in Vercel. Do not use placeholders.
-2. Deploy the application changes that route public RPCs through the server-only Supabase service role.
+1. Confirm the server-only `site_legal_settings` record is complete. This was completed for the current Nival deployment on 24 September 2026.
+2. Deploy the application changes that read legal identity from server-only settings and route public RPCs through the Supabase service role.
 3. Smoke-test login plus the public Nival Pay, Nival Puntos, digital-profile, smart-link and invitation routes.
 4. Apply `20260924065929_revoke_legacy_public_rpc_execute_20260924.sql`.
 5. Re-run Supabase security advisors and confirm the anonymous `SECURITY DEFINER` findings are removed/reduced as expected.
@@ -78,7 +74,14 @@ The public-RPC lockdown is intentionally a two-phase rollout because production 
 
 Do **not** apply the revoke migration before step 2. It is safe in syntax/permission behavior and was verified inside a transaction with `ROLLBACK`, but applying it against the current production code first would break public routes.
 
+## Legal identity verification status
+
+- The current legal settings record was verified server-side as present and complete for legal name, address, phone and support email.
+- The values themselves are not stored in this repository.
+- RFC remains optional in the application until a verified RFC is supplied; the site does not invent one.
+
 ## Security verification status
+
 
 - Platform CI uses Node 22 and runs `npm ci`, TypeScript, ESLint, a production-dependency audit that fails on high/critical findings, and `next build`.
 - The compliance branch passed TypeScript, lint, dependency audit and production build after the cookie-notice lint fix.
