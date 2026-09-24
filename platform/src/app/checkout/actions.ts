@@ -436,11 +436,17 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   redirect(result.init_point);
 }
 
-export async function startNivalPointsSubscription() {
+export async function startNivalPointsSubscription(formData: FormData) {
+  if (formData.get('subscriptionConsent') !== 'on') {
+    redirect('/dashboard/points?error=Confirma+el+cobro+mensual+recurrente+antes+de+continuar.');
+  }
   return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
 }
 
-export async function startNivalIntelligenceSubscription() {
+export async function startNivalIntelligenceSubscription(formData: FormData) {
+  if (formData.get('subscriptionConsent') !== 'on') {
+    redirect('/dashboard/intelligence?error=Confirma+el+cobro+mensual+recurrente+antes+de+continuar.');
+  }
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
   const { data: points } = await admin.from('business_product_entitlements').select('business_id')
