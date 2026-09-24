@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { awardPoint, claimScanToken, redeemPointReward } from "@/app/points/actions";
 
@@ -28,20 +28,26 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
   const [reviewUrl, setReviewUrl] = useState("");
   const [reviewPrompt, setReviewPrompt] = useState(false);
   const [confirmRedeem, setConfirmRedeem] = useState(false);
+  const claimingRef = useRef(false);
 
-  async function claim(value: string) {
+  const claim = useCallback(async (value: string) => {
     const cleaned = value.trim().replace(/^nivalpoints:/, "");
     const raw = cleaned.replace(/^(visit|redeem):/, "");
-    if (!raw || pending) return;
-    const result = await claimScanToken(raw, mode);
-    if (!result.ok || !result.customer) {
-      setCustomer(null); setMessage(result.error ?? "QR expirado."); return;
+    if (!raw || claimingRef.current) return;
+    claimingRef.current = true;
+    try {
+      const result = await claimScanToken(raw, mode);
+      if (!result.ok || !result.customer) {
+        setCustomer(null); setMessage(result.error ?? "QR expirado."); return;
+      }
+      setCustomer(result.customer as ScanCustomer);
+      setConfirmRedeem(false);
+      setMessage("");
+      setCameraOn(false);
+    } finally {
+      claimingRef.current = false;
     }
-    setCustomer(result.customer as ScanCustomer);
-    setConfirmRedeem(false);
-    setMessage("");
-    setCameraOn(false);
-  }
+  }, [mode]);
 
   useEffect(() => {
     if (!cameraOn) return;
@@ -65,7 +71,7 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
       } catch { setMessage("No pudimos abrir la cámara. Revisa el permiso del navegador."); setCameraOn(false); }
     })();
     return () => { stopped = true; window.clearInterval(timer); stream?.getTracks().forEach(track => track.stop()); };
-  }, [cameraOn]);
+  }, [cameraOn, claim]);
 
   function addPoint() {
     if (!customer) return;

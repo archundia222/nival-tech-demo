@@ -24,11 +24,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
-  const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: loyaltyCustomers }, { count: visits }, { data: program }] = await Promise.all([
+  const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: loyaltyCustomers }, { data: program }] = await Promise.all([
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').maybeSingle(),
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_intelligence').eq('status', 'active').maybeSingle(),
     supabase.from('loyalty_accounts').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
-    supabase.from('visits').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap, review_url, review_request_visit').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
   const paid = entitlement?.status === 'active';
@@ -55,6 +54,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     supabase.from('business_sales').select('id,customer_id,amount_cents,payment_method,transactions_count,sold_at,source').eq('business_id', membership.business_id).order('sold_at',{ascending:false}).limit(500),
   ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
   const metrics = metricRows?.[0]; // deployment sync
+  // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot used for recent-activity calculations.
   const nowMs=Date.now(), dayMs=86400000;
   const customerInsights=new Map((customerRows??[]).map(customer=>{const cv=(visitRows??[]).filter(v=>v.customer_id===customer.id);const cr=(rewardRows??[]).filter(r=>r.customer_id===customer.id);const last=cv[0]?.visited_at?new Date(cv[0].visited_at).getTime():null;const first=cv.length?new Date(cv[cv.length-1].visited_at).getTime():null;const avg=cv.length>1&&first&&last?Math.round((last-first)/dayMs/(cv.length-1)):null;return [customer.id,{visits30:cv.filter(v=>nowMs-new Date(v.visited_at).getTime()<=30*dayMs).length,totalVisits:cv.length,lastVisit:last?new Date(last):null,avgDays:avg,rewardsAvailable:cr.filter(x=>!x.redeemed_at).length,rewardsRedeemed:cr.filter(x=>x.redeemed_at).length,lastReward:cr.find(x=>x.redeemed_at)?.description??null}]}));
   const insightValues=[...customerInsights.values()];

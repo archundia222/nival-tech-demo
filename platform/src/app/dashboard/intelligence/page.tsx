@@ -46,6 +46,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     supabase.from('business_sales').select('customer_id,amount_cents,transactions_count,sold_at,source').eq('business_id', membership.business_id).order('sold_at',{ascending:false}).limit(5000),
   ]) : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
+  // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot used for age calculations.
   const now = Date.now();
   const day = 86400000;
   const visits = (visitRows ?? []) as Visit[];
@@ -70,7 +71,6 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const change = previous30 ? Math.round(((visits30 - previous30) / previous30) * 100) : visits30 ? 100 : 0;
   const atRisk = customers.filter((customer) => customer.status === 'En riesgo');
   const frequent = customers.filter((customer) => customer.status === 'Frecuente');
-  const inactive = customers.filter((customer) => customer.daysSince !== null && customer.daysSince > 60);
   const newCustomers = customers.filter((customer) => customer.visits <= 1);
   const recoverable = atRisk.filter((customer) => customer.daysSince !== null && customer.daysSince <= 60);
   const slipping = customers.filter((customer) => customer.frequency && customer.daysSince !== null && customer.daysSince > customer.frequency * 1.5 && customer.daysSince <= 30);
@@ -80,7 +80,6 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const priorityContacts = priorityAudience.filter((customer) => (customer.phone || customer.email) && customer.marketing_consent_at);
   const topPriority = priorityContacts.slice(0, 5);
   const pointsCustomers = customers.filter((customer) => customer.visits >= 2);
-  const riskWithHistory = frequentAtRisk.length || recoverable.filter((customer) => customer.visits >= 2).length;
   const secondVisitOpportunity = newCustomers.filter((customer) => customer.visits === 1 && customer.daysSince !== null && customer.daysSince <= 21);
   const loyaltyOpportunity = frequent.filter((customer) => customer.visits >= 4);
   const unreachableRisk = recoverable.filter((customer) => !(customer.phone || customer.email) || !customer.marketing_consent_at);
@@ -101,9 +100,6 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const activeCustomers = customers.filter((customer) => customer.daysSince !== null && customer.daysSince <= 30).length;
   const availableRewards = (rewardRows ?? []).filter((reward) => !reward.redeemed_at).length;
   const retention = customers.length ? Math.round((customers.filter(c => c.visits >= 2).length / customers.length) * 100) : 0;
-  const dataCoverage = customers.length ? Math.round((customers.filter(c => c.phone || c.email).length / customers.length) * 100) : 0;
-  const intelligenceScore = Math.min(100, Math.round((Math.min(customers.length, 50) / 50) * 35 + (Math.min(visits.length, 150) / 150) * 35 + (dataCoverage / 100) * 30));
-  const mainAdvice = atRisk.length ? `${atRisk.length} clientes necesitan atención antes de enfriarse más.` : visits30 ? 'Tu actividad reciente es estable. Conviene reforzar a tus clientes frecuentes.' : 'Registra visitas para que Intelligence encuentre oportunidades reales.';
   const averageTicketCents = Number(business?.average_ticket_cents ?? 0);
   const campaigns = (campaignRows ?? []) as Campaign[];
   const campaignStats = campaigns.filter((campaign) => campaign.status === 'sent' && campaign.sent_at).map((campaign) => {

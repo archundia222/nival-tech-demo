@@ -89,13 +89,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const freePoints = !paidPoints && entitlementMap.get('nival_points') === 'free';
   const hasPoints = paidPoints || freePoints;
   if ((!hasPoints && currentSection === 'clientes') || (!hasIntelligence && currentSection === 'inteligencia')) redirect('/dashboard?section=resumen');
-  const [{ count: customerCount }, { count: visitCount }, { count: campaignCount }] = businessId
+  const [{ count: customerCount }, { count: visitCount }] = businessId
     ? await Promise.all([
         supabase.from("customers").select("id", { count: "exact", head: true }).eq("business_id", businessId),
         supabase.from("visits").select("id", { count: "exact", head: true }).eq("business_id", businessId),
-        supabase.from("campaigns").select("id", { count: "exact", head: true }).eq("business_id", businessId),
       ])
-    : [{ count: 0 }, { count: 0 }, { count: 0 }];
+    : [{ count: 0 }, { count: 0 }];
   const { data: loyaltyPrograms } = businessId
     ? await supabase
         .from("loyalty_programs")
@@ -179,14 +178,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .order("created_at", { ascending: false })
     : { data: [] };
   const recommendations = recommendationRows as IntelligenceRecommendation[] | null;
-  const segmentMetrics = [
-    { label: "Nuevos", value: Number(segments?.new_customers ?? 0) },
-    { label: "Frecuentes", value: Number(segments?.frequent_customers ?? 0) },
-    { label: "En riesgo", value: Number(segments?.at_risk_customers ?? 0) },
-    { label: "Con premio", value: Number(segments?.reward_ready_customers ?? 0) },
-  ];
-  const maxSegmentValue = Math.max(...segmentMetrics.map((segment) => segment.value), 1);
-  const maxVisitValue = Math.max(recentVisits, previousVisits, 1);
   const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
     ...(paymentProfile?.active ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),

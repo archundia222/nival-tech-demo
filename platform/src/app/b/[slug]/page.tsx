@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import { createClient } from "@/lib/supabase/server";
@@ -24,7 +25,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
     <main className="customerShell brandedCustomerShell" style={{ "--business-accent": business.brand_color } as CSSProperties}>
       <header className="customerBrand">
         {business.logo_url ? <img className="businessLogo" src={business.logo_url} alt={`Logo de ${business.business_name}`} /> : <span className="brandmark">N</span>}
-        <span>Programa impulsado por <a href="/?from=nival-puntos"><b>NIVAL tech</b></a></span>
+        <span>Programa impulsado por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span>
       </header>
       <section className="customerHero">
         <p className="eyebrow">PROGRAMA DE CLIENTES FRECUENTES</p>
@@ -47,13 +48,13 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <input type="hidden" name="origin" value={query.from === "nfc" ? "nfc" : "qr"} />
             <label>Nombre<input name="name" required minLength={2} maxLength={100} autoComplete="name" /></label>
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
-            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el <a href="/privacy" target="_blank" rel="noreferrer">aviso de privacidad</a> y el uso de mis datos para operar el programa.</label>
+            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el <Link href="/privacy" target="_blank" rel="noreferrer">aviso de privacidad</Link> y el uso de mis datos para operar el programa.</label>
             <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>
-      <a className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Contacto y otros accesos del negocio</strong></span><b>→</b></a>
-      <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
+      <Link className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Contacto y otros accesos del negocio</strong></span><b>→</b></Link>
+      <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
       {(business.phone || business.website_url) && <footer className="businessContact">
         {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
         {business.website_url && <a href={business.website_url} target="_blank" rel="noreferrer">Visitar sitio web</a>}

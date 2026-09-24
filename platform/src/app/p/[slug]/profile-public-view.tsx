@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 
 export type ProfileActionItem = {
@@ -74,8 +75,8 @@ export function ProfilePublicView({
         </section>}
 
         {showFooter && <>
-          <aside className="profileNivalPromo"><div><span>¿TIENES UN NEGOCIO?</span><strong>Tu negocio también puede tener una página así.</strong><p>Cobros, lealtad y herramientas para hacer crecer clientes frecuentes.</p></div><a href="/?from=perfil-negocio#productos">Conocer Nival Tech →</a></aside>
-          <footer className="profileFooter"><span>Información proporcionada por el negocio</span><a href="/?from=perfil-negocio"><b>NIVAL tech</b></a></footer>
+          <aside className="profileNivalPromo"><div><span>¿TIENES UN NEGOCIO?</span><strong>Tu negocio también puede tener una página así.</strong><p>Cobros, lealtad y herramientas para hacer crecer clientes frecuentes.</p></div><Link href="/?from=perfil-negocio#productos">Conocer Nival Tech →</Link></aside>
+          <footer className="profileFooter"><span>Información proporcionada por el negocio</span><Link href="/?from=perfil-negocio"><b>NIVAL tech</b></Link></footer>
         </>}
       </article>
     </>;

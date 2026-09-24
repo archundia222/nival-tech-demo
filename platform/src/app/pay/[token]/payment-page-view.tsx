@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { CopyField } from "./copy-field";
 import styles from "./payment-page.module.css";
@@ -82,7 +83,7 @@ export function PaymentPageView({
           <small>Accesos útiles del negocio</small>
         </div>
 
-        {profile.points_enabled && <a className={`${styles.serviceAction} ${styles.loyaltyAction}`} href={`/b/${profile.business_slug}`}>
+        {profile.points_enabled && <Link className={`${styles.serviceAction} ${styles.loyaltyAction}`} href={`/b/${profile.business_slug}`}>
           <span className={styles.serviceIcon} aria-hidden="true">★</span>
           <span className={styles.serviceCopy}>
             <small>NIVAL PUNTOS</small>
@@ -90,9 +91,9 @@ export function PaymentPageView({
             <em>Guarda tu tarjeta digital y revisa tu avance.</em>
           </span>
           <b aria-hidden="true">→</b>
-        </a>}
+        </Link>}
 
-        <a className={styles.serviceAction} href={`/p/${profile.business_slug}`}>
+        <Link className={styles.serviceAction} href={`/p/${profile.business_slug}`}>
           <span className={styles.serviceIcon} aria-hidden="true">+</span>
           <span className={styles.serviceCopy}>
             <small>MÁS DEL NEGOCIO</small>
@@ -100,7 +101,7 @@ export function PaymentPageView({
             <em>Información, enlaces y formas de contactar.</em>
           </span>
           <b aria-hidden="true">→</b>
-        </a>
+        </Link>
       </div>}
     </section>
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech">
@@ -109,9 +110,9 @@ export function PaymentPageView({
         <strong>Tu negocio también puede cobrar así.</strong>
         <p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p>
       </div>
-      <a href="/?from=nival-pay">Conocer Nival Tech <b>→</b></a>
+      <Link href="/?from=nival-pay">Conocer Nival Tech <b>→</b></Link>
     </aside>}
-    <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <a href="/?from=nival-pay">Nival Tech</a>}</footer>
+    <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <Link href="/?from=nival-pay">Nival Tech</Link>}</footer>
   </>;
 
   if (embedded) {

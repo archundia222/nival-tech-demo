@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { issueCustomerScanToken } from "@/app/points/actions";
 
@@ -10,22 +10,31 @@ export function RotatingPointsQr({ accountToken, purpose = "points", rewardId }:
   const [shortCode, setShortCode] = useState("");
   const [error, setError] = useState("");
   const [remaining, setRemaining] = useState(0);
-
-
+  const refreshingRef = useRef(false);
 
   const refresh = useCallback(async () => {
-    const result = await issueCustomerScanToken(accountToken, purpose === "points" ? "visit" : "redeem", rewardId);
-    if (!result.ok || !result.raw || !result.expiresAt) {
-      setError(result.error ?? "No pudimos generar el QR.");
-      return;
+    if (refreshingRef.current) return;
+    refreshingRef.current = true;
+    try {
+      const result = await issueCustomerScanToken(accountToken, purpose === "points" ? "visit" : "redeem", rewardId);
+      if (!result.ok || !result.raw || !result.expiresAt) {
+        setError(result.error ?? "No pudimos generar el QR.");
+        return;
+      }
+      setRaw(result.raw);
+      setShortCode(result.shortCode ?? "");
+      setExpiresAt(result.expiresAt);
+      setRemaining(Math.max(0, Math.ceil((new Date(result.expiresAt).getTime() - Date.now()) / 1000)));
+      setError("");
+    } finally {
+      refreshingRef.current = false;
     }
-    setRaw(result.raw);
-    setShortCode(result.shortCode ?? "");
-    setExpiresAt(result.expiresAt);
-    setError("");
   }, [accountToken, purpose, rewardId]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    const firstRefresh = window.setTimeout(() => { void refresh(); }, 0);
+    return () => window.clearTimeout(firstRefresh);
+  }, [refresh]);
 
   useEffect(() => {
     if (!expiresAt) return;
@@ -34,7 +43,6 @@ export function RotatingPointsQr({ accountToken, purpose = "points", rewardId }:
       setRemaining(seconds);
       if (seconds === 0) void refresh();
     };
-    tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [expiresAt, refresh]);
