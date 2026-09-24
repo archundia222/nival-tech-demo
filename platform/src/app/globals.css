@@ -4283,3 +4283,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .physicalOrderConsent{margin:20px 0}
 @media(max-width:640px){.cookieNotice{align-items:stretch;flex-direction:column}.cookieNoticeActions{justify-content:space-between}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.subscriptionConsentForm{display:grid;gap:10px}
+.subscriptionConsentForm .checkLabel{display:grid;grid-template-columns:18px 1fr;align-items:start;gap:9px;font-size:12px;line-height:1.45}
+.subscriptionConsentForm .checkLabel input{width:18px;height:18px;margin-top:1px}
+.subscriptionConsentForm .checkLabel a{text-decoration:underline;text-underline-offset:2px}
