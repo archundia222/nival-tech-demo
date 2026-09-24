@@ -33,8 +33,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <div className="landingNavLinks">
           <a href="#productos">Productos</a>
           <a href="#como-funciona">Cómo funciona</a>
+          <a href="#precio">Precios</a>
           <a href="#empieza-gratis">Empieza gratis</a>
-          <a href="#empresas">Para equipos</a>
         </div>
         <div className="landingNavCtas">
           <a className="landingTalk" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Hablar con Nival</a>
@@ -252,7 +252,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
             <div className="landingPointsReward"><small>PRÓXIMA RECOMPENSA</small><strong>Café de la casa gratis</strong><span>Te faltan 3 visitas</span></div>
             <div className="landingPointsButtons"><b>＋ Sumar visita</b><b>★ Mis premios</b></div>
           </div>
-          <span className="landingWalletBadge">Tarjeta digital · QR · Google Wallet compatible</span>
+          <span className="landingWalletBadge">Tarjeta digital · QR · Google Wallet en Android</span>
         </div>
       </section>
 
