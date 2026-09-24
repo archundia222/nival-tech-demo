@@ -111,3 +111,50 @@ export async function createBusiness(formData: FormData) {
   if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
   redirect(safeNext(formData));
 }
+
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = value(formData, "email");
+  if (!email) {
+    redirect(`/auth?error=${encodeURIComponent("Escribe tu correo para recuperar el acceso.")}`);
+  }
+
+  const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent("/auth/update-password")}`,
+  });
+
+  // Keep the public response generic so the form does not reveal whether an
+  // email is registered.
+  if (error) {
+    console.warn("[auth] Password reset request failed", { code: error.code ?? null });
+  }
+  redirect(`/auth?message=${encodeURIComponent("Si existe una cuenta con ese correo, recibirás un enlace para cambiar tu contraseña. Revisa también spam.")}`);
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = value(formData, "password");
+  const confirmPassword = value(formData, "confirmPassword");
+  if (password.length < 8) {
+    redirect(`/auth/update-password?error=${encodeURIComponent("La contraseña debe tener al menos 8 caracteres.")}`);
+  }
+  if (password !== confirmPassword) {
+    redirect(`/auth/update-password?error=${encodeURIComponent("Las contraseñas no coinciden.")}`);
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    redirect(`/auth?error=${encodeURIComponent("El enlace de recuperación venció o ya fue usado. Solicita uno nuevo.")}`);
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    redirect(`/auth/update-password?error=${encodeURIComponent("No pudimos cambiar la contraseña. Solicita un enlace nuevo e inténtalo otra vez.")}`);
+  }
+
+  await supabase.auth.signOut();
+  redirect(`/auth?message=${encodeURIComponent("Contraseña actualizada. Ya puedes iniciar sesión.")}`);
+}

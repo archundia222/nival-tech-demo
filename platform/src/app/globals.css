@@ -4428,3 +4428,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nvPrimaryLink{display:inline-flex;align-items:center;justify-content:center;padding:13px 16px;border-radius:12px;background:#f3f0e7;color:#111318;font-size:13px;font-weight:900;text-decoration:none}
 @media(max-width:850px){.landingBusinessPlanGrid,.nivalPricingPrinciple{grid-template-columns:1fr}}
 @media(max-width:520px){.landingBusinessPlans{width:calc(100% - 28px);padding:36px 0}.landingBusinessPlanGrid article{min-height:0;padding:22px}.landingBusinessPlanGrid strong{font-size:32px}}
+
+.legalIdentity{display:grid;gap:7px;margin:24px 0;padding:18px;border:1px solid rgba(181,154,97,.26);border-radius:14px;background:rgba(181,154,97,.06)}
+.legalIdentity span{color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.14em}
+.legalIdentity strong{font-size:17px}
+.legalIdentity p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}

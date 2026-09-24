@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_PAY_REGULAR_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
 
 export const metadata = {
-  title: 'Planes y productos | Nival Tech',
+  title: 'Planes y productos',
   description: 'Empieza gratis con Nival Pay o Nival Puntos. Conoce los precios de lanzamiento y Nival Growth.',
 };
 
