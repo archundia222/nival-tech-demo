@@ -6,8 +6,8 @@ export const metadata = {
   description: "Términos y condiciones aplicables al uso y compra de productos Nival Tech.",
 };
 
-export default function TermsPage() {
-  const business = legalBusinessInfo();
+export default async function TermsPage() {
+  const business = await legalBusinessInfo();
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
