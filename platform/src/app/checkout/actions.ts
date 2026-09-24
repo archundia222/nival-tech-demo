@@ -107,6 +107,32 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       redirect(checkoutReturnPath('/checkout', 'error', 'Activa Nival Pay Pro antes de comprar herramientas adicionales.'));
     }
   }
+  if (!product.physicalOrder) {
+    let existingQuery = admin.from('product_orders')
+      .select('id,checkout_url,created_at')
+      .eq('business_id', businessId)
+      .eq('product_code', product.productCode)
+      .eq('payment_method', 'mercado_pago')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    existingQuery = product.paymentProfileId
+      ? existingQuery.eq('payment_profile_id', product.paymentProfileId)
+      : existingQuery.is('payment_profile_id', null);
+
+    const { data: existingOrder } = await existingQuery.maybeSingle();
+    if (existingOrder?.checkout_url) {
+      const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
+      if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+        redirect(existingOrder.checkout_url);
+      }
+      await admin.from('product_orders')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', existingOrder.id)
+        .eq('status', 'pending');
+    }
+  }
+
   const { data: order, error } = await admin.from('product_orders').insert({
     business_id: businessId,
     product_code: product.productCode,
@@ -200,6 +226,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
 
   await admin.from('product_orders').update({
     provider_preference_id: result.id,
+    checkout_url: result.checkout_url,
     updated_at: new Date().toISOString(),
   }).eq('id', order.id);
   redirect(result.checkout_url!);
