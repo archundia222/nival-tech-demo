@@ -4257,3 +4257,6 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 
 /* Easier business branding setup */
 .settingsForm label small{color:var(--muted);font-size:8px;font-weight:500}.settingsForm input[type="file"]{padding:9px;border:1px dashed rgba(181,154,97,.35);background:rgba(181,154,97,.04);cursor:pointer}
+
+/* Public profile review configuration */
+.profileReviewSetup{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.8fr);gap:22px;align-items:start;margin:18px 0;padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:#111114}.reviewStatus{display:grid;gap:3px;margin-top:14px;padding:12px;border:1px solid rgba(181,154,97,.22);border-radius:11px;background:rgba(181,154,97,.05)}.reviewStatus>span{color:#b59a61;font-size:7px;font-weight:900;letter-spacing:.12em}.reviewStatus>strong{font-size:10px}.reviewStatus>small{color:var(--muted);font-size:8px}.reviewStatus.pending{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.02)}.reviewStatus.pending>span{color:var(--muted)}.profileSmartLinks{margin-top:18px}@media(max-width:760px){.profileReviewSetup{grid-template-columns:1fr}}

@@ -50,7 +50,10 @@ export async function createTeamInvitation(formData: FormData) {
     redirect(`/dashboard?error=${encodeURIComponent("Selecciona un rol válido.")}`);
   }
 
-  const { supabase, businessId } = await getActiveManagerContext();
+  const { supabase, businessId, role: currentRole } = await getActiveManagerContext();
+  if (role === "manager" && currentRole !== "owner") {
+    redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Solo el propietario puede invitar a otro administrador.")}`);
+  }
   const { error } = await supabase.rpc("create_business_invitation_for", {
     p_business_id: businessId,
     invitee_email: email,
@@ -105,7 +108,15 @@ export async function updatePaymentProfile(formData: FormData) {
   redirect(`/dashboard?message=${encodeURIComponent("Datos para transferencias actualizados.")}`);
 }
 
+function smartLinkReturnPath(formData: FormData) {
+  const requested = String(formData.get("returnTo") ?? "").trim();
+  return requested === "/dashboard?section=perfil-digital"
+    ? requested
+    : "/dashboard?section=nival-card";
+}
+
 export async function createSmartLink(formData: FormData) {
+  const returnPath = smartLinkReturnPath(formData);
   const name = String(formData.get("linkName") ?? "").trim();
   const kind = String(formData.get("linkKind") ?? "").trim();
   const targetUrl = String(formData.get("targetUrl") ?? "").trim();
@@ -140,9 +151,9 @@ export async function createSmartLink(formData: FormData) {
         destination_url: targetUrl,
         enabled: true,
       });
-      if (updateError) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(updateError.message)}`);
+      if (updateError) redirect(`${returnPath}&error=${encodeURIComponent(updateError.message)}`);
       revalidatePath("/dashboard");
-      redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace de reseñas actualizado.")}`);
+      redirect(`${returnPath}&message=${encodeURIComponent("Enlace de reseñas actualizado.")}`);
     }
   }
 
@@ -153,12 +164,13 @@ export async function createSmartLink(formData: FormData) {
     destination_url: targetUrl,
   });
 
-  if (error) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`${returnPath}&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
-  redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace inteligente creado.")}`);
+  redirect(`${returnPath}&message=${encodeURIComponent("Enlace inteligente creado.")}`);
 }
 
 export async function updateSmartLink(formData: FormData) {
+  const returnPath = smartLinkReturnPath(formData);
   const linkId = String(formData.get("linkId") ?? "");
   const name = String(formData.get("linkName") ?? "").trim();
   const targetUrl = String(formData.get("targetUrl") ?? "").trim();
@@ -181,9 +193,9 @@ export async function updateSmartLink(formData: FormData) {
     enabled: active,
   });
 
-  if (error) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`${returnPath}&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
-  redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace inteligente actualizado.")}`);
+  redirect(`${returnPath}&message=${encodeURIComponent("Enlace inteligente actualizado.")}`);
 }
 
 export async function updateBusinessProfile(formData: FormData) {

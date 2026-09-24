@@ -192,7 +192,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const businessHealthItems = [
     { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },
     { label: "Perfil del negocio", complete: Boolean(business?.description && business?.phone && business?.logo_url), href: "/dashboard?section=perfil-digital", action: "Agrega descripción, teléfono y logotipo" },
-    { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=nival-card#nival-card", action: "Conecta tu enlace de reseñas" },
+    { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=perfil-digital#reviews", action: "Conecta tu enlace de reseñas" },
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
@@ -353,6 +353,35 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             />
           </div>
         </section>
+        <section className="profileReviewSetup" id="reviews">
+          <div className="settingsIntro">
+            <p className="eyebrow">RESEÑAS</p>
+            <h2>Haz que dejar una reseña tome un toque.</h2>
+            <p>Guarda aquí el enlace de reseñas de tu negocio. Nival crea un destino estable para tu perfil, QR y tarjetas NFC; si cambias el enlace más adelante, no necesitas reimprimir la tarjeta.</p>
+            {reviewLink ? <div className="reviewStatus"><span>ACTIVO</span><strong>{reviewLink.name}</strong><small>{Number(reviewLink.click_count ?? 0)} aperturas registradas</small></div> : <div className="reviewStatus pending"><span>PENDIENTE</span><strong>Aún no conectas reseñas</strong><small>Agrega el enlace que Google u otra plataforma te da para recibir opiniones.</small></div>}
+          </div>
+          {canManageProgram ? <form action={createSmartLink} className="settingsForm">
+            <input type="hidden" name="returnTo" value="/dashboard?section=perfil-digital" />
+            <input type="hidden" name="linkKind" value="google_review" />
+            <input type="hidden" name="linkName" value="Reseñas del negocio" />
+            <label>Enlace de reseñas<input name="targetUrl" type="url" required defaultValue={reviewLink?.target_url ?? ""} placeholder="https://..." /></label>
+            <button className="primaryButton" type="submit">{reviewLink ? "Actualizar enlace de reseñas" : "Conectar reseñas"}</button>
+          </form> : <p className="formMessage">Solo el propietario o un gerente puede cambiar el enlace de reseñas.</p>}
+        </section>
+        {!!smartLinks?.filter((link) => link.kind !== "google_review").length && <section className="smartLinksCard profileSmartLinks">
+          <div><p className="eyebrow">OTROS ENLACES</p><h2>Accesos del negocio</h2></div>
+          <div className="smartLinksList">{smartLinks.filter((link) => link.kind !== "google_review").map((link) => <SmartLinkQr
+            key={link.id}
+            id={link.id}
+            name={link.name}
+            kind={link.kind}
+            targetUrl={link.target_url}
+            url={`https://nival-tech-platform.vercel.app/go/${link.public_token}`}
+            clicks={Number(link.click_count)}
+            active={link.active}
+            editable={canManageProgram}
+          />)}</div>
+        </section>}
       </>}
       {currentSection === "configuracion" && <>
       {hasIntelligence && canManageProgram && business && (

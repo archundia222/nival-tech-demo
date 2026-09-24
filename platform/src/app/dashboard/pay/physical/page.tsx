@@ -73,7 +73,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           {(!primaryPaymentProfileId || !hasPointsDestination || !hasReviewDestination) && <div className="templateSetupLinks">
             {!primaryPaymentProfileId && <a href="/dashboard/pay">Configurar Nival Pay →</a>}
             {!hasPointsDestination && <a href="/dashboard/points">Activar / configurar Nival Puntos →</a>}
-            {!hasReviewDestination && <a href="/dashboard?section=nival-card#nival-card">Configurar reseñas →</a>}
+            {!hasReviewDestination && <a href="/dashboard?section=perfil-digital#reviews">Configurar reseñas →</a>}
           </div>}
           <label>Color base<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Color según mi marca</option></select></label>
           <label>Indicaciones del frente<textarea name="designNotes" maxLength={500} placeholder="Ej. usar mi logo blanco, fondo azul, nombre del negocio debajo del QR."/></label>
