@@ -231,6 +231,31 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         <PayDemo />
       </section>
 
+      <section className="landingPointsShowcase scrollReveal" aria-labelledby="points-demo-title">
+        <div className="landingPointsCopy">
+          <p className="landingEyebrow">NIVAL PUNTOS EN LA VIDA REAL</p>
+          <h2 id="points-demo-title">“A las 10 visitas, tu recompensa está lista.”</h2>
+          <p>El cliente se registra una sola vez. Después ve su avance desde el celular, muestra su código al visitar y recibe la recompensa cuando llega a la meta.</p>
+          <div className="landingPointsFlow">
+            <span><b>1</b> Escanea tu QR</span>
+            <span><b>2</b> Crea su tarjeta</span>
+            <span><b>3</b> Suma visitas</span>
+            <span><b>4</b> Canjea el premio</span>
+          </div>
+          <Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis</Link>
+        </div>
+        <div className="landingPointsPhone" aria-label="Ejemplo de tarjeta digital de Nival Puntos">
+          <div className="landingPointsCard">
+            <div className="landingPointsBrand"><span>CN</span><div><small>PROGRAMA DE CLIENTES FRECUENTES</small><strong>Café Nival</strong></div></div>
+            <div className="landingPointsBalance"><strong>7</strong><span>de 10 visitas</span></div>
+            <div className="landingPointsBar"><i /></div>
+            <div className="landingPointsReward"><small>PRÓXIMA RECOMPENSA</small><strong>Café de la casa gratis</strong><span>Te faltan 3 visitas</span></div>
+            <div className="landingPointsButtons"><b>＋ Sumar visita</b><b>★ Mis premios</b></div>
+          </div>
+          <span className="landingWalletBadge">Tarjeta digital · QR · Google Wallet compatible</span>
+        </div>
+      </section>
+
       <section className="landingSection landingIncludes scrollReveal">
         <div className="landingSectionHeading">
           <p className="landingEyebrow">TODO LO NECESARIO</p>
