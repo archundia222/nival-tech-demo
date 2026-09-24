@@ -457,6 +457,65 @@ export async function startNivalIntelligenceSubscription(formData: FormData) {
 }
 
 
+export async function cancelNivalSubscription(formData: FormData) {
+  const scope = String(formData.get('scope') ?? '');
+  const returnPath = scope === 'points' ? '/dashboard/points' : scope === 'intelligence' ? '/dashboard/intelligence' : '/dashboard';
+  if (formData.get('cancelConsent') !== 'on') {
+    redirect(`${returnPath}?error=Confirma+que+quieres+cancelar+la+suscripción.`);
+  }
+
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
+
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const productCodes = scope === 'points'
+    ? [NIVAL_POINTS_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT]
+    : [NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT];
+
+  const { data: subscription, error } = await admin.from('product_subscriptions')
+    .select('id, provider_subscription_id, product_code, status')
+    .eq('business_id', businessId)
+    .in('product_code', productCodes)
+    .in('status', ['authorized', 'active', 'pending'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !subscription?.provider_subscription_id) {
+    redirect(`${returnPath}?error=No+encontramos+una+suscripción+activa+para+cancelar.`);
+  }
+
+  const response = await fetch(`https://api.mercadopago.com/preapproval/${encodeURIComponent(subscription.provider_subscription_id)}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'canceled' }),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({})) as { message?: string };
+    console.error('[subscriptions] Mercado Pago cancellation failed', { status: response.status, message: result.message ?? null });
+    redirect(`${returnPath}?error=No+se+pudo+cancelar+la+suscripción.+Intenta+de+nuevo.`);
+  }
+
+  const { error: syncError } = await admin.rpc('sync_nival_product_subscription', {
+    p_subscription_id: subscription.id,
+    p_provider_subscription_id: subscription.provider_subscription_id,
+    p_status: 'cancelled',
+    p_current_period_end: null,
+  });
+  if (syncError) {
+    console.error('[subscriptions] Local cancellation sync failed', { subscriptionId: subscription.id, code: syncError.code });
+    redirect(`${returnPath}?error=Mercado+Pago+canceló+la+suscripción,+pero+no+pudimos+actualizar+el+panel.+Contacta+soporte.`);
+  }
+
+  revalidatePath('/dashboard/points');
+  revalidatePath('/dashboard/intelligence');
+  redirect(`${returnPath}?subscription=cancelled`);
+}
+
+
 type PhysicalCardInput = {
   design: 'black' | 'white' | 'custom';
   design_notes: string | null;
