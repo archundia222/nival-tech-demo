@@ -37,7 +37,7 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const next = safeNext(formData);
-  if (!privacyDisclosuresReady()) {
+  if (!(await privacyDisclosuresReady())) {
     redirect(`/auth?mode=signup&error=${encodeURIComponent("El registro está temporalmente deshabilitado hasta completar el aviso de privacidad.")}&next=${encodeURIComponent(next)}`);
   }
   if (formData.get("legalConsent") !== "on") {
