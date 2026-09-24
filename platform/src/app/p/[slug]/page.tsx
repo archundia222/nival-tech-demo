@@ -27,12 +27,12 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(hasReviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/r/${business.slug}`, icon: "☆" }] : []),
     ...(business.website_url && !hasWebsiteLink ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
-    ...customLinks.map((link) => ({
+    ...customLinks.filter((link) => link.link_kind !== 'google_review').map((link) => ({
       key: link.public_token,
-      label: link.link_kind === 'google_review' ? 'Reseñas' : link.link_kind === 'website' ? 'Sitio web' : link.link_name,
-      description: link.link_kind === 'google_review' ? 'Califica tu experiencia' : link.link_kind === 'website' ? 'Información y servicios' : 'Abrir enlace',
+      label: link.link_kind === 'website' ? 'Sitio web' : link.link_name,
+      description: link.link_kind === 'website' ? 'Información y servicios' : 'Abrir enlace',
       href: `/go/${link.public_token}`,
-      icon: link.link_kind === 'google_review' ? '☆' : '↗',
+      icon: '↗',
       external: true,
     })),
   ];

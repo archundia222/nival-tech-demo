@@ -123,6 +123,29 @@ export async function createSmartLink(formData: FormData) {
   }
 
   const { supabase, businessId } = await getActiveManagerContext();
+
+  if (kind === "google_review") {
+    const { data: existing } = await supabase.from("smart_links")
+      .select("id")
+      .eq("business_id", businessId)
+      .eq("kind", "google_review")
+      .eq("active", true)
+      .limit(1)
+      .maybeSingle();
+    if (existing?.id) {
+      const { error: updateError } = await supabase.rpc("update_smart_link_for", {
+        p_business_id: businessId,
+        link_id: existing.id,
+        link_name: name,
+        destination_url: targetUrl,
+        enabled: true,
+      });
+      if (updateError) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(updateError.message)}`);
+      revalidatePath("/dashboard");
+      redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace de reseñas actualizado.")}`);
+    }
+  }
+
   const { error } = await supabase.rpc("create_smart_link_for", {
     p_business_id: businessId,
     link_name: name,
@@ -130,9 +153,9 @@ export async function createSmartLink(formData: FormData) {
     destination_url: targetUrl,
   });
 
-  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
-  redirect(`/dashboard?message=${encodeURIComponent("Enlace inteligente creado.")}`);
+  redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace inteligente creado.")}`);
 }
 
 export async function updateSmartLink(formData: FormData) {
@@ -158,9 +181,9 @@ export async function updateSmartLink(formData: FormData) {
     enabled: active,
   });
 
-  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/dashboard?section=nival-card&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
-  redirect(`/dashboard?message=${encodeURIComponent("Enlace inteligente actualizado.")}`);
+  redirect(`/dashboard?section=nival-card&message=${encodeURIComponent("Enlace inteligente actualizado.")}`);
 }
 
 export async function updateBusinessProfile(formData: FormData) {
