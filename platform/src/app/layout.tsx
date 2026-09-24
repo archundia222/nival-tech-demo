@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { EssentialCookieNotice } from "./essential-cookie-notice";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nival-tech-platform.vercel.app";
 
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body><a className="skipLink" href="#main-content">Saltar al contenido principal</a>{children}<EssentialCookieNotice /></body>
     </html>
   );
 }
