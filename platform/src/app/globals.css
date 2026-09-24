@@ -4368,3 +4368,10 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .landingSalesAssurance,.landingCustomService{width:calc(100% - 28px)}
   .landingSalesAssurance>div{padding:16px}
 }
+
+.authHelp{margin-top:18px;border-top:1px solid var(--line);padding-top:18px}
+.authHelp summary{cursor:pointer;color:var(--muted);font-size:13px;font-weight:800;list-style:none}
+.authHelp summary::-webkit-details-marker{display:none}
+.authHelp summary:after{content:"＋";float:right;color:var(--accent)}
+.authHelp[open] summary:after{content:"−"}
+.authHelp .authForm{margin-top:16px}
