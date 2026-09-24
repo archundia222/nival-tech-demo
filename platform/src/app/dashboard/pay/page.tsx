@@ -204,6 +204,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     <DashboardNavigation businessName={business?.name ?? 'Mi negocio'} active={currentView === 'add' ? 'agregar-tarjetas' : currentView === 'share' ? 'compartir-paginas' : 'nival-pay'} productLevel={business?.product_level === 'intelligence' ? 'intelligence' : 'pay'} />
     <div className="dashboardContent dashboardPayContent">
       <header className="dashboardContentTopbar payTopbar"><div><strong>Nival Pay</strong></div><span className="ready">Gratis</span></header>
+      {params.error && <p role="alert" className="formMessage errorMessage">{params.error}</p>}
       <section className="dashboardHero trialHero">
         <div>
           <p className="eyebrow">NIVAL PAY GRATIS</p>
