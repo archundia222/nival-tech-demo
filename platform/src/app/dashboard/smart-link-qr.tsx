@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { updateSmartLink } from "./actions";
 
@@ -12,6 +13,7 @@ interface SmartLinkQrProps {
   clicks: number;
   active: boolean;
   editable: boolean;
+  returnTo?: "/dashboard?section=nival-card" | "/dashboard?section=perfil-digital";
 }
 
 const kindLabels: Record<string, string> = {
@@ -20,8 +22,9 @@ const kindLabels: Record<string, string> = {
   custom: "Enlace personalizado",
 };
 
-export function SmartLinkQr({ id, name, kind, targetUrl, url, clicks, active, editable }: SmartLinkQrProps) {
+export function SmartLinkQr({ id, name, kind, targetUrl, url, clicks, active, editable, returnTo = "/dashboard?section=nival-card" }: SmartLinkQrProps) {
   const qrId = `smart-link-${id}`;
+  const [copied, setCopied] = useState(false);
 
   function downloadQr() {
     const svg = document.getElementById(qrId);
@@ -38,6 +41,8 @@ export function SmartLinkQr({ id, name, kind, targetUrl, url, clicks, active, ed
 
   async function copyUrl() {
     await navigator.clipboard.writeText(url);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
   }
 
   return <article className="smartLinkRow">
@@ -46,13 +51,14 @@ export function SmartLinkQr({ id, name, kind, targetUrl, url, clicks, active, ed
       <span>{kindLabels[kind] ?? "Enlace"} · {clicks} aperturas</span>
       <a href={url} target="_blank" rel="noreferrer">{url}</a>
       <div className="smartLinkActions">
-        <button className="visitButton" type="button" onClick={copyUrl}>Copiar enlace NFC</button>
+        <button className="visitButton" type="button" onClick={copyUrl}>{copied ? "Enlace copiado ✓" : "Copiar enlace NFC"}</button>
         <button className="visitButton" type="button" onClick={downloadQr}>Descargar QR</button>
       </div>
       {editable && <details className="smartLinkEditor">
         <summary>Editar destino</summary>
         <form action={updateSmartLink} className="compactForm">
           <input type="hidden" name="linkId" value={id} />
+          <input type="hidden" name="returnTo" value={returnTo} />
           <label>Nombre<input name="linkName" required minLength={2} maxLength={80} defaultValue={name} /></label>
           <label>Destino<input name="targetUrl" type="url" required defaultValue={targetUrl} /></label>
           <label className="checkLabel"><input name="active" type="checkbox" defaultChecked={active} /> Enlace activo</label>

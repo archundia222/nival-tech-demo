@@ -380,6 +380,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             clicks={Number(link.click_count)}
             active={link.active}
             editable={canManageProgram}
+            returnTo="/dashboard?section=perfil-digital"
           />)}</div>
         </section>}
       </>}
