@@ -36,6 +36,9 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const next = safeNext(formData);
+  if (formData.get("legalConsent") !== "on") {
+    redirect(`/auth?mode=signup&error=${encodeURIComponent("Debes aceptar los Términos y confirmar que recibiste el Aviso de privacidad.")}&next=${encodeURIComponent(next)}`);
+  }
   const supabase = await createClient();
   const requestHeaders = await headers();
   const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
@@ -44,7 +47,7 @@ export async function signUp(formData: FormData) {
     email,
     password: value(formData, "password"),
     options: {
-      data: { full_name: value(formData, "fullName") },
+      data: { full_name: value(formData, "fullName"), terms_accepted_at: new Date().toISOString(), terms_version: "2026-09-24", privacy_notice_version: "2026-09-24" },
       emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
     },
   });
