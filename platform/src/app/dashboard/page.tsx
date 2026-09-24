@@ -202,13 +202,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
       : Number(paymentProfile?.view_count ?? 0) === 0
         ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link, descarga el QR o usa la tarjeta NFC. La primera apertura te confirma que el flujo ya está en la calle.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
-        : hasIntelligence
-          ? (Number(customerCount ?? 0) === 0 && Number(visitCount ?? 0) === 0
-            ? { eyebrow: "INTELLIGENCE NECESITA UNA PRIMERA SEÑAL", title: "Registra lo que ya sabes de tu negocio", text: "Empieza con un cliente, una venta, el cierre del día o un CSV. No necesitas cambiar tu forma de trabajar para que Nival empiece a aprender.", href: "/dashboard/intelligence?view=imports", cta: "Registrar datos" }
-            : { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa clientes, visitas y ventas registradas para priorizar recuperación, recurrencia y campañas sin hacerte interpretar tablas.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" })
-          : hasPoints
-            ? { eyebrow: "HAZ QUE EL PROGRAMA SE USE", title: "Registra lo que acaba de pasar", text: "Una visita, un cliente o una venta pueden registrarse en segundos. También puedes dejar que el cliente se dé de alta solo desde tu QR.", href: "/dashboard/points?view=register", cta: "Abrir registro rápido" }
-            : { eyebrow: "TU NIVAL PAY YA ESTÁ RECIBIENDO VISITAS", title: "El siguiente paso es hacer que esas personas vuelvan", text: "Nival Puntos convierte visitas repetidas en una experiencia de lealtad sencilla para el cliente y el negocio.", href: "/dashboard/points", cta: "Conocer Nival Puntos" };
+        : !hasPoints
+          ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de fidelización que el cliente entienda en segundos", text: "Nival Puntos permite que el cliente se registre desde QR o NFC, lleve su tarjeta en el celular y avance hacia una recompensa.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
+          : Number(loyaltyCustomerCount ?? 0) === 0
+            ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo. Esa primera alta empieza a construir la base que después puede usar Nival Intelligence.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
+            : Number(visitCount ?? 0) === 0
+              ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita agrega señal real al programa. Con el tiempo, Intelligence podrá detectar recurrencia y clientes que se están alejando.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
+              : hasIntelligence
+                ? { eyebrow: "NIVAL YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
+                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Activa Intelligence para detectar clientes frecuentes, personas que se están alejando y oportunidades de campaña a partir de tu programa.", href: "/dashboard/intelligence", cta: "Conocer Intelligence" };
 
   return (
     <main className="dashboardApp">
@@ -243,9 +245,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <a href="/dashboard/points">{hasPoints ? "Abrir mi programa →" : "Conocer Nival Puntos →"}</a>
         </article>
         <article className={"intelligenceProduct " + (hasIntelligence ? "activeProduct" : "")}>
-          <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
+          <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : hasPoints ? "DESDE PUNTOS" : "REQUIERE PUNTOS"}</b></div>
           <h2>Nival Intelligence</h2>
-          <p>Te dice a quién recuperar, qué campaña probar y qué funcionó. Menos análisis; más decisiones listas para ejecutar.</p>
+          <p>Analiza los clientes y visitas de Nival Puntos para decirte a quién recuperar, qué campaña probar y qué funcionó.</p>
           <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Intelligence →"}</a>
         </article>
       </section>
