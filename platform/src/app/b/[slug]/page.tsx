@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { enrollCustomer } from "./actions";
 import { getPublicPointsProgram } from "@/app/points/actions";
 
@@ -13,7 +13,7 @@ interface BusinessPageProps {
 export default async function BusinessPage({ params, searchParams }: BusinessPageProps) {
   const { slug } = await params;
   const query = await searchParams;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const [{ data, error }, pointsProgram] = await Promise.all([
     supabase.rpc("get_public_business_v3", { business_slug: slug }),
     getPublicPointsProgram(slug).catch(() => null),
