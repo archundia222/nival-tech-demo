@@ -17,3 +17,5 @@ La conexión usa clientes Supabase separados para navegador y servidor. El endpo
 ## Principio de seguridad
 
 Toda entidad operativa incluye `business_id`. Las políticas RLS comprueban la membresía del usuario antes de permitir acceso. Las claves de servicio nunca deben exponerse en el navegador.
+
+<!-- platform-quality-check -->
