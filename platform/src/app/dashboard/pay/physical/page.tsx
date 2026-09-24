@@ -40,7 +40,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     return payment?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
   const hasIncludedCard = Boolean(paidInitialOrders?.some((order) => !claimedOrderIds.has(order.id)));
-  const hasPointsDestination = Boolean(pointsEntitlement && business.slug);
+  const hasPointsDestination = Boolean(pointsEntitlement && loyaltyProgram && business.slug);
   const hasReviewDestination = Boolean(reviewSmartLink || loyaltyProgram?.review_url);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
   const canPurchase = membership.role === 'owner' || membership.role === 'manager';
@@ -64,7 +64,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
             <label className={!primaryPaymentProfileId ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="pay" defaultChecked={Boolean(primaryPaymentProfileId)} disabled={!primaryPaymentProfileId}/><span className="templateMock"><small>PAGAR</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong>{!primaryPaymentProfileId && <small>Configura tu página primero</small>}</label>
-            <label className={!hasPointsDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="points" defaultChecked={!primaryPaymentProfileId && hasPointsDestination} disabled={!hasPointsDestination}/><span className="templateMock"><small>PUNTOS</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong>{!hasPointsDestination && <small>Activa Puntos para usarla</small>}</label>
+            <label className={!hasPointsDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="points" defaultChecked={!primaryPaymentProfileId && hasPointsDestination} disabled={!hasPointsDestination}/><span className="templateMock"><small>PUNTOS</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong>{!hasPointsDestination && <small>Activa y configura Puntos para usarla</small>}</label>
             <label className={!hasReviewDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="reviews" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && hasReviewDestination} disabled={!hasReviewDestination}/><span className="templateMock"><small>RESEÑA</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong>{!hasReviewDestination && <small>Configura tu enlace de reseñas desde Página del negocio</small>}</label>
             <label><input type="radio" name="frontTemplate" value="profile" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && !hasReviewDestination}/><span className="templateMock"><small>NEGOCIO</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para ver nuestros enlaces</em></span><strong>Perfil digital</strong></label>
           </div>
@@ -72,7 +72,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <p className="payHelp">La tarjeta quedará programada al destino elegido. Nival valida que ese destino exista antes de registrar el pedido.</p>
           {(!primaryPaymentProfileId || !hasPointsDestination || !hasReviewDestination) && <div className="templateSetupLinks">
             {!primaryPaymentProfileId && <a href="/dashboard/pay">Configurar Nival Pay →</a>}
-            {!hasPointsDestination && <a href="/dashboard/points">Activar Nival Puntos →</a>}
+            {!hasPointsDestination && <a href="/dashboard/points">Activar / configurar Nival Puntos →</a>}
             {!hasReviewDestination && <a href="/dashboard?section=nival-card#nival-card">Configurar reseñas →</a>}
           </div>}
           <label>Color base<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Color según mi marca</option></select></label>

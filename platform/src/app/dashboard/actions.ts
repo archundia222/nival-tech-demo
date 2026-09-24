@@ -261,8 +261,13 @@ export async function createLoyaltyProgram(formData: FormData) {
   }
   const { supabase, businessId } = await getActiveManagerContext();
   const { data: business } = await supabase.from("businesses").select("product_level").eq("id", businessId).maybeSingle();
-  const { data: intelligenceEntitlement } = await supabase.from("business_product_entitlements").select("status").eq("business_id", businessId).eq("product_code", "nival_intelligence").eq("status", "active").maybeSingle();
-  if (business?.product_level !== "intelligence" && !intelligenceEntitlement) redirect("/dashboard?section=resumen");
+  const { data: pointsEntitlement } = await supabase.from("business_product_entitlements")
+    .select("status")
+    .eq("business_id", businessId)
+    .eq("product_code", "nival_points")
+    .in("status", ["active","free"])
+    .maybeSingle();
+  if (business?.product_level !== "intelligence" && !pointsEntitlement) redirect("/dashboard?section=resumen");
   const { data: existing } = await supabase.from("loyalty_programs").select("id").eq("business_id", businessId).eq("active", true).limit(1).maybeSingle();
   if (existing) redirect("/dashboard?section=configuracion");
   const { error } = await supabase.from("loyalty_programs").insert({ business_id: businessId, name: programName, points_per_visit: pointsPerVisit, reward_threshold: rewardThreshold, reward_description: rewardDescription, active: true });

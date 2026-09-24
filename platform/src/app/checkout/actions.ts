@@ -540,9 +540,14 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
   }
 
   if (details.front_template === 'points') {
-    const { data: entitlement } = await admin.from('business_product_entitlements').select('status')
-      .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).in('status', ['active','free']).maybeSingle();
+    const [{ data: entitlement }, { data: program }] = await Promise.all([
+      admin.from('business_product_entitlements').select('status')
+        .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).in('status', ['active','free']).maybeSingle(),
+      admin.from('loyalty_programs').select('id')
+        .eq('business_id', businessId).eq('active', true).order('created_at', { ascending: true }).limit(1).maybeSingle(),
+    ]);
     if (!entitlement) redirect('/dashboard/pay/physical?error=Activa+Nival+Puntos+antes+de+pedir+una+tarjeta+para+puntos.');
+    if (!program) redirect('/dashboard/pay/physical?error=Configura+primero+tu+programa+de+Nival+Puntos.');
     return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/b/${business.slug}?from=nfc` };
   }
 
