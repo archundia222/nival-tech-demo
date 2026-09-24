@@ -214,6 +214,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
       <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{workspaceActive ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
+      {params.error && <div className="formMessage errorMessage dashboardMessage dashboardMessageTop">{params.error}</div>}
+      {params.message && <div className="formMessage successMessage dashboardMessage dashboardMessageTop">{params.message}</div>}
       {currentSection === "resumen" && <>
       <section className="dashboardHero nivalHomeHero" id="resumen">
         <div>
@@ -427,8 +429,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         </section>
       )}
       </>}
-      {params.error && <div className="formMessage errorMessage dashboardMessage">{params.error}</div>}
-      {params.message && <div className="formMessage successMessage dashboardMessage">{params.message}</div>}
       {currentSection === "clientes" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">CLIENTES</p><h1>Configura tu programa de lealtad</h1><p>Antes de registrar clientes, visitas y puntos, configura y activa el programa de lealtad de este workspace.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <section className="customerTableCard" id="clientes">
         <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
