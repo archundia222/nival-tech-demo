@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LEGAL_VERSION, legalBusinessInfo } from "@/lib/legal";
+import { LEGAL_VERSION, legalBusinessInfo, privacyDisclosuresReady } from "@/lib/legal";
 
 export const metadata = {
   title: "Aviso de privacidad | Nival Tech",
@@ -8,12 +8,14 @@ export const metadata = {
 
 export default function PrivacyPage() {
   const business = legalBusinessInfo();
+  const privacyReady = privacyDisclosuresReady();
   return (
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
       <section className="legalCard">
         <p className="eyebrow">VERSIÓN {LEGAL_VERSION} · 24 DE SEPTIEMBRE DE 2026</p>
         <h1>Aviso de privacidad integral</h1>
+        {!privacyReady && <p className="legalWarning" role="alert">La identidad legal y el domicilio del responsable aún no han sido configurados. Por seguridad jurídica, Nival mantiene deshabilitadas las nuevas altas de datos personales hasta completar esta información.</p>}
         <p><strong>Responsable.</strong> {business.legalName}, que opera comercialmente como {business.tradeName}, es responsable del tratamiento de los datos personales que obtiene directamente a través de la plataforma cuando actúa como responsable. Contacto para privacidad: <a className="supportEmail" href={`mailto:${business.supportEmail}`}>{business.supportEmail}</a>.</p>
         {business.address && <p><strong>Domicilio del responsable:</strong> {business.address}.</p>}
         {business.phone && <p><strong>Teléfono:</strong> {business.phone}.</p>}
