@@ -24,10 +24,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
-  const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: customers }, { count: visits }, { data: program }] = await Promise.all([
+  const [{ data: entitlement }, { data: intelligenceEntitlement }, { count: loyaltyCustomers }, { count: visits }, { data: program }] = await Promise.all([
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').maybeSingle(),
     supabase.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_intelligence').eq('status', 'active').maybeSingle(),
-    supabase.from('customers').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
+    supabase.from('loyalty_accounts').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('visits').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id),
     supabase.from('loyalty_programs').select('id, name, points_per_visit, reward_threshold, reward_description, point_cooldown_minutes, daily_points_cap, review_url, review_request_visit').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
   ]);
@@ -46,7 +46,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       .order('occurred_at', { ascending: false })
       .limit(20),
     supabase.from('customers')
-      .select('id,name,phone,email,origin,created_at,loyalty_accounts(points_balance)')
+      .select('id,name,phone,email,origin,created_at,loyalty_accounts!inner(points_balance)')
       .eq('business_id', membership.business_id)
       .order('created_at', { ascending: false })
       .limit(100),
@@ -82,7 +82,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada.</p>}
       {params.saved === 'summary' && <p className="formMessage successMessage">Resumen del día registrado.</p>}
       {params.saved?.startsWith('import-') && <p className="formMessage successMessage">Importación lista: {params.saved.replace('import-','')} ventas agregadas.</p>}
-      {params.saved?.startsWith('customers-') && <p className="formMessage successMessage">Base importada: {params.saved.replace('customers-','')} clientes nuevos. Los duplicados se omitieron.</p>}
+      {params.saved?.startsWith('customers-') && (() => { const [, imported='0', attached='0'] = params.saved.split('-'); return <p className="formMessage successMessage">Base importada: {imported} clientes nuevos. {Number(attached) > 0 ? `${attached} quedaron conectados a Nival Puntos.` : 'Los duplicados se omitieron.'}</p>; })()}
       {!available ? <>
         <section className="productShowcase pointsShowcase">
           <div className="productShowcaseCopy"><span className="productPill">NIVAL PUNTOS</span><h1>Haz que tus clientes<br/>quieran volver.</h1><p>Premia cada visita con puntos. Tus clientes ven su saldo desde el celular y tú administras todo sin tarjetas de papel.</p><ul className="productBenefits"><li>Registro con código QR</li><li>Tarjeta digital del cliente</li><li>Visitas, puntos y premios en un mismo lugar</li></ul><div className="productPrice"><strong>Gratis</strong><span>hasta 30 clientes</span></div><div className="freemiumCtas"><form action={activateFreeNivalPoints}><button className="productCta">Crear mi programa gratis <span>→</span></button></form><form action={startNivalPointsSubscription}><button className="nvSecondaryButton">Ver Nival Puntos Pro · $199/mes</button></form></div><small>Empieza sin tarjeta. Paga cuando necesites más clientes, personalización y resultados completos.</small></div>
@@ -109,7 +109,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         <section className="productUseCases"><div><span>IDEAL PARA</span><h2>Cafeterías, restaurantes, barberías, salones y negocios con clientes frecuentes.</h2></div><form action={activateFreeNivalPoints}><button className="productCta">Empezar gratis <span>→</span></button></form></section>
       </> : <>
         {params.free === 'started' && <p className="formMessage successMessage">Nival Puntos Gratis ya está activo. Comparte tu QR y empieza a registrar clientes.</p>}
-        {freePlan && <section className="freemiumBanner"><div><span>NIVAL PUNTOS GRATIS</span><strong>{Math.min(customers ?? 0,30)} de 30 clientes usados</strong><p>Tu programa funciona de verdad. Cuando necesites más capacidad, resultados completos o configuración avanzada, puedes pasar a Pro sin perder clientes ni puntos.</p></div><form action={startNivalPointsSubscription}><button type="submit">Desbloquear Pro · $199/mes →</button></form></section>}
+        {freePlan && <section className="freemiumBanner"><div><span>NIVAL PUNTOS GRATIS</span><strong>{Math.min(loyaltyCustomers ?? 0,30)} de 30 clientes usados</strong><p>Tu programa funciona de verdad. Cuando necesites más capacidad, resultados completos o configuración avanzada, puedes pasar a Pro sin perder clientes ni puntos.</p></div><form action={startNivalPointsSubscription}><button type="submit">Desbloquear Pro · $199/mes →</button></form></section>}
         <section className="pointsV1Hero">
           <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'register' ? 'Registrar' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'register' ? 'Captura solo lo que ya haces: una visita, una venta, un cliente nuevo o el total del día.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
           {(view === 'share' || view === 'overview') && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">{view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}</a>}
@@ -190,7 +190,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
           <section className="captureScanner"><div><span>VISITA CON NIVAL PUNTOS</span><h2>Si el cliente ya tiene tarjeta, escanéala.</h2><p>El flujo de puntos sigue igual: código temporal, confirmación y registro en segundos.</p></div><PointsEmployeeScanner mode="visit" /></section>
         </>}
 
-        {canManage && view === 'overview' && !hasIntelligence && Number(customers ?? 0) > 0 && <section className="productBridge"><div><span>CUANDO QUIERAS IR MÁS ALLÁ DE LOS PUNTOS</span><h2>Ya estás registrando comportamiento. Intelligence puede convertirlo en acciones.</h2><p>Usa visitas y recurrencia para encontrar clientes en riesgo, preparar campañas y medir quién regresó después.</p></div><a href="/dashboard/intelligence">Conocer Intelligence · paquete $449/mes →</a></section>}
+        {canManage && view === 'overview' && !hasIntelligence && Number(loyaltyCustomers ?? 0) > 0 && <section className="productBridge"><div><span>CUANDO QUIERAS IR MÁS ALLÁ DE LOS PUNTOS</span><h2>Ya estás registrando comportamiento. Intelligence puede convertirlo en acciones.</h2><p>Usa visitas y recurrencia para encontrar clientes en riesgo, preparar campañas y medir quién regresó después.</p></div><a href="/dashboard/intelligence">Conocer Intelligence · paquete $449/mes →</a></section>}
 
         {canManage && view === 'analytics' && freePlan && <section className="freemiumLocked"><span>RESULTADOS PRO</span><h2>Nival ya está registrando la actividad. Pro te ayuda a entender si realmente están volviendo.</h2><p>Desbloquea recurrencia, clientes activos, premios usados y recomendaciones para mejorar el programa.</p><form action={startNivalPointsSubscription}><button type="submit">Desbloquear resultados · $199/mes →</button></form></section>}
         {canManage && view === 'analytics' && paid && <section className="pointsResultsGrid"><article><span>CLIENTES ACTIVOS · 30 DÍAS</span><strong>{active30Customers}</strong><p>Personas con al menos una visita reciente.</p></article><article><span>REGRESARON</span><strong>{returning30Customers}</strong><p>Clientes activos que ya tienen dos o más visitas registradas.</p></article><article><span>RECURRENCIA OBSERVADA</span><strong>{recurrence30}%</strong><p>Qué parte de los clientes activos ya volvió al menos una vez.</p></article><article><span>PREMIOS USADOS · 30 DÍAS</span><strong>{redeemed30}</strong><p>Recompensas que sí terminaron en una experiencia entregada.</p></article></section>}

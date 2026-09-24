@@ -372,6 +372,7 @@ export async function importCustomersCsv(formData: FormData) {
       .eq("business_id", membership.business_id),
   ]);
 
+  let pointsAttached = 0;
   if (pointsEntitlement && program) {
     const capacity = pointsEntitlement.status === "free"
       ? Math.max(0, 30 - Number(currentAccounts ?? 0))
@@ -384,13 +385,14 @@ export async function importCustomersCsv(formData: FormData) {
     if (accountRows.length) {
       const { error: accountError } = await supabase.from("loyalty_accounts").insert(accountRows);
       if (accountError) console.error("[customer-import] Could not attach some imported customers to Puntos", accountError.code);
+      else pointsAttached = accountRows.length;
     }
   }
 
   revalidatePath("/dashboard/points");
   revalidatePath("/dashboard/intelligence");
   revalidatePath("/dashboard");
-  redirect(captureReturn(formData, "saved", `customers-${inserted.length}`));
+  redirect(captureReturn(formData, "saved", `customers-${inserted.length}-${pointsAttached}`));
 }
 
 export async function importSalesCsv(formData: FormData) {
