@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { resendConfirmation, signIn, signUp } from "./actions";
 
+export const metadata = { robots: { index: false, follow: false } };
+
 interface AuthPageProps {
   searchParams: Promise<{ mode?: string; error?: string; message?: string; next?: string }>;
 }

@@ -6,6 +6,8 @@ import { getPublicLoyaltyCard, getPublicLoyaltyRewards } from "@/app/points/acti
 import { CustomerPointsActions } from "./customer-points-actions";
 import { CardSaveActions } from "./card-save-actions";
 
+export const metadata = { robots: { index: false, follow: false } };
+
 interface CardPageProps { params: Promise<{ token: string }>; }
 
 export default async function CardPage({ params }: CardPageProps) {
