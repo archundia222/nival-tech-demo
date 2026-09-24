@@ -86,8 +86,8 @@ type CheckoutProduct = {
   physicalOrder?: Record<string, string | null>;
 };
 
-function assertCommerceDisclosures(returnPath: string) {
-  if (!commerceDisclosuresReady()) {
+async function assertCommerceDisclosures(returnPath: string) {
+  if (!(await commerceDisclosuresReady())) {
     redirect(checkoutReturnPath(returnPath, 'error', 'Las compras están temporalmente deshabilitadas hasta completar el nombre legal, domicilio físico y teléfono del proveedor.'));
   }
 }
@@ -99,7 +99,7 @@ function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: 
 }
 
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
-  assertCommerceDisclosures(product.returnPath);
+  await assertCommerceDisclosures(product.returnPath);
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
@@ -237,7 +237,7 @@ export async function startAdditionalNivalPayCheckout(formData: FormData) {
 }
 
 export async function requestCashPayment(formData: FormData) {
-  assertCommerceDisclosures('/checkout');
+  await assertCommerceDisclosures('/checkout');
   if (formData.get('purchaseConsent') !== 'on') {
     redirect('/checkout?error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+registrar+el+pago.');
   }
@@ -402,7 +402,7 @@ type SubscriptionProduct = {
 
 async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
   const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
-  assertCommerceDisclosures(returnPath);
+  await assertCommerceDisclosures(returnPath);
   if (process.env.NIVAL_RENEWAL_NOTICE_READY !== 'true') {
     redirect(`${returnPath}?error=Las+suscripciones+mensuales+están+temporalmente+deshabilitadas+hasta+activar+un+aviso+de+renovación+con+al+menos+5+días+de+anticipación.`);
   }
@@ -723,7 +723,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {
-  assertCommerceDisclosures('/dashboard/pay/physical');
+  await assertCommerceDisclosures('/dashboard/pay/physical');
   if (form.get('orderConsent') !== 'on') redirect('/dashboard/pay/physical?error=Confirma+el+tratamiento+de+datos+y+las+condiciones+del+pedido.');
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
