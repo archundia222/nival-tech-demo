@@ -14,13 +14,16 @@ export function legalBusinessInfo() {
   };
 }
 
-export function commerceDisclosuresReady() {
+export function privacyDisclosuresReady() {
   return Boolean(
     process.env.NEXT_PUBLIC_NIVAL_LEGAL_NAME?.trim()
     && process.env.NEXT_PUBLIC_NIVAL_LEGAL_ADDRESS?.trim()
-    && process.env.NEXT_PUBLIC_NIVAL_PHONE?.trim()
     && SUPPORT_EMAIL
   );
+}
+
+export function commerceDisclosuresReady() {
+  return privacyDisclosuresReady() && Boolean(process.env.NEXT_PUBLIC_NIVAL_PHONE?.trim());
 }
 
 export function legalBusinessInfoComplete() {
