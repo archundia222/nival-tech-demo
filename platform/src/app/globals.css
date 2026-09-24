@@ -4473,3 +4473,52 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nivalProductsPage .productsBundle > a {
   color: #f0cf82;
 }
+
+/* Dashboard product groups: keep Pay / Puntos / Intelligence compact. */
+.professionalNav .sidebarMainProduct{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0;
+  padding:9px 10px;
+  border:0;
+  border-radius:8px;
+  color:#9ea2a9;
+  background:transparent;
+  font-size:12.5px;
+  font-weight:750;
+  line-height:1.2;
+}
+.professionalNav .sidebarMainProduct svg{
+  width:17px;
+  height:17px;
+  min-width:17px;
+  flex:0 0 17px;
+}
+.professionalNav .sidebarMainProduct > span{
+  min-width:0;
+  flex:1;
+  color:inherit;
+  font-size:12.5px;
+  letter-spacing:0;
+}
+.professionalNav .sidebarMainProduct > i{
+  flex:0 0 auto;
+  margin-left:auto;
+  color:#73777e;
+  font-size:12px;
+}
+.professionalNav .sidebarMainProduct:hover{
+  color:#eceef0;
+  background:#15171a;
+}
+.professionalNav .sidebarMainProduct.active{
+  color:#fff;
+  background:#1b1d21;
+  box-shadow:inset 3px 0 0 #b99750;
+}
+.professionalNav details[open] > .sidebarMainProduct{
+  margin-bottom:2px;
+}
