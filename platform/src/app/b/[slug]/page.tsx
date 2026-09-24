@@ -48,8 +48,9 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
             <input type="hidden" name="origin" value={query.from === "nfc" ? "nfc" : "qr"} />
             <label>Nombre<input name="name" required minLength={2} maxLength={100} autoComplete="name" /></label>
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
-            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el <Link href="/privacy" target="_blank" rel="noreferrer">aviso de privacidad</Link> y el uso de mis datos para operar el programa.</label>
-            <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
+            <p className="formPrivacyNotice"><strong>Aviso simplificado:</strong> tu nombre y teléfono se usarán para crear y administrar tu cuenta de lealtad, registrar visitas, puntos y recompensas. Nival Tech presta la plataforma al negocio. Consulta el <Link href="/privacy" target="_blank" rel="noreferrer">Aviso de privacidad integral</Link>.</p>
+            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Confirmo que recibí el aviso de privacidad y autorizo el tratamiento necesario para operar mi tarjeta de puntos.</label>
+            <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Opcional: quiero recibir promociones de este negocio. Puedo negarme y seguir usando mi tarjeta de puntos.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>
