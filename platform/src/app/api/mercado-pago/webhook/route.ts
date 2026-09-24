@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     }
     const mappedStatus = subscription.status === 'authorized' ? 'authorized'
       : subscription.status === 'paused' ? 'paused'
-      : subscription.status === 'cancelled' ? 'cancelled'
+      : (subscription.status === 'cancelled' || subscription.status === 'canceled') ? 'cancelled'
       : 'pending';
     const admin = createAdminClient();
     const { data: storedSubscription, error: lookupError } = await admin.from('product_subscriptions')
