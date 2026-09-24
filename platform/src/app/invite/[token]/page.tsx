@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { acceptTeamInvitation } from "@/app/dashboard/actions";
 
 interface InvitationPageProps {
@@ -13,12 +14,13 @@ const roleNames = { manager: "administrador", staff: "personal" } as const;
 export default async function InvitationPage({ params, searchParams }: InvitationPageProps) {
   const { token } = await params;
   const query = await searchParams;
-  const supabase = await createClient();
-  const { data: invitations } = await supabase.rpc("get_business_invitation", { invitation_token: token });
+  const admin = createAdminClient();
+  const { data: invitations } = await admin.rpc("get_business_invitation", { invitation_token: token });
   const invitation = invitations?.[0];
 
   if (!invitation) redirect("/auth?error=La invitación no existe.");
 
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const available = invitation.invitation_status === "pending" && new Date(invitation.expires_at) > new Date();
   const next = `/invite/${token}`;
