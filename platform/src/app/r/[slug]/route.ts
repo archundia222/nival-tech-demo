@@ -8,7 +8,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   if (!business) return NextResponse.redirect(new URL('/', request.url));
 
   const [{ data: smartLink }, { data: program }] = await Promise.all([
-    admin.from('smart_links').select('target_url')
+    admin.from('smart_links').select('target_url, public_token')
       .eq('business_id', business.id)
       .eq('kind', 'google_review')
       .eq('active', true)
@@ -23,7 +23,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       .maybeSingle(),
   ]);
 
-  const destination = smartLink?.target_url || program?.review_url;
+  if (smartLink?.public_token) return NextResponse.redirect(new URL(`/go/${smartLink.public_token}`, request.url));
+  const destination = program?.review_url;
   if (destination?.startsWith('https://')) return NextResponse.redirect(destination);
   return NextResponse.redirect(new URL(`/p/${encodeURIComponent(slug)}`, request.url));
 }

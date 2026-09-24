@@ -543,7 +543,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
     const { data: entitlement } = await admin.from('business_product_entitlements').select('status')
       .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).in('status', ['active','free']).maybeSingle();
     if (!entitlement) redirect('/dashboard/pay/physical?error=Activa+Nival+Puntos+antes+de+pedir+una+tarjeta+para+puntos.');
-    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/b/${business.slug}` };
+    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/b/${business.slug}?from=nfc` };
   }
 
   if (details.front_template === 'reviews') {

@@ -6,7 +6,7 @@ import { getPublicPointsProgram } from "@/app/points/actions";
 
 interface BusinessPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; from?: string }>;
 }
 
 export default async function BusinessPage({ params, searchParams }: BusinessPageProps) {
@@ -14,10 +14,10 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
   const query = await searchParams;
   const supabase = await createClient();
   const [{ data, error }, pointsProgram] = await Promise.all([
-    supabase.rpc("get_public_business_v2", { business_slug: slug }),
+    supabase.rpc("get_public_business_v3", { business_slug: slug }),
     getPublicPointsProgram(slug).catch(() => null),
   ]);
-  if (error || !data?.[0] || !pointsProgram) notFound();
+  if (error || !data?.[0] || !data[0].points_enabled || !pointsProgram) notFound();
   const business = data[0];
 
   return (
@@ -44,15 +44,15 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
           {query.error && <div className="formMessage errorMessage">{query.error}</div>}
           <form action={enrollCustomer} className="authForm">
             <input type="hidden" name="slug" value={business.slug} />
-            <input type="hidden" name="origin" value="qr" />
+            <input type="hidden" name="origin" value={query.from === "nfc" ? "nfc" : "qr"} />
             <label>Nombre<input name="name" required minLength={2} maxLength={100} autoComplete="name" /></label>
             <label>Teléfono<input name="phone" type="tel" required minLength={10} maxLength={18} inputMode="tel" autoComplete="tel" placeholder="55 1234 5678" /></label>
-            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el aviso de privacidad y el uso de mis datos para operar el programa.</label>
+            <label className="checkLabel"><input name="privacyConsent" type="checkbox" required /> Acepto el <a href="/privacy" target="_blank" rel="noreferrer">aviso de privacidad</a> y el uso de mis datos para operar el programa.</label>
             <label className="checkLabel"><input name="marketingConsent" type="checkbox" /> Quiero recibir promociones de este negocio.</label>
             <button className="primaryButton" type="submit">Crear mi tarjeta y empezar</button>
           </form>
       </section>
-      <a className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Pago, contacto y otros accesos del negocio</strong></span><b>→</b></a>
+      <a className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Contacto y otros accesos del negocio</strong></span><b>→</b></a>
       <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><a href="/?from=nival-puntos#productos">Conocer Nival Tech →</a></aside>
       {(business.phone || business.website_url) && <footer className="businessContact">
         {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
