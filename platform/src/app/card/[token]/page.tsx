@@ -15,6 +15,12 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const progress = Math.min(100, Math.round((Number(card.points_balance) / Number(card.reward_threshold)) * 100));
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
+  const googleWalletReady = Boolean(
+    process.env.GOOGLE_WALLET_ISSUER_ID &&
+    process.env.GOOGLE_WALLET_CLASS_SUFFIX &&
+    process.env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL &&
+    process.env.GOOGLE_WALLET_PRIVATE_KEY
+  );
   return <main className="pointsCustomerShell nivalDashboard" style={{ "--nv-accent": card.business_brand_color || "#C8A65A" } as CSSProperties}>
     <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span></header>
     <section className="pointsCustomerCard">
@@ -27,6 +33,7 @@ export default async function CardPage({ params }: CardPageProps) {
       </div>
       {availableRewards.length > 0 && <div className="pointsAvailableNotice"><span>✓</span><div><strong>{availableRewards.length} {availableRewards.length === 1 ? "recompensa disponible" : "recompensas disponibles"}</strong><small>Ya puedes canjear {availableRewards.length === 1 ? "tu premio" : "tus premios"} en caja.</small></div></div>}
     </section>
+    {googleWalletReady && <section className="pointsWalletSaveCard"><div><span>TU TARJETA EN EL CELULAR</span><strong>Guárdala en Google Wallet</strong><p>Así llevas tus puntos contigo y puedes recibir actualizaciones del programa directamente en tu teléfono.</p></div><a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a></section>}
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. El QR temporal solo sirve para identificar tu cuenta en caja.</p>
     {card.business_slug && <Link className="publicBusinessHub" href={`/p/${card.business_slug}`}><span><small>MÁS DE {card.business_name.toUpperCase()}</small><strong>Pagar, contactar o ver otros accesos del negocio</strong></span><b>→</b></Link>}
