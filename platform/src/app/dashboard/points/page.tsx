@@ -8,6 +8,7 @@ import { PointsEmployeeScanner } from './points-employee-scanner';
 import { PointsProgramForm } from './points-controls';
 import { deleteBusinessSale, importCustomersCsv, importSalesCsv, registerDailySalesSummary, registerQuickCustomer, registerQuickSale, reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
+import { PointsPromotionsPanel } from './points-promotions';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 
@@ -35,7 +36,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
   const available = paid || freePlan;
   const hasIntelligence = Boolean(intelligenceEntitlement);
   const view = params.view ?? 'overview';
-  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : (view === 'register' || view === 'visits') ? 'puntos-registro' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
+  const navActive = view === 'analytics' ? 'puntos-analitica' : view === 'customers' ? 'puntos-clientes' : view === 'promotions' ? 'puntos-promociones' : (view === 'register' || view === 'visits') ? 'puntos-registro' : view === 'redemptions' ? 'puntos-canjes' : view === 'share' ? 'puntos-compartir' : view === 'settings' ? 'puntos-configuracion' : 'puntos';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
   const [{ data: metricRows }, { data: ledgerRows }, { data: customerRows }, { data: visitRows }, { data: rewardRows }, { data: saleRows }] = available && canManage ? await Promise.all([
     supabase.rpc('get_points_dashboard_metrics_for', { p_business_id: membership.business_id }),
@@ -45,7 +46,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
       .order('occurred_at', { ascending: false })
       .limit(20),
     supabase.from('customers')
-      .select('id,name,phone,email,origin,created_at,loyalty_accounts!inner(points_balance)')
+      .select('id,name,phone,email,origin,created_at,marketing_consent_at,loyalty_accounts!inner(points_balance)')
       .eq('business_id', membership.business_id)
       .order('created_at', { ascending: false })
       .limit(100),
@@ -112,7 +113,7 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         {params.free === 'started' && <p className="formMessage successMessage">Nival Puntos Gratis ya está activo. Comparte tu QR y empieza a registrar clientes.</p>}
         {freePlan && <section className="freemiumBanner"><div><span>NIVAL PUNTOS GRATIS</span><strong>{Math.min(loyaltyCustomers ?? 0,30)} de 30 clientes usados</strong><p>Tu programa funciona de verdad. Cuando necesites más capacidad, resultados completos o configuración avanzada, puedes pasar a Pro sin perder clientes ni puntos.</p></div><form action={startNivalPointsSubscription}><button type="submit">Desbloquear Pro · $199/mes →</button></form></section>}
         <section className="pointsV1Hero">
-          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'register' ? 'Registrar' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'register' ? 'Captura solo lo que ya haces: una visita, una venta, un cliente nuevo o el total del día.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
+          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{view === 'analytics' ? 'Resultados' : view === 'customers' ? 'Tus clientes' : view === 'register' ? 'Registrar' : view === 'visits' ? 'Registrar visita' : view === 'redemptions' ? 'Canjear premio' : view === 'promotions' ? 'Promociones' : view === 'share' ? 'Compartir programa' : view === 'settings' ? 'Configurar programa' : (program?.name ?? 'Tu programa de puntos')}</h1><p>{view === 'analytics' ? 'Mide si el programa está logrando lo importante: que más personas regresen y usen sus recompensas.' : view === 'customers' ? 'Consulta primero a los clientes más recientes, su progreso y actividad.' : view === 'register' ? 'Captura solo lo que ya haces: una visita, una venta, un cliente nuevo o el total del día.' : view === 'visits' ? 'Escanea el código de visita del cliente y confirma en segundos.' : view === 'redemptions' ? 'Valida una recompensa específica y confirma únicamente cuando la entregues.' : view === 'promotions' ? 'Vuelve a contactar a clientes que aceptaron promociones por WhatsApp o mediante su tarjeta de Google Wallet.' : view === 'share' ? 'Administra las formas de acceso al programa mediante QR, enlace o NFC.' : view === 'settings' ? 'Define cómo se obtienen puntos, las recompensas y las reglas del programa.' : (program ? `1 punto por visita · Premio al llegar a ${program.reward_threshold} puntos · ${program.daily_points_cap === 0 ? 'Sin tope diario' : `Máximo ${program.daily_points_cap} al día`}.` : 'Configura tu programa para comenzar.')}</p></div>
           {(view === 'share' || view === 'overview') && business?.slug && <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">{view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}</a>}
         </section>
 
@@ -201,6 +202,10 @@ export default async function NivalPointsPage({ searchParams }: { searchParams: 
         {canManage && view === 'analytics' && paid && <section className="pointsResultsGrid"><article><span>CLIENTES ACTIVOS · 30 DÍAS</span><strong>{active30Customers}</strong><p>Personas con al menos una visita reciente.</p></article><article><span>REGRESARON</span><strong>{returning30Customers}</strong><p>Clientes activos que ya tienen dos o más visitas registradas.</p></article><article><span>RECURRENCIA OBSERVADA</span><strong>{recurrence30}%</strong><p>Qué parte de los clientes activos ya volvió al menos una vez.</p></article><article><span>PREMIOS USADOS · 30 DÍAS</span><strong>{redeemed30}</strong><p>Recompensas que sí terminaron en una experiencia entregada.</p></article></section>}
 
         {canManage && view === 'analytics' && paid && <section className="pointsResultsAdvice"><span>QUÉ HACER CON ESTO</span><h2>{recurrence30>=40?'Protege lo que ya está funcionando.':recurrence30>=20?'Hay recurrencia, pero todavía puedes empujar la segunda visita.':'Tu mayor oportunidad es lograr que la primera visita no sea la última.'}</h2><p>{recurrence30>=40?'Mantén el premio fácil de entender y revisa que tus clientes frecuentes sigan sintiendo valor.':recurrence30>=20?'Haz más visible el progreso y recuérdale al cliente qué gana si vuelve.':'Simplifica el programa, comunica el premio desde la primera visita y evita que el cliente se vaya sin saber cómo regresar.'}</p><a href="/dashboard/points?view=customers">Ver clientes →</a></section>}
+
+        {canManage && view === 'promotions' && freePlan && <section className="freemiumLocked"><span>PROMOCIONES PRO</span><h2>Convierte tu programa de puntos en un canal para hacer que vuelvan.</h2><p>Pro te permite preparar mensajes para clientes que aceptaron promociones y enviar notificaciones a tarjetas de Google Wallet cuando estén disponibles.</p><form action={startNivalPointsSubscription}><button type="submit">Desbloquear promociones · $199/mes →</button></form></section>}
+
+        {canManage && view === 'promotions' && paid && <PointsPromotionsPanel businessName={business.name} customers={(customerRows ?? []).map(customer => ({ id: customer.id, name: customer.name, phone: customer.phone, marketing_consent_at: customer.marketing_consent_at }))} />}
 
         {view === 'visits' && <PointsEmployeeScanner mode="visit" />}
 
