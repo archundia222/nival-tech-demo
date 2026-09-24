@@ -250,6 +250,9 @@ export async function completeCheckoutBankProfile(
   const holder = String(form.get('accountHolder') ?? '').trim();
   const bank = String(form.get('bankName') ?? '').trim();
   const clabe = String(form.get('clabe') ?? '').replace(/\D/g, '');
+  if (form.get('financialDataConsent') !== 'on') {
+    return { error: 'Necesitamos tu autorización expresa para publicar los datos de transferencia.' };
+  }
 
   if (holder.length < 2 || holder.length > 120) {
     return { error: 'Escribe el nombre completo del titular.' };
