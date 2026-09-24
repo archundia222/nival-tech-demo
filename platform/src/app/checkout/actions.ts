@@ -224,7 +224,10 @@ export async function startMercadoPagoCheckout(formData: FormData) {
     returnPath: '/checkout',
   });
 }
-export async function startAdditionalNivalPayCheckout() {
+export async function startAdditionalNivalPayCheckout(formData: FormData) {
+  if (formData.get('purchaseConsent') !== 'on') {
+    redirect('/dashboard/pay?view=add&error=Confirma+los+términos+y+la+política+de+reembolsos+antes+de+pagar.');
+  }
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_ADDITIONAL_PRODUCT,
     amountCents: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
@@ -384,7 +387,10 @@ export async function startExtraSectionCheckout(formData?: FormData) {
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
-export async function startExtraSectionCheckoutForProfile(paymentProfileId: string) {
+export async function startExtraSectionCheckoutForProfile(paymentProfileId: string, purchaseConsent: boolean) {
+  if (!purchaseConsent) {
+    redirect(`/dashboard/pay?view=manage&profile=${encodeURIComponent(paymentProfileId)}&error=Confirma+las+condiciones+de+la+compra.`);
+  }
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
@@ -397,6 +403,9 @@ type SubscriptionProduct = {
 async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
   const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
   assertCommerceDisclosures(returnPath);
+  if (process.env.NIVAL_RENEWAL_NOTICE_READY !== 'true') {
+    redirect(`${returnPath}?error=Las+suscripciones+mensuales+están+temporalmente+deshabilitadas+hasta+activar+un+aviso+de+renovación+con+al+menos+5+días+de+anticipación.`);
+  }
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const { user, businessId } = await currentPurchaseContext();
   if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
