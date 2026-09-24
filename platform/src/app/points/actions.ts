@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
+import { privacyDisclosuresReady } from "@/lib/legal";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
@@ -35,6 +36,7 @@ export async function getPublicPointsProgram(slug: string) {
 
 export async function enrollPointsCustomer(formData: FormData) {
   await enforceRate("enroll", 8, 60);
+  if (!privacyDisclosuresReady()) return { ok: false, error: "El registro está temporalmente deshabilitado hasta completar el aviso de privacidad." };
   if (formData.get("privacyConsent") !== "on") return { ok: false, error: "Debes aceptar el aviso de privacidad para crear la tarjeta." };
   const slug = String(formData.get("slug") ?? "").trim();
   const admin = createPointsAdminClient();
