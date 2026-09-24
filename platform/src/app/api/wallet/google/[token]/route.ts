@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGoogleWalletJwt } from "@/lib/google-wallet";
-import { createClient } from "@/lib/supabase/server";
+import { getPublicLoyaltyCard } from "@/app/points/actions";
 
 interface RouteContext {
   params: Promise<{ token: string }>;
@@ -8,23 +8,25 @@ interface RouteContext {
 
 export async function GET(request: NextRequest, { params }: RouteContext) {
   const { token } = await params;
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_public_loyalty_card", {
-    account_token: token,
-  });
 
-  if (error || !data?.[0]) {
-    return NextResponse.json({ error: "Tarjeta no encontrada." }, { status: 404 });
+  let card;
+  try {
+    card = await getPublicLoyaltyCard(token);
+  } catch (error) {
+    console.error("Google Wallet card lookup failed", error);
+    return NextResponse.json({ error: "No pudimos cargar la tarjeta." }, { status: 500 });
   }
 
-  const card = data[0];
+  if (!card) {
+    return NextResponse.json({ error: "Tarjeta no encontrada." }, { status: 404 });
+  }
 
   try {
     const jwt = createGoogleWalletJwt(
       {
         token,
         businessName: card.business_name,
-        customerName: card.customer_name,
+        customerName: card.customer_first_name,
         points: Number(card.points_balance),
         visits: Number(card.visit_count),
       },
