@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { FreePaySubmitButton } from "./free-pay-submit-button";
 import { createClient } from '@/lib/supabase/server';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { PaymentEditor } from './payment-editor';
@@ -210,7 +211,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
           <p className="eyebrow">NIVAL PAY GRATIS</p>
           <h1>Empieza con QR y enlace. Paga cuando quieras llevarlo más lejos.</h1>
           <p>Crea una página de cobro real con QR, enlace, tu marca y un apartado. Es gratis y no caduca.</p>
-          <form action={prepareFreeNivalPay}><button className="loginLink" type="submit">Crear mi Nival Pay Gratis →</button></form>
+          <form action={prepareFreeNivalPay}><FreePaySubmitButton /></form>
         </div>
       </section>
       <section className="analyticsGrid" aria-label="Qué incluye la prueba">
