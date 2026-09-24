@@ -19,11 +19,13 @@ export default async function DigitalProfilePage({ params }: DigitalProfilePageP
   const payment = payments?.[0];
   const customLinks = (links ?? []) as PublicLink[];
   const hasWebsiteLink = customLinks.some((link) => link.link_kind === 'website');
+  const hasReviewLink = customLinks.some((link) => link.link_kind === 'google_review');
 
   const actions: ProfileActionItem[] = [
     ...(payment ? [{ key: `payment-${payment.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${payment.public_token}`, icon: "＄", featured: true }] : []),
     ...(business.points_enabled ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
+    ...(hasReviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/r/${business.slug}`, icon: "☆" }] : []),
     ...(business.website_url && !hasWebsiteLink ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
     ...customLinks.map((link) => ({
       key: link.public_token,

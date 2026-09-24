@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import crypto from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 
@@ -165,7 +167,8 @@ export async function updateBusinessProfile(formData: FormData) {
   const name = String(formData.get("businessName") ?? "").trim();
   const phone = String(formData.get("businessPhone") ?? "").trim();
   const description = String(formData.get("businessDescription") ?? "").trim();
-  const logoUrl = String(formData.get("businessLogoUrl") ?? "").trim();
+  let logoUrl = String(formData.get("businessLogoUrl") ?? "").trim();
+  const logoFile = formData.get("businessLogoFile");
   const brandColor = String(formData.get("businessBrandColor") ?? "").trim();
   const websiteUrl = String(formData.get("businessWebsiteUrl") ?? "").trim();
 
@@ -184,6 +187,31 @@ export async function updateBusinessProfile(formData: FormData) {
   }
 
   const { supabase, businessId } = await getActiveManagerContext();
+
+  if (logoFile instanceof File && logoFile.size > 0) {
+    if (logoFile.size > 4 * 1024 * 1024) {
+      redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("El logotipo debe pesar menos de 4 MB.")}`);
+    }
+    const bytes = new Uint8Array(await logoFile.arrayBuffer());
+    const jpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const pngSignature = [137,80,78,71,13,10,26,10];
+    const png = bytes.length >= 8 && pngSignature.every((value,index) => bytes[index] === value);
+    const decoder = new TextDecoder();
+    const webp = bytes.length >= 12 && decoder.decode(bytes.slice(0,4)) === "RIFF" && decoder.decode(bytes.slice(8,12)) === "WEBP";
+    const contentType = jpeg ? "image/jpeg" : png ? "image/png" : webp ? "image/webp" : null;
+    if (!contentType || logoFile.type !== contentType) {
+      redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Sube un logotipo JPG, PNG o WebP válido.")}`);
+    }
+    const extension = contentType === "image/jpeg" ? "jpg" : contentType === "image/png" ? "png" : "webp";
+    const path = `${businessId}/logo-${crypto.randomUUID()}.${extension}`;
+    const admin = createAdminClient();
+    const { error: uploadError } = await admin.storage.from("business-assets").upload(path, bytes, { contentType, upsert: false });
+    if (uploadError) {
+      redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("No pudimos subir el logotipo.")}`);
+    }
+    logoUrl = admin.storage.from("business-assets").getPublicUrl(path).data.publicUrl;
+  }
+
   const { error } = await supabase.rpc("update_business_profile_for", {
     p_business_id: businessId,
     business_name: name,
@@ -197,7 +225,7 @@ export async function updateBusinessProfile(formData: FormData) {
   if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
   revalidatePath("/b/[slug]", "page");
-  redirect(`/dashboard?message=${encodeURIComponent("Perfil público actualizado.")}`);
+  redirect(`/dashboard?section=perfil-digital&message=${encodeURIComponent("Perfil del negocio actualizado.")}`);
 }
 
 export async function createLoyaltyProgram(formData: FormData) {

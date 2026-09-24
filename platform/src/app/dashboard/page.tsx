@@ -147,6 +147,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const paidNivalPay = Boolean(paidNivalPayOrder);
   const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
   const hasNivalPay = paidNivalPay || freeNivalPay;
+  const workspaceActive = hasNivalPay || hasPoints || hasIntelligence || business?.subscription_status === 'active';
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -212,7 +213,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     <main className="dashboardApp">
       <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
-      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{business?.subscription_status === 'active' ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
+      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{workspaceActive ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
       {currentSection === "resumen" && <>
       <section className="dashboardHero nivalHomeHero" id="resumen">
         <div>
@@ -331,7 +332,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
                 logoUrl={business.logo_url}
                 brandColor={business.brand_color}
                 actions={profilePreviewActions}
-                verifiedLabel="PERFIL OFICIAL"
+                verifiedLabel="PERFIL DEL NEGOCIO"
                 embedded
                 showQuickActions={false}
                 showFooter={false}
@@ -390,7 +391,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             <label>Descripción<textarea name="businessDescription" minLength={2} maxLength={240} defaultValue={business.description ?? ""} placeholder="Explica brevemente qué ofrece tu negocio." /></label>
             <label>Teléfono<input name="businessPhone" type="tel" minLength={10} maxLength={18} defaultValue={business.phone ?? ""} /></label>
             <label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ""} placeholder="https://..." /></label>
-            <label>URL del logo<input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
+            <label>Sube tu logotipo <small>JPG, PNG o WebP · máximo 4 MB</small><input name="businessLogoFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+            <label>URL alternativa del logo <small>opcional</small><input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
             <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b59a61"} /><code>{business.brand_color ?? "#b59a61"}</code></span></label>
             <button className="primaryButton" type="submit">Guardar perfil</button>
           </form>

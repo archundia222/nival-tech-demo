@@ -4254,3 +4254,6 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 
 .adminCardDelivery{display:grid;gap:3px}.adminCardDelivery small{font-size:7px;font-weight:900;letter-spacing:.1em;color:#b59a61}.adminCardDelivery strong{font-size:9px}.adminCardDelivery span{color:var(--muted);font-size:8px;line-height:1.35}.adminCardList>article{grid-template-columns:minmax(140px,.7fr) minmax(180px,.8fr) minmax(180px,1fr) minmax(200px,1fr) minmax(240px,1.05fr)}
 @media(max-width:1200px){.adminCardList>article{grid-template-columns:1fr 1fr 1fr}}@media(max-width:760px){.adminCardList>article{grid-template-columns:1fr}}
+
+/* Easier business branding setup */
+.settingsForm label small{color:var(--muted);font-size:8px;font-weight:500}.settingsForm input[type="file"]{padding:9px;border:1px dashed rgba(181,154,97,.35);background:rgba(181,154,97,.04);cursor:pointer}

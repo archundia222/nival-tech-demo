@@ -35,11 +35,12 @@ export function ProfilePublicView({
   phone,
   websiteUrl,
   actions,
-  verifiedLabel = "Perfil oficial",
+  verifiedLabel = "Perfil del negocio",
   embedded = false,
   showQuickActions = true,
   showFooter = true,
 }: ProfilePublicViewProps) {
+  const actionHrefs = new Set(actions.map((item) => item.href));
   const card = <>
       {!embedded && <div className="profileAmbient" aria-hidden="true" />}
       <article className="profileCard">
@@ -51,9 +52,9 @@ export function ProfilePublicView({
             <div><span className="profileVerified">{verifiedLabel}</span><h1>{businessName}</h1></div>
           </div>
           <p className="profileDescription">{description ?? "Información, contacto y formas de pago en un solo lugar."}</p>
-          {showQuickActions && (phone || websiteUrl) && <div className="profileQuickActions">
-            {phone && <a href={`tel:${phone}`}><span aria-hidden="true">☎</span><b>Llamar</b></a>}
-            {websiteUrl && <a href={websiteUrl} target="_blank" rel="noreferrer"><span aria-hidden="true">↗</span><b>Sitio web</b></a>}
+          {showQuickActions && ((phone && !actionHrefs.has(`tel:${phone}`)) || (websiteUrl && !actionHrefs.has(websiteUrl))) && <div className="profileQuickActions">
+            {phone && !actionHrefs.has(`tel:${phone}`) && <a href={`tel:${phone}`}><span aria-hidden="true">☎</span><b>Llamar</b></a>}
+            {websiteUrl && !actionHrefs.has(websiteUrl) && <a href={websiteUrl} target="_blank" rel="noreferrer"><span aria-hidden="true">↗</span><b>Sitio web</b></a>}
           </div>}
         </header>
 
