@@ -32,7 +32,6 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   const pointsStatus = pointsEntitlement?.status;
   const intelligenceStatus = intelligenceEntitlement?.status;
   const hasPoints = pointsStatus === 'active' || pointsStatus === 'free' || business?.product_level === 'intelligence';
-  const hasPaidPoints = pointsStatus === 'active' || business?.product_level === 'intelligence';
   const paid = intelligenceStatus === 'active' || business?.product_level === 'intelligence';
   const freePlan = !paid && intelligenceStatus === 'free';
   // eslint-disable-next-line react-hooks/purity -- Server-rendered request snapshot for trial countdown and analysis.
