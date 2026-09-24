@@ -156,14 +156,14 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
               <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>
-                <form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="checkoutPrimaryButton" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form>
+                <form action={startMercadoPagoCheckout} className="checkoutConsentForm"><label className="checkLabel"><input name="purchaseConsent" type="checkbox" required /><span>Confirmo el pago único mostrado y acepto los <Link href="/terms" target="_blank">Términos</Link> y la <Link href="/refunds" target="_blank">política de reembolsos</Link>.</span></label><CheckoutSubmitButton className="checkoutPrimaryButton" pendingLabel="Abriendo Mercado Pago…">Pagar {money(NIVAL_PAY_PRICE_CENTS)}</CheckoutSubmitButton></form>
               </article>
               <article className="checkoutMethodCash"><div><h2>Pago en efectivo</h2><p>Para ventas presenciales. Requiere confirmación manual del vendedor.</p></div>
-                <form action={requestCashPayment}><CheckoutSubmitButton className="checkoutCashButton" pendingLabel="Registrando…">Registrar efectivo</CheckoutSubmitButton></form>
+                <form action={requestCashPayment} className="checkoutConsentForm"><label className="checkLabel"><input name="purchaseConsent" type="checkbox" required /><span>Confirmo el total mostrado y acepto los <Link href="/terms" target="_blank">Términos</Link> y la <Link href="/refunds" target="_blank">política de reembolsos</Link>.</span></label><CheckoutSubmitButton className="checkoutCashButton" pendingLabel="Registrando…">Registrar pago en efectivo</CheckoutSubmitButton></form>
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></footer>
+          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/refunds">Reembolsos</Link></footer>
         </>}
     </div>
   </main>;
