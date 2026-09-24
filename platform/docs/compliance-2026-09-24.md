@@ -63,3 +63,25 @@ Review any new processor before connecting it, document the minimum data shared,
 ## Legal references checked
 
 Review was based on the current Mexican Federal Consumer Protection Law, including the December 12, 2025 recurring-charge amendments to article 76 Bis, and the Federal Law on Protection of Personal Data Held by Private Parties and its privacy-notice/express-consent requirements. Re-check the law before materially changing payment, marketing or personal-data flows.
+
+## Safe rollout order
+
+The public-RPC lockdown is intentionally a two-phase rollout because production on `main` still calls some public RPCs directly.
+
+1. Configure the real provider/privacy variables in Vercel. Do not use placeholders.
+2. Deploy the application changes that route public RPCs through the server-only Supabase service role.
+3. Smoke-test login plus the public Nival Pay, Nival Puntos, digital-profile, smart-link and invitation routes.
+4. Apply `20260924065929_revoke_legacy_public_rpc_execute_20260924.sql`.
+5. Re-run Supabase security advisors and confirm the anonymous `SECURITY DEFINER` findings are removed/reduced as expected.
+6. Re-test the same public routes and authenticated dashboard actions.
+7. Only after a real five-day renewal-notice mechanism exists and has been tested, set `NIVAL_RENEWAL_NOTICE_READY=true`.
+
+Do **not** apply the revoke migration before step 2. It is safe in syntax/permission behavior and was verified inside a transaction with `ROLLBACK`, but applying it against the current production code first would break public routes.
+
+## Security verification status
+
+- Platform CI uses Node 22 and runs `npm ci`, TypeScript, ESLint, a production-dependency audit that fails on high/critical findings, and `next build`.
+- The compliance branch passed TypeScript, lint, dependency audit and production build after the cookie-notice lint fix.
+- Vercel preview creation is currently blocked by the account build-rate limit; this is a platform quota failure, not the GitHub build result.
+- Supabase leaked-password protection remains a project-setting warning. Supabase documents this feature as available on Pro plans and above; enable it in Auth settings when the project plan supports it.
+- Authenticated `SECURITY DEFINER` functions that remain callable are not automatically unsafe: many enforce membership/role checks with `auth.uid()` and are required by dashboard actions. Legacy wrappers identified as unused are staged for revocation in phase 2.
