@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../dashboard-navigation';
-import { startNivalIntelligenceSubscription } from '@/app/checkout/actions';
+import { startNivalIntelligenceSubscription, cancelNivalSubscription } from '@/app/checkout/actions';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { ProductInteractiveDemo } from '../product-interactive-demo';
 import { saveAverageTicket, startIntelligenceCampaign, startIntelligenceMeasurement } from './actions';
@@ -160,8 +160,10 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalIntelligenceDark' : ''}`}>
       <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Qué hacer para crecer</b></div><span className="ready">{paid ? 'Pro' : freePlan ? 'Gratis' : 'Empieza gratis'}</span></header>
+      {paid && <details className="subscriptionManage"><summary>Administrar suscripción mensual</summary><form action={cancelNivalSubscription}><input type="hidden" name="scope" value="intelligence" /><label className="checkLabel"><input type="checkbox" name="cancelConsent" required /><span>Confirmo que quiero cancelar esta suscripción recurrente y detener futuros cobros automáticos.</span></label><button type="submit" className="nvSecondaryButton">Cancelar suscripción mensual</button></form></details>}
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription === 'return' && <p className="formMessage">Estamos confirmando tu suscripción con Mercado Pago.</p>}
+      {params.subscription === 'cancelled' && <p className="formMessage successMessage">Suscripción cancelada. No se crearán nuevos cobros recurrentes desde Nival para esta suscripción.</p>}
       {params.saved === 'customer' && <p className="formMessage successMessage">Cliente registrado.</p>}
       {params.saved === 'existing' && <p className="formMessage successMessage">Ese cliente ya existía; actualizamos su información sin duplicarlo.</p>}
       {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada. Intelligence ya puede usarla como dato operativo.</p>}
