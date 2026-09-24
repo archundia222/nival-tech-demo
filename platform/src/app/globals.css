@@ -4446,3 +4446,91 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .checkoutPrimaryButton{border-radius:14px;background:#c9a75d;box-shadow:0 12px 30px rgba(198,168,95,.2)}
 .checkoutCashButton{border-radius:12px}
 .checkoutSeller{border-radius:14px;background:#eeece6;border-color:#d9d5ca}
+
+
+/* Premium dashboard chrome — restrained, compact and product-first */
+.dashboardApp{
+  grid-template-columns:238px minmax(0,1fr);
+  background:
+    radial-gradient(circle at 82% -8%,rgba(181,154,97,.055),transparent 24%),
+    #0b0c0f;
+}
+.dashboardSidebar{
+  padding:24px 16px 18px;
+  background:
+    linear-gradient(180deg,rgba(18,19,23,.97),rgba(10,11,13,.99));
+  border-right:1px solid rgba(255,255,255,.075);
+  box-shadow:8px 0 40px rgba(0,0,0,.1);
+}
+.dashboardBrand{margin-bottom:26px}
+.sidebarBusiness{
+  gap:6px;
+  padding:13px 14px;
+  border-color:rgba(255,255,255,.075);
+  border-radius:13px;
+  background:rgba(255,255,255,.025);
+}
+.sidebarBusiness span{color:#747984;font-size:8px;letter-spacing:.14em}
+.sidebarBusiness strong{font-size:12px;letter-spacing:-.01em}
+.sidebarNav{gap:4px;margin-top:22px}
+.sidebarNav a{
+  min-height:40px;
+  gap:11px;
+  padding:9px 11px;
+  border-radius:10px;
+  color:#8b9099;
+  font-size:11px;
+  font-weight:750;
+}
+.sidebarNav a span{color:#8c7547;font-size:8px}
+.sidebarNav a:hover,.sidebarNav a:focus-visible{
+  color:#e9e9eb;
+  background:rgba(255,255,255,.035);
+  border-color:rgba(255,255,255,.065);
+}
+.sidebarNav a.active{
+  color:#f5f3ee;
+  background:linear-gradient(90deg,rgba(181,154,97,.12),rgba(255,255,255,.025));
+  border-color:rgba(181,154,97,.16);
+  box-shadow:inset 2px 0 0 #c2a35e;
+}
+.sidebarFooter{gap:4px;padding-top:16px}
+.sidebarFooter a,.sidebarFooter .textButton{padding:8px;color:#6f747d;font-size:10px}
+.dashboardContent{
+  max-width:1320px;
+  padding:28px clamp(24px,3vw,42px) 88px;
+}
+.dashboardContentTopbar{
+  min-height:58px;
+  padding:0 0 18px;
+  border-bottom:1px solid rgba(255,255,255,.075);
+}
+.dashboardContentTopbar>div{display:grid;gap:2px}
+.dashboardContentTopbar>div>span{color:#70757e;font-size:8px;font-weight:850;letter-spacing:.12em}
+.dashboardContentTopbar>div>b{font-size:14px;letter-spacing:-.015em}
+.dashboardContentTopbar .ready{
+  padding:7px 10px;
+  border:1px solid rgba(181,154,97,.18);
+  border-radius:9px;
+  background:rgba(181,154,97,.055);
+  color:#c7aa68;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.dashboardContent :where(article,.settingsCard,.businessQrCard,.chartCard,.summaryCard,.module){
+  box-shadow:none;
+}
+.dashboardContent :where(input,textarea,select):focus-visible{
+  border-color:#b59a61!important;
+  box-shadow:0 0 0 3px rgba(181,154,97,.11);
+}
+.nvSecondaryButton,.dashboardContent .primaryButton{
+  border-radius:10px;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease;
+}
+.nvSecondaryButton:hover,.dashboardContent .primaryButton:hover{transform:translateY(-1px)}
+@media(max-width:960px){
+  .dashboardApp{grid-template-columns:1fr}
+  .dashboardContent{padding:22px 18px 80px}
+}
