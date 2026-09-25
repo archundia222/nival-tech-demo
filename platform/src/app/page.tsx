@@ -213,11 +213,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
           <p>Empieza gratis donde tiene sentido y paga solo cuando necesitas la siguiente capa.</p>
         </div>
         <div className="landingBusinessPlanGrid">
-          <article><span>NIVAL PAY</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único · fundador</small><p>Digital gratis para siempre. Pro agrega NFC física y 3 apartados.</p><em>Regular previsto: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</em></article>
-          <article className="featured"><span>NIVAL PUNTOS PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · fundador</small><p>{NIVAL_TRIAL_DAYS} días de herramientas Pro. Después puedes seguir Free hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><em>Regular previsto: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</em></article>
-          <article><span>NIVAL GROWTH</span><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}</strong><small>al mes</small><p>Puntos Pro + Intelligence para recuperar, segmentar, lanzar campañas y medir resultados.</p><em>La expansión natural cuando Puntos ya genera actividad.</em></article>
+          <article><span>NIVAL PAY</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único · fundador</small><p>Digital gratis para siempre. Pro agrega NFC física y 3 apartados.</p><em>Regular previsto: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</em><Link className="landingPlanAction" href={signupUrl}>Empezar con Pay →</Link></article>
+          <article className="featured"><span>NIVAL PUNTOS PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · fundador</small><p>{NIVAL_TRIAL_DAYS} días de herramientas Pro. Después puedes seguir Free hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><em>Regular previsto: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</em><Link className="landingPlanAction" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Probar Puntos →</Link></article>
+          <article><span>NIVAL GROWTH</span><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}</strong><small>al mes</small><p>Puntos Pro + Intelligence para recuperar, segmentar, lanzar campañas y medir resultados.</p><em>La expansión natural cuando Puntos ya genera actividad.</em><Link className="landingPlanAction" href="/products#growth">Ver Growth →</Link></article>
         </div>
-        <Link className="landingPrimary" href="/products">Comparar planes →</Link>
+        <Link className="landingCompareLink" href="/products">Ver comparación completa de planes →</Link>
       </section>
 
       <section className="landingTrust scrollReveal" aria-labelledby="trust-title">
@@ -269,7 +269,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
-      <a className="landingMobileContact" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>¿Tienes dudas? Escríbenos →</a>
+      <Link className="landingMobileContact" href={signupUrl}>Empezar gratis →</Link>
 
       <footer className="landingFooter">
         <Link className="landingBrand" href="#inicio">
