@@ -4945,3 +4945,105 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   text-decoration:none;
 }
 .landingCompareLink:hover{color:#fff}
+
+
+/* Mobile Nival Pay editor containment — prevent horizontal clipping on phones. */
+@media (max-width: 900px) {
+  .nivalDashboard,
+  .nivalDashboard .dashboardApp,
+  .nivalDashboard .dashboardContent,
+  .nivalDashboard .dashboardPayContent,
+  .nivalDashboard .nivalPayEditorShell,
+  .nivalDashboard .nivalPayEditorPanel,
+  .nivalDashboard .nivalPayFieldGroup,
+  .nivalDashboard .nivalPayCustomSection,
+  .nivalDashboard .nivalPaySectionsAction,
+  .nivalDashboard .nivalPayLivePreview {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .nivalDashboard,
+  .nivalDashboard .dashboardApp,
+  .nivalDashboard .dashboardContent {
+    overflow-x: clip;
+  }
+
+  .nivalDashboard .nivalPayEditorShell,
+  .nivalDashboard .nivalPayEditorPanel,
+  .nivalDashboard .nivalPayLivePreview {
+    width: 100%;
+  }
+
+  .nivalDashboard .nivalPayField,
+  .nivalDashboard .nivalPayFieldHeading,
+  .nivalDashboard .nivalPayField input,
+  .nivalDashboard .nivalPayTextInput,
+  .nivalDashboard .nivalPayFileControl,
+  .nivalDashboard .nivalPayFileControl input {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .nivalDashboard .nivalPayFieldHeading {
+    width: 100%;
+    align-items: center;
+  }
+
+  .nivalDashboard .nivalPayFieldHeading > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .nivalDashboard .nivalPayVisibility {
+    flex: 0 0 auto;
+    min-width: 70px;
+    max-width: 92px;
+  }
+
+  .nivalDashboard .nivalPayPhoneFrame {
+    width: 100%;
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 600px) {
+  .nivalDashboard .dashboardContent {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .nivalDashboard .nivalPayEditorPanel {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .nivalDashboard .nivalPayFieldGroup,
+  .nivalDashboard .nivalPayCustomSection,
+  .nivalDashboard .nivalPaySectionsAction {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .nivalDashboard .nivalPayFieldHeading {
+    gap: 10px;
+  }
+
+  .nivalDashboard .nivalPayVisibility {
+    min-height: 40px;
+    min-width: 68px;
+    padding-inline: 10px;
+  }
+
+  .nivalDashboard .nivalPaySecondaryAction {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .nivalDashboard .nivalPaySectionsAction .apartadoIntro,
+  .nivalDashboard .nivalPaySectionsAction .apartadoFootnote {
+    overflow-wrap: anywhere;
+  }
+}
