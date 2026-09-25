@@ -212,7 +212,7 @@ function parseCsvLine(line: string) {
 async function activeBusinessContext() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth?next=%2Fdashboard%2Fpoints%3Fview%3Dregister");
+  if (!user) redirect("/auth?next=%2Fdashboard%2Fpoints%3Fview%3Dcustomers");
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect("/dashboard");
   return { supabase, user, membership };
@@ -224,7 +224,7 @@ function captureReturn(formData: FormData, key: 'error' | 'saved', value: string
     ? requested
     : requested.startsWith("/dashboard/points")
       ? requested
-      : "/dashboard/points?view=register";
+      : "/dashboard/points?view=customers";
   const url = new URL(base, "https://nival.local");
   url.searchParams.set(key, value);
   return `${url.pathname}${url.search}`;
