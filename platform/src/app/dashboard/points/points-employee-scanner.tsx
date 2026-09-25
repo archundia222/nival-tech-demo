@@ -81,12 +81,6 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
       if (walletMatch?.[1]) walletToken = walletMatch[1];
     }
 
-    if (walletToken && mode !== "visit") {
-      setCustomer(null);
-      setMessage("El QR de Google Wallet sirve para registrar visitas. Para canjear, usa el código temporal de la recompensa.");
-      return;
-    }
-
     cleaned = cleaned.replace(/^nivalpoints:/, "");
     const raw = cleaned.replace(/^(visit|redeem):/, "");
     if (!walletToken && !raw) return;
@@ -94,12 +88,12 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     claimingRef.current = true;
     try {
       const result = walletToken
-        ? await claimWalletCard(walletToken)
+        ? await claimWalletCard(walletToken, mode)
         : await claimScanToken(raw, mode);
       if (!result.ok || !result.customer) {
         setCustomer(null);
         setMessage(walletToken
-          ? (result.error ?? "No pudimos reconocer esta tarjeta de Google Wallet.")
+          ? (result.error ?? (mode === "redeem" ? "No pudimos preparar el canje con esta tarjeta." : "No pudimos reconocer esta tarjeta de Google Wallet."))
           : (result.error ?? "Este QR temporal ya expiró o ya fue usado. Pide al cliente que genere uno nuevo."));
         return;
       }
@@ -212,7 +206,7 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>
       {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><canvas ref={canvasRef} hidden aria-hidden="true" /><span>Centra el QR de Google Wallet o el QR temporal dentro del recuadro</span></div>}
-      <p className="pointsDataSourceNote">El QR de Google Wallet es permanente y se puede escanear en cada visita. Los códigos temporales de la página cambian por seguridad.</p><div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
+      <p className="pointsDataSourceNote">El QR de Google Wallet es permanente y sirve tanto para registrar visitas como para canjear premios. Los códigos temporales de la página siguen disponibles como respaldo.</p><div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
     </>}
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
