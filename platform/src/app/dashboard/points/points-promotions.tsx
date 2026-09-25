@@ -58,7 +58,7 @@ export function PointsPromotionsPanel({ businessName, customers }: { businessNam
     startTransition(async () => {
       const result = await sendPointsWalletPromotion({ title, body });
       if (result.ok) {
-        setStatus(`Notificación enviada a ${result.sent} tarjeta${result.sent === 1 ? "" : "s"} de Google Wallet.${result.failed ? ` ${result.failed} no pudieron recibirla.` : ""}`);
+        setStatus(`Google Wallet aceptó el aviso para ${result.sent} tarjeta${result.sent === 1 ? "" : "s"}.${result.failed ? ` ${result.failed} tarjeta${result.failed === 1 ? "" : "s"} no se pudo${result.failed === 1 ? "" : "ieron"} actualizar.` : ""} La alerta aparece si el cliente tiene sus notificaciones activadas.`);
       } else {
         setStatus(result.error ?? "No pudimos enviar la notificación.");
       }

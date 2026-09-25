@@ -195,7 +195,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
     ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
-    ...(smartLinks?.some((link) => link.kind === "custom" && link.active) ? [{ key: "links", label: "Más enlaces", description: "Redes, menú y otros accesos", href: `/p/${business.slug}`, icon: "+" }] : []),
+    ...(smartLinks ?? []).filter((link) => link.active && (link.kind === "custom" || link.kind === "website")).map((link) => ({ key: `link-${link.public_token}`, label: link.name, description: "Abrir enlace", href: `/go/${link.public_token}`, icon: "↗", external: true })),
   ] : [];
   const businessHealthItems = [
     { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },

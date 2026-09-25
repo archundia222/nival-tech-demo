@@ -47,11 +47,12 @@ export default async function CardPage({ params }: CardPageProps) {
           ? isIOS
             ? "En Android puedes agregar esta tarjeta a Google Wallet y recibir avisos de promociones y descuentos del negocio. En iPhone puedes guardar este acceso y volver cuando quieras."
             : "Agrégala a Google Wallet para llevar tus puntos contigo y recibir avisos de promociones y descuentos cuando el negocio los envíe."
-          : "Guarda o comparte este acceso para volver a abrir tu tarjeta cuando quieras."}</p>
+          : "Google Wallet aún no está habilitado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta para volver a consultar tus puntos."}</p>
       </div>
       <div className="pointsWalletSaveActions">
         {googleWalletReady && !isIOS && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
         {googleWalletReady && isIOS && <span className="pointsMuted">Google Wallet está disponible en Android.</span>}
+        {!googleWalletReady && <span className="pointsMuted">La opción de agregar a Google Wallet estará disponible cuando se complete su configuración.</span>}
         <CardSaveActions />
       </div>
     </section>

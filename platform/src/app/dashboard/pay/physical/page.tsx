@@ -98,7 +98,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
             {!hasPointsDestination && <a href="/dashboard/points">Activar / configurar Nival Puntos →</a>}
             {!hasReviewDestination && <a href="/dashboard?section=perfil-digital#reviews">Configurar reseñas →</a>}
           </div>}
-          <label>Color base<select name="design" required defaultValue="black"><option value="black">Negra Nival</option><option value="white">Blanca Nival</option><option value="custom">Color según mi marca</option></select></label>
+          <label>Color del frente<select name="design" required defaultValue="black"><option value="black">Negro Nival</option><option value="white">Blanco Nival</option><option value="custom">Color de mi marca</option></select></label>
           <label>Indicaciones del frente<textarea name="designNotes" maxLength={500} placeholder="Ej. usar mi logo blanco, fondo azul, nombre del negocio debajo del QR."/></label>
         </section>
         <section className="chartCard physicalCardSection">
@@ -107,9 +107,9 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
             <label><input type="radio" name="backStyle" value="nival" defaultChecked/><span><b>Reverso Nival</b><small>Diseño limpio de Nival Tech · incluido</small></span><strong>$0</strong></label>
             <label><input type="radio" name="backStyle" value="custom"/><span><b>Reverso personalizado</b><small>Tu imagen, frase, promoción, redes o diseño propio</small></span><strong>+$10</strong></label>
           </div>
-          <label>Sube tu diseño o imagen <small>opcional · JPG, PNG o WebP</small><input name="backDesign" type="file" accept="image/jpeg,image/png,image/webp"/></label>
-          <label>Indicaciones para el reverso personalizado<textarea name="backDesignNotes" maxLength={500} placeholder="Ej. fondo negro, Instagram @minegocio y la frase Gracias por visitarnos."/></label>
-          <p className="payHelp">Puedes subir una imagen ya hecha o describir lo que quieres. Si eliges reverso Nival, estos campos se ignoran.</p>
+          <div className="physicalCustomHelp"><strong>Si elegiste reverso personalizado</strong><span>Sube una imagen o describe tu idea. Puedes usar ambas opciones; el diseño estándar no necesita nada más.</span></div>
+          <label>Imagen para el reverso <small>JPG, PNG o WebP · opcional</small><input name="backDesign" type="file" accept="image/jpeg,image/png,image/webp"/></label>
+          <label>¿Cómo quieres el reverso?<textarea name="backDesignNotes" maxLength={500} placeholder="Ej. fondo negro, Instagram @minegocio y la frase Gracias por visitarnos."/></label>
         </section>
         <section className="chartCard physicalCardSection">
           <h2>3. Entrega</h2>

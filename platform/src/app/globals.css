@@ -5047,3 +5047,33 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
     overflow-wrap: anywhere;
   }
 }
+
+/* Keep the editor's grid and native file input inside the actual phone viewport. */
+@media (max-width: 900px) {
+  .nivalDashboard .dashboardApp { display: block; width: 100%; min-width: 0; }
+  .nivalDashboard .dashboardContent,
+  .nivalDashboard .dashboardPayContent { width: 100%; min-width: 0; box-sizing: border-box; }
+  .nivalDashboard .nivalPayEditorShell { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
+  .nivalDashboard .nivalPayEditorShell *,
+  .nivalDashboard .nivalPayEditorShell *::before,
+  .nivalDashboard .nivalPayEditorShell *::after { box-sizing: border-box; }
+  .nivalDashboard .nivalPayEditorPanel,
+  .nivalDashboard .nivalPayFieldGroup,
+  .nivalDashboard .nivalPayCustomSection,
+  .nivalDashboard .nivalPayField,
+  .nivalDashboard .nivalPayFileControl { min-width: 0; width: 100%; }
+  .nivalDashboard .nivalPayFileControl input[type="file"] { display: block; width: 100%; overflow: hidden; }
+}
+@media (max-width: 480px) {
+  .nivalDashboard .nivalPayFieldHeading { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .nivalDashboard .nivalPayVisibility { justify-self: end; }
+}
+
+/* Card choices: readable and unmistakable on narrow screens. */
+.physicalCustomHelp{display:grid;gap:5px;padding:14px;border:1px solid rgba(181,154,97,.3);border-radius:12px;background:rgba(181,154,97,.08)}
+.physicalCustomHelp strong{font-size:14px}.physicalCustomHelp span{font-size:14px;line-height:1.5;color:var(--muted)}
+.cardTemplateChoiceGrid input:focus-visible+.templateMock{outline:3px solid #c8a65a;outline-offset:3px}
+.cardTemplateChoiceGrid input:checked+.templateMock::after{content:'Seleccionada ✓';position:absolute;top:9px;right:9px;padding:5px 8px;border-radius:20px;background:#171717;color:#fff;font-size:12px;font-style:normal;font-weight:800}
+.cardTemplateChoiceGrid label>strong,.backDesignOptions b{font-size:14px}
+.backDesignOptions small,.cardTemplateChoiceGrid label>small{font-size:13px;line-height:1.4}
+@media(max-width:520px){.physicalCardSection{min-width:0;padding:16px}.physicalCardSection input[type=file]{max-width:100%}.cardTemplateChoiceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.cardTemplateChoiceGrid label{min-width:0}.cardTemplateChoiceGrid input:checked+.templateMock::after{top:auto;bottom:8px;right:8px}.templateMock{min-height:168px}.templateMock em{padding-bottom:18px}.backDesignOptions{grid-template-columns:1fr}}

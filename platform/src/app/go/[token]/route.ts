@@ -11,9 +11,15 @@ export async function GET(_request: Request, { params }: SmartLinkRouteProps) {
   const { data, error } = await supabase.rpc("resolve_smart_link", { link_token: token });
   const destination = data?.[0]?.target_url;
 
-  if (error || !destination) {
+  let validDestination: URL | null = null;
+  try {
+    const parsed = new URL(destination);
+    if (['https:', 'http:'].includes(parsed.protocol) && parsed.hostname.includes('.')) validDestination = parsed;
+  } catch { /* Existing incomplete links must not become a broken redirect. */ }
+
+  if (error || !validDestination) {
     return NextResponse.redirect(new URL("/support", _request.url));
   }
 
-  return NextResponse.redirect(destination, 307);
+  return NextResponse.redirect(validDestination, 307);
 }

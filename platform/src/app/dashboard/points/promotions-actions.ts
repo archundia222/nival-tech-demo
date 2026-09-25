@@ -51,6 +51,9 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
   }
 
   const recipients = (data ?? []) as WalletRecipient[];
+  if (!["GOOGLE_WALLET_ISSUER_ID", "GOOGLE_WALLET_CLASS_SUFFIX", "GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL", "GOOGLE_WALLET_PRIVATE_KEY"].every((key) => Boolean(process.env[key]?.trim()))) {
+    return { ok: false, sent: 0, failed: 0, error: "Google Wallet no está disponible en este momento. Inténtalo más tarde." };
+  }
   if (!recipients.length) {
     return { ok: false, sent: 0, failed: 0, error: "Todavía no hay clientes con consentimiento para promociones." };
   }
@@ -58,24 +61,24 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
   let sent = 0;
   let failed = 0;
 
-  for (const recipient of recipients) {
-    const account = Array.isArray(recipient.loyalty_accounts)
-      ? recipient.loyalty_accounts[0]
-      : recipient.loyalty_accounts;
-    if (!account?.public_token) {
-      failed += 1;
-      continue;
-    }
-
-    const personalizedBody = body.replaceAll("{{nombre}}", recipient.name.split(" ")[0] || recipient.name);
-    try {
+  // Keep each request bounded so a larger audience does not time out the action.
+  for (let index = 0; index < recipients.length; index += 5) {
+    const results = await Promise.allSettled(recipients.slice(index, index + 5).map(async (recipient) => {
+      const account = Array.isArray(recipient.loyalty_accounts)
+        ? recipient.loyalty_accounts[0]
+        : recipient.loyalty_accounts;
+      if (!account?.public_token) throw new Error("Missing loyalty account token");
+      const personalizedBody = body.replaceAll("{{nombre}}", recipient.name.split(" ")[0] || recipient.name);
       await sendGoogleWalletNotification(account.public_token, title, personalizedBody);
-      sent += 1;
-    } catch (error) {
-      failed += 1;
-      console.error("[points-promotions] wallet delivery failed", {
-        message: error instanceof Error ? error.message.slice(0, 220) : "unknown",
-      });
+    }));
+    for (const result of results) {
+      if (result.status === "fulfilled") sent += 1;
+      else {
+        failed += 1;
+        console.error("[points-promotions] wallet delivery failed", {
+          message: result.reason instanceof Error ? result.reason.message.slice(0, 220) : "unknown",
+        });
+      }
     }
   }
 
