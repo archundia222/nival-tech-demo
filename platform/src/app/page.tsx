@@ -51,16 +51,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingHero">
         <div className="landingHeroCopy">
           <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para negocios locales</p>
-          <h1 className="heroReveal heroReveal2">Haz más fácil cobrar, lograr que tus clientes vuelvan y saber qué hacer para crecer.</h1>
-          <p className="landingHeroLead heroReveal heroReveal3">Nival reúne cobros, clientes frecuentes y recomendaciones en un flujo simple: comparte cómo pagarte, da una razón para volver y usa la actividad real para decidir qué hacer después.</p>
-          <div className="landingPriceLine heroReveal heroReveal4">
-            <strong>Empieza gratis</strong>
-            <span>usa el producto primero; paga cuando necesites más</span>
+          <h1 className="heroReveal heroReveal2">
+            <span>Haz más fácil cobrar,</span>
+            <span>lograr que tus clientes vuelvan</span>
+            <span>y saber qué hacer para crecer.</span>
+          </h1>
+          <p className="landingHeroLead heroReveal heroReveal3">Cobros, lealtad e inteligencia para negocios locales, sin obligarte a cambiar la forma en que ya trabajas.</p>
+          <div className="landingHeroActions heroReveal heroReveal4">
+            <Link className="landingPrimary" href={signupUrl}>Empezar gratis <b>→</b></Link>
+            <a className="landingSecondary" href="#demostracion">Ver cómo funciona</a>
           </div>
-          <div className="landingHeroActions heroReveal heroReveal5">
-            <Link className="landingPrimary" href={signupUrl}>Empezar gratis</Link>
-            <a className="landingSecondary" href="#demostracion">Probar Nival Pay</a>
-            <a className="landingTextCta" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Quiero que me orienten →</a>
+          <div className="landingHeroPromise heroReveal heroReveal5">
+            <span><b>Pay</b> gratis digital</span>
+            <span><b>Puntos</b> {NIVAL_TRIAL_DAYS} días Pro</span>
+            <span><b>Growth</b> cuando ya tengas actividad</span>
           </div>
         </div>
 
@@ -92,39 +96,42 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
-      <section className="landingSalesAssurance scrollReveal" aria-label="Qué necesitas para usar Nival">
-        <div><strong>Sin descargar una app</strong><span>El cliente abre Nival desde QR, enlace, NFC o Wallet.</span></div>
-        <div><strong>Puedes empezar gratis</strong><span>Prueba el flujo con clientes reales antes de ampliar.</span></div>
-        <div><strong>Hecho para celular</strong><span>La experiencia pública está pensada para resolverse en segundos.</span></div>
+      <section className="landingSalesAssurance scrollReveal" aria-label="Lo esencial de Nival">
+        <div><strong>Abre. Toca. Listo.</strong><span>QR, enlace y NFC sin instalar una app.</span></div>
+        <div><strong>Empieza sin riesgo</strong><span>Prueba Pay gratis y Puntos Pro antes de decidir.</span></div>
+        <div><strong>Diseñado para celular</strong><span>La experiencia pública está pensada para resolverse en segundos.</span></div>
       </section>
 
       <section className="nivalEcosystem scrollReveal" id="productos">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">UN SISTEMA, TRES TRABAJOS</p>
-          <h2>Empieza por el problema que más te cuesta hoy.</h2>
-          <p>La entrada gratuita reduce el riesgo. El negocio paga después de comprobar valor real y puede ampliar a Growth cuando la actividad ya permite tomar mejores decisiones.</p>
+          <h2>Tres productos. Una sola lógica.</h2>
+          <p>Resuelve primero lo urgente y amplía después. No necesitas comprar todo para empezar.</p>
         </div>
         <div className="nivalProductCards">
           <article>
-            <span>COBRAR</span>
+            <span>01 · COBRAR</span>
             <h3>Nival Pay</h3>
-            <p>Empieza con una página de cobro, QR, enlace, tu marca y estadísticas básicas. Mantén el mismo QR si después activas NFC y más herramientas.</p>
+            <p>Una página clara con tus datos de pago, QR y enlace. Activa NFC cuando quieras llevarla al mostrador.</p>
+            <ul className="landingProductMiniList"><li>QR y enlace permanentes</li><li>Datos editables</li><li>Sin app para tu cliente</li></ul>
             <div><strong>Gratis digital</strong><small>Pro fundador: {mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)} pago único</small></div>
-            <Link href={signupUrl}>Crear mi Nival Pay gratis →</Link>
+            <Link href={signupUrl}>Crear Nival Pay gratis <b>→</b></Link>
           </article>
           <article>
-            <span>HACER QUE VUELVAN</span>
+            <span>02 · HACER QUE VUELVAN</span>
             <h3>Nival Puntos</h3>
-            <p>El cliente escanea, se registra y lleva su tarjeta digital en el celular. Cada visita suma hasta desbloquear la recompensa que tú defines.</p>
-            <div><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><small>Fundador: {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis →</Link>
+            <p>Convierte visitas en progreso visible. Tu cliente suma, ve su recompensa y tiene una razón concreta para regresar.</p>
+            <ul className="landingProductMiniList"><li>Clientes y visitas</li><li>Tarjeta digital</li><li>Recompensas configurables</li></ul>
+            <div><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><small>Después puedes seguir Free</small></div>
+            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa <b>→</b></Link>
           </article>
           <article className="featured">
-            <span>CRECER</span>
+            <span>03 · CRECER</span>
             <h3>Nival Growth</h3>
-            <p>Combina Nival Puntos + Intelligence para detectar clientes frecuentes, personas que se están alejando y oportunidades de campaña sin volver a capturar una base.</p>
-            <div><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><small>Puntos + Intelligence</small></div>
-            <Link href="/products#growth">Conocer Nival Growth →</Link>
+            <p>Usa lo que pasa en Puntos para detectar a quién recuperar, qué clientes cuidar y qué acción conviene probar.</p>
+            <ul className="landingProductMiniList"><li>Puntos Pro incluido</li><li>Intelligence</li><li>Campañas y medición</li></ul>
+            <div><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><small>Puntos Pro + Intelligence</small></div>
+            <Link href="/products#growth">Conocer Growth <b>→</b></Link>
           </article>
         </div>
       </section>
@@ -143,24 +150,24 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
 
       <section className="landingSection landingProblem scrollReveal" id="como-funciona">
         <div className="landingSectionHeading">
-          <p className="landingEyebrow">LO SIMPLE FUNCIONA</p>
-          <h2>Del “te dicto mi CLABE” a cobrar con un toque.</h2>
+          <p className="landingEyebrow">ASÍ DE SIMPLE</p>
+          <h2>Tu cliente entiende qué hacer sin preguntarte.</h2>
         </div>
         <div className="stepsGrid">
           <article>
             <span>01</span>
-            <h3>Crea tu Nival Pay gratis</h3>
-            <p>Agrega negocio, banco, titular y CLABE. Obtienes una página, enlace y QR permanente.</p>
+            <h3>Configura una vez</h3>
+            <p>Agrega tu negocio y datos. Nival genera tu página, enlace y QR permanente.</p>
           </article>
           <article>
             <span>02</span>
-            <h3>Úsala con clientes reales</h3>
-            <p>Comparte el enlace o imprime el QR. Puedes ver aperturas y copias de CLABE antes de pagar nada.</p>
+            <h3>Compártelo donde ya cobras</h3>
+            <p>Usa el QR, enlace o NFC. El cliente abre la experiencia en su propio celular.</p>
           </article>
           <article>
             <span>03</span>
-            <h3>Amplía cuando tenga sentido</h3>
-            <p>Activa Nival Pay completo para recibir la tarjeta NFC física, 3 apartados y las herramientas adicionales sin cambiar tu QR.</p>
+            <h3>Amplía solo si te sirve</h3>
+            <p>Conserva el mismo QR y activa NFC, más apartados o Puntos cuando tu operación lo necesite.</p>
           </article>
         </div>
       </section>
@@ -202,8 +209,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingBusinessPlans scrollReveal" id="precio" aria-labelledby="planes-title">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">PRECIOS PENSADOS PARA CRECER</p>
-          <h2 id="planes-title">Empieza simple. Amplía cuando tenga sentido.</h2>
-          <p>Empieza gratis o con precio fundador y amplía solo cuando la herramienta ya esté generando valor para tu negocio.</p>
+          <h2 id="planes-title">Precios claros. Sin obligarte a comprar de más.</h2>
+          <p>Empieza gratis donde tiene sentido y paga solo cuando necesitas la siguiente capa.</p>
         </div>
         <div className="landingBusinessPlanGrid">
           <article><span>NIVAL PAY</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único · fundador</small><p>Digital gratis para siempre. Pro agrega NFC física y 3 apartados.</p><em>Regular previsto: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</em></article>
@@ -216,8 +223,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
       <section className="landingTrust scrollReveal" aria-labelledby="trust-title">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">CONTROL Y CONFIANZA</p>
-          <h2 id="trust-title">Lo simple para el cliente no tiene que ser improvisado por detrás.</h2>
-          <p>Nival separa la experiencia pública de la administración del negocio y aplica controles distintos según quién usa cada herramienta.</p>
+          <h2 id="trust-title">Simple por fuera. Serio por dentro.</h2>
+          <p>La experiencia del cliente es sencilla, mientras tu negocio mantiene control sobre acceso, datos y configuración.</p>
         </div>
         <div className="landingTrustGrid">
           <article><span>01</span><strong>Espacios de trabajo separados</strong><p>Cada negocio mantiene su configuración, clientes y productos dentro de su propio contexto operativo.</p></article>
@@ -234,28 +241,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
         <div className="faqList">
           <details>
-            <summary>¿Qué necesita hacer mi cliente para usar Nival Puntos?</summary>
-            <p>Escanea tu QR o NFC, se registra una vez y abre su tarjeta digital. Puede guardar su tarjeta en Google Wallet cuando esté disponible en su dispositivo. Después solo muestra su código para sumar visitas o canjear premios.</p>
+            <summary>¿Mi cliente necesita instalar algo?</summary>
+            <p>No. Nival abre en el navegador desde QR, enlace o NFC. En Puntos, también puede guardar su tarjeta digital en Google Wallet cuando esté disponible en su dispositivo.</p>
           </details>
           <details>
-            <summary>¿Tengo que registrar manualmente a todos mis clientes para Intelligence?</summary>
-            <p>No. La fuente principal de Intelligence son los clientes y visitas que Nival Puntos va registrando. Así el análisis crece con el uso normal del programa.</p>
+            <summary>¿Nival Pay procesa mi dinero?</summary>
+            <p>No. Nival Pay muestra los datos que tú decides compartir para que el cliente transfiera directamente desde su banco.</p>
           </details>
           <details>
-            <summary>¿Necesito descargar una aplicación?</summary>
-            <p>No. La página se abre en el navegador del celular al acercarlo a la tarjeta NFC o escanear el QR.</p>
+            <summary>¿Puedo cambiar mis datos después?</summary>
+            <p>Sí. Puedes actualizar banco, titular, CLABE y contenido sin cambiar el enlace, QR o tarjeta ya programada.</p>
           </details>
           <details>
-            <summary>¿La tarjeta guarda mis datos bancarios?</summary>
-            <p>No. La tarjeta solo contiene una liga. Tus datos viven en tu página y puedes actualizarlos sin reprogramar la tarjeta.</p>
-          </details>
-          <details>
-            <summary>¿Nival Tech procesa el dinero?</summary>
-            <p>No. Nival Pay muestra tus datos para que el cliente haga la transferencia directamente desde su banco.</p>
-          </details>
-          <details>
-            <summary>¿Puedo cambiar mi CLABE después?</summary>
-            <p>Sí. El enlace de tu tarjeta y QR permanece igual aunque actualices el banco, titular o CLABE.</p>
+            <summary>¿Qué diferencia hay entre Puntos y Growth?</summary>
+            <p>Puntos registra clientes, visitas y recompensas. Growth incluye Puntos Pro + Intelligence para detectar oportunidades y ayudarte a actuar sobre esa actividad.</p>
           </details>
         </div>
       </section>
