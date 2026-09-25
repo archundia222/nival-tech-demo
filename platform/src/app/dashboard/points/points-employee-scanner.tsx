@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { awardPoint, claimScanToken, claimWalletCard, redeemPointReward } from "@/app/points/actions";
+import { awardPoint, claimScanToken, claimWalletCard, redeemPointReward, redeemRewardAfterVisit } from "@/app/points/actions";
 
 type ScanCustomer = {
   scan_session_id: string;
@@ -63,6 +63,7 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
   const [reviewUrl, setReviewUrl] = useState("");
   const [reviewPrompt, setReviewPrompt] = useState(false);
   const [confirmRedeem, setConfirmRedeem] = useState(false);
+  const [visitConfirmed, setVisitConfirmed] = useState(false);
   const claimingRef = useRef(false);
 
   const claim = useCallback(async (value: string) => {
@@ -99,6 +100,7 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
       }
       setCustomer(result.customer as ScanCustomer);
       setConfirmRedeem(false);
+      setVisitConfirmed(false);
       setMessage("");
       setCameraOn(false);
     } finally {
@@ -182,9 +184,15 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     startTransition(async () => {
       const result = await awardPoint(customer.scan_session_id);
       if (!result.ok) { setMessage(result.error ?? "No pudimos sumar el punto."); return; }
-      setCustomer({ ...customer, points_balance: result.result?.new_points_balance ?? customer.points_balance + 1 });
+      const earnedReward = Boolean(result.result?.reward_earned);
+      setCustomer({
+        ...customer,
+        points_balance: result.result?.new_points_balance ?? customer.points_balance + 1,
+        available_rewards: customer.available_rewards + (earnedReward ? 1 : 0),
+      });
       setReviewPrompt(Boolean(result.result?.review_prompt));
       setReviewUrl(result.result?.review_url ?? "");
+      setVisitConfirmed(true);
       setMessage("Punto registrado.");
     });
   }
@@ -192,7 +200,9 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
   function redeem() {
     if (!customer) return;
     startTransition(async () => {
-      const result = await redeemPointReward(customer.scan_session_id);
+      const result = mode === "visit"
+        ? await redeemRewardAfterVisit(customer.scan_session_id)
+        : await redeemPointReward(customer.scan_session_id);
       if (!result.ok) { setMessage(result.error ?? "No pudimos canjear."); return; }
       setCustomer({ ...customer, points_balance: result.result?.new_points_balance ?? customer.points_balance, available_rewards: Math.max(0, customer.available_rewards - 1) });
       setMessage("Canje confirmado. Entrega la recompensa al cliente.");
@@ -211,8 +221,23 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
       <div className="pointsCashActions">
-        {mode === "visit" ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>Confirmar visita y sumar punto</button> : customer.available_rewards < 1 ? <div className="pointsNoReward"><strong>Sin recompensas disponibles</strong><span>Este cliente todavía no tiene un premio listo para canjear.</span></div> : !confirmRedeem ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={() => setConfirmRedeem(true)}>Revisar canje</button> : <div className="pointsRedeemConfirm"><span>VAS A CANJEAR</span><strong>{customer.reward_description}</strong><p>Confirma solo cuando estés listo para entregar la recompensa.</p><button className="nvPrimaryButton" disabled={pending} type="button" onClick={redeem}>{pending ? "Canjeando…" : "Confirmar canje"}</button><button className="nvTertiaryButton" type="button" onClick={() => setConfirmRedeem(false)}>Cancelar</button></div>}
-        <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setConfirmRedeem(false); }}>Otro cliente</button>
+        {mode === "visit" && !visitConfirmed && <button className="nvPrimaryButton" disabled={pending} type="button" onClick={addPoint}>{pending ? "Registrando…" : "Confirmar visita y sumar punto"}</button>}
+        {mode === "visit" && visitConfirmed && customer.available_rewards > 0 && !confirmRedeem && <div className="pointsRedeemConfirm">
+          <span>PREMIO DISPONIBLE</span>
+          <strong>Este cliente tiene {customer.available_rewards === 1 ? "un premio acumulado" : customer.available_rewards + " premios acumulados"}</strong>
+          <p>{customer.reward_description}. Pregúntale si quiere canjearlo ahora o guardarlo para después.</p>
+          <button className="nvPrimaryButton" disabled={pending} type="button" onClick={() => setConfirmRedeem(true)}>Canjear ahora</button>
+          <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setVisitConfirmed(false); }}>Guardar para después</button>
+        </div>}
+        {mode === "visit" && visitConfirmed && customer.available_rewards > 0 && confirmRedeem && <div className="pointsRedeemConfirm">
+          <span>CONFIRMAR CANJE</span>
+          <strong>{customer.reward_description}</strong>
+          <p>Confirma solo cuando vayas a entregar el premio al cliente.</p>
+          <button className="nvPrimaryButton" disabled={pending} type="button" onClick={redeem}>{pending ? "Canjeando…" : "Confirmar canje"}</button>
+          <button className="nvTertiaryButton" type="button" onClick={() => setConfirmRedeem(false)}>Volver</button>
+        </div>}
+        {mode === "redeem" && (customer.available_rewards < 1 ? <div className="pointsNoReward"><strong>Sin recompensas disponibles</strong><span>Este cliente todavía no tiene un premio listo para canjear.</span></div> : !confirmRedeem ? <button className="nvPrimaryButton" disabled={pending} type="button" onClick={() => setConfirmRedeem(true)}>Revisar canje</button> : <div className="pointsRedeemConfirm"><span>VAS A CANJEAR</span><strong>{customer.reward_description}</strong><p>Confirma solo cuando estés listo para entregar la recompensa.</p><button className="nvPrimaryButton" disabled={pending} type="button" onClick={redeem}>{pending ? "Canjeando…" : "Confirmar canje"}</button><button className="nvTertiaryButton" type="button" onClick={() => setConfirmRedeem(false)}>Cancelar</button></div>)}
+        {(mode === "redeem" || (mode === "visit" && (!visitConfirmed || customer.available_rewards === 0))) && <button className="nvTertiaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setConfirmRedeem(false); setVisitConfirmed(false); }}>Otro cliente</button>}
       </div>
     </div>}
     {message && <p className={message.includes("registrado") || message.includes("canjeado") || message.includes("Canje confirmado") ? "pointsStatus" : "pointsStatus pointsStatusError"}>{message}</p>}
@@ -221,6 +246,6 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
       <div className="pointsQrCanvas"><QRCodeSVG value={reviewUrl} size={180} level="M" /></div>
       <a className="nvSecondaryButton" href={reviewUrl} target="_blank" rel="noreferrer">Abrir enlace de reseña ↗</a>
     </div>}
-    {mode === "visit" && message === "Punto registrado." && <button className="nvPrimaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setConfirmRedeem(false); }}>Regresar al registro de visitas</button>}
+    {mode === "visit" && message === "Punto registrado." && customer?.available_rewards === 0 && <button className="nvPrimaryButton" type="button" onClick={() => { setCustomer(null); setMessage(""); setReviewPrompt(false); setReviewUrl(""); setManual(""); setConfirmRedeem(false); setVisitConfirmed(false); }}>Registrar otro cliente</button>}
   </section>;
 }
