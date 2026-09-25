@@ -108,7 +108,17 @@ export async function issueCustomerScanToken(token: string, purpose: "visit" | "
   return { ok: true, raw, shortCode, expiresAt: data[0].expires_at as string };
 }
 
+async function cleanupExpiredScanSessions() {
+  try {
+    const admin = createPointsAdminClient();
+    await admin.rpc("close_expired_loyalty_scan_sessions");
+  } catch (error) {
+    console.warn("[points] Expired scan session cleanup skipped", error);
+  }
+}
+
 export async function claimScanToken(raw: string, purpose: "visit" | "redeem") {
+  await cleanupExpiredScanSessions();
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("claim_customer_scan_token", { p_raw_token: raw.trim(), p_expected_purpose: purpose });
   if (error || !data?.[0]) return { ok: false, error: error?.message.includes("wrong_scan_purpose") ? (purpose === "visit" ? "Este código es para canjear una recompensa, no para sumar puntos." : "Este código es para sumar puntos, no para canjear.") : "QR expirado, usado o no pertenece a este negocio." };
@@ -116,6 +126,7 @@ export async function claimScanToken(raw: string, purpose: "visit" | "redeem") {
 }
 
 export async function claimWalletCard(accountToken: string, purpose: "visit" | "redeem" = "visit") {
+  await cleanupExpiredScanSessions();
   const token = accountToken.trim();
   if (!/^[0-9a-f-]{36}$/i.test(token)) return { ok: false, error: "Tarjeta de Google Wallet no válida." };
   const supabase = await createClient();
