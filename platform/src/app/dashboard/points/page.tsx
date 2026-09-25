@@ -62,6 +62,7 @@ export default async function NivalPointsPage({
   const hasIntelligence = intelligenceEntitlement?.status === 'active' || intelligenceEntitlement?.status === 'free' || business.product_level === 'intelligence';
   const view = params.view ?? 'overview';
   const canManage = membership.role === 'owner' || membership.role === 'manager';
+  const subscriptionConfirming = params.subscription === 'return' && !paid;
 
   const navActive =
     view === 'customers' ? 'puntos-clientes'
@@ -149,7 +150,8 @@ export default async function NivalPointsPage({
       </header>
 
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className="formMessage">{paid ? 'Suscripción confirmada. Nival Puntos Pro ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>}
+      {params.subscription && <p className={`formMessage ${paid ? 'successMessage' : ''}`}>{paid ? 'Suscripción confirmada. Nival Puntos Pro ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>}
+      {subscriptionConfirming && <section className="subscriptionConfirming"><span>VALIDANDO SUSCRIPCIÓN</span><strong>Ya recibimos tu regreso de Mercado Pago.</strong><p>Nival está confirmando la autorización. No necesitas iniciar otro pago; la pantalla se actualizará automáticamente.</p></section>}
 
       {!available ? <>
         <section className="productShowcase pointsShowcase">
@@ -196,7 +198,7 @@ export default async function NivalPointsPage({
             <strong>Usa configuración y promociones Pro antes de decidir.</strong>
             <p>Si no pagas al terminar, conservas tu programa y bajas al plan Gratis de hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes. No borramos tu información.</p>
           </div>
-          <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conservar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
+          {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conservar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
         </section>}
         {baseFree && <section className="freemiumBanner">
           <div>
@@ -204,7 +206,7 @@ export default async function NivalPointsPage({
             <strong>{Math.min(loyaltyCustomers ?? 0, NIVAL_POINTS_FREE_CUSTOMER_LIMIT)} de {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes usados</strong>
             <p>Tu programa, tarjetas, puntos y recompensas siguen funcionando. Pro aumenta capacidad y recupera configuración y promociones.</p>
           </div>
-          <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Volver a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
+          {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Volver a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
         </section>}
 
         <section className="pointsV1Hero">
@@ -281,7 +283,7 @@ export default async function NivalPointsPage({
             <span>PROMOCIONES PRO</span>
             <h2>Envía una promoción general a quienes aceptaron recibirla.</h2>
             <p>La selección inteligente de audiencias, recuperación de clientes y campañas medidas pertenece a Nival Intelligence.</p>
-            <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
+            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
         {canManage && view === 'promotions' && proAccess &&
@@ -306,7 +308,7 @@ export default async function NivalPointsPage({
             <span>CONFIGURACIÓN PRO</span>
             <h2>El plan gratis usa una regla simple para que puedas empezar rápido.</h2>
             <p>Pro te deja cambiar la meta, el premio, límites, tiempos de espera y estrategia de reseñas.</p>
-            <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear configuración · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>
+            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear configuración · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
         {canManage && program && view === 'settings' && proAccess &&
