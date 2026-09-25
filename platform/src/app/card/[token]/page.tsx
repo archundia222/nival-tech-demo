@@ -40,9 +40,18 @@ export default async function CardPage({ params }: CardPageProps) {
       {availableRewards.length > 0 && <div className="pointsAvailableNotice"><span>✓</span><div><strong>{availableRewards.length} {availableRewards.length === 1 ? "recompensa disponible" : "recompensas disponibles"}</strong><small>Ya puedes canjear {availableRewards.length === 1 ? "tu premio" : "tus premios"} en caja.</small></div></div>}
     </section>
     <section className="pointsWalletSaveCard">
-      <div><span>TU TARJETA EN EL CELULAR</span><strong>{googleWalletReady && !isIOS ? "Guárdala en Google Wallet" : "Tenla siempre a la mano"}</strong><p>{googleWalletReady && !isIOS ? "Lleva tus puntos contigo y recibe actualizaciones del programa directamente en tu teléfono." : "Guarda o comparte este acceso para volver a abrir tu tarjeta cuando quieras."}</p></div>
+      <div>
+        <span>TU TARJETA EN EL CELULAR</span>
+        <strong>{googleWalletReady ? "Google Wallet + avisos de promociones" : "Tenla siempre a la mano"}</strong>
+        <p>{googleWalletReady
+          ? isIOS
+            ? "En Android puedes agregar esta tarjeta a Google Wallet y recibir avisos de promociones y descuentos del negocio. En iPhone puedes guardar este acceso y volver cuando quieras."
+            : "Agrégala a Google Wallet para llevar tus puntos contigo y recibir avisos de promociones y descuentos cuando el negocio los envíe."
+          : "Guarda o comparte este acceso para volver a abrir tu tarjeta cuando quieras."}</p>
+      </div>
       <div className="pointsWalletSaveActions">
         {googleWalletReady && !isIOS && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
+        {googleWalletReady && isIOS && <span className="pointsMuted">Google Wallet está disponible en Android.</span>}
         <CardSaveActions />
       </div>
     </section>
