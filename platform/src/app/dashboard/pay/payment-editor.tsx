@@ -130,9 +130,11 @@ export function PaymentEditor({
   useEffect(() => {
     if (revision === 0 || pending || lastSubmittedRevision.current === revision) return;
     const timeout = window.setTimeout(() => {
+      const form = formRef.current;
+      if (!form || !form.checkValidity()) return;
       lastSubmittedRevision.current = revision;
-      formRef.current?.requestSubmit();
-    }, 850);
+      form.requestSubmit();
+    }, 1100);
     return () => window.clearTimeout(timeout);
   }, [revision, pending]);
 
