@@ -5126,3 +5126,8 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .dashboardContentTopbar b{font-size:12px}
   .dashboardContentTopbar .ready{font-size:10px}
 }
+
+.nivalPayDeleteSection{justify-self:start;margin-top:2px;padding:8px 0;border:0;background:transparent;color:#d7a6a2;font-size:11px;font-weight:800;cursor:pointer}
+.nivalPayDeleteSection:hover{color:#ffd0cc;text-decoration:underline}
+.nivalPayDeleteSection:focus-visible{outline:3px solid #d8b868;outline-offset:3px;border-radius:6px}
+.nivalPaySaveStatus.isPending{border-color:rgba(216,184,104,.35);background:rgba(216,184,104,.08);color:#e1c57f}
