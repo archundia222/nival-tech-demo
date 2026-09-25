@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getActiveBusinessMembership, getBusinessChoices } from '@/lib/active-business';
 import { switchActiveBusiness } from './workspace-actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-inactivos' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-promociones' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'web-ia' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-inactivos' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'inteligencia-datos' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-promociones' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'web-ia' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Páginas de cobro', href: '/dashboard/pay' },
@@ -30,6 +30,7 @@ const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; gr
   { id: 'inteligencia-recurrentes', label: 'Frecuentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
   { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
   { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
+  { id: 'inteligencia-datos', label: 'Ventas y datos', href: '/dashboard/intelligence?view=data', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
 ];
 
