@@ -67,6 +67,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   const latestPhysicalPayment = orders?.[0]
     ? (Array.isArray(orders[0].product_orders) ? orders[0].product_orders[0] : orders[0].product_orders)
     : null;
+  const physicalPaymentConfirming = (params.result === 'success' || params.result === 'pending')
+    && latestPhysicalPayment?.status !== 'paid';
 
   return <main className="dashboardApp nivalDashboard">
     <PaymentStatusPoller active={(params.result === 'success' || params.result === 'pending') && latestPhysicalPayment?.status !== 'paid'} />
@@ -81,8 +83,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
       <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : hasPendingIncludedCard ? 'Ya hay una personalización de tu tarjeta incluida esperando confirmación de Mercado Pago. No necesitas volver a pagar.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
       {!canPurchase && <p className="formMessage">Puedes revisar las tarjetas de este negocio, pero solo el propietario o un gerente puede solicitar o comprar una nueva.</p>}
-      {canPurchase && hasPendingIncludedCard && !hasIncludedCard && <p className="formMessage">Tu solicitud ya está en proceso. Esta pantalla se actualizará cuando Mercado Pago confirme el cobro.</p>}
-      {canPurchase && (!hasPendingIncludedCard || hasIncludedCard) && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
+      {canPurchase && (hasPendingIncludedCard && !hasIncludedCard || physicalPaymentConfirming) && <section className="physicalPaymentWaiting" aria-live="polite"><span>CONFIRMANDO PAGO</span><strong>No necesitas volver a comprar.</strong><p>Estamos validando el pago con Mercado Pago. Cuando quede acreditado, tu pedido aparecerá como pagado automáticamente.</p></section>}
+      {canPurchase && !physicalPaymentConfirming && (!hasPendingIncludedCard || hasIncludedCard) && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
         <section className="chartCard physicalCardSection">
           <div className="physicalSectionHeading"><span>1</span><div><h2>Elige qué hará el frente</h2><p>Nival usa una plantilla clara con el logo actual de tu negocio, QR y una instrucción corta. Tú eliges el objetivo.</p></div></div>
           <div className="cardTemplateChoiceGrid">
