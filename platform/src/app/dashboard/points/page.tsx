@@ -22,6 +22,7 @@ export default async function NivalPointsPage({
   searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string; scan?: string; wallet?: string }>;
 }) {
   const params = await searchParams;
+  if (params.view === 'redemptions') redirect('/dashboard/points?view=visits');
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpoints');
@@ -124,18 +125,16 @@ export default async function NivalPointsPage({
   const title =
     view === 'customers' ? 'Clientes'
       : view === 'promotions' ? 'Promociones y notificaciones'
-        : view === 'visits' ? 'Registrar visita'
-          : view === 'redemptions' ? 'Canjear premio'
-            : view === 'share' ? 'Compartir programa'
+        : view === 'visits' ? 'Registrar visita y premios'
+          : view === 'share' ? 'Compartir programa'
               : view === 'settings' ? 'Configurar programa'
                 : program?.name ?? 'Tu programa de puntos';
 
   const description =
     view === 'customers' ? 'Consulta el saldo, visitas y premios de las personas registradas en tu programa.'
       : view === 'promotions' ? 'Envía descuentos y promociones por Google Wallet o abre WhatsApp con el mensaje listo, únicamente para clientes que aceptaron recibirlos.'
-        : view === 'visits' ? 'Escanea el código temporal del cliente y suma su visita en segundos.'
-          : view === 'redemptions' ? 'Escanea el código de una recompensa y confirma cuando realmente la entregues.'
-            : view === 'share' ? 'Pon el QR en caja, mesa, menú o NFC para que el cliente se registre solo.'
+        : view === 'visits' ? 'Escanea una sola vez: registra la visita y, si hay un premio disponible, Nival te pregunta si el cliente quiere canjearlo ahora o guardarlo.'
+          : view === 'share' ? 'Pon el QR en caja, mesa, menú o NFC para que el cliente se registre solo.'
               : view === 'settings' ? 'Define la meta y el premio. El programa se encarga del resto.'
                 : program
                   ? `Cada visita suma · ${program.reward_description} al llegar a ${program.reward_threshold} puntos.`
@@ -231,15 +230,15 @@ export default async function NivalPointsPage({
               <h2>{availableRewards > 0 ? `Tienes ${availableRewards} premio${availableRewards === 1 ? '' : 's'} listo${availableRewards === 1 ? '' : 's'} para entregar.` : 'Tu trabajo aquí es solo registrar visitas y entregar recompensas.'}</h2>
               <p>{qrNfcRegistrations > 0 ? `${qrNfcRegistrations} clientes se registraron por QR o NFC. Nival se encarga de construir la base mientras usas el programa.` : 'Comparte el QR para que los clientes se registren solos y evita capturar información manualmente.'}</p>
             </div>
-            <a href={availableRewards > 0 ? '/dashboard/points?view=redemptions' : '/dashboard/points?view=share'}>
-              {availableRewards > 0 ? 'Canjear premio →' : 'Compartir mi QR →'}
+            <a href={availableRewards > 0 ? '/dashboard/points?view=visits' : '/dashboard/points?view=share'}>
+              {availableRewards > 0 ? 'Registrar visita / premio →' : 'Compartir mi QR →'}
             </a>
           </section>
 
           <section className="pointsQuickOps">
             <a href="/dashboard/points?view=share"><span>1 · REGISTRAR</span><strong>Comparte tu QR</strong><small>El cliente crea su tarjeta solo →</small></a>
             <a href="/dashboard/points?view=visits"><span>2 · ACUMULAR</span><strong>Registrar visita</strong><small>Escanea el código del cliente →</small></a>
-            <a href="/dashboard/points?view=redemptions"><span>3 · PREMIAR</span><strong>Canjear recompensa</strong><small>Confirma cuando la entregues →</small></a>
+            <a href="/dashboard/points?view=visits"><span>3 · PREMIAR</span><strong>Premio dentro de la visita</strong><small>Nival te avisa cuando haya uno disponible →</small></a>
             {proAccess && <a href="/dashboard/points?view=promotions"><span>4 · RECUPERAR</span><strong>Enviar descuento o promoción</strong><small>Google Wallet o WhatsApp →</small></a>}
           </section>
 
@@ -299,7 +298,6 @@ export default async function NivalPointsPage({
           />}
 
         {view === 'visits' && <PointsEmployeeScanner mode="visit" initialScanToken={params.scan ?? ''} initialWalletToken={params.wallet ?? ''} />}
-        {view === 'redemptions' && <PointsEmployeeScanner mode="redeem" initialScanToken={params.scan ?? ''} />}
         {view === 'share' && business.slug &&
           <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
