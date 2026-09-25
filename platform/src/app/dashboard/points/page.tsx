@@ -298,8 +298,8 @@ export default async function NivalPointsPage({
             }))}
           />}
 
-        {view === 'visits' && <PointsEmployeeScanner mode="visit" />}
-        {view === 'redemptions' && <PointsEmployeeScanner mode="redeem" />}
+        {view === 'visits' && <PointsEmployeeScanner mode="visit" initialScanToken={params.scan ?? ''} initialWalletToken={params.wallet ?? ''} />}
+        {view === 'redemptions' && <PointsEmployeeScanner mode="redeem" initialScanToken={params.scan ?? ''} />}
         {view === 'share' && business.slug &&
           <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
 
