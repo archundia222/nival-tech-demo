@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 function value(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -19,10 +20,33 @@ function isEmailNotConfirmed(error: { code?: string; message?: string } | null) 
 
 export async function signIn(formData: FormData) {
   const next = safeNext(formData);
+  const email = value(formData, "email");
+  const password = value(formData, "password");
+
+  // The demo account is intentionally synthetic. Repair its password through
+  // Supabase Auth Admin before signing in so direct database seeding can never
+  // leave the demo credentials out of sync with GoTrue.
+  if (email.toLowerCase() === "demo@nivaltech.dev" && password === "NivalDemo!26-R7xQ") {
+    const admin = createAdminClient();
+    const { data: usersData } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const demoUser = usersData?.users.find((candidate) => candidate.email?.toLowerCase() === "demo@nivaltech.dev");
+    if (demoUser) {
+      const { error: repairError } = await admin.auth.admin.updateUserById(demoUser.id, {
+        password,
+        email_confirm: true,
+        user_metadata: { ...(demoUser.user_metadata ?? {}), full_name: "Nival Demo" },
+        app_metadata: { ...(demoUser.app_metadata ?? {}), account_type: "demo" },
+      });
+      if (repairError) {
+        console.error("[auth] Demo account repair failed", { code: repairError.code ?? null });
+      }
+    }
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
-    email: value(formData, "email"),
-    password: value(formData, "password"),
+    email,
+    password,
   });
 
   if (error) {
