@@ -606,6 +606,16 @@ type PhysicalCardInput = {
   target_url: string | null;
 };
 
+function validateRequestedSunday(form: FormData) {
+  const delivery = String(form.get('deliveryMethod') ?? '');
+  const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
+  if (delivery !== 'sunday_local' || !requestedDate) return;
+  const parsed = new Date(requestedDate + 'T12:00:00Z');
+  if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== 0) {
+    redirect('/dashboard/pay/physical?error=La+entrega+local+solo+se+programa+en+domingo.+Elige+un+domingo+o+deja+la+fecha+vacía.');
+  }
+}
+
 function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const design = String(form.get('design') ?? '');
   const frontTemplate = String(form.get('frontTemplate') ?? 'pay');
@@ -708,6 +718,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
 }
 
 export async function startPhysicalCardCheckout(form: FormData) {
+  validateRequestedSunday(form);
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -724,6 +735,7 @@ export async function startPhysicalCardCheckout(form: FormData) {
 }
 
 export async function claimIncludedPhysicalCard(form: FormData) {
+  validateRequestedSunday(form);
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
@@ -785,6 +797,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
 }
 
 export async function requestPhysicalCardCashPayment(form: FormData) {
+  validateRequestedSunday(form);
   const rawDetails = readPhysicalCardInput(form);
   if (!rawDetails) redirect('/dashboard/pay/physical?error=Revisa+los+datos+de+diseño+y+entrega.');
   const { businessId } = await currentPurchaseContext();
