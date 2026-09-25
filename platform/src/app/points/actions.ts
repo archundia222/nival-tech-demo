@@ -440,7 +440,7 @@ export async function importCustomersCsv(formData: FormData) {
   if (error || !inserted?.length) redirect(captureReturn(formData, "error", "No pudimos importar la base de clientes."));
 
   const [{ data: pointsEntitlement }, { data: program }, { count: currentAccounts }] = await Promise.all([
-    supabase.from("business_product_entitlements").select("status")
+    supabase.from("business_product_entitlements").select("status,current_period_end")
       .eq("business_id", membership.business_id)
       .eq("product_code", "nival_points")
       .in("status", ["active","free"])
@@ -457,7 +457,9 @@ export async function importCustomersCsv(formData: FormData) {
 
   let pointsAttached = 0;
   if (pointsEntitlement && program) {
-    const capacity = pointsEntitlement.status === "free"
+    const freeLimited = pointsEntitlement.status === "free"
+      && (!pointsEntitlement.current_period_end || new Date(pointsEntitlement.current_period_end as string).getTime() <= Date.now());
+    const capacity = freeLimited
       ? Math.max(0, 30 - Number(currentAccounts ?? 0))
       : inserted.length;
     const accountRows = inserted.slice(0, capacity).map((customer) => ({
