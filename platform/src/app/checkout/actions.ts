@@ -99,6 +99,23 @@ function checkoutOrigin() {
   return (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
 }
 
+const PHYSICAL_ORDER_MATCH_FIELDS = [
+  'design','design_notes','front_template','back_style','back_design_notes',
+  'delivery_method','recipient_name','phone','address_line1','address_line2',
+  'city','state','postal_code','requested_delivery_date',
+  'target_payment_profile_id','target_url','included_base_order_id',
+] as const;
+
+function physicalOrderMatches(
+  existing: Record<string, unknown> | null,
+  requested: Record<string, string | null>,
+) {
+  if (!existing) return false;
+  return PHYSICAL_ORDER_MATCH_FIELDS.every((field) =>
+    String(existing[field] ?? '') === String(requested[field] ?? ''),
+  );
+}
+
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
@@ -146,12 +163,29 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       const { data: freshOrder } = await admin.from('product_orders').select('status')
         .eq('id', existingOrder.id).single();
       if (freshOrder?.status !== 'pending') redirect(product.returnPath);
-      if (existingOrder.checkout_url) {
+
+      let samePhysicalOrder = true;
+      if (product.physicalOrder) {
+        const { data: existingPhysical } = await admin.from('physical_card_orders')
+          .select(PHYSICAL_ORDER_MATCH_FIELDS.join(','))
+          .eq('product_order_id', existingOrder.id)
+          .maybeSingle();
+        samePhysicalOrder = physicalOrderMatches(
+          existingPhysical as Record<string, unknown> | null,
+          product.physicalOrder,
+        );
+      }
+
+      if (existingOrder.checkout_url && samePhysicalOrder) {
         const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
         const reuseWindowMs = product.physicalOrder ? 15 * 60 * 1000 : 6 * 60 * 60 * 1000;
         if (Number.isFinite(ageMs) && ageMs < reuseWindowMs) {
           redirect(existingOrder.checkout_url);
         }
+      }
+
+      if (product.physicalOrder) {
+        await admin.from('physical_card_orders').delete().eq('product_order_id', existingOrder.id);
       }
       await admin.from('product_orders')
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
