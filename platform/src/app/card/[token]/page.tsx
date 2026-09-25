@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import { getPublicLoyaltyCard, getPublicLoyaltyRewards } from "@/app/points/actions";
@@ -19,8 +18,6 @@ export default async function CardPage({ params }: CardPageProps) {
 
   const progress = Math.min(100, Math.round((Number(card.points_balance) / Number(card.reward_threshold)) * 100));
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
-  const userAgent = (await headers()).get("user-agent") ?? "";
-  const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
   const googleWalletReady = Boolean(
     process.env.GOOGLE_WALLET_ISSUER_ID &&
     process.env.GOOGLE_WALLET_CLASS_SUFFIX &&
@@ -44,14 +41,11 @@ export default async function CardPage({ params }: CardPageProps) {
         <span>TU TARJETA EN EL CELULAR</span>
         <strong>{googleWalletReady ? "Google Wallet + avisos de promociones" : "Tenla siempre a la mano"}</strong>
         <p>{googleWalletReady
-          ? isIOS
-            ? "En Android puedes agregar esta tarjeta a Google Wallet y recibir avisos de promociones y descuentos del negocio. En iPhone puedes guardar este acceso y volver cuando quieras."
-            : "Agrégala a Google Wallet para llevar tus puntos contigo y recibir avisos de promociones y descuentos cuando el negocio los envíe."
+          ? "Abre el enlace de Google Wallet para guardar esta tarjeta en tu cuenta. En Android también podrás verla en la app; en iPhone puedes seguir consultándola desde este enlace."
           : "Google Wallet aún no está habilitado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta para volver a consultar tus puntos."}</p>
       </div>
       <div className="pointsWalletSaveActions">
-        {googleWalletReady && !isIOS && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
-        {googleWalletReady && isIOS && <span className="pointsMuted">Google Wallet está disponible en Android.</span>}
+        {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
         {!googleWalletReady && <span className="pointsMuted">La opción de agregar a Google Wallet estará disponible cuando se complete su configuración.</span>}
         <CardSaveActions />
       </div>
