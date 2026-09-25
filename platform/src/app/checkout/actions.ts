@@ -804,8 +804,23 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
     .limit(1)
     .maybeSingle();
   if (existing) {
+    const { data: existingPhysical } = await admin.from('physical_card_orders')
+      .select(PHYSICAL_ORDER_MATCH_FIELDS.join(','))
+      .eq('product_order_id', existing.id)
+      .maybeSingle();
+    const samePhysicalOrder = physicalOrderMatches(
+      existingPhysical as Record<string, unknown> | null,
+      details as unknown as Record<string, string | null>,
+    );
     const ageMs = Date.now() - new Date(existing.created_at).getTime();
-    if (Number.isFinite(ageMs) && ageMs < 15 * 60 * 1000) redirect('/dashboard/pay/physical?result=cash');
+    if (samePhysicalOrder && Number.isFinite(ageMs) && ageMs < 15 * 60 * 1000) {
+      redirect('/dashboard/pay/physical?result=cash');
+    }
+    await admin.from('physical_card_orders').delete().eq('product_order_id', existing.id);
+    await admin.from('product_orders')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', existing.id)
+      .eq('status', 'pending_cash_confirmation');
   }
 
   const { data: order, error } = await admin.from('product_orders').insert({
