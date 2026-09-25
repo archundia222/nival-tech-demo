@@ -15,16 +15,17 @@ async function syncWalletForScanSession(scanSessionId: string) {
     .select("loyalty_account_id, customer_id, business_id")
     .eq("id", scanSessionId).single();
   if (error || !session) throw error ?? new Error("Scan session not found");
-  const [{ data: account }, { data: customer }, { data: business }, { count }] = await Promise.all([
-    admin.from("loyalty_accounts").select("public_token, points_balance").eq("id", session.loyalty_account_id).single(),
+  const [{ data: account }, { data: customer }, { data: business }, { count }, { data: balance, error: balanceError }] = await Promise.all([
+    admin.from("loyalty_accounts").select("public_token").eq("id", session.loyalty_account_id).single(),
     admin.from("customers").select("name").eq("id", session.customer_id).single(),
     admin.from("businesses").select("name").eq("id", session.business_id).single(),
     admin.from("visits").select("id", { count: "exact", head: true }).eq("customer_id", session.customer_id).eq("business_id", session.business_id),
+    admin.rpc("points_balance_for_account", { p_account_id: session.loyalty_account_id }),
   ]);
-  if (!account?.public_token || !customer || !business) throw new Error("Incomplete wallet account");
+  if (!account?.public_token || !customer || !business || balanceError || balance == null) throw new Error("Incomplete wallet account balance");
   await syncGoogleWalletObject({
     token: account.public_token, businessName: business.name,
-    customerName: customer.name, points: Number(account.points_balance), visits: count ?? 0,
+    customerName: customer.name, points: Number(balance), visits: count ?? 0,
   });
 }
 

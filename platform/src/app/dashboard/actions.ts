@@ -337,7 +337,7 @@ export async function recordVisit(formData: FormData) {
 
   const { data: customer } = await supabase
     .from("customers")
-    .select("name, businesses(name), loyalty_accounts(points_balance, public_token), visits(id)")
+    .select("name, businesses(name), loyalty_accounts(id, public_token), visits(id)")
     .eq("id", customerId)
     .single();
 
@@ -351,11 +351,13 @@ export async function recordVisit(formData: FormData) {
 
     if (account?.public_token) {
       try {
+        const { data: balance, error: balanceError } = await createAdminClient().rpc("points_balance_for_account", { p_account_id: account.id });
+        if (balanceError || balance == null) throw balanceError ?? new Error("Missing points balance");
         await syncGoogleWalletObject({
           token: account.public_token,
           businessName: business?.name ?? "Nival Tech",
           customerName: customer.name,
-          points: Number(account.points_balance),
+          points: Number(balance),
           visits: customer.visits?.length ?? 0,
         });
       } catch (walletError) {
@@ -382,7 +384,7 @@ export async function redeemReward(formData: FormData) {
 
   const { data: customer } = await supabase
     .from("customers")
-    .select("name, businesses(name), loyalty_accounts(points_balance, public_token), visits(id)")
+    .select("name, businesses(name), loyalty_accounts(id, public_token), visits(id)")
     .eq("id", customerId)
     .single();
 
@@ -396,11 +398,13 @@ export async function redeemReward(formData: FormData) {
 
     if (account?.public_token) {
       try {
+        const { data: balance, error: balanceError } = await createAdminClient().rpc("points_balance_for_account", { p_account_id: account.id });
+        if (balanceError || balance == null) throw balanceError ?? new Error("Missing points balance");
         await syncGoogleWalletObject({
           token: account.public_token,
           businessName: business?.name ?? "Nival Tech",
           customerName: customer.name,
-          points: Number(account.points_balance),
+          points: Number(balance),
           visits: customer.visits?.length ?? 0,
         });
       } catch (walletError) {
