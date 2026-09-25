@@ -147,6 +147,25 @@ export async function awardPoint(scanSessionId: string) {
   return { ok: true, result: data?.[0] };
 }
 
+export async function redeemRewardAfterVisit(scanSessionId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("redeem_available_reward_after_visit", { p_scan_session_id: scanSessionId });
+  if (error) {
+    const message = error.message.includes("no_available_reward") ? "Este cliente ya no tiene recompensas disponibles."
+      : error.message.includes("scan_session_expired") ? "La validación expiró. Escanea de nuevo la tarjeta del cliente."
+      : error.message.includes("visit_not_confirmed") ? "Primero confirma la visita."
+      : error.message.includes("already_redeemed") ? "Este premio ya fue canjeado."
+      : "No pudimos canjear el premio.";
+    return { ok: false, error: message };
+  }
+  try { await syncWalletForScanSession(scanSessionId); }
+  catch (walletError) { console.error("Google Wallet post-visit redemption sync failed", walletError); }
+  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+  catch (walletError) { console.error('[apple-wallet] post-visit redemption update failed', walletError); }
+  revalidatePath("/dashboard/points");
+  return { ok: true, result: data?.[0] };
+}
+
 export async function redeemPointReward(scanSessionId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("redeem_reward", { p_scan_session_id: scanSessionId });
