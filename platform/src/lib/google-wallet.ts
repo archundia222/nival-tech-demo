@@ -117,7 +117,7 @@ export async function syncGoogleWalletObject(card: LoyaltyCard) {
         },
         barcode: {
           type: "QR_CODE",
-          value: card.token,
+          value: `${(process.env.NIVAL_PUBLIC_ORIGIN || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/card/${encodeURIComponent(card.token)}`,
           alternateText: `${card.visits} visitas`,
         },
         textModulesData: [

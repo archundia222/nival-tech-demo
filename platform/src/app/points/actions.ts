@@ -104,6 +104,8 @@ export async function awardPoint(scanSessionId: string) {
       : "No pudimos sumar el punto.";
     return { ok: false, error: message };
   }
+  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+  catch (walletError) { console.error('[apple-wallet] point update failed', walletError); }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }
@@ -118,6 +120,8 @@ export async function redeemPointReward(scanSessionId: string) {
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
   }
+  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+  catch (walletError) { console.error('[apple-wallet] redemption update failed', walletError); }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }

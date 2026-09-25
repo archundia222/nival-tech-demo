@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 import { sendGoogleWalletNotification } from "@/lib/google-wallet";
+import { appleWalletReady, notifyAppleWalletPass } from '@/lib/apple-wallet';
+import { createPointsAdminClient } from '@/lib/supabase/points-admin';
 
 type WalletRecipient = {
   name: string;
@@ -10,10 +12,11 @@ type WalletRecipient = {
   loyalty_accounts: { public_token: string }[] | { public_token: string } | null;
 };
 
-export async function sendPointsWalletPromotion(input: { title: string; body: string }) {
+export async function sendPointsWalletPromotion(input: { title: string; body: string; recipient: string }) {
   const title = input.title.trim().slice(0, 60);
   const body = input.body.trim().slice(0, 280);
   if (!title || !body) return { ok: false, sent: 0, failed: 0, error: "Escribe un título y un mensaje." };
+  if (input.recipient !== 'all' && !/^[a-f0-9-]{36}$/i.test(input.recipient)) return { ok: false, sent: 0, failed: 0, error: 'Selecciona a quién enviar el aviso.' };
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -38,12 +41,13 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
     return { ok: false, sent: 0, failed: 0, error: "Las promociones por Wallet son una función de Nival Puntos Pro." };
   }
 
-  const { data, error } = await supabase
+  let recipientsQuery = supabase
     .from("customers")
     .select("name,marketing_consent_at,loyalty_accounts!inner(public_token)")
     .eq("business_id", membership.business_id)
-    .not("marketing_consent_at", "is", null)
-    .limit(100);
+    .not("marketing_consent_at", "is", null);
+  if (input.recipient !== 'all') recipientsQuery = recipientsQuery.eq('id', input.recipient);
+  const { data, error } = await recipientsQuery.limit(input.recipient === 'all' ? 100 : 1);
 
   if (error) {
     console.error("[points-promotions] recipients failed", { code: error.code });
@@ -51,15 +55,18 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
   }
 
   const recipients = (data ?? []) as WalletRecipient[];
-  if (!["GOOGLE_WALLET_ISSUER_ID", "GOOGLE_WALLET_CLASS_SUFFIX", "GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL", "GOOGLE_WALLET_PRIVATE_KEY"].every((key) => Boolean(process.env[key]?.trim()))) {
-    return { ok: false, sent: 0, failed: 0, error: "Google Wallet no está disponible en este momento. Inténtalo más tarde." };
-  }
+  const googleReady = ["GOOGLE_WALLET_ISSUER_ID", "GOOGLE_WALLET_CLASS_SUFFIX", "GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL", "GOOGLE_WALLET_PRIVATE_KEY"].every((key) => Boolean(process.env[key]?.trim()));
+  if (!googleReady && !appleWalletReady()) return { ok: false, sent: 0, failed: 0, error: 'Las Wallet todavía no están configuradas.' };
   if (!recipients.length) {
     return { ok: false, sent: 0, failed: 0, error: "Todavía no hay clientes con consentimiento para promociones." };
   }
 
   let sent = 0;
   let failed = 0;
+  let appleAccepted = 0;
+  let appleFailed = 0;
+  const appleReady = appleWalletReady();
+  const admin = createPointsAdminClient();
 
   // Keep each request bounded so a larger audience does not time out the action.
   for (let index = 0; index < recipients.length; index += 5) {
@@ -69,10 +76,24 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
         : recipient.loyalty_accounts;
       if (!account?.public_token) throw new Error("Missing loyalty account token");
       const personalizedBody = body.replaceAll("{{nombre}}", recipient.name.split(" ")[0] || recipient.name);
-      await sendGoogleWalletNotification(account.public_token, title, personalizedBody);
+      const serial = account.public_token;
+      const { error: saveError } = await admin.from('loyalty_wallet_messages').upsert({ pass_serial: serial, title, body: personalizedBody, updated_at: new Date().toISOString() }, { onConflict: 'pass_serial' });
+      if (saveError) throw saveError;
+      const google = googleReady && await sendGoogleWalletNotification(serial, title, personalizedBody).then(() => true, (error) => {
+        console.error('[points-promotions] Google Wallet rejected message', error instanceof Error ? error.message.slice(0, 160) : 'unknown');
+        return false;
+      });
+      let apple = { accepted: 0, failed: 0 };
+      if (appleReady) apple = await notifyAppleWalletPass(serial);
+      return { google, apple };
     }));
     for (const result of results) {
-      if (result.status === "fulfilled") sent += 1;
+      if (result.status === "fulfilled") {
+        if (result.value.google) sent += 1;
+        else if (googleReady) failed += 1;
+        appleAccepted += result.value.apple.accepted;
+        appleFailed += result.value.apple.failed;
+      }
       else {
         failed += 1;
         console.error("[points-promotions] wallet delivery failed", {
@@ -82,14 +103,14 @@ export async function sendPointsWalletPromotion(input: { title: string; body: st
     }
   }
 
-  if (!sent) {
+  if (!sent && !appleAccepted) {
     return {
       ok: false,
       sent,
       failed,
-      error: "No encontramos tarjetas de Google Wallet guardadas o Wallet todavía no está configurado.",
+      error: "Ninguna Wallet aceptó el aviso. Revisa que las tarjetas estén guardadas y que no hayas alcanzado el límite de avisos.",
     };
   }
 
-  return { ok: true, sent, failed, error: null };
+  return { ok: true, sent, failed, appleAccepted, appleFailed, error: null };
 }

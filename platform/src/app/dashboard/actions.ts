@@ -6,6 +6,7 @@ import crypto from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
+import { notifyAppleWalletPass } from '@/lib/apple-wallet';
 import { getActiveBusinessMembership } from "@/lib/active-business";
 
 async function getActiveManagerContext() {
@@ -360,6 +361,8 @@ export async function recordVisit(formData: FormData) {
       } catch (walletError) {
         console.error("Google Wallet sync error", walletError);
       }
+      try { await notifyAppleWalletPass(account.public_token); }
+      catch (walletError) { console.error('[apple-wallet] visit update failed', walletError); }
     }
   }
 
@@ -403,6 +406,8 @@ export async function redeemReward(formData: FormData) {
       } catch (walletError) {
         console.error("Google Wallet sync error after redemption", walletError);
       }
+      try { await notifyAppleWalletPass(account.public_token); }
+      catch (walletError) { console.error('[apple-wallet] reward update failed', walletError); }
     }
   }
 

@@ -11,6 +11,7 @@ import { PointsProgramForm } from './points-controls';
 import { reversePointForm } from '@/app/points/actions';
 import { PointsShareTools } from './points-share-tools';
 import { PointsPromotionsPanel } from './points-promotions';
+import { appleWalletReady } from '@/lib/apple-wallet';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
@@ -288,6 +289,7 @@ export default async function NivalPointsPage({
         {canManage && view === 'promotions' && proAccess &&
           <PointsPromotionsPanel
             businessName={business.name}
+            appleEnabled={appleWalletReady()}
             customers={(customerRows ?? []).map((customer) => ({
               id: customer.id,
               name: customer.name,

@@ -39,11 +39,12 @@ function normalizePhone(phone: string) {
   return digits;
 }
 
-export function PointsPromotionsPanel({ businessName, customers }: { businessName: string; customers: Customer[] }) {
+export function PointsPromotionsPanel({ businessName, customers, appleEnabled = false }: { businessName: string; customers: Customer[]; appleEnabled?: boolean }) {
   const eligible = useMemo(() => customers.filter((customer) => customer.marketing_consent_at), [customers]);
   const whatsappEligible = eligible.filter((customer) => customer.phone);
   const [title, setTitle] = useState("Tenemos algo para ti");
   const [body, setBody] = useState("Hola {{nombre}}, vuelve pronto a " + businessName + " y sigue avanzando hacia tu próxima recompensa.");
+  const [recipient, setRecipient] = useState('');
   const [status, setStatus] = useState("");
   const [pending, startTransition] = useTransition();
 
@@ -54,11 +55,14 @@ export function PointsPromotionsPanel({ businessName, customers }: { businessNam
   }
 
   function sendWallet() {
+    if (!recipient) { setStatus('Selecciona un cliente o elige enviar a todos.'); return; }
+    if (recipient === 'all' && !window.confirm(`¿Enviar este aviso a hasta 100 clientes que aceptaron promociones? Revisa el mensaje antes de continuar.`)) return;
     setStatus("");
     startTransition(async () => {
-      const result = await sendPointsWalletPromotion({ title, body });
+      const result = await sendPointsWalletPromotion({ title, body, recipient });
       if (result.ok) {
-        setStatus(`Google Wallet aceptó el aviso para ${result.sent} tarjeta${result.sent === 1 ? "" : "s"}.${result.failed ? ` ${result.failed} tarjeta${result.failed === 1 ? "" : "s"} no se pudo${result.failed === 1 ? "" : "ieron"} actualizar.` : ""} La alerta aparece si el cliente tiene sus notificaciones activadas.`);
+        const apple = 'appleAccepted' in result ? result.appleAccepted : 0;
+        setStatus(`Google Wallet aceptó ${result.sent} aviso${result.sent === 1 ? '' : 's'}.${appleEnabled ? ` Apple Wallet aceptó ${apple} actualizaciones.` : ''} ${result.failed || ('appleFailed' in result && result.appleFailed) ? 'Algunas tarjetas no se pudieron actualizar. ' : ''}La alerta aparece si el cliente tiene las notificaciones activadas.`);
       } else {
         setStatus(result.error ?? "No pudimos enviar la notificación.");
       }
@@ -68,13 +72,14 @@ export function PointsPromotionsPanel({ businessName, customers }: { businessNam
   return <section className="pointsPromotions">
     <div className="pointsSectionHeading">
       <div><span>PROMOCIONES + WALLET</span><h2>Manda descuentos y haz que vuelvan</h2></div>
-      <p>Envía una notificación a las tarjetas guardadas en Google Wallet o abre WhatsApp con el mensaje listo. Solo aparecen clientes que aceptaron recibir promociones.</p>
+      <p>Envía promociones a las tarjetas guardadas en Google Wallet o abre WhatsApp con el mensaje listo. Solo aparecen clientes que aceptaron recibir promociones.</p>
     </div>
 
-    <div className="pointsPromotionStats">
+    <div className={`pointsPromotionStats${appleEnabled ? ' withApple' : ''}`}>
       <article><small>AUTORIZADOS</small><strong>{eligible.length}</strong><span>clientes con consentimiento</span></article>
       <article><small>WHATSAPP</small><strong>{whatsappEligible.length}</strong><span>con teléfono disponible</span></article>
       <article><small>GOOGLE WALLET</small><strong>Push</strong><span>para tarjetas guardadas y con notificaciones activas</span></article>
+      {appleEnabled && <article><small>APPLE WALLET</small><strong>Actualización</strong><span>para pases guardados y con notificaciones activas</span></article>}
     </div>
 
     <div className="pointsPromotionWorkspace">
@@ -96,12 +101,19 @@ export function PointsPromotionsPanel({ businessName, customers }: { businessNam
         <label>Mensaje
           <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={280} rows={5} />
         </label>
+        <label>¿A quién enviar?
+          <select value={recipient} onChange={(event) => setRecipient(event.target.value)}>
+            <option value="">Selecciona un destinatario</option>
+            {eligible.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} · prueba individual</option>)}
+            <option value="all">Todos los clientes autorizados (máximo 100 por envío)</option>
+          </select>
+        </label>
 
         <div className="pointsPromoActions">
-          <button type="button" className="nvPrimaryButton" onClick={sendWallet} disabled={pending || !eligible.length}>
-            {pending ? "Enviando…" : "Enviar notificación a Google Wallet"}
+          <button type="button" className="nvPrimaryButton" onClick={sendWallet} disabled={pending || !eligible.length || !recipient}>
+            {pending ? "Enviando…" : appleEnabled ? "Enviar aviso a las Wallet" : "Enviar aviso a Google Wallet"}
           </button>
-          <small>Google limita las notificaciones de Wallet para evitar spam. El cliente también debe tener la tarjeta guardada y sus notificaciones activas.</small>
+          <small>Google limita los avisos a tres por tarjeta al día. El cliente debe tenerla guardada y permitir notificaciones.{appleEnabled ? ' Apple actualiza el pase y controla cuándo muestra el aviso.' : ''}</small>
         </div>
         {status && <p className="pointsStatus">{status}</p>}
       </article>

@@ -4,6 +4,8 @@ import type { CSSProperties } from "react";
 import { getPublicLoyaltyCard, getPublicLoyaltyRewards } from "@/app/points/actions";
 import { CustomerPointsActions } from "./customer-points-actions";
 import { CardSaveActions } from "./card-save-actions";
+import { appleWalletReady } from '@/lib/apple-wallet';
+import { createPointsAdminClient } from '@/lib/supabase/points-admin';
 
 export const metadata = { robots: { index: false, follow: false } };
 
@@ -16,6 +18,13 @@ export default async function CardPage({ params }: CardPageProps) {
   try { [card, rewards] = await Promise.all([getPublicLoyaltyCard(token), getPublicLoyaltyRewards(token)]); } catch { notFound(); }
   if (!card) notFound();
 
+  const admin = createPointsAdminClient();
+  const { data: account } = await admin.from('loyalty_accounts').select('customer_id').eq('public_token', token).maybeSingle();
+  const { data: consent } = account ? await admin.from('customers').select('marketing_consent_at').eq('id', account.customer_id).maybeSingle() : { data: null };
+  const { data: latestPromotion } = consent?.marketing_consent_at
+    ? await admin.from('loyalty_wallet_messages').select('title,body').eq('pass_serial', token).maybeSingle()
+    : { data: null };
+
   const progress = Math.min(100, Math.round((Number(card.points_balance) / Number(card.reward_threshold)) * 100));
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
   const googleWalletReady = Boolean(
@@ -24,6 +33,7 @@ export default async function CardPage({ params }: CardPageProps) {
     process.env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_WALLET_PRIVATE_KEY
   );
+  const appleReady = appleWalletReady();
   return <main className="pointsCustomerShell nivalDashboard" style={{ "--nv-accent": card.business_brand_color || "#C8A65A" } as CSSProperties}>
     <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span></header>
     <section className="pointsCustomerCard">
@@ -36,16 +46,18 @@ export default async function CardPage({ params }: CardPageProps) {
       </div>
       {availableRewards.length > 0 && <div className="pointsAvailableNotice"><span>✓</span><div><strong>{availableRewards.length} {availableRewards.length === 1 ? "recompensa disponible" : "recompensas disponibles"}</strong><small>Ya puedes canjear {availableRewards.length === 1 ? "tu premio" : "tus premios"} en caja.</small></div></div>}
     </section>
+    {latestPromotion && <section className="pointsAvailableNotice" aria-label="Aviso del negocio"><span>✦</span><div><strong>{latestPromotion.title}</strong><small>{latestPromotion.body}</small></div></section>}
     <section className="pointsWalletSaveCard">
       <div>
         <span>TU TARJETA EN EL CELULAR</span>
-        <strong>{googleWalletReady ? "Google Wallet + avisos de promociones" : "Tenla siempre a la mano"}</strong>
+        <strong>Tu tarjeta, donde la necesites</strong>
         <p>{googleWalletReady
-          ? "Abre el enlace de Google Wallet para guardar esta tarjeta en tu cuenta. En Android también podrás verla en la app; en iPhone puedes seguir consultándola desde este enlace."
+          ? "Consulta tus puntos aquí o agrega la tarjeta a Google Wallet. En Android la verás en la app; los avisos requieren tu consentimiento y las notificaciones activadas."
           : "Google Wallet aún no está habilitado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta para volver a consultar tus puntos."}</p>
       </div>
       <div className="pointsWalletSaveActions">
         {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
+        {appleReady && <a href={`/api/wallet/apple/${encodeURIComponent(token)}`}>Agregar a Apple Wallet →</a>}
         {!googleWalletReady && <span className="pointsMuted">La opción de agregar a Google Wallet estará disponible cuando se complete su configuración.</span>}
         <CardSaveActions />
       </div>

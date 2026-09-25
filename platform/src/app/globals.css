@@ -4306,6 +4306,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 /* Nival Puntos · promotions + Wallet */
 .pointsPromotions{display:grid;gap:18px}
 .pointsPromotionStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pointsPromotionStats.withApple{grid-template-columns:repeat(4,minmax(0,1fr))}
 .pointsPromotionStats article{background:#fff;border:1px solid #e8e9ed;border-radius:18px;padding:22px;display:grid;gap:5px}
 .pointsPromotionStats small,.pointsPromoEyebrow,.pointsWalletExplainer>div>span{font-size:11px;letter-spacing:.14em;font-weight:800;color:#70788a}
 .pointsPromotionStats strong{font-size:30px;letter-spacing:-.04em}
@@ -4318,7 +4319,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .pointsPromoTemplates{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
 .pointsPromoTemplates button{border:1px solid #dfe2e8;background:#f8f9fb;border-radius:999px;padding:9px 12px;font-weight:700;cursor:pointer}
 .pointsPromotionComposer label{display:grid;gap:7px;margin-top:14px;font-size:13px;font-weight:700}
-.pointsPromotionComposer input,.pointsPromotionComposer textarea{width:100%;border:1px solid #dfe2e8;border-radius:12px;padding:12px 13px;font:inherit;background:#fff;color:inherit}
+.pointsPromotionComposer input,.pointsPromotionComposer textarea,.pointsPromotionComposer select{width:100%;border:1px solid #dfe2e8;border-radius:12px;padding:12px 13px;font:inherit;background:#fff;color:inherit}
 .pointsPromotionComposer textarea{resize:vertical}
 .pointsPromoActions{display:grid;gap:8px;margin-top:18px}
 .pointsPromoActions small{color:#777e8d;line-height:1.45}
@@ -4334,7 +4335,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .pointsWalletSaveCard{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:14px auto 18px;max-width:760px;padding:20px 22px;border-radius:18px;background:#fff;border:1px solid #e6e8ec;box-shadow:0 14px 35px rgba(0,0,0,.06)}
 .pointsWalletSaveCard>div{display:grid;gap:4px}.pointsWalletSaveCard span{font-size:10px;letter-spacing:.14em;font-weight:800;color:#65708a}.pointsWalletSaveCard strong{font-size:18px}.pointsWalletSaveCard p{margin:0;color:#6c7482;font-size:13px;line-height:1.45}
 .pointsWalletSaveCard a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#111318;color:#fff;border-radius:11px;padding:12px 15px;font-weight:800;white-space:nowrap}
-@media(max-width:900px){.pointsPromotionWorkspace,.pointsWalletExplainer{grid-template-columns:1fr}.pointsPromotionStats{grid-template-columns:1fr}}
+@media(max-width:900px){.pointsPromotionWorkspace,.pointsWalletExplainer{grid-template-columns:1fr}.pointsPromotionStats,.pointsPromotionStats.withApple{grid-template-columns:1fr}}
 @media(max-width:640px){.pointsPromotionComposer,.pointsPromotionRecipients{padding:20px}.pointsWalletSaveCard{align-items:flex-start;flex-direction:column}.pointsWalletSaveCard a{width:100%}}
 
 
