@@ -59,3 +59,8 @@
   .solutionHero p,.workspaceHero p,.missionFlow p,.growthGrid p,.solutionCards span{font-size:11px}
   .missionFlow article,.growthGrid article,.solutionCards a{padding:16px}
 }
+
+.questionGridFive{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:1100px){.questionGridFive{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.questionGridFive{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.questionGridFive{grid-template-columns:1fr}}
