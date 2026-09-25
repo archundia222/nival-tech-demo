@@ -122,7 +122,7 @@ export default async function NivalPointsPage({
 
   const title =
     view === 'customers' ? 'Clientes'
-      : view === 'promotions' ? 'Promociones'
+      : view === 'promotions' ? 'Promociones y notificaciones'
         : view === 'visits' ? 'Registrar visita'
           : view === 'redemptions' ? 'Canjear premio'
             : view === 'share' ? 'Compartir programa'
@@ -131,7 +131,7 @@ export default async function NivalPointsPage({
 
   const description =
     view === 'customers' ? 'Consulta el saldo, visitas y premios de las personas registradas en tu programa.'
-      : view === 'promotions' ? 'Vuelve a contactar únicamente a clientes que aceptaron recibir promociones.'
+      : view === 'promotions' ? 'Envía descuentos y promociones por Google Wallet o abre WhatsApp con el mensaje listo, únicamente para clientes que aceptaron recibirlos.'
         : view === 'visits' ? 'Escanea el código temporal del cliente y suma su visita en segundos.'
           : view === 'redemptions' ? 'Escanea el código de una recompensa y confirma cuando realmente la entregues.'
             : view === 'share' ? 'Pon el QR en caja, mesa, menú o NFC para que el cliente se registre solo.'
@@ -239,6 +239,7 @@ export default async function NivalPointsPage({
             <a href="/dashboard/points?view=share"><span>1 · REGISTRAR</span><strong>Comparte tu QR</strong><small>El cliente crea su tarjeta solo →</small></a>
             <a href="/dashboard/points?view=visits"><span>2 · ACUMULAR</span><strong>Registrar visita</strong><small>Escanea el código del cliente →</small></a>
             <a href="/dashboard/points?view=redemptions"><span>3 · PREMIAR</span><strong>Canjear recompensa</strong><small>Confirma cuando la entregues →</small></a>
+            {proAccess && <a href="/dashboard/points?view=promotions"><span>4 · RECUPERAR</span><strong>Enviar descuento o promoción</strong><small>Google Wallet o WhatsApp →</small></a>}
           </section>
 
           <section className="productBridge">
