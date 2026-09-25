@@ -637,7 +637,7 @@ async function attachPhysicalCardArtwork(businessId: string, form: FormData, det
 
 async function resolvePhysicalCardDestination(businessId: string, details: PhysicalCardInput) {
   const admin = createAdminClient();
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
+  const siteUrl = (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
   const { data: business } = await admin.from('businesses').select('slug').eq('id', businessId).maybeSingle();
   if (!business?.slug) redirect('/dashboard/pay/physical?error=No+pudimos+resolver+el+destino+de+la+tarjeta.');
 
