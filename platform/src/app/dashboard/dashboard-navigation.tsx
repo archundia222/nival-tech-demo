@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getActiveBusinessMembership, getBusinessChoices } from '@/lib/active-business';
 import { switchActiveBusiness } from './workspace-actions';
 
-type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-promociones' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'web-ia' | 'configuracion';
+type ActiveItem = 'resumen' | 'inteligencia' | 'inteligencia-clientes' | 'inteligencia-importar' | 'inteligencia-asistente' | 'inteligencia-oportunidades' | 'inteligencia-recurrentes' | 'inteligencia-riesgo' | 'inteligencia-inactivos' | 'inteligencia-campanas' | 'inteligencia-impacto' | 'puntos' | 'puntos-registro' | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-promociones' | 'puntos-compartir' | 'puntos-configuracion' | 'clientes' | 'nival-card' | 'nival-pay' | 'agregar-tarjetas' | 'compartir-paginas' | 'perfil-digital' | 'web-ia' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Páginas de cobro', href: '/dashboard/pay' },
@@ -25,8 +25,9 @@ const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: '
 
 const intelligenceItems: Array<{ id: ActiveItem; label: string; href: string; group: 'accion' | 'resultados' | 'herramientas' }> = [
   { id: 'inteligencia', label: 'Hoy', href: '/dashboard/intelligence', group: 'accion' },
-  { id: 'inteligencia-riesgo', label: 'Recuperar clientes', href: '/dashboard/intelligence?view=risk', group: 'accion' },
-  { id: 'inteligencia-recurrentes', label: 'Clientes frecuentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
+  { id: 'inteligencia-riesgo', label: 'En riesgo', href: '/dashboard/intelligence?view=risk', group: 'accion' },
+  { id: 'inteligencia-inactivos', label: 'Inactivos', href: '/dashboard/intelligence?view=inactive', group: 'accion' },
+  { id: 'inteligencia-recurrentes', label: 'Frecuentes', href: '/dashboard/intelligence?view=recurring', group: 'accion' },
   { id: 'inteligencia-campanas', label: 'Campañas', href: '/dashboard/intelligence?view=campaigns', group: 'accion' },
   { id: 'inteligencia-impacto', label: 'Resultados', href: '/dashboard/intelligence?view=impact', group: 'resultados' },
   { id: 'inteligencia-asistente', label: 'Pregúntale a Nival', href: '/dashboard/intelligence?view=assistant', group: 'herramientas' },
