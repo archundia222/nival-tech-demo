@@ -110,7 +110,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     supabase.from('smart_links').select('id, name, kind, target_url, public_token, click_count, active')
       .eq('business_id', membership.business_id).order('created_at', { ascending: false }),
     supabase.from('business_product_entitlements').select('status')
-      .eq('business_id', membership.business_id).eq('product_code', 'nival_points').eq('status', 'active').maybeSingle(),
+      .eq('business_id', membership.business_id).eq('product_code', 'nival_points').in('status', ['active','free']).maybeSingle(),
   ]);
   if (profileError) throw new Error('No se pudo cargar Nival Pay.');
   const profile = profiles?.find((item) => item.id === params.profile) ?? profiles?.[0] ?? null;
