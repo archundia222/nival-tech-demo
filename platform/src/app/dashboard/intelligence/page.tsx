@@ -30,16 +30,25 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
-  const { data: entitlements } = await supabase.from('business_product_entitlements').select('product_code,status,current_period_end').eq('business_id', membership.business_id);
+  const [{ data: entitlements }, { data: paidPointsSubscription }] = await Promise.all([
+    supabase.from('business_product_entitlements').select('product_code,status,current_period_end').eq('business_id', membership.business_id),
+    supabase.from('product_subscriptions').select('id')
+      .eq('business_id', membership.business_id)
+      .eq('product_code', 'nival_points')
+      .eq('status', 'authorized')
+      .limit(1)
+      .maybeSingle(),
+  ]);
   const entitlementMap = new Map((entitlements ?? []).map((item) => [item.product_code, item]));
   const pointsEntitlement = entitlementMap.get('nival_points');
   const intelligenceEntitlement = entitlementMap.get('nival_intelligence');
   const pointsStatus = pointsEntitlement?.status;
   const intelligenceStatus = intelligenceEntitlement?.status;
-  const growthCheckoutCents = pointsStatus === 'active'
+  const hasPaidPointsSubscription = Boolean(paidPointsSubscription);
+  const growthCheckoutCents = hasPaidPointsSubscription
     ? NIVAL_GROWTH_PRICE_CENTS - NIVAL_POINTS_FOUNDER_PRICE_CENTS
     : NIVAL_GROWTH_PRICE_CENTS;
-  const growthCheckoutLabel = pointsStatus === 'active'
+  const growthCheckoutLabel = hasPaidPointsSubscription
     ? `Subir a Growth · +${mxn(growthCheckoutCents)}/mes`
     : `Activar Growth · ${mxn(growthCheckoutCents)}/mes`;
   const hasPoints = pointsStatus === 'active' || pointsStatus === 'free' || business?.product_level === 'intelligence';
@@ -220,7 +229,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
     <PaymentStatusPoller active={params.subscription === 'return' && !paid} />
     <DashboardNavigation businessName={business?.name ?? 'Tu negocio'} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalIntelligenceDark' : ''}`}>
-      <header className="dashboardContentTopbar"><div><span>Nival Intelligence</span><b>Herramienta incluida en Nival Growth</b></div><span className="ready">{paid ? 'Growth activo' : trialActive ? `Prueba · ${trialDaysLeft}d` : freePlan ? 'Vista gratis' : 'Desde Puntos'}</span></header>
+      <header className="dashboardContentTopbar"><div><span>Nival Growth</span><b>Intelligence convierte tus datos en acciones</b></div><span className="ready">{paid ? 'Growth activo' : trialActive ? `Prueba · ${trialDaysLeft}d` : freePlan ? 'Vista gratis' : 'Desde Puntos'}</span></header>
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
       {params.saved === 'sale' && <p className="formMessage successMessage">Venta registrada. Growth ya puede usarla como dato observado del cliente.</p>}
       {params.saved === 'summary' && <p className="formMessage successMessage">Resumen diario guardado.</p>}
@@ -245,7 +254,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
         </section>
         <section className="productFeatureStrip darkFeatureStrip"><article><span>01</span><div><b>Puntos registra</b><p>El cliente se da de alta solo y cada visita queda guardada.</p></div></article><article><span>02</span><div><b>Intelligence entiende</b><p>Compara hábitos y detecta cambios sin pedirte capturas adicionales.</p></div></article><article><span>03</span><div><b>Tú actúas</b><p>Recibes audiencias, mensajes y acciones concretas para hacer que vuelvan.</p></div></article></section>
       </> : !available ? <>
-        <section className="productShowcase intelligenceShowcase"><div className="productShowcaseCopy"><span className="productPill">NIVAL INTELLIGENCE · DENTRO DE GROWTH</span><h1>Puntos registra.<br/>Intelligence decide.</h1><p>Nival analiza automáticamente a los clientes y visitas de tu programa de fidelización para convertirlos en una acción concreta: a quién contactar, qué decir y qué medir después.</p><ul className="productBenefits"><li>Detecta clientes frecuentes y personas que se están alejando</li><li>Propone campañas según el comportamiento de Nival Puntos</li><li>Mide quién regresó y aprende del resultado</li></ul><div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después queda una vista gratuita de oportunidades</span></div><div className="freemiumCtas"><form action={activateFreeNivalIntelligence}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Intelligence {NIVAL_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>{!subscriptionConfirming && <form action={startNivalGrowthSubscription}><CheckoutSubmitButton className="nvSecondaryButton" pendingLabel="Abriendo Mercado Pago…">{growthCheckoutLabel}</CheckoutSubmitButton></form>}</div><small>{pointsStatus === 'active' ? 'Ya pagas Puntos Pro: Growth solo agrega $250/mes, para un total de $449/mes.' : 'Growth cuesta $449/mes e incluye Puntos Pro + Intelligence.'}</small></div><div className="intelligenceVisual"><div className="aiGlow"/><div className="aiPanel"><div className="aiPanelTop"><b>NIVAL <em>INTELLIGENCE</em></b><span>HOY</span></div><div className="aiInsight"><small>HAZ ESTO PRIMERO</small><strong>Recupera a 8 clientes que antes regresaban seguido.</strong><p>Nival ya eligió la audiencia y preparó un mensaje de regreso.</p><button type="button">Abrir campaña →</button></div><div className="aiMiniGrid"><div><small>PUEDES CONTACTAR</small><b>6</b><i>ahora</i></div><div><small>OBJETIVO</small><b>Volver</b><i>30 días</i></div></div></div></div></section>
+        <section className="productShowcase intelligenceShowcase"><div className="productShowcaseCopy"><span className="productPill">NIVAL INTELLIGENCE · DENTRO DE GROWTH</span><h1>Puntos registra.<br/>Intelligence decide.</h1><p>Nival analiza automáticamente a los clientes y visitas de tu programa de fidelización para convertirlos en una acción concreta: a quién contactar, qué decir y qué medir después.</p><ul className="productBenefits"><li>Detecta clientes frecuentes y personas que se están alejando</li><li>Propone campañas según el comportamiento de Nival Puntos</li><li>Mide quién regresó y aprende del resultado</li></ul><div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después queda una vista gratuita de oportunidades</span></div><div className="freemiumCtas"><form action={activateFreeNivalIntelligence}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Intelligence {NIVAL_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>{!subscriptionConfirming && <form action={startNivalGrowthSubscription}><CheckoutSubmitButton className="nvSecondaryButton" pendingLabel="Abriendo Mercado Pago…">{growthCheckoutLabel}</CheckoutSubmitButton></form>}</div><small>{hasPaidPointsSubscription ? 'Ya pagas Puntos Pro: Growth solo agrega $250/mes, para un total de $449/mes.' : 'Growth cuesta $449/mes e incluye Puntos Pro + Intelligence.'}</small></div><div className="intelligenceVisual"><div className="aiGlow"/><div className="aiPanel"><div className="aiPanelTop"><b>NIVAL <em>INTELLIGENCE</em></b><span>HOY</span></div><div className="aiInsight"><small>HAZ ESTO PRIMERO</small><strong>Recupera a 8 clientes que antes regresaban seguido.</strong><p>Nival ya eligió la audiencia y preparó un mensaje de regreso.</p><button type="button">Abrir campaña →</button></div><div className="aiMiniGrid"><div><small>PUEDES CONTACTAR</small><b>6</b><i>ahora</i></div><div><small>OBJETIVO</small><b>Volver</b><i>30 días</i></div></div></div></div></section>
         <section className="productFeatureStrip darkFeatureStrip"><article><span>01</span><div><b>Detecta</b><p>Nival encuentra clientes que se están alejando, hábitos que cambiaron y oportunidades de segunda visita.</p></div></article><article><span>02</span><div><b>Actúa</b><p>Te dice con quién empezar y prepara una estrategia lista para ejecutar.</p></div></article><article><span>03</span><div><b>Aprende</b><p>Mide quién volvió después y usa el resultado para recomendar la siguiente acción.</p></div></article></section>
         <ProductInteractiveDemo mode="intelligence" />
       </> : baseFree ? <div className={styles.shell}>
