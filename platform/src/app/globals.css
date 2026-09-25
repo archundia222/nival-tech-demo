@@ -5139,3 +5139,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .checkoutConfirmingSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0}.checkoutConfirmingSteps span{padding:12px;border:1px solid #ddd0b0;border-radius:11px;background:rgba(255,255,255,.58);color:#4e493f;font-size:10px;font-weight:800}
 .checkoutSecondaryLink{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 15px;border:1px solid #c9b98e;border-radius:10px;color:#3e392f;font-size:11px;font-weight:850;text-decoration:none}
 @media(max-width:620px){.checkoutConfirming{margin:24px auto;padding:24px 18px}.checkoutConfirmingSteps{grid-template-columns:1fr}.checkoutSecondaryLink{width:100%}}
+
+.physicalPaymentWaiting{display:grid;gap:6px;margin:16px 0 22px;padding:18px 20px;border:1px solid rgba(200,166,90,.32);border-radius:14px;background:rgba(200,166,90,.06)}
+.physicalPaymentWaiting span{color:#d1b36e;font-size:8px;font-weight:900;letter-spacing:.12em}
+.physicalPaymentWaiting strong{font-size:15px}.physicalPaymentWaiting p{margin:0;color:#b9bbc1;font-size:10px;line-height:1.55}
