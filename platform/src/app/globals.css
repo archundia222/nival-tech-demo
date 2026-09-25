@@ -5152,3 +5152,17 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .cardTemplateChoiceGrid .templateUnavailable>strong{color:#c2c4c9}
 .cardTemplateChoiceGrid .templateUnavailable>small{color:#a9abb2;font-size:8px}
 .cardTemplateChoiceGrid .templateUnavailable .templateMock{filter:saturate(.55)}
+
+@media(max-width:850px){
+  .nivalDashboard .physicalCardSection input,
+  .nivalDashboard .physicalCardSection select,
+  .nivalDashboard .physicalCardSection textarea,
+  .nivalDashboard .nivalPayEditorShell input,
+  .nivalDashboard .nivalPayEditorShell select,
+  .nivalDashboard .nivalPayEditorShell textarea,
+  .nivalDashboard .settingsForm input,
+  .nivalDashboard .settingsForm select,
+  .nivalDashboard .settingsForm textarea{
+    font-size:16px;
+  }
+}
