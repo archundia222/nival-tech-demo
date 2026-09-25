@@ -5131,3 +5131,11 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nivalPayDeleteSection:hover{color:#ffd0cc;text-decoration:underline}
 .nivalPayDeleteSection:focus-visible{outline:3px solid #d8b868;outline-offset:3px;border-radius:6px}
 .nivalPaySaveStatus.isPending{border-color:rgba(216,184,104,.35);background:rgba(216,184,104,.08);color:#e1c57f}
+
+.checkoutConfirming{max-width:720px;margin:46px auto;padding:34px;border:1px solid #d8c89f;border-radius:22px;background:linear-gradient(145deg,#fffdf8,#f6efe0);color:#17181b;text-align:center;box-shadow:0 18px 48px rgba(27,24,18,.08)}
+.checkoutConfirmingMark{width:46px;height:46px;display:grid;place-items:center;margin:0 auto 14px;border-radius:50%;background:#17181b;color:#f0d797;font-size:20px;font-weight:900}
+.checkoutConfirming h1{margin:6px 0 10px;font-size:clamp(34px,6vw,52px);line-height:1;letter-spacing:-.04em}
+.checkoutConfirming>p:not(.checkoutKicker){max-width:600px;margin:0 auto;color:#5f5a50;font-size:14px;line-height:1.65}
+.checkoutConfirmingSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0}.checkoutConfirmingSteps span{padding:12px;border:1px solid #ddd0b0;border-radius:11px;background:rgba(255,255,255,.58);color:#4e493f;font-size:10px;font-weight:800}
+.checkoutSecondaryLink{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 15px;border:1px solid #c9b98e;border-radius:10px;color:#3e392f;font-size:11px;font-weight:850;text-decoration:none}
+@media(max-width:620px){.checkoutConfirming{margin:24px auto;padding:24px 18px}.checkoutConfirmingSteps{grid-template-columns:1fr}.checkoutSecondaryLink{width:100%}}
