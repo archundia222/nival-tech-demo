@@ -105,21 +105,19 @@ export default async function NivalPointsPage({
   const redeemedRewards = (rewardRows ?? []).filter((reward) => reward.redeemed_at).length;
   const qrNfcRegistrations = (customerRows ?? []).filter((customer) => customer.origin === 'qr' || customer.origin === 'nfc').length;
 
-  const customerActivity = new Map(
-    (customerRows ?? []).map((customer) => {
-      const visits = (visitRows ?? []).filter((visit) => visit.customer_id === customer.id);
-      const rewards = (rewardRows ?? []).filter((reward) => reward.customer_id === customer.id);
-      return [
-        customer.id,
-        {
-          visits: visits.length,
-          lastVisit: visits[0]?.visited_at ?? null,
-          availableRewards: rewards.filter((reward) => !reward.redeemed_at).length,
-          redeemedRewards: rewards.filter((reward) => reward.redeemed_at).length,
-        },
-      ];
-    }),
-  );
+  const customerActivity = new Map<string, { visits: number; lastVisit: string | null; availableRewards: number; redeemedRewards: number }>();
+  for (const visit of visitRows ?? []) {
+    const current = customerActivity.get(visit.customer_id) ?? { visits: 0, lastVisit: null, availableRewards: 0, redeemedRewards: 0 };
+    current.visits += 1;
+    if (!current.lastVisit) current.lastVisit = visit.visited_at;
+    customerActivity.set(visit.customer_id, current);
+  }
+  for (const reward of rewardRows ?? []) {
+    const current = customerActivity.get(reward.customer_id) ?? { visits: 0, lastVisit: null, availableRewards: 0, redeemedRewards: 0 };
+    if (reward.redeemed_at) current.redeemedRewards += 1;
+    else current.availableRewards += 1;
+    customerActivity.set(reward.customer_id, current);
+  }
 
   const title =
     view === 'customers' ? 'Clientes'
