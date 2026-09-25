@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export function PaymentStatusPoller({
   active,
   intervalMs = 2000,
-  attempts = 8,
+  attempts = 18,
 }: {
   active: boolean;
   intervalMs?: number;
@@ -17,6 +17,7 @@ export function PaymentStatusPoller({
   useEffect(() => {
     if (!active) return;
     let count = 0;
+    router.refresh();
     const timer = window.setInterval(() => {
       count += 1;
       router.refresh();
