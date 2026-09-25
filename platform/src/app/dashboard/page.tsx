@@ -139,8 +139,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: paymentProfiles } = businessId
     ? await supabase
         .from("payment_profiles")
-        .select("account_holder, bank_name, clabe, public_token, active, view_count")
+        .select("account_holder, bank_name, clabe, public_token, active, view_count, created_at")
         .eq("business_id", businessId)
+        .order("active", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
