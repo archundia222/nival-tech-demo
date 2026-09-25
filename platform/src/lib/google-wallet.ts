@@ -68,9 +68,9 @@ export function createGoogleWalletJwt(card: LoyaltyCard, origin: string) {
           textModulesData: [
             { id: "visits", header: "Visitas", body: String(card.visits) },
             { id: "business", header: "Negocio", body: card.businessName },
-            { id: "instructions", header: "Para sumar puntos y ver premios", body: "Abre tu tarjeta en la página web y muestra el código temporal en caja." },
+            { id: "instructions", header: "Cómo usar tu tarjeta", body: "Muestra este QR en caja para registrar visitas. Para usar un premio cuando quieras, abre Mis recompensas en tu tarjeta y toca Canjear." },
           ],
-          linksModuleData: { uris: [{ id: "card", uri: `${origin}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta, sumar puntos y ver premios" }] },
+          linksModuleData: { uris: [{ id: "card", uri: `${origin}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta y ver premios" }] },
         },
       ],
     },
@@ -125,9 +125,9 @@ export async function syncGoogleWalletObject(card: LoyaltyCard) {
         textModulesData: [
           { id: "visits", header: "Visitas", body: String(card.visits) },
           { id: "business", header: "Negocio", body: card.businessName },
-          { id: "instructions", header: "Para sumar puntos y ver premios", body: "Abre tu tarjeta en la página web y muestra el código temporal en caja." },
+          { id: "instructions", header: "Cómo usar tu tarjeta", body: "Muestra este QR en caja para registrar visitas. Para usar un premio cuando quieras, abre Mis recompensas en tu tarjeta y toca Canjear." },
         ],
-        linksModuleData: { uris: [{ id: "card", uri: `${(process.env.NIVAL_PUBLIC_ORIGIN || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta, sumar puntos y ver premios" }] },
+        linksModuleData: { uris: [{ id: "card", uri: `${(process.env.NIVAL_PUBLIC_ORIGIN || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta y ver premios" }] },
       }),
       cache: "no-store",
     },
