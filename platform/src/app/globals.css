@@ -5107,3 +5107,22 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .nivalDashboard .pointsScannedCustomer h3{font-size:30px}
   .nivalDashboard .pointsCamera{aspect-ratio:3/4}
 }
+
+/* 2026-09-25 mobile dashboard navigation hardening */
+@media(max-width:850px){
+  .professionalMobileMenu{position:sticky;top:0;z-index:80}
+  .professionalMobileMenu[open]{max-height:100dvh;overflow:auto;overscroll-behavior:contain}
+  .professionalMobileMenu>summary{position:sticky;top:0;z-index:2;background:#090a0c;border-bottom:1px solid #25272b}
+  .professionalMobileMenu nav{padding-bottom:max(22px,env(safe-area-inset-bottom))}
+  .professionalMobileMenu nav>a,.professionalMobileMenu .mobileSubmenu a,.professionalMobileMenu .mobileSignOut button{min-height:46px;display:flex;align-items:center}
+  .professionalMobileMenu .mobileSubmenu a{padding-left:22px;color:#b2b5bb}
+  .professionalMobileMenu .mobileSubmenu a[aria-current='page']{color:#fff;background:#1b1c20;box-shadow:inset 3px 0 0 #b99750}
+  .professionalMobileMenu .mobileSignOut{position:sticky;bottom:0;padding-top:8px;background:linear-gradient(180deg,rgba(9,10,12,0),#090a0c 28%)}
+  .professionalMobileMenu .mobileSignOut button{width:100%;justify-content:flex-start;padding:0 14px;border:1px solid #303238;border-radius:9px;background:#131418;color:#d7d9dd;font-weight:750}
+}
+@media(max-width:520px){
+  .dashboardContent{padding-left:12px;padding-right:12px}
+  .dashboardContentTopbar{gap:10px}
+  .dashboardContentTopbar b{font-size:12px}
+  .dashboardContentTopbar .ready{font-size:10px}
+}
