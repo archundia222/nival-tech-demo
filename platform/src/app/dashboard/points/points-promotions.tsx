@@ -12,6 +12,11 @@ type Customer = {
 
 const templates = [
   {
+    label: "10% de descuento",
+    title: "10% de descuento para ti",
+    body: "Hola {{nombre}}, tienes 10% de descuento en tu próxima visita. Muéstranos este mensaje antes de pagar. Aplican condiciones del negocio.",
+  },
+  {
     label: "Regresa esta semana",
     title: "Tenemos algo para ti",
     body: "Hola {{nombre}}, vuelve esta semana y sigue avanzando hacia tu próxima recompensa. Te esperamos.",
@@ -62,8 +67,8 @@ export function PointsPromotionsPanel({ businessName, customers }: { businessNam
 
   return <section className="pointsPromotions">
     <div className="pointsSectionHeading">
-      <div><span>PROMOCIONES</span><h2>Haz que vuelvan sin empezar de cero</h2></div>
-      <p>Solo aparecen clientes que aceptaron recibir promociones. Nival no habilita envíos a quien no dio consentimiento.</p>
+      <div><span>PROMOCIONES + WALLET</span><h2>Manda descuentos y haz que vuelvan</h2></div>
+      <p>Envía una notificación a las tarjetas guardadas en Google Wallet o abre WhatsApp con el mensaje listo. Solo aparecen clientes que aceptaron recibir promociones.</p>
     </div>
 
     <div className="pointsPromotionStats">
