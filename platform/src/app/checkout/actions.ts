@@ -274,6 +274,16 @@ export async function startAdditionalNivalPayCheckout() {
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
+  const { data: existing } = await admin.from('product_orders').select('id,created_at')
+    .eq('business_id', businessId)
+    .eq('product_code', NIVAL_PAY_PRODUCT)
+    .eq('payment_method', 'cash')
+    .eq('status', 'pending_cash_confirmation')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (existing) redirect('/checkout?result=cash');
+
   const { error } = await admin.from('product_orders').insert({
     business_id: businessId,
     product_code: NIVAL_PAY_PRODUCT,
@@ -748,9 +758,27 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
   const details = await attachPhysicalCardArtwork(businessId, form, targetedDetails);
   const admin = createAdminClient();
   const customBack = details.back_style === 'custom';
+  const productCode = customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT;
+  const amountCents = customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS;
+
+  const { data: existing } = await admin.from('product_orders').select('id,created_at')
+    .eq('business_id', businessId)
+    .eq('product_code', productCode)
+    .eq('payment_method', 'cash')
+    .eq('status', 'pending_cash_confirmation')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (existing) {
+    const ageMs = Date.now() - new Date(existing.created_at).getTime();
+    if (Number.isFinite(ageMs) && ageMs < 15 * 60 * 1000) redirect('/dashboard/pay/physical?result=cash');
+  }
+
   const { data: order, error } = await admin.from('product_orders').insert({
-    business_id: businessId, product_code: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
-    amount_cents: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, payment_method: 'cash',
+    business_id: businessId,
+    product_code: productCode,
+    amount_cents: amountCents,
+    payment_method: 'cash',
     status: 'pending_cash_confirmation',
   }).select('id').single();
   if (error || !order) redirect('/dashboard/pay/physical?error=No+se+pudo+registrar+el+pedido.');
