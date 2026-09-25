@@ -41,7 +41,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     : "resumen";
   const sectionTitles: Record<DashboardSection, string> = {
     resumen: "Resumen general",
-    inteligencia: "Nival Intelligence",
+    inteligencia: "Nival Growth",
     clientes: "Clientes",
     "nival-card": "Enlaces y reseñas",
     "perfil-digital": "Página del negocio",
@@ -220,8 +220,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             : Number(visitCount ?? 0) === 0
               ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita agrega señal real al programa. Con el tiempo, Growth podrá detectar recurrencia y clientes que se están alejando.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
               : hasIntelligence
-                ? { eyebrow: "NIVAL GROWTH YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Intelligence" }
-                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Prueba Intelligence sobre tu actividad de Puntos y, si te sirve, Nival Growth reúne ambos productos en un solo plan.", href: "/dashboard/intelligence", cta: "Probar Intelligence" };
+                ? { eyebrow: "NIVAL GROWTH YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Growth" }
+                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Prueba Intelligence sobre tu actividad de Puntos y, si te sirve, Nival Growth reúne ambos productos en un solo plan.", href: "/dashboard/intelligence", cta: "Probar Growth" };
 
   return (
     <main className="dashboardApp">
@@ -259,7 +259,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : hasPoints ? "DESDE PUNTOS" : "REQUIERE PUNTOS"}</b></div>
           <h2>Nival Growth</h2>
           <p>Combina Puntos + Intelligence para decirte a quién recuperar, qué campaña probar y qué funcionó.</p>
-          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Probar Intelligence →"}</a>
+          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Nival Growth →"}</a>
         </article>
       </section>
       <section className="nivalSignals">
@@ -411,7 +411,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
               </div>)}
               {pendingInvitations?.map((invitation) => <div className="teamMember" key={invitation.id}>
                 <div><strong>{invitation.email}</strong><span>Invitación pendiente · vence {new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(new Date(invitation.expires_at))}</span></div>
-                <InvitationLink url={`https://nival-tech-platform.vercel.app/invite/${invitation.token}`} />
+                <InvitationLink url={`${publicOrigin}/invite/${invitation.token}`} />
               </div>)}
             </div>
           </div>
