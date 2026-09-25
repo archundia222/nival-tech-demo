@@ -19,7 +19,7 @@ const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: '
   { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
   { id: 'puntos-canjes', label: 'Canjear premio', href: '/dashboard/points?view=redemptions', group: 'operacion' },
   { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
-  { id: 'puntos-promociones', label: 'Promociones', href: '/dashboard/points?view=promotions', group: 'clientes' },
+  { id: 'puntos-promociones', label: 'Promociones y notificaciones', href: '/dashboard/points?view=promotions', group: 'clientes' },
   { id: 'puntos-compartir', label: 'Compartir programa', href: '/dashboard/points?view=share', group: 'gestion' },
   { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings', group: 'gestion' },
 ];
