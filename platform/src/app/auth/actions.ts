@@ -23,24 +23,49 @@ export async function signIn(formData: FormData) {
   const email = value(formData, "email");
   const password = value(formData, "password");
 
-  // The demo account is intentionally synthetic. Repair its password through
-  // Supabase Auth Admin before signing in so direct database seeding can never
-  // leave the demo credentials out of sync with GoTrue.
+  // Demo access is synthetic. Authenticate it with the server-side Supabase
+  // client after repairing the Auth user, then persist that verified session
+  // into the normal cookie-backed client. This avoids depending on a stale
+  // seeded password hash or a mismatched browser-side credential state.
   if (email.toLowerCase() === "demo@nivaltech.dev" && password === "NivalDemo!26-R7xQ") {
     const admin = createAdminClient();
-    const { data: usersData } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const { data: usersData, error: listError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const demoUser = usersData?.users.find((candidate) => candidate.email?.toLowerCase() === "demo@nivaltech.dev");
-    if (demoUser) {
-      const { error: repairError } = await admin.auth.admin.updateUserById(demoUser.id, {
-        password,
-        email_confirm: true,
-        user_metadata: { ...(demoUser.user_metadata ?? {}), full_name: "Nival Demo" },
-        app_metadata: { ...(demoUser.app_metadata ?? {}), account_type: "demo" },
-      });
-      if (repairError) {
-        console.error("[auth] Demo account repair failed", { code: repairError.code ?? null });
-      }
+
+    if (listError || !demoUser) {
+      console.error("[auth] Demo account lookup failed", { code: listError?.code ?? null });
+      redirect(`/auth?error=${encodeURIComponent("La cuenta demo no está disponible todavía. Intenta de nuevo en un momento.")}&next=${encodeURIComponent(next)}`);
     }
+
+    const { error: repairError } = await admin.auth.admin.updateUserById(demoUser.id, {
+      password,
+      email_confirm: true,
+      user_metadata: { ...(demoUser.user_metadata ?? {}), full_name: "Nival Demo" },
+      app_metadata: { ...(demoUser.app_metadata ?? {}), account_type: "demo" },
+    });
+
+    if (repairError) {
+      console.error("[auth] Demo account repair failed", { code: repairError.code ?? null });
+      redirect(`/auth?error=${encodeURIComponent("No pudimos preparar la cuenta demo. Intenta de nuevo en un momento.")}&next=${encodeURIComponent(next)}`);
+    }
+
+    const { data: demoSession, error: demoSignInError } = await admin.auth.signInWithPassword({ email, password });
+    if (demoSignInError || !demoSession.session) {
+      console.error("[auth] Demo sign-in verification failed", { code: demoSignInError?.code ?? null });
+      redirect(`/auth?error=${encodeURIComponent("No pudimos iniciar la cuenta demo. Intenta de nuevo en un momento.")}&next=${encodeURIComponent(next)}`);
+    }
+
+    const supabase = await createClient();
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: demoSession.session.access_token,
+      refresh_token: demoSession.session.refresh_token,
+    });
+    if (sessionError) {
+      console.error("[auth] Demo session persistence failed", { code: sessionError.code ?? null });
+      redirect(`/auth?error=${encodeURIComponent("No pudimos abrir la sesión demo. Intenta de nuevo en un momento.")}&next=${encodeURIComponent(next)}`);
+    }
+
+    redirect(next);
   }
 
   const supabase = await createClient();
