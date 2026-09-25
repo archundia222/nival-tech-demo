@@ -674,7 +674,7 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
 .landingHeroCopy, .landingProductVisual { position: relative; z-index: 1; }
 .landingKicker { display: flex; align-items: center; gap: 9px; margin: 0 0 22px; color: var(--landing-accent); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
 .landingKicker span { width: 8px; height: 8px; background: var(--landing-accent); border-radius: 50%; box-shadow: 0 0 18px rgba(181,154,97,.8); }
-.landingHero h1 { max-width: 680px; margin: 0; font-size: clamp(58px, 7.25vw, 98px); line-height: .92; letter-spacing: -.072em; }
+.landingHero h1 { max-width: 720px; margin: 0; font-size: clamp(48px, 6vw, 82px); line-height: .94; letter-spacing: -.058em; }
 .landingHeroLead { max-width: 640px; margin: 30px 0 0; color: var(--landing-muted); font-size: clamp(18px, 2vw, 22px); line-height: 1.55; }
 .landingHeroActions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 36px; }
 .landingPrimary { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding: 14px 22px; color: #0b0b0b; background: var(--landing-accent); border: 1px solid var(--landing-accent); border-radius: 999px; font-size: 15px; font-weight: 800; transition: transform .2s ease, box-shadow .2s ease; }
@@ -831,9 +831,9 @@ h1 { margin: 0; max-width: 850px; font-size: clamp(52px, 8vw, 92px); line-height
   .landingNav, .landingHero, .landingProof, .landingSection, .landingDemoSection, .landingFaq, .intelligenceTeaser, .landingFooter { width: min(100% - 28px, 1180px); }
   .landingNav { min-height: 76px; }
   .landingBrand span { font-size: 15px; }
-  .landingHero { min-height: auto; padding: 58px 0 76px; }
-  .landingHero h1 { font-size: clamp(52px, 16vw, 76px); }
-  .landingHeroLead { font-size: 18px; }
+  .landingHero { min-height: auto; padding: 44px 0 64px; }
+  .landingHero h1 { max-width: 100%; font-size: clamp(42px, 11.5vw, 54px); line-height: .96; letter-spacing: -.05em; }
+  .landingHeroLead { margin-top: 22px; font-size: 16px; line-height: 1.48; }
   .landingHeroActions { align-items: stretch; flex-direction: column; }
   .landingPrimary, .landingSecondary { width: 100%; }
   .landingPriceLine { align-items: start; flex-direction: column; }
@@ -4361,7 +4361,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 @media(max-width:760px){
   .landingNavCtas .landingTalk{display:none}
   .landingHeroActions .landingTextCta{width:100%;justify-content:center}
-  .landingMobileContact{position:fixed;z-index:90;left:16px;right:16px;bottom:max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;padding:14px 18px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(18,18,19,.94);box-shadow:0 16px 45px rgba(0,0,0,.32);backdrop-filter:blur(16px);color:#fff;font-size:13px;font-weight:900}
+  .landingMobileContact{position:fixed;z-index:90;left:auto;right:14px;bottom:max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;max-width:230px;padding:12px 15px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(18,18,19,.94);box-shadow:0 12px 34px rgba(0,0,0,.28);backdrop-filter:blur(16px);color:#fff;font-size:12px;font-weight:900}
   .landingFooter{padding-bottom:92px}
 }
 @media(max-width:520px){
@@ -4521,4 +4521,14 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 }
 .professionalNav details[open] > .sidebarMainProduct{
   margin-bottom:2px;
+}
+
+
+/* Landing mobile polish: keep the story premium without making it feel endless. */
+@media (max-width: 760px) {
+  .landingSalesAssurance { margin-top: 8px; margin-bottom: 10px; }
+  .nivalEcosystem, .landingCustomService, .landingBusinessPlans, .landingTrust { padding-top: 64px; padding-bottom: 64px; }
+  .landingDemoSection, .landingFaq { padding-top: 70px; padding-bottom: 70px; }
+  .landingPointsShowcase { margin-top: 62px; margin-bottom: 62px; }
+  .landingFinalCta { padding-top: 72px; padding-bottom: 96px; }
 }
