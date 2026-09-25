@@ -260,7 +260,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </div>
       </section>
 
-      <section className="landingFinalCta scrollReveal">
+      <section className="landingFinalCta scrollReveal" id="empieza-gratis">
         <p className="landingEyebrow">EMPIEZA POR UN PROBLEMA</p>
         <h2>No necesitas comprar todo.<br />Empieza por lo que tu negocio necesita hoy.</h2>
         <p>Pay si quieres cobrar más fácil. Puntos si quieres que regresen. Growth cuando Puntos ya esté generando actividad que puedas convertir en decisiones y campañas.</p>
