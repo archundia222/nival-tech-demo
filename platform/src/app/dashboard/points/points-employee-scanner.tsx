@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { awardPoint, claimScanToken, redeemPointReward } from "@/app/points/actions";
+import { awardPoint, claimScanToken, claimWalletCard, redeemPointReward } from "@/app/points/actions";
 
 type ScanCustomer = {
   scan_session_id: string;
@@ -18,7 +18,7 @@ type BarcodeDetectorLike = {
   detect(source: HTMLVideoElement): Promise<Array<{ rawValue: string }>>;
 };
 
-export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "redeem" }) {
+export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", initialWalletToken = "" }: { mode?: "visit" | "redeem"; initialScanToken?: string; initialWalletToken?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [manual, setManual] = useState("");
@@ -31,12 +31,36 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
   const claimingRef = useRef(false);
 
   const claim = useCallback(async (value: string) => {
-    const cleaned = value.trim().replace(/^nivalpoints:/, "");
+    let cleaned = value.trim();
+    if (!cleaned || claimingRef.current) return;
+
+    let walletToken = "";
+    try {
+      const parsed = new URL(cleaned);
+      const walletMatch = parsed.pathname.match(/^\/card\/([0-9a-f-]{36})/i);
+      if (walletMatch?.[1]) walletToken = walletMatch[1];
+      const urlScan = parsed.searchParams.get("scan");
+      if (urlScan) cleaned = urlScan;
+    } catch {
+      const walletMatch = cleaned.match(/^wallet:([0-9a-f-]{36})$/i);
+      if (walletMatch?.[1]) walletToken = walletMatch[1];
+    }
+
+    if (walletToken && mode !== "visit") {
+      setCustomer(null);
+      setMessage("El QR de Google Wallet sirve para registrar visitas. Para canjear, usa el código temporal de la recompensa.");
+      return;
+    }
+
+    cleaned = cleaned.replace(/^nivalpoints:/, "");
     const raw = cleaned.replace(/^(visit|redeem):/, "");
-    if (!raw || claimingRef.current) return;
+    if (!walletToken && !raw) return;
+
     claimingRef.current = true;
     try {
-      const result = await claimScanToken(raw, mode);
+      const result = walletToken
+        ? await claimWalletCard(walletToken)
+        : await claimScanToken(raw, mode);
       if (!result.ok || !result.customer) {
         setCustomer(null); setMessage(result.error ?? "QR expirado."); return;
       }
@@ -50,6 +74,14 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
   }, [mode]);
 
   useEffect(() => {
+    if (initialWalletToken && mode === "visit") {
+      void claim(`wallet:${initialWalletToken}`);
+      return;
+    }
+    if (initialScanToken) void claim(initialScanToken);
+  }, [claim, initialScanToken, initialWalletToken, mode]);
+
+  useEffect(() => {
     if (!cameraOn) return;
     let stream: MediaStream | null = null;
     let timer = 0;
@@ -61,7 +93,7 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
         const Detector = (window as unknown as { BarcodeDetector?: new (options: { formats: string[] }) => BarcodeDetectorLike }).BarcodeDetector;
-        if (!Detector) { setMessage("Tu navegador no permite escaneo automático. Pega el código manualmente."); return; }
+        if (!Detector) { setMessage("Este navegador no permite leer QR dentro de la página. Usa la cámara normal del teléfono: al escanear el QR, Nival abrirá esta pantalla y cargará al cliente automáticamente."); setCameraOn(false); return; }
         const detector = new Detector({ formats: ["qr_code"] });
         timer = window.setInterval(async () => {
           if (!videoRef.current) return;
@@ -102,7 +134,7 @@ export function PointsEmployeeScanner({ mode = "visit" }: { mode?: "visit" | "re
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>
       {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><span>Centra el QR dentro del recuadro</span></div>}
-      <div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal" aria-label="Código temporal" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
+      <div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
     </>}
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
