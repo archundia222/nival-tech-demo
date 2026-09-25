@@ -466,7 +466,8 @@ export async function importCustomersCsv(formData: FormData) {
       customer_id: customer.id,
     }));
     if (accountRows.length) {
-      const { error: accountError } = await supabase.from("loyalty_accounts").insert(accountRows);
+      const pointsAdmin = createPointsAdminClient();
+      const { error: accountError } = await pointsAdmin.from("loyalty_accounts").insert(accountRows);
       if (accountError) console.error("[customer-import] Could not attach some imported customers to Puntos", accountError.code);
       else pointsAttached = accountRows.length;
     }
