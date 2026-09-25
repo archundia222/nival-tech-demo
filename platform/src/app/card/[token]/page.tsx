@@ -75,7 +75,7 @@ export default async function CardPage({ params }: CardPageProps) {
       </div>
     </section>
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
-    <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. En caja puedes mostrar tu tarjeta de Google Wallet para registrar visitas y usar premios; el QR temporal queda como respaldo.</p>
+    <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. Para registrar visitas, muestra tu tarjeta de Google Wallet. Si quieres canjear un premio sin registrar una visita nueva, abre Mis recompensas, toca el premio y muestra su QR en caja.</p>
     {card.business_slug && <Link className="publicBusinessHub" href={`/p/${card.business_slug}`}><span><small>MÁS DE {card.business_name.toUpperCase()}</small><strong>Pagar, contactar o ver otros accesos del negocio</strong></span><b>→</b></Link>}
     <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Nival Puntos te ayuda a registrar visitas y premiar la recurrencia con una tarjeta digital sencilla.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
   </main>;
