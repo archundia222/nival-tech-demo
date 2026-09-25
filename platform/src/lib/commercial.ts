@@ -1,4 +1,4 @@
-export const NIVAL_TRIAL_DAYS = 14;
+export const NIVAL_TRIAL_DAYS = 7;
 export const NIVAL_POINTS_FREE_CUSTOMER_LIMIT = 30;
 
 // Launch/founder pricing charged during the current validation phase.
