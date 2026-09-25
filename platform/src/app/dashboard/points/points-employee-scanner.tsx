@@ -227,7 +227,12 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>
       {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><canvas ref={canvasRef} hidden aria-hidden="true" /><span>Centra el QR de Google Wallet o el QR temporal dentro del recuadro</span></div>}
-      <p className="pointsDataSourceNote">El QR de Google Wallet es permanente y sirve tanto para registrar visitas como para canjear premios. Los códigos temporales de la página siguen disponibles como respaldo.</p><div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
+      <p className="pointsDataSourceNote">Escanea la tarjeta de Google Wallet para visitas. Si el cliente abrió una recompensa, Nival reconocerá automáticamente su QR de canje.</p>
+      <details className="pointsScanFallback">
+        <summary>¿La cámara no lee el código?</summary>
+        <p>Pega el código o enlace como respaldo. No necesitas cambiar de pantalla entre visita y canje.</p>
+        <div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código o enlace de Nival" aria-label="Código o enlace de Nival" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
+      </details>
     </>}
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
