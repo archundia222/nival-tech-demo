@@ -28,7 +28,7 @@ export default async function NivalPointsPage({
 
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
-  if (params.subscription === 'return') await reconcileLatestSubscription(membership.business_id);
+  await reconcileLatestSubscription(membership.business_id);
 
   const { data: business } = await supabase
     .from('businesses')
