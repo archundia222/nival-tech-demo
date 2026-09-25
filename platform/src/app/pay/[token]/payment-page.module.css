@@ -36,3 +36,7 @@
 .loyaltyAction{background:linear-gradient(135deg,#fffaf0,#faf7f0);border-color:rgba(184,154,90,.28)}
 .loyaltyAction .serviceIcon{color:#8d6e31;background:#efe1bd}
 @media(max-width:470px){.cardExtras{margin-top:18px;padding-top:16px}.extrasHeading{align-items:start;flex-direction:column;gap:2px}.serviceAction{padding:12px}.serviceCopy em{font-size:.66rem}}
+
+.customSectionLink{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:64px;padding:14px 16px;border:1px solid rgba(25,25,25,.11);border-radius:14px;background:#fff;color:#171717;text-decoration:none;box-shadow:0 8px 24px rgba(40,34,24,.04)}
+.customSectionLink span{display:grid;gap:4px;min-width:0}.customSectionLink small{color:#7b756c;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}.customSectionLink strong{overflow:hidden;text-overflow:ellipsis;color:#171717;font-size:14px;white-space:nowrap}.customSectionLink>b{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#171717;color:#f4d98f;font-size:14px}.customSectionLink:hover{border-color:rgba(184,154,90,.5);transform:translateY(-1px)}.customSectionLink:focus-visible{outline:3px solid #b89a5a;outline-offset:3px}
+@media(max-width:520px){.customSectionLink{min-height:60px;padding:13px 14px}.customSectionLink strong{font-size:13px}}
