@@ -64,3 +64,8 @@
 @media(max-width:1100px){.questionGridFive{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.questionGridFive{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.questionGridFive{grid-template-columns:1fr}}
+
+.saleCapture{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,auto);gap:22px;align-items:end;padding:20px;border:1px solid rgba(200,166,90,.3);border-radius:16px;background:linear-gradient(135deg,rgba(200,166,90,.06),#111114)}
+.saleCapture>div{max-width:620px}.saleCapture b{display:block;margin:6px 0 0;font-size:15px}.saleCapture p{margin:6px 0 0;color:#a6a6af;font-size:9px;line-height:1.55}.saleCapture form{display:grid;grid-template-columns:minmax(160px,1.5fr) minmax(110px,.8fr) minmax(120px,.8fr) auto;gap:8px;align-items:end}.saleCapture label{display:grid;gap:5px;color:#b7b7bf;font-size:8px;font-weight:800}.saleCapture input,.saleCapture select{min-height:42px;width:100%;padding:9px 10px;border:1px solid #3a3a42;border-radius:9px;background:#18181c;color:#f5f5f7;font:inherit;font-size:10px}.saleCapture button{min-height:42px;padding:0 14px;border:0;border-radius:9px;background:#c8a65a;color:#151515;font-size:9px;font-weight:900;cursor:pointer}.saleCapture input:focus-visible,.saleCapture select:focus-visible,.saleCapture button:focus-visible{outline:3px solid #d8b868;outline-offset:3px}
+@media(max-width:980px){.saleCapture{grid-template-columns:1fr}.saleCapture form{grid-template-columns:1fr 1fr}.saleCapture button{grid-column:1/-1}}
+@media(max-width:560px){.saleCapture form{grid-template-columns:1fr}}
