@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { CSSProperties } from "react";
 import { getPublicLoyaltyCard, getPublicLoyaltyRewards } from "@/app/points/actions";
 import { CustomerPointsActions } from "./customer-points-actions";
 import { CardSaveActions } from "./card-save-actions";
 import { appleWalletReady } from '@/lib/apple-wallet';
 import { createPointsAdminClient } from '@/lib/supabase/points-admin';
+import { createClient } from '@/lib/supabase/server';
+import { getActiveBusinessMembership } from '@/lib/active-business';
 
 export const metadata = { robots: { index: false, follow: false } };
 
@@ -19,7 +21,17 @@ export default async function CardPage({ params }: CardPageProps) {
   if (!card) notFound();
 
   const admin = createPointsAdminClient();
-  const { data: account } = await admin.from('loyalty_accounts').select('customer_id').eq('public_token', token).maybeSingle();
+  const { data: account } = await admin.from('loyalty_accounts').select('customer_id,business_id').eq('public_token', token).maybeSingle();
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user && account?.business_id) {
+    const membership = await getActiveBusinessMembership(user.id);
+    if (membership?.business_id === account.business_id) {
+      redirect(`/dashboard/points?view=visits&wallet=${encodeURIComponent(token)}`);
+    }
+  }
+
   const { data: consent } = account ? await admin.from('customers').select('marketing_consent_at').eq('id', account.customer_id).maybeSingle() : { data: null };
   const { data: latestPromotion } = consent?.marketing_consent_at
     ? await admin.from('loyalty_wallet_messages').select('title,body').eq('pass_serial', token).maybeSingle()
