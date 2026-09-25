@@ -228,18 +228,18 @@ export default async function NivalPointsPage({
           <section className="pointsTodayAction">
             <div>
               <span>OPERACIÓN SIMPLE</span>
-              <h2>{availableRewards > 0 ? `Tienes ${availableRewards} premio${availableRewards === 1 ? '' : 's'} listo${availableRewards === 1 ? '' : 's'} para entregar.` : 'Tu trabajo aquí es solo registrar visitas y entregar recompensas.'}</h2>
+              <h2>{availableRewards > 0 ? `Tienes ${availableRewards} premio${availableRewards === 1 ? '' : 's'} listo${availableRewards === 1 ? '' : 's'} para entregar.` : 'Tu trabajo aquí es solo escanear: Nival reconoce visita o canje.'}</h2>
               <p>{qrNfcRegistrations > 0 ? `${qrNfcRegistrations} clientes se registraron por QR o NFC. Nival se encarga de construir la base mientras usas el programa.` : 'Comparte el QR para que los clientes se registren solos y evita capturar información manualmente.'}</p>
             </div>
             <a href={availableRewards > 0 ? '/dashboard/points?view=visits' : '/dashboard/points?view=share'}>
-              {availableRewards > 0 ? 'Registrar visita / premio →' : 'Compartir mi QR →'}
+              {availableRewards > 0 ? 'Abrir escáner →' : 'Compartir mi QR →'}
             </a>
           </section>
 
           <section className="pointsQuickOps">
             <a href="/dashboard/points?view=share"><span>1 · REGISTRAR</span><strong>Comparte tu QR</strong><small>El cliente crea su tarjeta solo →</small></a>
             <a href="/dashboard/points?view=visits"><span>2 · ACUMULAR</span><strong>Registrar visita</strong><small>Escanea el código del cliente →</small></a>
-            <a href="/dashboard/points?view=visits"><span>3 · PREMIAR</span><strong>Premio dentro de la visita</strong><small>Nival te avisa cuando haya uno disponible →</small></a>
+            <a href="/dashboard/points?view=visits"><span>3 · PREMIAR</span><strong>Canjear cuando el cliente quiera</strong><small>El mismo escáner reconoce visita o recompensa →</small></a>
             {proAccess && <a href="/dashboard/points?view=promotions"><span>4 · RECUPERAR</span><strong>Enviar descuento o promoción</strong><small>Google Wallet o WhatsApp →</small></a>}
           </section>
 
