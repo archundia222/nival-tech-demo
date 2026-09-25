@@ -116,6 +116,13 @@ export function PaymentEditor({
     markDirty();
     setSections((current) => current.map((section) => section.id === id ? { ...section, ...patch } : section));
   };
+  const removeSection = (id: string, title: string) => {
+    const label = title.trim() || 'este apartado';
+    if (!window.confirm(`¿Eliminar ${label}? Podrás usar este espacio para crear otro apartado después.`)) return;
+    markDirty();
+    setSections((current) => current.filter((section) => section.id !== id));
+    if (newSectionId === id) setNewSectionId(null);
+  };
 
   useEffect(() => () => {
     if (preview) URL.revokeObjectURL(preview);
@@ -209,7 +216,7 @@ export function PaymentEditor({
           <div className="nivalPaySaveCluster">
             {profile?.public_token && profile.active && <a className="nivalPayPublicLink" href={siteUrl + '/pay/' + profile.public_token} target="_blank" rel="noreferrer">Ver página ↗</a>}
             <span
-              className={`nivalPaySaveStatus ${state.error ? 'isError' : pending ? 'isSaving' : 'isSaved'}`}
+              className={`nivalPaySaveStatus ${state.error ? 'isError' : pending ? 'isSaving' : hasPendingChanges ? 'isPending' : 'isSaved'}`}
               role={state.error ? 'alert' : 'status'}
               aria-live="polite"
             >
@@ -362,6 +369,13 @@ export function PaymentEditor({
                 placeholder="https://... o escribe información"
               />
             </label>
+            <button
+              type="button"
+              className="nivalPayDeleteSection"
+              onClick={() => removeSection(section.id, section.title)}
+            >
+              Eliminar apartado
+            </button>
           </div>
         ))}
 
