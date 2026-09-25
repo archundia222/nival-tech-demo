@@ -301,7 +301,7 @@ export default async function NivalPointsPage({
         {view === 'visits' && <PointsEmployeeScanner mode="visit" initialScanToken={params.scan ?? ''} initialWalletToken={params.wallet ?? ''} />}
         {view === 'redemptions' && <PointsEmployeeScanner mode="redeem" initialScanToken={params.scan ?? ''} />}
         {view === 'share' && business.slug &&
-          <PointsShareTools url={`${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://nival-tech-platform.vercel.app'}/b/${business.slug}`} />}
+          <PointsShareTools url={`${(process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/b/${business.slug}`} />}
 
         {canManage && program && view === 'settings' && baseFree &&
           <section className="freemiumLocked">
