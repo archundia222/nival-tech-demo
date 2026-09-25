@@ -123,15 +123,15 @@ export async function createSmartLink(formData: FormData) {
   const targetUrl = String(formData.get("targetUrl") ?? "").trim();
 
   if (name.length < 2 || name.length > 80) {
-    redirect(`/dashboard?error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
+    redirect(`${returnPath}&error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
   }
 
   if (!["google_review", "website", "custom"].includes(kind)) {
-    redirect(`/dashboard?error=${encodeURIComponent("Selecciona un tipo de enlace válido.")}`);
+    redirect(`${returnPath}&error=${encodeURIComponent("Selecciona un tipo de enlace válido.")}`);
   }
 
   if (!targetUrl.startsWith("https://")) {
-    redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
+    redirect(`${returnPath}&error=${encodeURIComponent("El destino debe comenzar con https://")}`);
   }
 
   const { supabase, businessId } = await getActiveManagerContext();
@@ -178,11 +178,11 @@ export async function updateSmartLink(formData: FormData) {
   const active = formData.get("active") === "on";
 
   if (name.length < 2 || name.length > 80) {
-    redirect(`/dashboard?error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
+    redirect(`${returnPath}&error=${encodeURIComponent("El nombre del enlace debe tener entre 2 y 80 caracteres.")}`);
   }
 
   if (!targetUrl.startsWith("https://")) {
-    redirect(`/dashboard?error=${encodeURIComponent("El destino debe comenzar con https://")}`);
+    redirect(`${returnPath}&error=${encodeURIComponent("El destino debe comenzar con https://")}`);
   }
 
   const { supabase, businessId } = await getActiveManagerContext();
@@ -209,16 +209,16 @@ export async function updateBusinessProfile(formData: FormData) {
   const websiteUrl = String(formData.get("businessWebsiteUrl") ?? "").trim();
 
   if (name.length < 2 || name.length > 100) {
-    redirect(`/dashboard?error=${encodeURIComponent("El nombre debe tener entre 2 y 100 caracteres.")}`);
+    redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("El nombre debe tener entre 2 y 100 caracteres.")}`);
   }
 
   if (!/^#[0-9a-fA-F]{6}$/.test(brandColor)) {
-    redirect(`/dashboard?error=${encodeURIComponent("Selecciona un color válido.")}`);
+    redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Selecciona un color válido.")}`);
   }
 
   for (const url of [logoUrl, websiteUrl]) {
     if (url && !url.startsWith("https://")) {
-      redirect(`/dashboard?error=${encodeURIComponent("Las direcciones del logo y sitio web deben comenzar con https://")}`);
+      redirect(`/dashboard?section=configuracion&error=${encodeURIComponent("Las direcciones del logo y sitio web deben comenzar con https://")}`);
     }
   }
 
@@ -258,7 +258,7 @@ export async function updateBusinessProfile(formData: FormData) {
     business_website_url: websiteUrl,
   });
 
-  if (error) redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  if (error) redirect(`/dashboard?section=configuracion&error=${encodeURIComponent(error.message)}`);
   revalidatePath("/dashboard");
   revalidatePath("/b/[slug]", "page");
   redirect(`/dashboard?section=perfil-digital&message=${encodeURIComponent("Perfil del negocio actualizado.")}`);
