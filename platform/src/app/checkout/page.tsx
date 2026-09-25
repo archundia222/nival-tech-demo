@@ -132,6 +132,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       .maybeSingle()
     : { data: null };
   const hasBankProfile = Boolean(paymentProfile?.public_token && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
+  const paymentConfirmationPending = !paid && (params.result === 'success' || params.result === 'pending');
   const siteUrl = publicSiteUrl();
 
   return <main className="checkoutExperience">
@@ -147,7 +148,16 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
         ? hasBankProfile && paymentProfile
           ? <ActiveCard businessName={business?.name ?? 'Tu negocio'} url={`${siteUrl}/pay/${paymentProfile.public_token}`} />
           : <BankSetupForm businessName={business?.name ?? 'Tu negocio'} siteUrl={siteUrl} />
-        : <>
+        : paymentConfirmationPending
+          ? <section className="checkoutConfirming" aria-live="polite">
+              <div className="checkoutConfirmingMark" aria-hidden="true">✓</div>
+              <p className="checkoutKicker">PAGO EN VALIDACIÓN</p>
+              <h1>No vuelvas a pagar.</h1>
+              <p>Mercado Pago ya nos devolvió a Nival y estamos verificando la acreditación. Esta pantalla se actualiza automáticamente; cuando termine, continuaremos con la activación.</p>
+              <div className="checkoutConfirmingSteps"><span>1 · Pago enviado</span><span>2 · Validando con Mercado Pago</span><span>3 · Activación automática</span></div>
+              <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Nival Pay</Link>
+            </section>
+          : <>
           <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único desbloquea la tarjeta NFC física, 3 apartados y las herramientas Pro.</p></section>
           <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
