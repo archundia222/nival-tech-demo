@@ -96,13 +96,20 @@ function checkoutOrigin() {
   if (process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return 'https://nival-tech-platform.vercel.app';
+  return (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
 }
 
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
+  const isPreviewCheckout = process.env.VERCEL_ENV === 'preview';
+  const payerEmail = isPreviewCheckout
+    ? process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim()
+    : user.email?.trim();
+  if (!isPreviewCheckout && !payerEmail) {
+    redirect(checkoutReturnPath(product.returnPath, 'error', 'Tu cuenta necesita un correo para continuar con el pago.'));
+  }
   const admin = createAdminClient();
   await reconcileLatestMercadoPagoProductOrder(businessId, { [product.productCode]: product.amountCents });
   if (product.productCode === NIVAL_PAY_PRODUCT) {
@@ -121,7 +128,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       redirect(checkoutReturnPath('/checkout', 'error', 'Activa Nival Pay Pro antes de comprar herramientas adicionales.'));
     }
   }
-  if (!product.physicalOrder) {
+  {
     let existingQuery = admin.from('product_orders')
       .select('id,checkout_url,created_at')
       .eq('business_id', businessId)
@@ -141,7 +148,8 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       if (freshOrder?.status !== 'pending') redirect(product.returnPath);
       if (existingOrder.checkout_url) {
         const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
-        if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+        const reuseWindowMs = product.physicalOrder ? 15 * 60 * 1000 : 6 * 60 * 60 * 1000;
+        if (Number.isFinite(ageMs) && ageMs < reuseWindowMs) {
           redirect(existingOrder.checkout_url);
         }
       }
@@ -180,13 +188,6 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   // test seller. Mercado Pago rejects mixed real/test parties. A dedicated test
   // buyer email can be configured; otherwise Checkout will collect the test
   // buyer identity when the tester signs in.
-  const isPreviewCheckout = process.env.VERCEL_ENV === 'preview';
-  const payerEmail = isPreviewCheckout
-    ? process.env.MERCADO_PAGO_TEST_PAYER_EMAIL?.trim()
-    : user.email?.trim();
-  if (!isPreviewCheckout && !payerEmail) {
-    redirect(checkoutReturnPath(product.returnPath, 'error', 'Tu cuenta necesita un correo para continuar con el pago.'));
-  }
   let result: MercadoPagoOrderCreateResponse = {};
 
   try {
@@ -238,6 +239,9 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     }
   } catch (checkoutError) {
     console.error('Mercado Pago order error', checkoutError);
+    if (product.physicalOrder) {
+      await admin.from('physical_card_orders').delete().eq('product_order_id', order.id);
+    }
     await admin.from('product_orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', order.id);
     redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudo abrir Mercado Pago. Intenta de nuevo.'));
   }
