@@ -18,8 +18,43 @@ type BarcodeDetectorLike = {
   detect(source: HTMLVideoElement): Promise<Array<{ rawValue: string }>>;
 };
 
+type JsQrResult = { data: string } | null;
+type JsQrFn = (data: Uint8ClampedArray, width: number, height: number, options?: { inversionAttempts?: "dontInvert" | "onlyInvert" | "attemptBoth" | "invertFirst" }) => JsQrResult;
+
+declare global {
+  interface Window {
+    jsQR?: JsQrFn;
+  }
+}
+
+let jsQrLoader: Promise<JsQrFn> | null = null;
+
+function loadJsQr() {
+  if (window.jsQR) return Promise.resolve(window.jsQR);
+  if (jsQrLoader) return jsQrLoader;
+  jsQrLoader = new Promise<JsQrFn>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>('script[data-nival-jsqr="1"]');
+    const finish = () => window.jsQR ? resolve(window.jsQR) : reject(new Error("QR decoder unavailable"));
+    if (existing) {
+      existing.addEventListener("load", finish, { once: true });
+      existing.addEventListener("error", () => reject(new Error("QR decoder failed")), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.dataset.nivalJsqr = "1";
+    script.addEventListener("load", finish, { once: true });
+    script.addEventListener("error", () => reject(new Error("QR decoder failed")), { once: true });
+    document.head.appendChild(script);
+  });
+  return jsQrLoader;
+}
+
 export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", initialWalletToken = "" }: { mode?: "visit" | "redeem"; initialScanToken?: string; initialWalletToken?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [manual, setManual] = useState("");
   const [customer, setCustomer] = useState<ScanCustomer | null>(null);
@@ -62,7 +97,11 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
         ? await claimWalletCard(walletToken)
         : await claimScanToken(raw, mode);
       if (!result.ok || !result.customer) {
-        setCustomer(null); setMessage(result.error ?? "QR expirado."); return;
+        setCustomer(null);
+        setMessage(walletToken
+          ? (result.error ?? "No pudimos reconocer esta tarjeta de Google Wallet.")
+          : (result.error ?? "Este QR temporal ya expiró o ya fue usado. Pide al cliente que genere uno nuevo."));
+        return;
       }
       setCustomer(result.customer as ScanCustomer);
       setConfirmRedeem(false);
@@ -86,23 +125,62 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     let stream: MediaStream | null = null;
     let timer = 0;
     let stopped = false;
+
     void (async () => {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+        setMessage("");
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
         if (!videoRef.current || stopped) return;
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+
         const Detector = (window as unknown as { BarcodeDetector?: new (options: { formats: string[] }) => BarcodeDetectorLike }).BarcodeDetector;
-        if (!Detector) { setMessage("Este navegador no permite leer QR dentro de la página. Usa la cámara normal del teléfono: al escanear el QR, Nival abrirá esta pantalla y cargará al cliente automáticamente."); setCameraOn(false); return; }
-        const detector = new Detector({ formats: ["qr_code"] });
-        timer = window.setInterval(async () => {
-          if (!videoRef.current) return;
-          const found = await detector.detect(videoRef.current).catch(() => []);
-          if (found[0]?.rawValue) void claim(found[0].rawValue);
-        }, 700);
-      } catch { setMessage("No pudimos abrir la cámara. Revisa el permiso del navegador."); setCameraOn(false); }
+        if (Detector) {
+          const detector = new Detector({ formats: ["qr_code"] });
+          timer = window.setInterval(async () => {
+            if (!videoRef.current || claimingRef.current) return;
+            const found = await detector.detect(videoRef.current).catch(() => []);
+            if (found[0]?.rawValue) void claim(found[0].rawValue);
+          }, 450);
+          return;
+        }
+
+        const decoder = await loadJsQr();
+        if (stopped) return;
+        timer = window.setInterval(() => {
+          const video = videoRef.current;
+          const canvas = canvasRef.current;
+          if (!video || !canvas || claimingRef.current || video.readyState < 2) return;
+          const width = video.videoWidth;
+          const height = video.videoHeight;
+          if (!width || !height) return;
+          const targetWidth = Math.min(720, width);
+          const scale = targetWidth / width;
+          const targetHeight = Math.round(height * scale);
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          if (!ctx) return;
+          ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+          const image = ctx.getImageData(0, 0, targetWidth, targetHeight);
+          const result = decoder(image.data, targetWidth, targetHeight, { inversionAttempts: "attemptBoth" });
+          if (result?.data) void claim(result.data);
+        }, 280);
+      } catch (error) {
+        console.error("Nival QR scanner failed", error);
+        setMessage("No pudimos usar la cámara dentro de Nival. Revisa que el navegador tenga permiso de cámara y vuelve a intentar.");
+        setCameraOn(false);
+      }
     })();
-    return () => { stopped = true; window.clearInterval(timer); stream?.getTracks().forEach(track => track.stop()); };
+
+    return () => {
+      stopped = true;
+      window.clearInterval(timer);
+      stream?.getTracks().forEach(track => track.stop());
+    };
   }, [cameraOn, claim]);
 
   function addPoint() {
@@ -133,8 +211,8 @@ export function PointsEmployeeScanner({ mode = "visit", initialScanToken = "", i
     <div className="pointsFlowSteps"><span className={!customer ? "active" : "done"}><b>1</b> Validar código</span><i>→</i><span className={customer && !message ? "active" : customer ? "done" : ""}><b>2</b> Revisar</span><i>→</i><span className={message ? "active" : ""}><b>3</b> Confirmar</span></div>
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>
-      {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><span>Centra el QR dentro del recuadro</span></div>}
-      <div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
+      {cameraOn && <div className="pointsCamera"><video ref={videoRef} playsInline muted /><canvas ref={canvasRef} hidden aria-hidden="true" /><span>Centra el QR de Google Wallet o el QR temporal dentro del recuadro</span></div>}
+      <p className="pointsDataSourceNote">El QR de Google Wallet es permanente y se puede escanear en cada visita. Los códigos temporales de la página cambian por seguridad.</p><div className="pointsManualScan"><input value={manual} onChange={e => setManual(e.target.value)} placeholder="Código temporal o enlace de Wallet" aria-label="Código temporal o enlace de Wallet" /><button className="nvSecondaryButton" type="button" onClick={() => void claim(manual)}>Validar</button></div>
     </>}
     {customer && <div className="pointsScannedCustomer">
       <div><span>CLIENTE</span><h3>{customer.customer_first_name}</h3><p>{customer.points_balance} de {customer.reward_threshold} puntos · {customer.available_rewards > 0 ? `${customer.available_rewards} recompensa${customer.available_rewards === 1 ? "" : "s"} disponible${customer.available_rewards === 1 ? "" : "s"}` : customer.reward_description}</p></div>
