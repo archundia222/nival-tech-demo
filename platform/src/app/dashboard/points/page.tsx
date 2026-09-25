@@ -19,7 +19,7 @@ import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIV
 export default async function NivalPointsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string }>;
+  searchParams: Promise<{ error?: string; subscription?: string; view?: string; free?: string; scan?: string; wallet?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
