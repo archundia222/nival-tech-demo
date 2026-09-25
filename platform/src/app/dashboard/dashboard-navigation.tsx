@@ -17,7 +17,6 @@ const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
 const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'operacion' | 'clientes' | 'gestion' }> = [
   { id: 'puntos', label: 'Hoy', href: '/dashboard/points', group: 'operacion' },
   { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'operacion' },
-  { id: 'puntos-canjes', label: 'Canjear premio', href: '/dashboard/points?view=redemptions', group: 'operacion' },
   { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
   { id: 'puntos-promociones', label: 'Promociones y notificaciones', href: '/dashboard/points?view=promotions', group: 'clientes' },
   { id: 'puntos-compartir', label: 'Compartir programa', href: '/dashboard/points?view=share', group: 'gestion' },
