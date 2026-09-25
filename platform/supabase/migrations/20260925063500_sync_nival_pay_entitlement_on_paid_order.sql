@@ -92,7 +92,7 @@ end;
 $$;
 
 insert into public.business_product_entitlements(business_id, product_code, status, current_period_end, updated_at)
-select distinct po.business_id, 'nival_pay', 'active', null, now()
+select distinct po.business_id, 'nival_pay', 'active', null::timestamptz, now()
 from public.product_orders po
 where po.product_code='nival_pay' and po.status='paid'
 on conflict (business_id, product_code)
