@@ -115,6 +115,15 @@ export async function claimScanToken(raw: string, purpose: "visit" | "redeem") {
   return { ok: true, customer: data[0] };
 }
 
+export async function claimWalletCard(accountToken: string) {
+  const token = accountToken.trim();
+  if (!/^[0-9a-f-]{36}$/i.test(token)) return { ok: false, error: "Tarjeta de Google Wallet no válida." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("claim_wallet_loyalty_card", { p_account_token: token });
+  if (error || !data?.[0]) return { ok: false, error: "Esta tarjeta no pertenece a este negocio o Nival Puntos no está activo." };
+  return { ok: true, customer: data[0] };
+}
+
 export async function awardPoint(scanSessionId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("award_point", { p_scan_session_id: scanSessionId });
