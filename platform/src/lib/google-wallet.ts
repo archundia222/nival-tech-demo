@@ -68,7 +68,9 @@ export function createGoogleWalletJwt(card: LoyaltyCard, origin: string) {
           textModulesData: [
             { id: "visits", header: "Visitas", body: String(card.visits) },
             { id: "business", header: "Negocio", body: card.businessName },
+            { id: "instructions", header: "Para sumar puntos y ver premios", body: "Abre tu tarjeta en la página web y muestra el código temporal en caja." },
           ],
+          linksModuleData: { uris: [{ id: "card", uri: `${origin}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta, sumar puntos y ver premios" }] },
         },
       ],
     },
@@ -103,7 +105,7 @@ export async function syncGoogleWalletObject(card: LoyaltyCard) {
   const accessToken = await googleAccessToken();
   const id = objectId(card.token);
   const response = await fetch(
-    `https://walletobjects.googleapis.com/walletobjects/v1/loyaltyObject/${encodeURIComponent(id)}?updateMask=loyaltyPoints,textModulesData,barcode`,
+    `https://walletobjects.googleapis.com/walletobjects/v1/loyaltyObject/${encodeURIComponent(id)}`,
     {
       method: "PATCH",
       headers: {
@@ -123,12 +125,17 @@ export async function syncGoogleWalletObject(card: LoyaltyCard) {
         textModulesData: [
           { id: "visits", header: "Visitas", body: String(card.visits) },
           { id: "business", header: "Negocio", body: card.businessName },
+          { id: "instructions", header: "Para sumar puntos y ver premios", body: "Abre tu tarjeta en la página web y muestra el código temporal en caja." },
         ],
+        linksModuleData: { uris: [{ id: "card", uri: `${(process.env.NIVAL_PUBLIC_ORIGIN || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/card/${encodeURIComponent(card.token)}`, description: "Abrir tarjeta, sumar puntos y ver premios" }] },
       }),
       cache: "no-store",
     },
   );
-  if (!response.ok) throw new Error(`Google Wallet sync failed with status ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`Google Wallet sync failed with status ${response.status}: ${detail.slice(0, 300)}`);
+  }
 }
 
 

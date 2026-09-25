@@ -7,6 +7,26 @@ import { redirect } from "next/navigation";
 import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBusinessMembership } from "@/lib/active-business";
+import { syncGoogleWalletObject } from "@/lib/google-wallet";
+
+async function syncWalletForScanSession(scanSessionId: string) {
+  const admin = createPointsAdminClient();
+  const { data: session, error } = await admin.from("loyalty_scan_sessions")
+    .select("loyalty_account_id, customer_id, business_id")
+    .eq("id", scanSessionId).single();
+  if (error || !session) throw error ?? new Error("Scan session not found");
+  const [{ data: account }, { data: customer }, { data: business }, { count }] = await Promise.all([
+    admin.from("loyalty_accounts").select("public_token, points_balance").eq("id", session.loyalty_account_id).single(),
+    admin.from("customers").select("name").eq("id", session.customer_id).single(),
+    admin.from("businesses").select("name").eq("id", session.business_id).single(),
+    admin.from("visits").select("id", { count: "exact", head: true }).eq("customer_id", session.customer_id).eq("business_id", session.business_id),
+  ]);
+  if (!account?.public_token || !customer || !business) throw new Error("Incomplete wallet account");
+  await syncGoogleWalletObject({
+    token: account.public_token, businessName: business.name,
+    customerName: customer.name, points: Number(account.points_balance), visits: count ?? 0,
+  });
+}
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
   const h = await headers();
@@ -104,6 +124,8 @@ export async function awardPoint(scanSessionId: string) {
       : "No pudimos sumar el punto.";
     return { ok: false, error: message };
   }
+  try { await syncWalletForScanSession(scanSessionId); }
+  catch (walletError) { console.error("Google Wallet point sync failed", walletError); }
   try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
   catch (walletError) { console.error('[apple-wallet] point update failed', walletError); }
   revalidatePath("/dashboard/points");
@@ -120,6 +142,8 @@ export async function redeemPointReward(scanSessionId: string) {
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
   }
+  try { await syncWalletForScanSession(scanSessionId); }
+  catch (walletError) { console.error("Google Wallet redemption sync failed", walletError); }
   try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
   catch (walletError) { console.error('[apple-wallet] redemption update failed', walletError); }
   revalidatePath("/dashboard/points");
