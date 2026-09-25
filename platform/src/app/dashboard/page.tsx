@@ -80,6 +80,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const legacySection = currentSection as DashboardSection;
 
   const businessId = membership.business_id;
+  const publicOrigin = (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
   const { data: business } = await supabase
     .from("businesses")
     .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled")
@@ -326,7 +327,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           name={link.name}
           kind={link.kind}
           targetUrl={link.target_url}
-          url={`https://nival-tech-platform.vercel.app/go/${link.public_token}`}
+          url={`${publicOrigin}/go/${link.public_token}`}
           clicks={Number(link.click_count)}
           active={link.active}
           editable={canManageProgram}
@@ -354,7 +355,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             </div>
             <BusinessQr
               businessName={business.name}
-              url={`https://nival-tech-platform.vercel.app/p/${business.slug}`}
+              url={`${publicOrigin}/p/${business.slug}`}
               qrId="business-digital-profile-qr"
               eyebrow="COMPARTE TU NEGOCIO"
               title="Un enlace para todo"
@@ -386,7 +387,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             name={link.name}
             kind={link.kind}
             targetUrl={link.target_url}
-            url={`https://nival-tech-platform.vercel.app/go/${link.public_token}`}
+            url={`${publicOrigin}/go/${link.public_token}`}
             clicks={Number(link.click_count)}
             active={link.active}
             editable={canManageProgram}
