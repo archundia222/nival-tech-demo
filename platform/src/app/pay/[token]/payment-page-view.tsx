@@ -48,6 +48,10 @@ export function PaymentPageView({
     .join("")
     .toUpperCase();
 
+  const publicSections = Array.isArray(profile.custom_sections)
+    ? profile.custom_sections.filter((section) => section.public !== false && section.content.trim().length > 0)
+    : [];
+
   const content = <>
     <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} style={{ "--blue": profile.brand_color || "#b89a5a" } as CSSProperties} aria-labelledby={embedded ? undefined : "payment-title"}>
       <div className={styles.brandRow}>
@@ -70,9 +74,14 @@ export function PaymentPageView({
         {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
         {profile.clabe_visible && <CopyField label="CLABE interbancaria" value={profile.clabe} variant="clabe" trackingToken={trackingToken} />}
         {profile.concept_visible && profile.concept && <CopyField label="Concepto" value={profile.concept} variant="detail" />}
-        {Array.isArray(profile.custom_sections) && profile.custom_sections.filter((section) => section.public !== false).map((section) =>
-          section.title || section.content ? <CopyField key={section.id} label={section.title || "Información"} value={section.content || "—"} variant="detail" /> : null
-        )}
+        {publicSections.map((section) => {
+          const label = section.title.trim() || "Información";
+          const value = section.content.trim();
+          const isHttpsLink = /^https:\/\//i.test(value);
+          return isHttpsLink
+            ? <a key={section.id} className={styles.customSectionLink} href={value} target="_blank" rel="noreferrer"><span><small>{label}</small><strong>Abrir enlace</strong></span><b aria-hidden="true">↗</b></a>
+            : <CopyField key={section.id} label={label} value={value} variant="detail" />;
+        })}
       </div>
       <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
