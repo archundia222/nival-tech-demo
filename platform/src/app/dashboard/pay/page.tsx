@@ -4,93 +4,15 @@ import { createClient } from '@/lib/supabase/server';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { PaymentEditor } from './payment-editor';
 import { DashboardNavigation } from '../dashboard-navigation';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT } from '@/lib/orders';
 import { createAdditionalPaymentProfile, prepareFreeNivalPay, publishFreeNivalPay } from './actions';
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 import { SmartLinkQr } from '../smart-link-qr';
-import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
+import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
-
-type MercadoPagoOrder = {
-  id?: string;
-  external_reference?: string;
-  currency_id?: string;
-  status?: string;
-  status_detail?: string;
-  total_amount?: string | number;
-  total_paid_amount?: string | number;
-  transactions?: { payments?: Array<{ id?: string; status?: string; status_detail?: string }> };
-};
-
-async function reconcileLatestPayOrder(businessId: string, productCode: typeof NIVAL_PAY_EXTRA_SECTION_PRODUCT | typeof NIVAL_PAY_ADDITIONAL_PRODUCT, expectedAmountCents: number) {
-  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!accessToken) return;
-
-  const admin = createAdminClient();
-  const { data: pendingOrders } = await admin.from('product_orders')
-    .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
-    .eq('business_id', businessId)
-    .eq('product_code', productCode)
-    .eq('payment_method', 'mercado_pago')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: false })
-    .limit(20);
-  const order = pendingOrders?.find((candidate) =>
-    candidate.provider_preference_id
-      && isCompatibleMercadoPagoOrderId(candidate.provider_preference_id, accessToken)
-  );
-  if (!order?.provider_preference_id) return;
-
-  const response = await fetch(
-    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
-    { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
-  );
-  if (!response.ok) {
-    console.warn('Extra section reconciliation request failed', {
-      providerOrderId: order.provider_preference_id,
-      httpStatus: response.status,
-    });
-    return;
-  }
-
-  const payload = await response.json() as MercadoPagoOrder;
-  const payment = payload.transactions?.payments?.find((candidate) =>
-    candidate.status === 'processed' && candidate.status_detail === 'accredited'
-  );
-  const paymentId = payment?.id ? String(payment.id) : null;
-  const checks = {
-    orderId: payload.id === order.provider_preference_id,
-    externalReference: payload.external_reference === order.id,
-    orderStatus: payload.status === 'processed',
-    orderStatusDetail: payload.status_detail === 'accredited',
-    currency: !payload.currency_id || payload.currency_id === order.currency,
-    totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
-    totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
-    catalogAmount: order.amount_cents === expectedAmountCents,
-    paymentId: Boolean(paymentId),
-    storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
-  };
-  const approved = Object.values(checks).every(Boolean);
-  if (!approved || !paymentId) {
-    console.warn('Extra section reconciliation verification failed', {
-      orderId: order.id,
-      failedChecks: Object.entries(checks).filter(([, passed]) => !passed).map(([name]) => name),
-      providerStatus: payload.status ?? null,
-      providerStatusDetail: payload.status_detail ?? null,
-    });
-    return;
-  }
-
-  const { error } = await admin.rpc('finalize_nival_pay_order', {
-    p_order_id: order.id,
-    p_provider_payment_id: paymentId,
-  });
-  if (error) console.error('Extra section reconciliation failed', { orderId: order.id, code: error.code });
-}
 
 export default async function PaySettings({ searchParams }: { searchParams: Promise<{ profile?: string; new?: string; error?: string; view?: string; unlocked?: string; result?: string; created?: string; free?: string }> }) {
   const params = await searchParams;
@@ -105,10 +27,10 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     .eq('id', membership.business_id)
     .maybeSingle();
   if (error || !business) throw new Error('No se pudo cargar el negocio.');
-  await Promise.all([
-    reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS),
-    reconcileLatestPayOrder(membership.business_id, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS),
-  ]);
+  await reconcileLatestMercadoPagoProductOrder(membership.business_id, {
+    [NIVAL_PAY_EXTRA_SECTION_PRODUCT]: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
+    [NIVAL_PAY_ADDITIONAL_PRODUCT]: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
+  });
 
   // A successful extra-section checkout should also finish in one trip.
   // If Mercado Pago has already granted a new section entitlement, create the

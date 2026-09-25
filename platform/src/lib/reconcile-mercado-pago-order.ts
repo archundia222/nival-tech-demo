@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isCompatibleMercadoPagoOrderId } from '@/lib/mercado-pago-mode';
 
 type MercadoPagoOrder = {
   id?: string;
@@ -34,10 +35,11 @@ export async function reconcileLatestMercadoPagoProductOrder(
     .eq('status', 'pending')
     .in('product_code', Object.keys(catalog))
     .order('created_at', { ascending: false })
-    .limit(10);
+    .limit(30);
 
+  let reconciled = false;
   for (const order of orders ?? []) {
-    if (!order.provider_preference_id) continue;
+    if (!order.provider_preference_id || !isCompatibleMercadoPagoOrderId(order.provider_preference_id, accessToken)) continue;
 
     const response = await fetch(
       `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
@@ -77,8 +79,8 @@ export async function reconcileLatestMercadoPagoProductOrder(
       });
       continue;
     }
-    return true;
+    reconciled = true;
   }
 
-  return false;
+  return reconciled;
 }

@@ -56,7 +56,7 @@ export default async function CardPage({ params }: CardPageProps) {
           : "Google Wallet aún no está habilitado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta para volver a consultar tus puntos."}</p>
       </div>
       <div className="pointsWalletSaveActions">
-        {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar a Google Wallet →</a>}
+        {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar o actualizar en Google Wallet →</a>}
         {appleReady && <a href={`/api/wallet/apple/${encodeURIComponent(token)}`}>Agregar a Apple Wallet →</a>}
         {!googleWalletReady && <span className="pointsMuted">La opción de agregar a Google Wallet estará disponible cuando se complete su configuración.</span>}
         <CardSaveActions />

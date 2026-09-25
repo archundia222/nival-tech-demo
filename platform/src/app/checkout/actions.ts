@@ -1,7 +1,6 @@
 'use server';
 
 import crypto from 'node:crypto';
-import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -10,6 +9,7 @@ import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CE
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
+import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 
 async function currentPurchaseContext() {
   const supabase = await createClient();
@@ -92,11 +92,24 @@ function checkoutReturnPath(returnPath: string, key: 'error' | 'result', value: 
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+function checkoutOrigin() {
+  if (process.env.VERCEL_ENV === 'preview' && process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'https://nival-tech-platform.vercel.app';
+}
+
 async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token) redirect(checkoutReturnPath(product.returnPath, 'error', 'Mercado Pago aún no está configurado.'));
   const { user, businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
+  await reconcileLatestMercadoPagoProductOrder(businessId, { [product.productCode]: product.amountCents });
+  if (product.productCode === NIVAL_PAY_PRODUCT) {
+    const { data: purchased } = await admin.from('product_orders').select('id')
+      .eq('business_id', businessId).eq('product_code', NIVAL_PAY_PRODUCT).eq('status', 'paid').limit(1).maybeSingle();
+    if (purchased) redirect('/dashboard/pay?view=manage');
+  }
   if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId)
@@ -123,6 +136,9 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
 
     const { data: existingOrder } = await existingQuery.maybeSingle();
     if (existingOrder) {
+      const { data: freshOrder } = await admin.from('product_orders').select('status')
+        .eq('id', existingOrder.id).single();
+      if (freshOrder?.status !== 'pending') redirect(product.returnPath);
       if (existingOrder.checkout_url) {
         const ageMs = Date.now() - new Date(existingOrder.created_at).getTime();
         if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
@@ -158,8 +174,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     }
   }
 
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
+  const origin = checkoutOrigin();
   const amount = (product.amountCents / 100).toFixed(2);
   // In Preview/QA, never send the real Nival account email to a Mercado Pago
   // test seller. Mercado Pago rejects mixed real/test parties. A dedicated test
@@ -443,8 +458,7 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   }).select('id').single();
   if (insertError || !subscription) redirect(`${returnPath}?error=No+se+pudo+preparar+la+suscripción.`);
 
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get('origin') ?? 'https://nival-tech-platform.vercel.app';
+  const origin = checkoutOrigin();
   const response = await fetch('https://api.mercadopago.com/preapproval', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
