@@ -12,19 +12,13 @@ export async function confirmCashPayment(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user || !isNivalAdmin(user.email)) redirect('/dashboard');
   const admin = createAdminClient();
-  const { data: order } = await admin.from('product_orders').select('business_id, product_code, status, payment_method')
-    .eq('id', orderId).maybeSingle();
-  if (!order || order.payment_method !== 'cash' || order.status !== 'pending_cash_confirmation') redirect('/admin/ventas?error=Orden+inválida');
-  const now = new Date().toISOString();
-  const { error } = await admin.from('product_orders').update({ status: 'paid', paid_at: now, confirmed_by: user.id, updated_at: now }).eq('id', orderId);
-  if (error) redirect('/admin/ventas?error=No+se+pudo+confirmar');
-  if (order.product_code === 'nival_pay') {
-    await admin.from('businesses').update({ subscription_status: 'active', updated_at: now }).eq('id', order.business_id);
-  } else if (order.product_code.startsWith('nival_pay_physical_card')) {
-    await admin.from('physical_card_orders')
-      .update({ fulfillment_status: 'confirmed', updated_at: now })
-      .eq('product_order_id', orderId)
-      .eq('fulfillment_status', 'new');
+  const { error } = await admin.rpc('confirm_cash_product_order', {
+    p_order_id: orderId,
+    p_confirmed_by: user.id,
+  });
+  if (error) {
+    console.error('[admin-sales] Cash confirmation failed', { orderId, code: error.code });
+    redirect('/admin/ventas?error=No+se+pudo+confirmar');
   }
   revalidatePath('/admin/ventas');
 }
