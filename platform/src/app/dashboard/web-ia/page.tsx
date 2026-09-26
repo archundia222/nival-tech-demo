@@ -12,6 +12,7 @@ export default async function AiWebsiteServicePage() {
 
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
+  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
 
   const [{ data: business }, { data: legal }] = await Promise.all([
     supabase.from('businesses').select('name').eq('id', membership.business_id).maybeSingle(),
