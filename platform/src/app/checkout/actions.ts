@@ -202,6 +202,23 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     status: 'pending',
     payment_profile_id: product.paymentProfileId ?? null,
   }).select('id').single();
+
+  if (error?.code === '23505') {
+    let duplicateQuery = admin.from('product_orders')
+      .select('id,checkout_url')
+      .eq('business_id', businessId)
+      .eq('product_code', product.productCode)
+      .eq('payment_method', 'mercado_pago')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    duplicateQuery = product.paymentProfileId
+      ? duplicateQuery.eq('payment_profile_id', product.paymentProfileId)
+      : duplicateQuery.is('payment_profile_id', null);
+    const { data: duplicate } = await duplicateQuery.maybeSingle();
+    if (duplicate?.checkout_url) redirect(duplicate.checkout_url);
+    redirect(checkoutReturnPath(product.returnPath, 'result', 'pending'));
+  }
   if (error || !order) redirect(checkoutReturnPath(product.returnPath, 'error', 'No se pudo crear la orden.'));
   if (product.physicalOrder) {
     const { error: physicalError } = await admin.from('physical_card_orders').insert({
@@ -333,6 +350,7 @@ export async function requestCashPayment() {
     payment_method: 'cash',
     status: 'pending_cash_confirmation',
   });
+  if (error?.code === '23505') redirect('/checkout?result=cash');
   if (error) redirect('/checkout?error=No+se+pudo+registrar+el+pago+en+efectivo.');
   redirect('/checkout?result=cash');
 }
@@ -966,6 +984,7 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
     payment_method: 'cash',
     status: 'pending_cash_confirmation',
   }).select('id').single();
+  if (error?.code === '23505') redirect('/dashboard/pay/physical?result=cash');
   if (error || !order) redirect('/dashboard/pay/physical?error=No+se+pudo+registrar+el+pedido.');
   const { error: detailsError } = await admin.from('physical_card_orders').insert({
     ...details, product_order_id: order.id, business_id: businessId,
