@@ -73,6 +73,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     );
   }
 
+  if (membership.role === 'staff' && currentSection !== 'resumen') redirect('/dashboard');
   if (currentSection === "inteligencia") redirect('/dashboard/intelligence');
   if (currentSection === "clientes") redirect('/dashboard/points?view=customers');
   if (currentSection === "nival-card") redirect('/dashboard?section=perfil-digital#reviews');
