@@ -4,7 +4,7 @@ import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
-import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
+import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
 import { getActiveBusinessMembership } from '@/lib/active-business';
@@ -26,42 +26,11 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   if (!business) redirect('/dashboard');
 
   if (params.result === 'failure') {
-    const admin = createAdminClient();
-    const { data: failedPending } = await admin.from('product_orders')
-      .select('id,provider_preference_id')
-      .eq('business_id', membership.business_id)
-      .eq('payment_method', 'mercado_pago')
-      .eq('status', 'pending')
-      .in('product_code', [
-        NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
-        NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT,
-        NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT,
-      ])
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    if (failedPending?.id && failedPending.provider_preference_id && accessToken) {
-      try {
-        const response = await fetch(
-          `https://api.mercadopago.com/v1/orders/${encodeURIComponent(failedPending.provider_preference_id)}`,
-          { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
-        );
-        const providerOrder = response.ok ? await response.json() as { status?: string; status_detail?: string } : null;
-        const terminalFailure = providerOrder
-          && ['failed','cancelled','canceled','expired'].includes(String(providerOrder.status ?? '').toLowerCase());
-        if (terminalFailure) {
-          await admin.from('physical_card_orders').delete().eq('product_order_id', failedPending.id);
-          await admin.from('product_orders')
-            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-            .eq('id', failedPending.id)
-            .eq('status', 'pending');
-        }
-      } catch (providerError) {
-        console.warn('[physical-card] Could not confirm failed Mercado Pago order', providerError);
-      }
-    }
+    await cancelLatestTerminalMercadoPagoProductOrder(membership.business_id, {
+      [NIVAL_PAY_PHYSICAL_CARD_PRODUCT]: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
+      [NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT]: NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS,
+      [NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]: NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS,
+    });
   }
 
   if (params.result === 'success') {
