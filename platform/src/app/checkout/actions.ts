@@ -489,9 +489,11 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   if (existingSubscription?.status === 'authorized') {
     redirect(`${returnPath}?subscription=active`);
   }
-  if (existingSubscription?.status === 'pending' && existingSubscription.checkout_url) {
+  if (existingSubscription?.status === 'pending') {
     const ageMs = Date.now() - new Date(existingSubscription.created_at).getTime();
-    if (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) redirect(existingSubscription.checkout_url);
+    if (existingSubscription.checkout_url && Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+      redirect(existingSubscription.checkout_url);
+    }
     await admin.from('product_subscriptions')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
       .eq('id', existingSubscription.id)
