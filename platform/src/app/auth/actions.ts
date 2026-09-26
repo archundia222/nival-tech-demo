@@ -18,6 +18,14 @@ function isEmailNotConfirmed(error: { code?: string; message?: string } | null) 
   return error?.code === "email_not_confirmed" || /email not confirmed/i.test(error?.message ?? "");
 }
 
+async function authRedirectOrigin() {
+  if (process.env.VERCEL_ENV === "production") {
+    return (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || "https://nival-tech-platform.vercel.app").replace(/\/$/, "");
+  }
+  const requestHeaders = await headers();
+  return (requestHeaders.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "https://nival-tech-platform.vercel.app").replace(/\/$/, "");
+}
+
 export async function signIn(formData: FormData) {
   const next = safeNext(formData);
   const email = value(formData, "email");
@@ -86,8 +94,7 @@ export async function signIn(formData: FormData) {
 export async function signUp(formData: FormData) {
   const next = safeNext(formData);
   const supabase = await createClient();
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
+  const origin = await authRedirectOrigin();
   const email = value(formData, "email");
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -119,8 +126,7 @@ export async function resendConfirmation(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
+  const origin = await authRedirectOrigin();
   const { error } = await supabase.auth.resend({
     type: "signup",
     email,
@@ -174,8 +180,7 @@ export async function requestPasswordReset(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const requestHeaders = await headers();
-  const origin = requestHeaders.get("origin") ?? "https://nival-tech-platform.vercel.app";
+  const origin = await authRedirectOrigin();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent("/auth/update-password")}`,
   });
