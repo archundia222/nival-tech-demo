@@ -2,13 +2,14 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
+import { money, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
 import { PaymentStatusPoller } from './payment-status-poller';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
 import { getActiveBusinessMembership } from '@/lib/active-business';
+import { cancelLatestTerminalMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 
 type MercadoPagoOrder = {
   id?: string;
