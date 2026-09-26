@@ -477,31 +477,34 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
   if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
 
   const admin = createAdminClient();
-  const { data: existingSubscription } = await admin.from('product_subscriptions')
+  const { data: subscriptionHistory } = await admin.from('product_subscriptions')
     .select('id,status,checkout_url,created_at,current_period_end')
     .eq('business_id', businessId)
     .eq('product_code', product.productCode)
     .in('status', ['pending','authorized','paused','cancelled'])
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(20);
 
-  const existingPeriodEnd = existingSubscription?.current_period_end
-    ? new Date(existingSubscription.current_period_end).getTime()
-    : 0;
-  const existingPaidAccess = existingSubscription?.status === 'authorized'
-    || (['paused','cancelled'].includes(existingSubscription?.status ?? '') && existingPeriodEnd > Date.now());
-  if (existingPaidAccess) {
+  const nowMs = Date.now();
+  const authorizedSubscription = (subscriptionHistory ?? []).find((item) => item.status === 'authorized');
+  const remainingPaidSubscription = (subscriptionHistory ?? []).find((item) =>
+    ['paused','cancelled'].includes(item.status)
+    && Boolean(item.current_period_end)
+    && new Date(item.current_period_end as string).getTime() > nowMs
+  );
+  const pendingSubscription = (subscriptionHistory ?? []).find((item) => item.status === 'pending');
+
+  if (authorizedSubscription || remainingPaidSubscription) {
     redirect(`${returnPath}?subscription=active`);
   }
-  if (existingSubscription?.status === 'pending') {
-    const ageMs = Date.now() - new Date(existingSubscription.created_at).getTime();
-    if (existingSubscription.checkout_url && Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
-      redirect(existingSubscription.checkout_url);
+  if (pendingSubscription) {
+    const ageMs = nowMs - new Date(pendingSubscription.created_at).getTime();
+    if (pendingSubscription.checkout_url && Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
+      redirect(pendingSubscription.checkout_url);
     }
     await admin.from('product_subscriptions')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', existingSubscription.id)
+      .eq('id', pendingSubscription.id)
       .eq('status', 'pending');
   }
 
@@ -608,28 +611,37 @@ export async function startNivalGrowthSubscription() {
       .eq('status', 'pending');
   }
 
-  const [{ data: points }, { data: livePointsSubscription }] = await Promise.all([
+  const [{ data: points }, { data: pointsSubscriptionHistory }] = await Promise.all([
     admin.from('business_product_entitlements').select('status')
       .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle(),
-    admin.from('product_subscriptions').select('id,status,checkout_url')
+    admin.from('product_subscriptions').select('id,status,checkout_url,current_period_end,created_at')
       .eq('business_id', businessId)
       .eq('product_code', NIVAL_POINTS_PRODUCT)
-      .in('status', ['pending','authorized'])
+      .in('status', ['pending','authorized','paused','cancelled'])
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .limit(20),
   ]);
 
-  if (livePointsSubscription?.status === 'pending' && livePointsSubscription.checkout_url) {
-    redirect(livePointsSubscription.checkout_url);
+  const paidPointsSubscription = (pointsSubscriptionHistory ?? []).find((item) => item.status === 'authorized') ?? null;
+  const pendingPointsSubscription = (pointsSubscriptionHistory ?? []).find((item) => item.status === 'pending') ?? null;
+  const gracePointsSubscription = (pointsSubscriptionHistory ?? []).find((item) =>
+    ['paused','cancelled'].includes(item.status)
+    && Boolean(item.current_period_end)
+    && new Date(item.current_period_end as string).getTime() > Date.now()
+  ) ?? null;
+
+  if (pendingPointsSubscription?.checkout_url) {
+    redirect(pendingPointsSubscription.checkout_url);
   }
-  if (livePointsSubscription?.status === 'pending') {
+  if (pendingPointsSubscription) {
     await admin.from('product_subscriptions')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', livePointsSubscription.id)
+      .eq('id', pendingPointsSubscription.id)
       .eq('status', 'pending');
   }
-  const paidPointsSubscription = livePointsSubscription?.status === 'authorized' ? livePointsSubscription : null;
+  if (gracePointsSubscription && !paidPointsSubscription) {
+    redirect('/dashboard/intelligence?error=Tu+plan+de+Puntos+está+cancelado+o+pausado,+pero+sigue+activo+hasta+el+fin+del+periodo+pagado.+Growth+se+puede+activar+cuando+Puntos+vuelva+a+tener+renovación+activa.');
+  }
 
   if (!points || !['free', 'active'].includes(points.status)) {
     redirect('/dashboard/points?error=Activa+Nival+Puntos+primero.+Growth+incluye+Puntos+e+Intelligence.');
