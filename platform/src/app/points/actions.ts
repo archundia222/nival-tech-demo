@@ -8,6 +8,7 @@ import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 import { syncGoogleWalletObject } from "@/lib/google-wallet";
+import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT } from "@/lib/commercial";
 
 async function syncWalletForScanSession(scanSessionId: string) {
   const admin = createPointsAdminClient();
