@@ -84,3 +84,56 @@ export async function reconcileLatestMercadoPagoProductOrder(
 
   return reconciled;
 }
+
+
+export async function cancelLatestTerminalMercadoPagoProductOrder(
+  businessId: string,
+  catalog: Record<string, number>,
+) {
+  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!accessToken) return false;
+
+  const admin = createAdminClient();
+  const { data: order } = await admin.from('product_orders')
+    .select('id,product_code,amount_cents,currency,provider_preference_id')
+    .eq('business_id', businessId)
+    .eq('payment_method', 'mercado_pago')
+    .eq('status', 'pending')
+    .in('product_code', Object.keys(catalog))
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!order?.provider_preference_id
+      || !isCompatibleMercadoPagoOrderId(order.provider_preference_id, accessToken)) {
+    return false;
+  }
+
+  const response = await fetch(
+    `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
+    { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
+  );
+  if (!response.ok) return false;
+
+  const payload = await response.json() as MercadoPagoOrder;
+  const expectedAmount = catalog[order.product_code];
+  const providerStatus = String(payload.status ?? '').toLowerCase();
+  const terminalFailure = ['failed','cancelled','canceled','expired'].includes(providerStatus);
+  const verified = payload.id === order.provider_preference_id
+    && payload.external_reference === order.id
+    && (!payload.currency_id || payload.currency_id === order.currency)
+    && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
+    && order.amount_cents === expectedAmount;
+
+  if (!terminalFailure || !verified) return false;
+
+  await admin.from('physical_card_orders').delete().eq('product_order_id', order.id);
+  const { data: cancelled } = await admin.from('product_orders')
+    .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+    .eq('id', order.id)
+    .eq('status', 'pending')
+    .select('id')
+    .maybeSingle();
+
+  return Boolean(cancelled?.id);
+}
