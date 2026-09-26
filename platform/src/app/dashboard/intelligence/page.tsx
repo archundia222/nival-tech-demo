@@ -24,6 +24,7 @@ export default async function NivalIntelligencePage({ searchParams }: { searchPa
   if (!user) redirect('/auth?next=%2Fdashboard%2Fintelligence');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
+  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
   await reconcileLatestSubscription(membership.business_id);
   const { data: business } = await supabase.from('businesses')
     .select('name, product_level, average_ticket_cents')
