@@ -28,7 +28,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   if (params.result === 'failure') {
     const admin = createAdminClient();
     const { data: failedPending } = await admin.from('product_orders')
-      .select('id')
+      .select('id,provider_preference_id')
       .eq('business_id', membership.business_id)
       .eq('payment_method', 'mercado_pago')
       .eq('status', 'pending')
@@ -40,12 +40,27 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (failedPending?.id) {
-      await admin.from('physical_card_orders').delete().eq('product_order_id', failedPending.id);
-      await admin.from('product_orders')
-        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-        .eq('id', failedPending.id)
-        .eq('status', 'pending');
+
+    const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+    if (failedPending?.id && failedPending.provider_preference_id && accessToken) {
+      try {
+        const response = await fetch(
+          `https://api.mercadopago.com/v1/orders/${encodeURIComponent(failedPending.provider_preference_id)}`,
+          { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
+        );
+        const providerOrder = response.ok ? await response.json() as { status?: string; status_detail?: string } : null;
+        const terminalFailure = providerOrder
+          && ['failed','cancelled','canceled','expired'].includes(String(providerOrder.status ?? '').toLowerCase());
+        if (terminalFailure) {
+          await admin.from('physical_card_orders').delete().eq('product_order_id', failedPending.id);
+          await admin.from('product_orders')
+            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('id', failedPending.id)
+            .eq('status', 'pending');
+        }
+      } catch (providerError) {
+        console.warn('[physical-card] Could not confirm failed Mercado Pago order', providerError);
+      }
     }
   }
 
