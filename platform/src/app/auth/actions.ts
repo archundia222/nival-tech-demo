@@ -164,7 +164,8 @@ export async function createBusiness(formData: FormData) {
   });
 
   if (error) {
-    const message = error.code === "23505"
+    const slugTaken = error.code === "23505" || /slug is already in use|already in use/i.test(error.message ?? "");
+    const message = slugTaken
       ? "Ese enlace público ya está ocupado. Prueba una variante, por ejemplo agregando tu colonia o una palabra corta."
       : "No pudimos crear tu negocio. Revisa el nombre y el enlace e inténtalo de nuevo.";
     redirect(`/dashboard?error=${encodeURIComponent(message)}`);
