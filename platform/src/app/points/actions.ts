@@ -445,11 +445,6 @@ export async function importCustomersCsv(formData: FormData) {
 
   if (!rows.length) redirect(captureReturn(formData, "error", "No encontramos clientes nuevos válidos. Los duplicados no se vuelven a crear."));
 
-  const { data: inserted, error } = await supabase.from("customers")
-    .insert(rows)
-    .select("id");
-  if (error || !inserted?.length) redirect(captureReturn(formData, "error", "No pudimos importar la base de clientes."));
-
   const [{ data: pointsEntitlement }, { data: program }, { count: currentAccounts }] = await Promise.all([
     supabase.from("business_product_entitlements").select("status,current_period_end")
       .eq("business_id", membership.business_id)
@@ -466,14 +461,24 @@ export async function importCustomersCsv(formData: FormData) {
       .eq("business_id", membership.business_id),
   ]);
 
+  const freeLimited = pointsEntitlement?.status === "free"
+    && (!pointsEntitlement.current_period_end || new Date(pointsEntitlement.current_period_end as string).getTime() <= Date.now());
+  const availableSlots = freeLimited
+    ? Math.max(0, NIVAL_POINTS_FREE_CUSTOMER_LIMIT - Number(currentAccounts ?? 0))
+    : rows.length;
+  if (freeLimited && availableSlots <= 0) {
+    redirect(captureReturn(formData, "error", `Llegaste al límite de ${NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes del plan Gratis.`));
+  }
+  const rowsToInsert = freeLimited ? rows.slice(0, availableSlots) : rows;
+
+  const { data: inserted, error } = await supabase.from("customers")
+    .insert(rowsToInsert)
+    .select("id");
+  if (error || !inserted?.length) redirect(captureReturn(formData, "error", "No pudimos importar la base de clientes."));
+
   let pointsAttached = 0;
   if (pointsEntitlement && program) {
-    const freeLimited = pointsEntitlement.status === "free"
-      && (!pointsEntitlement.current_period_end || new Date(pointsEntitlement.current_period_end as string).getTime() <= Date.now());
-    const capacity = freeLimited
-      ? Math.max(0, 30 - Number(currentAccounts ?? 0))
-      : inserted.length;
-    const accountRows = inserted.slice(0, capacity).map((customer) => ({
+    const accountRows = inserted.map((customer) => ({
       business_id: membership.business_id,
       program_id: program.id,
       customer_id: customer.id,
