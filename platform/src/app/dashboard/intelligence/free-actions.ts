@@ -13,7 +13,7 @@ export async function activateFreeNivalIntelligence() {
   if (!user) redirect('/auth?mode=signup&next=%2Fdashboard%2Fintelligence');
 
   const membership = await getActiveBusinessMembership(user.id);
-  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/intelligence?error=No+tienes+permiso+para+activar+Intelligence.');
+  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/intelligence?error=No+tienes+permiso+para+activar+Growth.');
 
   const admin = createAdminClient();
   const { data: points } = await admin.from('business_product_entitlements')
@@ -33,16 +33,30 @@ export async function activateFreeNivalIntelligence() {
     .maybeSingle();
 
   if (existing?.status !== 'active' && (!existing || !existing.current_period_end)) {
-    const { error } = await admin.from('business_product_entitlements').upsert({
+    const growthTrialEnd = trialEndsAt();
+    const entitlementRows = [{
       business_id: membership.business_id,
       product_code: 'nival_intelligence',
       status: 'free',
-      current_period_end: trialEndsAt(),
+      current_period_end: growthTrialEnd,
       updated_at: new Date().toISOString(),
-    }, { onConflict: 'business_id,product_code' });
+    }];
+    if (points.status !== 'active') {
+      entitlementRows.push({
+        business_id: membership.business_id,
+        product_code: 'nival_points',
+        status: 'free',
+        current_period_end: growthTrialEnd,
+        updated_at: new Date().toISOString(),
+      });
+    }
+    const { error } = await admin.from('business_product_entitlements').upsert(
+      entitlementRows,
+      { onConflict: 'business_id,product_code' },
+    );
     if (error) {
       console.error('[intelligence-free] entitlement failed', { code: error.code });
-      redirect('/dashboard/intelligence?error=No+pudimos+activar+la+prueba+de+Intelligence.');
+      redirect('/dashboard/intelligence?error=No+pudimos+activar+la+prueba+de+Growth.');
     }
   }
 
