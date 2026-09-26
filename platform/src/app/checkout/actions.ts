@@ -478,15 +478,20 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
 
   const admin = createAdminClient();
   const { data: existingSubscription } = await admin.from('product_subscriptions')
-    .select('id,status,checkout_url,created_at')
+    .select('id,status,checkout_url,created_at,current_period_end')
     .eq('business_id', businessId)
     .eq('product_code', product.productCode)
-    .in('status', ['pending','authorized'])
+    .in('status', ['pending','authorized','paused','cancelled'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (existingSubscription?.status === 'authorized') {
+  const existingPeriodEnd = existingSubscription?.current_period_end
+    ? new Date(existingSubscription.current_period_end).getTime()
+    : 0;
+  const existingPaidAccess = existingSubscription?.status === 'authorized'
+    || (['paused','cancelled'].includes(existingSubscription?.status ?? '') && existingPeriodEnd > Date.now());
+  if (existingPaidAccess) {
     redirect(`${returnPath}?subscription=active`);
   }
   if (existingSubscription?.status === 'pending') {
@@ -547,14 +552,18 @@ export async function startNivalPointsSubscription() {
   await reconcileLatestSubscription(businessId);
   const admin = createAdminClient();
   const { data: growthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code,status,checkout_url')
+    .select('id,product_code,status,checkout_url,current_period_end')
     .eq('business_id', businessId)
     .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .in('status', ['pending','authorized'])
+    .in('status', ['pending','authorized','paused','cancelled'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (growthSubscription?.status === 'authorized') redirect('/dashboard/points?subscription=active');
+  const growthPeriodEnd = growthSubscription?.current_period_end ? new Date(growthSubscription.current_period_end).getTime() : 0;
+  if (growthSubscription?.status === 'authorized'
+      || (['paused','cancelled'].includes(growthSubscription?.status ?? '') && growthPeriodEnd > Date.now())) {
+    redirect('/dashboard/points?subscription=active');
+  }
   if (growthSubscription?.status === 'pending' && growthSubscription.checkout_url) redirect(growthSubscription.checkout_url);
   if (growthSubscription?.status === 'pending') {
     await admin.from('product_subscriptions')
@@ -575,14 +584,20 @@ export async function startNivalGrowthSubscription() {
 
   const admin = createAdminClient();
   const { data: existingGrowthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code,status,checkout_url')
+    .select('id,product_code,status,checkout_url,current_period_end')
     .eq('business_id', businessId)
     .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .in('status', ['pending','authorized'])
+    .in('status', ['pending','authorized','paused','cancelled'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (existingGrowthSubscription?.status === 'authorized') redirect('/dashboard/intelligence?subscription=active');
+  const existingGrowthPeriodEnd = existingGrowthSubscription?.current_period_end
+    ? new Date(existingGrowthSubscription.current_period_end).getTime()
+    : 0;
+  if (existingGrowthSubscription?.status === 'authorized'
+      || (['paused','cancelled'].includes(existingGrowthSubscription?.status ?? '') && existingGrowthPeriodEnd > Date.now())) {
+    redirect('/dashboard/intelligence?subscription=active');
+  }
   if (existingGrowthSubscription?.status === 'pending' && existingGrowthSubscription.checkout_url) {
     redirect(existingGrowthSubscription.checkout_url);
   }
