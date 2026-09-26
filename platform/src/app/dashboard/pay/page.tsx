@@ -9,7 +9,7 @@ import { createAdditionalPaymentProfile, prepareFreeNivalPay, publishFreeNivalPa
 import { startAdditionalNivalPayCheckout } from '@/app/checkout/actions';
 import { PaymentProfileQr } from '../payment-profile-qr';
 import { SmartLinkQr } from '../smart-link-qr';
-import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
+import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
@@ -32,6 +32,12 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     [NIVAL_PAY_EXTRA_SECTION_PRODUCT]: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
     [NIVAL_PAY_ADDITIONAL_PRODUCT]: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
   });
+  if (params.result === 'failure') {
+    await cancelLatestTerminalMercadoPagoProductOrder(membership.business_id, {
+      [NIVAL_PAY_EXTRA_SECTION_PRODUCT]: NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS,
+      [NIVAL_PAY_ADDITIONAL_PRODUCT]: NIVAL_PAY_ADDITIONAL_PRICE_CENTS,
+    });
+  }
 
   // A successful extra-section checkout should also finish in one trip.
   // If Mercado Pago has already granted a new section entitlement, create the
