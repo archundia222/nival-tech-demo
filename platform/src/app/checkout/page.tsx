@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { money, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
@@ -9,104 +8,7 @@ import { CheckoutSubmitButton } from './submit-button';
 import { PaymentStatusPoller } from './payment-status-poller';
 import { ActiveCard, BankSetupForm } from './bank-setup-form';
 import { getActiveBusinessMembership } from '@/lib/active-business';
-import { cancelLatestTerminalMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
-
-type MercadoPagoOrder = {
-  id?: string;
-  external_reference?: string;
-  currency_id?: string;
-  status?: string;
-  status_detail?: string;
-  total_amount?: string | number;
-  total_paid_amount?: string | number;
-  transactions?: { payments?: Array<{
-    id?: string;
-    status?: string;
-    status_detail?: string;
-    amount?: string | number;
-    paid_amount?: string | number;
-  }> };
-};
-
-async function reconcileLatestOrder(businessId: string) {
-  const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  if (!accessToken) return;
-  const admin = createAdminClient();
-  const { data: recentOrders } = await admin.from('product_orders')
-    .select('id, amount_cents, currency, status, provider_preference_id, provider_payment_id')
-    .eq('business_id', businessId)
-    .eq('product_code', 'nival_pay')
-    .eq('payment_method', 'mercado_pago')
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  const activateBusiness = async () => {
-    const now = new Date().toISOString();
-    await admin.from('businesses')
-      .update({ subscription_status: 'active', updated_at: now })
-      .eq('id', businessId)
-      .neq('subscription_status', 'active');
-  };
-
-  for (const order of recentOrders ?? []) {
-    if (order.status === 'paid' && order.provider_payment_id) {
-      await activateBusiness();
-      return;
-    }
-    if (!order.provider_preference_id) continue;
-
-    const response = await fetch(
-      `https://api.mercadopago.com/v1/orders/${encodeURIComponent(order.provider_preference_id)}`,
-      { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
-    );
-
-    // Mercado Pago can return orders from a different credential scope in the
-    // same database during QA. A 404 only means this token cannot see that
-    // order, so continue with the next recent order instead of getting stuck.
-    if (response.status === 404) continue;
-    if (!response.ok) {
-      console.warn('Mercado Pago reconciliation request failed', {
-        providerOrderId: order.provider_preference_id,
-        httpStatus: response.status,
-      });
-      continue;
-    }
-
-    const payload = await response.json() as MercadoPagoOrder;
-    const payment = payload.transactions?.payments?.find((candidate) =>
-      candidate.status === 'processed' && candidate.status_detail === 'accredited'
-    );
-    const paymentId = payment?.id ? String(payment.id) : null;
-    const checks = {
-      orderId: payload.id === order.provider_preference_id,
-      externalReference: payload.external_reference === order.id,
-      orderStatus: payload.status === 'processed',
-      orderStatusDetail: payload.status_detail === 'accredited',
-      currency: !payload.currency_id || payload.currency_id === order.currency,
-      totalAmount: Math.round(Number(payload.total_amount) * 100) === order.amount_cents,
-      totalPaidAmount: Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents,
-      catalogAmount: order.amount_cents === NIVAL_PAY_PRICE_CENTS,
-      paymentId: Boolean(paymentId),
-      storedPaymentId: !order.provider_payment_id || order.provider_payment_id === paymentId,
-    };
-    const approved = Object.values(checks).every(Boolean);
-    if (!approved || !paymentId) continue;
-
-    const { error: finalizeError } = await admin.rpc('finalize_nival_pay_order', {
-      p_order_id: order.id,
-      p_provider_payment_id: paymentId,
-    });
-    if (finalizeError) {
-      console.error('Nival Pay reconciliation finalization failed', {
-        orderId: order.id,
-        code: finalizeError.code,
-      });
-      continue;
-    }
-    await activateBusiness();
-    return;
-  }
-}
+import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 
 export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ result?: string; error?: string }> }) {
   const params = await searchParams;
@@ -120,7 +22,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
-  if (params.result === 'success') await reconcileLatestOrder(membership.business_id);
+  if (params.result === 'success' || params.result === 'pending') {
+    await reconcileLatestMercadoPagoProductOrder(membership.business_id, {
+      [NIVAL_PAY_PRODUCT]: NIVAL_PAY_PRICE_CENTS,
+    });
+  }
   if (params.result === 'failure') {
     await cancelLatestTerminalMercadoPagoProductOrder(membership.business_id, {
       [NIVAL_PAY_PRODUCT]: NIVAL_PAY_PRICE_CENTS,
