@@ -120,6 +120,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
     .maybeSingle();
   if (!business) redirect('/dashboard');
   if (params.result === 'success') await reconcileLatestOrder(membership.business_id);
+  if (params.result === 'failure') {
+    await cancelLatestTerminalMercadoPagoProductOrder(membership.business_id, {
+      [NIVAL_PAY_PRODUCT]: NIVAL_PAY_PRICE_CENTS,
+    });
+  }
   const { data: orders } = await supabase.from('product_orders')
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
     .eq('product_code', 'nival_pay').order('created_at', { ascending: false }).limit(5);
