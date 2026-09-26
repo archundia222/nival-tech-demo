@@ -541,6 +541,17 @@ async function startMercadoPagoSubscription(product: SubscriptionProduct): Promi
 }
 
 export async function startNivalPointsSubscription() {
+  const { businessId } = await currentPurchaseContext();
+  await reconcileLatestSubscription(businessId);
+  const admin = createAdminClient();
+  const { data: growthSubscription } = await admin.from('product_subscriptions')
+    .select('id,product_code')
+    .eq('business_id', businessId)
+    .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
+    .eq('status', 'authorized')
+    .limit(1)
+    .maybeSingle();
+  if (growthSubscription) redirect('/dashboard/points?subscription=active');
   return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
 }
 
@@ -553,6 +564,15 @@ export async function startNivalGrowthSubscription() {
   await reconcileLatestSubscription(businessId);
 
   const admin = createAdminClient();
+  const { data: existingGrowthSubscription } = await admin.from('product_subscriptions')
+    .select('id,product_code')
+    .eq('business_id', businessId)
+    .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
+    .eq('status', 'authorized')
+    .limit(1)
+    .maybeSingle();
+  if (existingGrowthSubscription) redirect('/dashboard/intelligence?subscription=active');
+
   const [{ data: points }, { data: paidPointsSubscription }] = await Promise.all([
     admin.from('business_product_entitlements').select('status')
       .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle(),
