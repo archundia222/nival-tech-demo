@@ -1,0 +1,3 @@
+create unique index if not exists physical_card_orders_included_base_order_unique
+on public.physical_card_orders(included_base_order_id)
+where included_base_order_id is not null;
