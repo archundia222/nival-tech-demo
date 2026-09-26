@@ -22,6 +22,7 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
+  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
   const { data: business, error } = await supabase.from('businesses')
     .select('name, logo_url, brand_color, subscription_status, product_level, nival_pay_free_enabled')
     .eq('id', membership.business_id)
