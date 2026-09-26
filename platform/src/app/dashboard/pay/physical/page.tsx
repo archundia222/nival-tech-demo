@@ -24,6 +24,31 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     .eq('id', membership.business_id)
     .maybeSingle();
   if (!business) redirect('/dashboard');
+
+  if (params.result === 'failure') {
+    const admin = createAdminClient();
+    const { data: failedPending } = await admin.from('product_orders')
+      .select('id')
+      .eq('business_id', membership.business_id)
+      .eq('payment_method', 'mercado_pago')
+      .eq('status', 'pending')
+      .in('product_code', [
+        NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
+        NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT,
+        NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT,
+      ])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (failedPending?.id) {
+      await admin.from('physical_card_orders').delete().eq('product_order_id', failedPending.id);
+      await admin.from('product_orders')
+        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+        .eq('id', failedPending.id)
+        .eq('status', 'pending');
+    }
+  }
+
   if (params.result === 'success') {
     await reconcileLatestMercadoPagoProductOrder(membership.business_id, {
       [NIVAL_PAY_PHYSICAL_CARD_PRODUCT]: NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
