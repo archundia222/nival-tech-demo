@@ -28,6 +28,10 @@ export default async function NivalPointsPage({
 
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
+  const requestedView = params.view ?? 'overview';
+  if (membership.role === 'staff' && !['visits','redemptions'].includes(requestedView)) {
+    redirect('/dashboard/points?view=visits');
+  }
   await reconcileLatestSubscription(membership.business_id);
 
   const { data: business } = await supabase
@@ -60,7 +64,7 @@ export default async function NivalPointsPage({
   const baseFree = freePlan && !trialActive;
   const available = paid || freePlan;
   const hasIntelligence = intelligenceEntitlement?.status === 'active' || intelligenceEntitlement?.status === 'free' || business.product_level === 'intelligence';
-  const view = params.view ?? 'overview';
+  const view = requestedView;
   const canManage = membership.role === 'owner' || membership.role === 'manager';
   const subscriptionConfirming = params.subscription === 'return' && !paid;
 
