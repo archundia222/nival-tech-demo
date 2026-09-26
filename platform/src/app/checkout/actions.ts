@@ -547,13 +547,21 @@ export async function startNivalPointsSubscription() {
   await reconcileLatestSubscription(businessId);
   const admin = createAdminClient();
   const { data: growthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code')
+    .select('id,product_code,status,checkout_url')
     .eq('business_id', businessId)
     .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .eq('status', 'authorized')
+    .in('status', ['pending','authorized'])
+    .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (growthSubscription) redirect('/dashboard/points?subscription=active');
+  if (growthSubscription?.status === 'authorized') redirect('/dashboard/points?subscription=active');
+  if (growthSubscription?.status === 'pending' && growthSubscription.checkout_url) redirect(growthSubscription.checkout_url);
+  if (growthSubscription?.status === 'pending') {
+    await admin.from('product_subscriptions')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', growthSubscription.id)
+      .eq('status', 'pending');
+  }
   return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
 }
 
@@ -567,24 +575,46 @@ export async function startNivalGrowthSubscription() {
 
   const admin = createAdminClient();
   const { data: existingGrowthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code')
+    .select('id,product_code,status,checkout_url')
     .eq('business_id', businessId)
     .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .eq('status', 'authorized')
+    .in('status', ['pending','authorized'])
+    .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (existingGrowthSubscription) redirect('/dashboard/intelligence?subscription=active');
+  if (existingGrowthSubscription?.status === 'authorized') redirect('/dashboard/intelligence?subscription=active');
+  if (existingGrowthSubscription?.status === 'pending' && existingGrowthSubscription.checkout_url) {
+    redirect(existingGrowthSubscription.checkout_url);
+  }
+  if (existingGrowthSubscription?.status === 'pending') {
+    await admin.from('product_subscriptions')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', existingGrowthSubscription.id)
+      .eq('status', 'pending');
+  }
 
-  const [{ data: points }, { data: paidPointsSubscription }] = await Promise.all([
+  const [{ data: points }, { data: livePointsSubscription }] = await Promise.all([
     admin.from('business_product_entitlements').select('status')
       .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle(),
-    admin.from('product_subscriptions').select('id')
+    admin.from('product_subscriptions').select('id,status,checkout_url')
       .eq('business_id', businessId)
       .eq('product_code', NIVAL_POINTS_PRODUCT)
-      .eq('status', 'authorized')
+      .in('status', ['pending','authorized'])
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
   ]);
+
+  if (livePointsSubscription?.status === 'pending' && livePointsSubscription.checkout_url) {
+    redirect(livePointsSubscription.checkout_url);
+  }
+  if (livePointsSubscription?.status === 'pending') {
+    await admin.from('product_subscriptions')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', livePointsSubscription.id)
+      .eq('status', 'pending');
+  }
+  const paidPointsSubscription = livePointsSubscription?.status === 'authorized' ? livePointsSubscription : null;
 
   if (!points || !['free', 'active'].includes(points.status)) {
     redirect('/dashboard/points?error=Activa+Nival+Puntos+primero.+Growth+incluye+Puntos+e+Intelligence.');
