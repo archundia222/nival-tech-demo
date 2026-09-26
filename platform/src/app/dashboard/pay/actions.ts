@@ -190,17 +190,12 @@ export async function publishFreeNivalPay(formData: FormData) {
     redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=Completa+beneficiario,+banco+y+una+CLABE+válida+antes+de+publicar+tu+QR.`);
   }
 
-  const now = new Date().toISOString();
-  const [{ error: businessError }, { error: profileError }] = await Promise.all([
-    supabase.from('businesses').update({
-      nival_pay_free_enabled: true,
-      updated_at: now,
-    }).eq('id', membership.business_id),
-    supabase.from('payment_profiles').update({ active: true, updated_at: now })
-      .eq('id', profile.id).eq('business_id', membership.business_id),
-  ]);
+  const { error: publishError } = await supabase.rpc('publish_free_nival_pay', {
+    p_business_id: membership.business_id,
+    p_profile_id: profile.id,
+  });
 
-  if (businessError || profileError) {
+  if (publishError) {
     redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=No+pudimos+publicar+tu+Nival+Pay+Gratis.+Intenta+de+nuevo.`);
   }
 
