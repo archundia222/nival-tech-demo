@@ -470,6 +470,10 @@ export async function importCustomersCsv(formData: FormData) {
       .eq("business_id", membership.business_id),
   ]);
 
+  if (pointsEntitlement && !program) {
+    redirect(captureReturn(formData, "error", "Configura primero tu programa de Nival Puntos antes de importar clientes."));
+  }
+
   const freeLimited = pointsEntitlement?.status === "free"
     && (!pointsEntitlement.current_period_end || new Date(pointsEntitlement.current_period_end as string).getTime() <= Date.now());
   const availableSlots = freeLimited
@@ -495,8 +499,12 @@ export async function importCustomersCsv(formData: FormData) {
     if (accountRows.length) {
       const pointsAdmin = createPointsAdminClient();
       const { error: accountError } = await pointsAdmin.from("loyalty_accounts").insert(accountRows);
-      if (accountError) console.error("[customer-import] Could not attach some imported customers to Puntos", accountError.code);
-      else pointsAttached = accountRows.length;
+      if (accountError) {
+        console.error("[customer-import] Could not attach imported customers to Puntos", accountError.code);
+        await pointsAdmin.from("customers").delete().in("id", inserted.map((customer) => customer.id));
+        redirect(captureReturn(formData, "error", "No pudimos completar la importación. No guardamos clientes incompletos."));
+      }
+      pointsAttached = accountRows.length;
     }
   }
 
@@ -595,44 +603,13 @@ export async function updatePointsProgram(formData: FormData) {
   };
 
   const { error } = await supabase.rpc("update_points_program_for", payload);
-  if (error && !error.message.includes("points_not_active")) return { ok: false, error: error.message };
-
-  if (error?.message.includes("points_not_active")) {
-    const admin = createPointsAdminClient();
-    const { data: entitlement } = await admin.from("business_product_entitlements")
-      .select("status,current_period_end")
-      .eq("business_id", membership.business_id)
-      .eq("product_code", "nival_points")
-      .maybeSingle();
-    const trialActive = entitlement?.status === "free"
-      && Boolean(entitlement.current_period_end)
-      && new Date(entitlement.current_period_end as string).getTime() > Date.now();
-
-    const valid = name.length >= 2 && name.length <= 80
-      && Number.isInteger(threshold) && threshold >= 1 && threshold <= 1000
-      && reward.length >= 2 && reward.length <= 160
-      && Number.isInteger(cooldown) && cooldown >= 0 && cooldown <= 1440
-      && Number.isInteger(dailyCap) && dailyCap >= 0 && dailyCap <= 100
-      && Number.isInteger(reviewVisit) && reviewVisit >= 1 && reviewVisit <= 20
-      && (!reviewUrl || reviewUrl.startsWith("https://"));
-
-    if (!trialActive) return { ok: false, error: "Esta configuración requiere Nival Puntos Pro." };
-    if (!valid) return { ok: false, error: "Revisa los datos del programa." };
-
-    const { error: trialUpdateError } = await admin.from("loyalty_programs")
-      .update({
-        name,
-        reward_threshold: threshold,
-        reward_description: reward,
-        point_cooldown_minutes: cooldown,
-        daily_points_cap: dailyCap,
-        review_url: reviewUrl || null,
-        review_request_visit: reviewVisit,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("business_id", membership.business_id)
-      .eq("active", true);
-    if (trialUpdateError) return { ok: false, error: "No pudimos guardar la configuración del trial." };
+  if (error) {
+    const message = error.message.includes("points_not_active")
+      ? "Esta configuración requiere Nival Puntos Pro o una prueba Pro activa."
+      : error.message.includes("invalid_program_settings")
+        ? "Revisa los datos del programa."
+        : "No pudimos guardar la configuración.";
+    return { ok: false, error: message };
   }
 
   revalidatePath("/dashboard/points");
