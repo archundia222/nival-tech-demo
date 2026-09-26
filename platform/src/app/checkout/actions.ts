@@ -750,7 +750,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
       .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
-    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at)').eq('business_id', businessId),
+    admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at,checkout_url)').eq('business_id', businessId),
   ]);
   if (paidError || cardsError) redirect('/dashboard/pay/physical?error=No+pudimos+validar+tu+tarjeta+incluida.');
   const claimedOrderIds = new Set((existingCards ?? []).filter((card) => {
@@ -758,16 +758,24 @@ export async function claimIncludedPhysicalCard(form: FormData) {
     return linked?.status === 'paid';
   }).map((card) => card.included_base_order_id ?? card.product_order_id));
 
-  const recentPendingIncluded = (existingCards ?? []).find((card) => {
+  const pendingIncluded = (existingCards ?? []).find((card) => {
     const linked = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
     const baseOrderId = card.included_base_order_id ?? card.product_order_id;
-    if (linked?.status !== 'pending' || !paidOrders?.some((order) => order.id === baseOrderId)) return false;
-    const createdAt = linked?.created_at ?? card.created_at;
-    const ageMs = createdAt ? Date.now() - new Date(createdAt).getTime() : Number.POSITIVE_INFINITY;
-    return Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000;
+    return linked?.status === 'pending' && paidOrders?.some((order) => order.id === baseOrderId);
   });
-  if (recentPendingIncluded) {
-    redirect('/dashboard/pay/physical?result=pending');
+  if (pendingIncluded) {
+    const linked = Array.isArray(pendingIncluded.product_orders) ? pendingIncluded.product_orders[0] : pendingIncluded.product_orders;
+    const createdAt = linked?.created_at ?? pendingIncluded.created_at;
+    const ageMs = createdAt ? Date.now() - new Date(createdAt).getTime() : Number.POSITIVE_INFINITY;
+    if (Number.isFinite(ageMs) && ageMs < 15 * 60 * 1000) {
+      if (linked?.checkout_url) redirect(linked.checkout_url);
+      redirect('/dashboard/pay/physical?result=pending');
+    }
+    await admin.from('physical_card_orders').delete().eq('product_order_id', pendingIncluded.product_order_id);
+    await admin.from('product_orders')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', pendingIncluded.product_order_id)
+      .eq('status', 'pending');
   }
 
   const includedOrder = paidOrders?.find((order) => !claimedOrderIds.has(order.id));
