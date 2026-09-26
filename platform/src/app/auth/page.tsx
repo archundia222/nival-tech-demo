@@ -31,7 +31,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <p className="authIntro">
           {signup
             ? signupContext.text
-            : "Administra Nival Pay, Puntos e Intelligence desde la misma cuenta."}
+            : "Administra Nival Pay, Nival Puntos y Nival Growth desde la misma cuenta."}
         </p>
         {signup && <>
           <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay puede quedarse gratis. Puntos empieza con prueba Pro y después puede seguir en Free; Growth se construye sobre Puntos.</span></div>
