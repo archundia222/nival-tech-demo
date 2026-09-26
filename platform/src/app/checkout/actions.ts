@@ -633,11 +633,6 @@ export async function startNivalGrowthSubscription() {
       });
 }
 
-export async function startNivalIntelligenceSubscription() {
-  return startNivalGrowthSubscription();
-}
-
-
 type PhysicalCardInput = {
   design: 'black' | 'white' | 'custom';
   design_notes: string | null;
