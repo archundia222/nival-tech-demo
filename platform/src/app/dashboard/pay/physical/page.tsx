@@ -18,6 +18,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay%2Fphysical');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard');
+  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
   const { data: business } = await supabase.from('businesses')
     .select('name, product_level, slug, logo_url')
     .eq('id', membership.business_id)
