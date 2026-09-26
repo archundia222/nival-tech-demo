@@ -308,6 +308,14 @@ export async function startAdditionalNivalPayCheckout() {
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
+  const { data: alreadyPaid } = await admin.from('product_orders').select('id')
+    .eq('business_id', businessId)
+    .eq('product_code', NIVAL_PAY_PRODUCT)
+    .eq('status', 'paid')
+    .limit(1)
+    .maybeSingle();
+  if (alreadyPaid) redirect('/dashboard/pay?view=manage');
+
   const { data: existing } = await admin.from('product_orders').select('id,created_at')
     .eq('business_id', businessId)
     .eq('product_code', NIVAL_PAY_PRODUCT)
@@ -799,6 +807,24 @@ export async function startPhysicalCardCheckout(form: FormData) {
   const targetedDetails = await resolvePhysicalCardDestination(businessId, rawDetails);
   const details = await attachPhysicalCardArtwork(businessId, form, targetedDetails);
   const customBack = details.back_style === 'custom';
+
+  const admin = createAdminClient();
+  const desiredProductCode = customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT;
+  const { data: conflictingPending } = await admin.from('product_orders')
+    .select('id,product_code')
+    .eq('business_id', businessId)
+    .in('product_code', [NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT])
+    .eq('payment_method', 'mercado_pago')
+    .eq('status', 'pending')
+    .neq('product_code', desiredProductCode);
+  for (const order of conflictingPending ?? []) {
+    await admin.from('physical_card_orders').delete().eq('product_order_id', order.id);
+    await admin.from('product_orders')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', order.id)
+      .eq('status', 'pending');
+  }
+
   return startMercadoPagoProductCheckout({
     productCode: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT,
     amountCents: customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS,
@@ -889,6 +915,21 @@ export async function requestPhysicalCardCashPayment(form: FormData) {
   const customBack = details.back_style === 'custom';
   const productCode = customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT : NIVAL_PAY_PHYSICAL_CARD_PRODUCT;
   const amountCents = customBack ? NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS : NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS;
+
+  const { data: conflictingCash } = await admin.from('product_orders')
+    .select('id')
+    .eq('business_id', businessId)
+    .in('product_code', [NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT])
+    .eq('payment_method', 'cash')
+    .eq('status', 'pending_cash_confirmation')
+    .neq('product_code', productCode);
+  for (const order of conflictingCash ?? []) {
+    await admin.from('physical_card_orders').delete().eq('product_order_id', order.id);
+    await admin.from('product_orders')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', order.id)
+      .eq('status', 'pending_cash_confirmation');
+  }
 
   const { data: existing } = await admin.from('product_orders').select('id,created_at')
     .eq('business_id', businessId)
