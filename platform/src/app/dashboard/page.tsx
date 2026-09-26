@@ -300,7 +300,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       </>}
       </>}
-      {currentSection === "nival-card" && <>
+      {legacySection === "nival-card" && <>
       <section className="profileDigitalHeading compactSectionHeading">
         <p className="eyebrow">ENLACES Y RESEÑAS</p>
         <h1>Configura destinos que puedas reutilizar.</h1>
