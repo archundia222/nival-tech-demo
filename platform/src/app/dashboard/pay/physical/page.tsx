@@ -125,9 +125,9 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
         </section>
         <section className="chartCard physicalCardSection">
           <h2>3. Entrega</h2>
-          <label>Método<select name="deliveryMethod" required defaultValue="sunday_local"><option value="sunday_local">Entrega local en domingo · sin costo</option><option value="shipping">Paquetería · envío por cotizar</option></select></label>
+          <label>Método<select name="deliveryMethod" required defaultValue="sunday_local"><option value="sunday_local">Entrega local en domingo · sin costo</option><option value="shipping">Paquetería · envío se cotiza aparte</option></select></label>
           <label>Domingo solicitado<input name="requestedDeliveryDate" type="date" /></label>
-          <p className="payHelp">La fecha se confirma según producción y disponibilidad. Si eliges paquetería, puedes dejarla vacía.</p>
+          <p className="payHelp">La fecha se confirma según producción y disponibilidad. Si eliges paquetería, puedes dejarla vacía: este pago cubre la tarjeta y su personalización; el envío se cotiza y confirma aparte antes de enviarse.</p>
         </section>
         <section className="chartCard physicalCardSection">
           <h2>4. Datos para recibir</h2>
@@ -142,7 +142,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
         <div className="checkoutActions">
           <CheckoutSubmitButton className="nvPrimaryButton" pendingLabel={hasIncludedCard ? 'Procesando tarjeta…' : 'Abriendo Mercado Pago…'}>{hasIncludedCard ? 'Solicitar tarjeta / continuar si elegí reverso +$10' : 'Continuar al pago · $99 o $109'}</CheckoutSubmitButton>
           {!hasIncludedCard && <button className="nvSecondaryButton" type="submit" formAction={requestPhysicalCardCashPayment}>Registrar pago en efectivo · $99 o $109</button>}
-          <p className="payHelp">El total depende únicamente del reverso: estándar $0 extra · personalizado +$10 MXN.</p>
+          <p className="payHelp">El total de este pago depende únicamente del reverso: estándar $0 extra · personalizado +$10 MXN. La paquetería, si la eliges, no está incluida y se cotiza aparte.</p>
         </div>
       </form>}
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
