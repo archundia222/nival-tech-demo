@@ -50,7 +50,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const canManageWorkspace = activeMembership?.role === 'owner' || activeMembership?.role === 'manager';
   const visiblePointsItems = canManageWorkspace
     ? pointsItems
-    : pointsItems.filter((item) => ['puntos','puntos-visitas','puntos-clientes'].includes(item.id));
+    : pointsItems.filter((item) => item.id === 'puntos-visitas');
   const visiblePointGroups = (['operacion','clientes','gestion'] as const)
     .filter((group) => visiblePointsItems.some((item) => item.group === group));
   return <>
