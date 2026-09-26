@@ -208,7 +208,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
-  const homeNextAction = !hasNivalPay
+  const homeNextAction = !canManageProgram
+    ? hasPoints
+      ? { eyebrow: "OPERACIÓN", title: "Registra la siguiente visita", text: "Escanea la tarjeta del cliente y Nival reconocerá si corresponde sumar visita o canjear una recompensa.", href: "/dashboard/points?view=visits", cta: "Abrir escáner" }
+      : { eyebrow: "ACCESO DE PERSONAL", title: "Todavía no hay un programa de Puntos activo", text: "El propietario o un gerente debe activar y configurar los productos del negocio. Tu cuenta de personal no puede hacer compras ni cambiar la configuración.", href: "/support", cta: "Ver ayuda" }
+    : !hasNivalPay
     ? { eyebrow: "EMPIEZA GRATIS", title: "Crea tu primera Nival Pay", text: "Publica un QR y enlace de cobro sin pagar. Si después quieres NFC física y más herramientas, activas la versión completa sin cambiar tu QR.", href: "/dashboard/pay", cta: "Crear Nival Pay Gratis" }
     : !payReady
       ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
@@ -243,7 +247,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
         <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
       </section>
-      <section className="nivalProductHub" aria-label="Productos Nival">
+      {canManageProgram && <><section className="nivalProductHub" aria-label="Productos Nival">
         <article className={hasNivalPay ? "activeProduct" : ""}>
           <div><span>COBRAR</span><b>{paidNivalPay ? "COMPLETO" : freeNivalPay ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Pay</h2>
@@ -268,7 +272,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>
         <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
       </section>
-      <BusinessHealthCard items={businessHealthItems} />
+      <BusinessHealthCard items={businessHealthItems} /></>}
       </>}
       {legacySection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
