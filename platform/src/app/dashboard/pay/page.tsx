@@ -62,42 +62,10 @@ export default async function PaySettings({ searchParams }: { searchParams: Prom
     }
   }
 
-  // A successful additional-card checkout should finish the job in one trip.
-  // Create the purchased profile immediately instead of asking the customer to
-  // press the plus button a second time.
+  // Finish a paid additional Nival Pay through the same idempotent
+  // order-linked path used by the manual fallback.
   if (params.result === 'success' && currentView === 'add') {
-    const [{ data: purchasedProfiles }, { count: purchasedExtras }] = await Promise.all([
-      supabase.from('payment_profiles')
-        .select('id, account_holder, bank_name, clabe')
-        .eq('business_id', membership.business_id)
-        .order('created_at'),
-      supabase.from('product_orders')
-        .select('id', { count: 'exact', head: true })
-        .eq('business_id', membership.business_id)
-        .eq('product_code', NIVAL_PAY_ADDITIONAL_PRODUCT)
-        .eq('status', 'paid'),
-    ]);
-    const currentProfiles = purchasedProfiles ?? [];
-    const sourceProfile = currentProfiles[0];
-    if (sourceProfile && currentProfiles.length < 1 + (purchasedExtras ?? 0)) {
-      const { data: createdProfile, error: createError } = await supabase.from('payment_profiles').insert({
-        business_id: membership.business_id,
-        display_name: 'Nival Pay',
-        account_holder: sourceProfile.account_holder,
-        bank_name: sourceProfile.bank_name,
-        clabe: sourceProfile.clabe,
-        active: true,
-      }).select('id').single();
-      if (createError) {
-        console.error('[pay] Purchased Nival Pay profile creation failed', {
-          businessId: membership.business_id,
-          code: createError.code,
-          message: createError.message,
-        });
-      } else if (createdProfile) {
-        redirect(`/dashboard/pay?view=manage&profile=${createdProfile.id}&created=1`);
-      }
-    }
+    await createAdditionalPaymentProfile();
   }
 
   const [{ data: paidOrder }, { data: profiles, error: profileError }, { count: paidExtras }, { data: smartLinks }, { data: pointsEntitlement }] = await Promise.all([
