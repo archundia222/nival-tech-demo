@@ -24,6 +24,16 @@ export async function reconcileLatestSubscription(businessId: string) {
   if (!accessToken) return;
 
   const admin = createAdminClient();
+  const { error: refreshError } = await admin.rpc('refresh_nival_subscription_entitlements', {
+    p_business_id: businessId,
+  });
+  if (refreshError) {
+    console.error('[subscriptions] Entitlement refresh failed', {
+      businessId,
+      code: refreshError.code,
+    });
+  }
+
   const { data: subscription, error: lookupError } = await admin
     .from('product_subscriptions')
     .select('id, product_code, amount_cents, provider_subscription_id, status')
