@@ -47,6 +47,10 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const payActive = payItems.some((item) => item.id === active);
   const pointsActive = pointsItems.some((item) => item.id === active);
   const intelligenceActive = intelligenceItems.some((item) => item.id === active);
+  const canManageWorkspace = activeMembership?.role === 'owner' || activeMembership?.role === 'manager';
+  const visiblePointsItems = canManageWorkspace
+    ? pointsItems
+    : pointsItems.filter((item) => ['puntos','puntos-visitas','puntos-clientes'].includes(item.id));
   return <>
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
@@ -56,17 +60,17 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         <button type="submit">Cambiar</button>
       </form> : <div className="workspaceSwitcher"><span>{businessName.slice(0, 1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong></div></div>}
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
-        <span className="sidebarSectionLabel">COBRAR</span>
+        {canManageWorkspace && <><span className="sidebarSectionLabel">COBRAR</span>
         <details className={styles.productGroup} open={payActive}>
           <summary className={`sidebarMainProduct ${payActive ? 'active' : ''}`}><NavIcon><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 9h10M7 13h5" /></NavIcon><span>Nival Pay</span><i aria-hidden="true">⌄</i></summary>
           <div className="sidebarSubmenu" aria-label="Opciones de Nival Pay">{payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>
-        </details>
+        </details></>}
         <span className="sidebarSectionLabel">HACER QUE VUELVAN</span>
         <details className={styles.productGroup} open={pointsActive}>
           <summary className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`}><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon><span>Nival Puntos</span><i aria-hidden="true">⌄</i></summary>
-          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'USAR' : group === 'clientes' ? 'CLIENTES' : 'PROGRAMA'}</small>{pointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
+          <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Opciones de Nival Puntos">{(['operacion','clientes','gestion'] as const).map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'operacion' ? 'USAR' : group === 'clientes' ? 'CLIENTES' : 'PROGRAMA'}</small>{visiblePointsItems.filter(item => item.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
         </details>
-        <span className="sidebarSectionLabel">CRECER</span>
+        {canManageWorkspace && <><span className="sidebarSectionLabel">CRECER</span>
         <details className={styles.productGroup} open={intelligenceActive}>
           <summary className={`sidebarMainProduct ${intelligenceActive ? 'active' : ''}`}><NavIcon><path d="m12 3 1.7 4.3L18 9l-4.3 1.7L12 15l-1.7-4.3L6 9l4.3-1.7L12 3Z" /></NavIcon><span>Nival Growth</span><i aria-hidden="true">⌄</i></summary>
           <div className="sidebarSubmenu pointsSidebarSubmenu" aria-label="Herramientas de Nival Growth">{(['accion','resultados','herramientas'] as const).map(group => <div className="pointsNavGroup" key={group}><small>{group === 'accion' ? 'ACTUAR' : group === 'resultados' ? 'MEDIR' : 'PREGUNTAR'}</small>{intelligenceItems.filter(item => item.group === group).map(item => <Link key={item.id} className={active === item.id ? 'active' : undefined} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div>
@@ -74,7 +78,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         <Link className={active === 'nival-card' ? 'active' : undefined} aria-current={active === 'nival-card' ? 'page' : undefined} href="/dashboard/pay/physical"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M16 10c1.5 1.1 1.5 2.9 0 4M18.5 8c3 2.1 3 5.9 0 8"/></NavIcon>Tarjeta NFC</Link>
         <span className="sidebarSectionLabel">SERVICIOS</span>
         <Link className={active === 'web-ia' ? 'active' : undefined} aria-current={active === 'web-ia' ? 'page' : undefined} href="/dashboard/web-ia"><NavIcon><path d="M4 5h16v14H4z"/><path d="M4 9h16M8 5v4M12 14l1.2 2.6L16 18l-2.8 1.2L12 22l-1.2-2.8L8 18l2.8-1.4L12 14z"/></NavIcon>Página web con IA</Link>
-        <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Página del negocio</Link>
+        <Link className={active === 'perfil-digital' ? 'active' : undefined} aria-current={active === 'perfil-digital' ? 'page' : undefined} href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0M4 4h16v16H4z" /></NavIcon>Página del negocio</Link></>}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/support">Ayuda</Link><Link href="/dashboard?section=configuracion">Configuración</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
@@ -85,10 +89,10 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
           <label><span>ESPACIO DE TRABAJO</span><select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}</select></label>
           <button type="submit">Cambiar negocio</button>
         </form>}
-        <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{pointsItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        <details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Growth <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        <MobileAutoCloseLink href="/dashboard/pay/physical">Tarjeta NFC</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/web-ia">Página web con IA</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Página del negocio</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
+        {canManageWorkspace && <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>}
+        <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{visiblePointsItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
+        {canManageWorkspace && <><details className={styles.mobileGroup} open={intelligenceActive}><summary>Nival Growth <i>⌄</i></summary><div className="mobileSubmenu">{intelligenceItems.map((item) => <MobileAutoCloseLink key={item.id} aria-current={active === item.id ? 'page' : undefined} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
+        <MobileAutoCloseLink href="/dashboard/pay/physical">Tarjeta NFC</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/web-ia">Página web con IA</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Página del negocio</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink></>}<form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
   </>;
