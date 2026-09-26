@@ -221,10 +221,18 @@ function parseCsvLine(line: string) {
   return cells;
 }
 
-async function activeBusinessContext() {
+async function activeBusinessContext(formData?: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth?next=%2Fdashboard%2Fpoints%3Fview%3Dcustomers");
+  if (!user) {
+    const requested = String(formData?.get("returnTo") ?? "").trim();
+    const next = requested.startsWith("/dashboard/intelligence")
+      ? requested
+      : requested.startsWith("/dashboard/points")
+        ? requested
+        : "/dashboard/points?view=customers";
+    redirect(`/auth?next=${encodeURIComponent(next)}`);
+  }
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect("/dashboard");
   return { supabase, user, membership };
@@ -249,7 +257,7 @@ function normalizedPhoneKeys(value: string | null | undefined) {
 }
 
 export async function registerQuickCustomer(formData: FormData) {
-  const { supabase, membership } = await activeBusinessContext();
+  const { supabase, membership } = await activeBusinessContext(formData);
   if (formData.get("privacyAcknowledged") !== "on") {
     redirect(captureReturn(formData, "error", "Confirma que informaste al cliente sobre el uso de sus datos."));
   }
@@ -277,7 +285,7 @@ export async function registerQuickCustomer(formData: FormData) {
 }
 
 export async function registerQuickSale(formData: FormData) {
-  const { supabase, user, membership } = await activeBusinessContext();
+  const { supabase, user, membership } = await activeBusinessContext(formData);
   const amountCents = normalizeSaleAmount(formData.get("amount"));
   const paymentMethod = String(formData.get("paymentMethod") ?? "other");
   const customerId = String(formData.get("customerId") ?? "").trim() || null;
@@ -308,7 +316,7 @@ export async function registerQuickSale(formData: FormData) {
 }
 
 export async function registerDailySalesSummary(formData: FormData) {
-  const { supabase, user, membership } = await activeBusinessContext();
+  const { supabase, user, membership } = await activeBusinessContext(formData);
   const amountCents = normalizeSaleAmount(formData.get("amount"));
   const transactions = Math.max(1, Math.min(100000, Number(formData.get("transactions") ?? 1) || 1));
   const saleDate = String(formData.get("saleDate") ?? "").trim();
@@ -352,7 +360,7 @@ export async function registerDailySalesSummary(formData: FormData) {
 
 
 export async function deleteBusinessSale(formData: FormData) {
-  const { supabase, membership } = await activeBusinessContext();
+  const { supabase, membership } = await activeBusinessContext(formData);
   if (!["owner","manager"].includes(membership.role)) {
     redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede corregir ventas registradas."));
   }
@@ -372,7 +380,7 @@ export async function deleteBusinessSale(formData: FormData) {
 }
 
 export async function importCustomersCsv(formData: FormData) {
-  const { supabase, membership } = await activeBusinessContext();
+  const { supabase, membership } = await activeBusinessContext(formData);
   if (!["owner","manager"].includes(membership.role)) {
     redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede importar una base de clientes."));
   }
@@ -499,7 +507,7 @@ export async function importCustomersCsv(formData: FormData) {
 }
 
 export async function importSalesCsv(formData: FormData) {
-  const { supabase, user, membership } = await activeBusinessContext();
+  const { supabase, user, membership } = await activeBusinessContext(formData);
   if (formData.get("dataAuthorization") !== "on") {
     redirect(captureReturn(formData, "error", "Confirma que puedes utilizar los datos incluidos en este archivo."));
   }
