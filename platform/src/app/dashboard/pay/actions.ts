@@ -89,19 +89,48 @@ export async function createAdditionalPaymentProfile() {
   if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
-  const [{ data: profiles }, { count: paidExtras }] = await Promise.all([
-    supabase.from('payment_profiles').select('id, account_holder, bank_name, clabe').eq('business_id', membership.business_id).order('created_at'),
-    supabase.from('product_orders').select('id', { count: 'exact', head: true }).eq('business_id', membership.business_id).eq('product_code', 'nival_pay_additional').eq('status', 'paid'),
+
+  const [{ data: profiles }, { data: paidExtraOrders }] = await Promise.all([
+    supabase.from('payment_profiles')
+      .select('id, account_holder, bank_name, clabe, source_order_id')
+      .eq('business_id', membership.business_id)
+      .order('created_at'),
+    supabase.from('product_orders')
+      .select('id,paid_at,created_at')
+      .eq('business_id', membership.business_id)
+      .eq('product_code', 'nival_pay_additional')
+      .eq('status', 'paid')
+      .order('paid_at', { ascending: true }),
   ]);
+
   const current = profiles ?? [];
-  if (current.length >= 1 + (paidExtras ?? 0)) redirect('/dashboard/pay?new=1');
   const source = current[0];
   if (!source) redirect('/dashboard/pay?error=Configura+primero+tu+Nival+Pay+principal.');
+
+  const consumedOrderIds = new Set(current.map((profile) => profile.source_order_id).filter(Boolean));
+  const missingOrder = (paidExtraOrders ?? []).find((order) => !consumedOrderIds.has(order.id));
+  if (!missingOrder) redirect('/dashboard/pay?new=1');
+
   const { data, error } = await supabase.from('payment_profiles').insert({
-    business_id: membership.business_id, display_name: 'Nival Pay',
-    account_holder: source.account_holder, bank_name: source.bank_name, clabe: source.clabe, active: true,
+    business_id: membership.business_id,
+    display_name: 'Nival Pay',
+    account_holder: source.account_holder,
+    bank_name: source.bank_name,
+    clabe: source.clabe,
+    active: true,
+    source_order_id: missingOrder.id,
   }).select('id').single();
+
+  if (error?.code === '23505') {
+    const { data: existing } = await supabase.from('payment_profiles')
+      .select('id')
+      .eq('business_id', membership.business_id)
+      .eq('source_order_id', missingOrder.id)
+      .maybeSingle();
+    if (existing?.id) redirect(`/dashboard/pay?profile=${existing.id}`);
+  }
   if (error || !data) redirect('/dashboard/pay?error=No+se+pudo+crear+la+nueva+Nival+Pay.');
+
   revalidatePath('/dashboard/pay');
   redirect(`/dashboard/pay?profile=${data.id}`);
 }
