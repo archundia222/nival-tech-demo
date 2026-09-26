@@ -75,6 +75,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   if (currentSection === "inteligencia") redirect('/dashboard/intelligence');
   if (currentSection === "clientes") redirect('/dashboard/points?view=customers');
+  if (currentSection === "nival-card") redirect('/dashboard?section=perfil-digital#reviews');
   // Keep the legacy render union wide below while old sections remain in this file.
   // The redirects above make these branches unreachable at runtime.
   const legacySection = currentSection as DashboardSection;
