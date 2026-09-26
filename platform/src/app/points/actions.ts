@@ -286,6 +286,9 @@ export async function registerQuickCustomer(formData: FormData) {
 
 export async function registerQuickSale(formData: FormData) {
   const { supabase, user, membership } = await activeBusinessContext(formData);
+  if (!["owner","manager"].includes(membership.role)) {
+    redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede registrar o importar ventas."));
+  }
   const amountCents = normalizeSaleAmount(formData.get("amount"));
   const paymentMethod = String(formData.get("paymentMethod") ?? "other");
   const customerId = String(formData.get("customerId") ?? "").trim() || null;
@@ -317,6 +320,9 @@ export async function registerQuickSale(formData: FormData) {
 
 export async function registerDailySalesSummary(formData: FormData) {
   const { supabase, user, membership } = await activeBusinessContext(formData);
+  if (!["owner","manager"].includes(membership.role)) {
+    redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede registrar o importar ventas."));
+  }
   const amountCents = normalizeSaleAmount(formData.get("amount"));
   const transactions = Math.max(1, Math.min(100000, Number(formData.get("transactions") ?? 1) || 1));
   const saleDate = String(formData.get("saleDate") ?? "").trim();
@@ -516,6 +522,9 @@ export async function importCustomersCsv(formData: FormData) {
 
 export async function importSalesCsv(formData: FormData) {
   const { supabase, user, membership } = await activeBusinessContext(formData);
+  if (!["owner","manager"].includes(membership.role)) {
+    redirect(captureReturn(formData, "error", "Solo el propietario o un gerente puede registrar o importar ventas."));
+  }
   if (formData.get("dataAuthorization") !== "on") {
     redirect(captureReturn(formData, "error", "Confirma que puedes utilizar los datos incluidos en este archivo."));
   }
