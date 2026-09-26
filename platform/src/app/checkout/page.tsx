@@ -17,6 +17,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
+  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
   const { data: business } = await supabase.from('businesses')
     .select('name, subscription_status')
     .eq('id', membership.business_id)
