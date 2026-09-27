@@ -2,20 +2,76 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { PaymentPageView } from "../pay/[token]/payment-page-view";
 
-type Step = "intro" | "pay-about" | "pay-config" | "pay-live" | "pay-use" | "points-about" | "points-config" | "points-live" | "reviews-about" | "reviews-live" | "done";
-const steps: Step[] = ["intro","pay-about","pay-config","pay-live","pay-use","points-about","points-config","points-live","reviews-about","reviews-live","done"];
+type Step =
+  | "intro"
+  | "pay-about"
+  | "pay-config"
+  | "pay-use"
+  | "points-about"
+  | "points-config"
+  | "points-use"
+  | "reviews-about"
+  | "reviews-use"
+  | "done";
+
+const steps: Step[] = [
+  "intro",
+  "pay-about",
+  "pay-config",
+  "pay-use",
+  "points-about",
+  "points-config",
+  "points-use",
+  "reviews-about",
+  "reviews-use",
+  "done",
+];
 
 export function DemoFlow() {
   const [step, setStep] = useState<Step>("intro");
   const [holder, setHolder] = useState("Café Nival");
   const [bank, setBank] = useState("BBVA");
-  const [reward, setReward] = useState("Café de la casa gratis");
-  const [goal, setGoal] = useState(10);
+  const [reward, setReward] = useState("Café gratis");
+  const [points, setPoints] = useState(7);
+  const [redeemed, setRedeemed] = useState(false);
   const index = steps.indexOf(step);
   const next = () => setStep(steps[Math.min(index + 1, steps.length - 1)]);
   const progress = Math.round(((index + 1) / steps.length) * 100);
-  const clabe = useMemo(() => "000 000 000000000 000", []);
+  const clabe = useMemo(() => "000000000000000000", []);
+
+  const payProfile = useMemo(() => ({
+    business_name: holder || "Tu negocio",
+    business_slug: null,
+    points_enabled: false,
+    logo_url: null,
+    brand_color: "#cdae67",
+    account_holder: holder || "Tu negocio",
+    bank_name: bank || "Tu banco",
+    clabe,
+    concept: "Pago de consumo",
+    payment_url: null,
+    holder_visible: true,
+    bank_visible: true,
+    clabe_visible: true,
+    concept_visible: true,
+    payment_url_visible: false,
+    custom_sections: [],
+  }), [holder, bank, clabe]);
+
+  const pointsReady = points >= 10 && !redeemed;
+  const visiblePoints = redeemed ? 0 : Math.min(points, 10);
+
+  function addPoint() {
+    if (redeemed) setRedeemed(false);
+    setPoints((value) => Math.min(10, value + 1));
+  }
+
+  function redeem() {
+    setRedeemed(true);
+    setPoints(0);
+  }
 
   return <main className="guidedDemo">
     <header className="guidedDemoTop">
@@ -27,81 +83,129 @@ export function DemoFlow() {
     <section className="guidedDemoStage">
       {step === "intro" && <div className="guidedCopy">
         <span>DEMO GUIADA</span>
-        <h1>Tres herramientas. Tres problemas cotidianos.</h1>
-        <p><b>Nival Pay</b> facilita que te paguen. <b>Nival Puntos</b> ayuda a que tus clientes regresen. <b>Nival Reseñas</b> hace más fácil pedir una reseña después de una buena experiencia.</p>
+        <h1>Vas a probar Nival como si ya fuera tu negocio.</h1>
+        <p>Primero Pay, después Puntos y al final Reseñas. Tú configuras; después verás exactamente lo que recibe tu cliente.</p>
         <button onClick={next}>Empezar demo →</button>
       </div>}
 
       {step === "pay-about" && <div className="guidedCopy">
-        <span>NIVAL PAY</span><h1>Que pagar no dependa de que tú dictes la CLABE.</h1>
-        <p>Creas una página simple con los datos que tu cliente necesita para pagarte y la compartes desde un QR, un enlace o un acceso físico en tu negocio.</p>
+        <span>NIVAL PAY</span>
+        <h1>Una forma más simple de compartir cómo pagarte.</h1>
+        <p>Configuras tus datos una vez. Después compartes el mismo acceso por QR, enlace o desde un punto físico de tu negocio.</p>
         <button onClick={next}>Continuar →</button>
       </div>}
 
-      {step === "pay-config" && <div className="guidedSplit">
-        <div className="guidedCopy compact"><span>PASO 1 · CONFIGURA</span><h1>Personaliza tu Nival Pay.</h1><p>En esta demo solo edita el titular y el banco. Los demás datos son falsos a propósito.</p></div>
-        <div className="guidedForm">
-          <label>Nombre del titular<input value={holder} onChange={(e)=>setHolder(e.target.value)} maxLength={50}/></label>
-          <label>Banco<input value={bank} onChange={(e)=>setBank(e.target.value)} maxLength={30}/></label>
-          <div className="guidedLocked"><span>CLABE de demostración</span><strong>{clabe}</strong><small>No es una cuenta real</small></div>
+      {step === "pay-config" && <div className="guidedDemoProductStage">
+        <div className="guidedCopy compact">
+          <span>PASO 1 · CONFIGURA TU NIVAL PAY</span>
+          <h1>Edita directamente y mira cómo cambia.</h1>
+          <p>Escribe el titular y el banco. La CLABE es falsa a propósito. Dentro de la vista puedes tocar los datos para copiarlos.</p>
+          <div className="guidedInlineFields">
+            <label>Titular<input value={holder} onChange={(e)=>setHolder(e.target.value)} maxLength={50}/></label>
+            <label>Banco<input value={bank} onChange={(e)=>setBank(e.target.value)} maxLength={30}/></label>
+          </div>
+          <small className="guidedAutosave">● Los cambios se guardan automáticamente</small>
           <button onClick={next}>Publicar Nival Pay →</button>
         </div>
-      </div>}
-
-      {step === "pay-live" && <div className="guidedSplit">
-        <div className="guidedCopy compact"><span>PASO 2 · ASÍ LO VE TU CLIENTE</span><h1>Sin instrucciones largas.</h1><p>Tu cliente abre esta vista y sigue tres pasos.</p></div>
-        <div className="guidedPhone light">
-          <div className="guidedPayHeader"><span>CN</span><small>Paga a</small><h2>{holder || "Tu negocio"}</h2></div>
-          <div className="guidedSteps"><b>1 · Copia la CLABE</b><b>2 · Abre tu banco</b><b>3 · Pega y verifica</b></div>
-          <p className="guidedWarning">Antes de transferir, confirma que el beneficiario coincida.</p>
-          <div className="guidedField"><span>Beneficiario</span><strong>{holder}</strong></div>
-          <div className="guidedField"><span>Banco</span><strong>{bank}</strong></div>
-          <div className="guidedField"><span>CLABE</span><strong>{clabe}</strong></div>
-          <button onClick={next}>Continuar →</button>
+        <div className="guidedExactPreview">
+          <PaymentPageView profile={payProfile} embedded />
         </div>
       </div>}
 
       {step === "pay-use" && <div className="guidedCopy">
-        <span>¿CÓMO LO USAS?</span><h1>Lo pones donde ya cobras.</h1>
-        <div className="guidedUseGrid"><article><b>1</b><strong>Comparte</strong><p>QR en mostrador, link por WhatsApp o acceso físico.</p></article><article><b>2</b><strong>El cliente abre</strong><p>Ve tus datos y sabe exactamente qué hacer.</p></article><article><b>3</b><strong>Tú actualizas</strong><p>Si cambias banco o titular, editas Nival y conservas el mismo acceso.</p></article></div>
+        <span>PASO 2 · ÚSALO CON TUS CLIENTES</span>
+        <h1>Lo colocas donde ya cobras.</h1>
+        <div className="guidedUseGrid">
+          <article><b>1</b><strong>Comparte</strong><p>QR en mostrador, enlace por WhatsApp o acceso físico.</p></article>
+          <article><b>2</b><strong>Tu cliente abre</strong><p>Ve tus datos, copia y sabe qué hacer.</p></article>
+          <article><b>3</b><strong>Tú mantienes el control</strong><p>Si cambias banco o titular, editas Nival una sola vez.</p></article>
+        </div>
         <button onClick={next}>Siguiente: Nival Puntos →</button>
       </div>}
 
       {step === "points-about" && <div className="guidedCopy">
-        <span>NIVAL PUNTOS</span><h1>Dale una razón visible para volver.</h1><p>Tu cliente se registra una vez, acumula visitas o puntos y ve cuánto le falta para su recompensa desde el celular.</p><button onClick={next}>Configurar demo →</button>
+        <span>NIVAL PUNTOS</span>
+        <h1>Haz visible la razón para regresar.</h1>
+        <p>Tu cliente acumula puntos o visitas y ve en su celular cuánto le falta para su recompensa.</p>
+        <button onClick={next}>Continuar →</button>
       </div>}
 
-      {step === "points-config" && <div className="guidedSplit">
-        <div className="guidedCopy compact"><span>PASO 1 · CONFIGURA</span><h1>Define la recompensa.</h1><p>Elige qué gana el cliente y cuántas visitas necesita.</p></div>
-        <div className="guidedForm">
-          <label>Recompensa<input value={reward} onChange={(e)=>setReward(e.target.value)} maxLength={70}/></label>
-          <label>Meta de visitas<input type="number" min={2} max={30} value={goal} onChange={(e)=>setGoal(Math.max(2, Math.min(30, Number(e.target.value) || 10)))}/></label>
-          <button onClick={next}>Publicar programa →</button>
+      {step === "points-config" && <div className="guidedDemoProductStage">
+        <div className="guidedCopy compact">
+          <span>PASO 1 · CONFIGURA TU PROGRAMA</span>
+          <h1>Define la recompensa y prueba el flujo.</h1>
+          <label className="guidedRewardField">Recompensa<input value={reward} onChange={(e)=>setReward(e.target.value)} maxLength={60}/></label>
+          <div className="guidedPointsActions">
+            <button type="button" onClick={addPoint} disabled={pointsReady}>+ Agregar punto</button>
+            {pointsReady && <button type="button" className="rewardAction" onClick={redeem}>Canjear premio</button>}
+          </div>
+          {redeemed && <div className="guidedRedeemed"><b>✓ Premio canjeado</b><span>{reward}</span></div>}
+          <button onClick={next}>Entender cómo se usa →</button>
+        </div>
+
+        <div className="guidedExactPoints nivalDashboard">
+          <div className="guidedCustomerHint">ASÍ LO VE TU CLIENTE</div>
+          <section className="pointsCustomerCard">
+            <div className="pointsCustomerCardTop">
+              <div className="pointsBusinessIdentity"><span>C</span><div><p className="pointsCustomerProgram">Clientes frecuentes</p><h1>Café Nival</h1></div></div>
+              <span className="pointsCustomerMemberBadge">MIEMBRO</span>
+            </div>
+            <div className="pointsCustomerGreeting"><span>Hola, Ana</span><small>Tu saldo actual</small></div>
+            <div className="pointsBalance"><strong>{visiblePoints}</strong><span>puntos</span></div>
+            <div className="pointsProgressBlock">
+              <div className="pointsProgressMeta"><span>Progreso</span><b>{visiblePoints} / 10</b></div>
+              <div className="pointsProgress"><i style={{ width: `${visiblePoints * 10}%` }} /></div>
+            </div>
+            <div className="pointsReward">
+              <div><span>{pointsReady ? "PREMIO DISPONIBLE" : "PRÓXIMA RECOMPENSA"}</span><strong>{reward}</strong></div>
+              {pointsReady ? <b>Lista para usar</b> : <b>Te faltan {Math.max(0,10-visiblePoints)} puntos</b>}
+            </div>
+            {pointsReady && <div className="pointsAvailableNotice"><span>✓</span><div><strong>1 recompensa disponible</strong><small>Ya puede canjearla en caja.</small></div></div>}
+          </section>
         </div>
       </div>}
 
-      {step === "points-live" && <div className="guidedSplit">
-        <div className="guidedCopy compact"><span>PASO 2 · ASÍ LO VE TU CLIENTE</span><h1>El progreso se entiende solo.</h1><p>El cliente ve sus puntos y la recompensa sin pedirte explicación.</p></div>
-        <div className="guidedPhone dark">
-          <div className="guidedPointsBrand"><span>CN</span><div><small>CLIENTES FRECUENTES</small><h2>Café Nival</h2></div></div>
-          <p>Hola, Ana · Tu saldo actual</p><div className="guidedBalance"><strong>{Math.max(1, goal - 3)}</strong><span>de {goal} visitas</span></div>
-          <div className="guidedBar"><i style={{width:`${Math.round(((goal-3)/goal)*100)}%`}} /></div>
-          <div className="guidedReward"><small>PRÓXIMA RECOMPENSA</small><strong>{reward}</strong><span>Te faltan 3 visitas</span></div>
-          <button onClick={next}>Siguiente: Nival Reseñas →</button>
+      {step === "points-use" && <div className="guidedCopy">
+        <span>PASO 2 · CÓMO FUNCIONA EN EL NEGOCIO</span>
+        <h1>Tu cliente ve el progreso. Tú registras lo que pasa.</h1>
+        <div className="guidedUseGrid">
+          <article><b>1</b><strong>Se registra</strong><p>Abre tu QR y obtiene su tarjeta digital.</p></article>
+          <article><b>2</b><strong>Vuelve</strong><p>Registras la visita y su progreso aumenta.</p></article>
+          <article><b>3</b><strong>Canjea</strong><p>Al llegar a la meta aparece la recompensa disponible.</p></article>
         </div>
+        <button onClick={next}>Siguiente: Nival Reseñas →</button>
       </div>}
 
       {step === "reviews-about" && <div className="guidedCopy">
-        <span>NIVAL RESEÑAS</span><h1>Una buena experiencia vale más si termina en una reseña.</h1><p>Conecta el enlace de reseñas de Google de tu negocio. El cliente escanea o acerca el celular y llega directo a dejar su opinión.</p><button onClick={next}>Ver ejemplo →</button>
+        <span>NIVAL RESEÑAS</span>
+        <h1>Haz más fácil aprovechar una buena experiencia.</h1>
+        <p>Conectas tu enlace de Google y Nival crea un acceso simple para que el cliente llegue directo a dejar su reseña.</p>
+        <button onClick={next}>Ver cómo funciona →</button>
       </div>}
 
-      {step === "reviews-live" && <div className="guidedSplit">
-        <div className="guidedCopy compact"><span>ASÍ SE USA</span><h1>Un acceso directo, sin buscar tu negocio.</h1><div className="guidedUseGrid single"><article><b>1</b><strong>Pides la reseña</strong><p>Después de una buena atención.</p></article><article><b>2</b><strong>Escanea o acerca</strong><p>El cliente abre el enlace correcto.</p></article><article><b>3</b><strong>Opina</strong><p>Llega directamente a Google para dejar la reseña.</p></article></div></div>
-        <div className="guidedReviewCard"><span>★★★★★</span><h2>¿Cómo fue tu experiencia?</h2><p>Tu opinión ayuda a este negocio.</p><button onClick={next}>Dejar reseña</button></div>
+      {step === "reviews-use" && <div className="guidedSplit">
+        <div className="guidedCopy compact">
+          <span>ASÍ SE USA</span>
+          <h1>De “¿nos dejas una reseña?” a un acceso directo.</h1>
+          <div className="guidedUseGrid single">
+            <article><b>1</b><strong>Pides la reseña</strong><p>Después de una buena experiencia.</p></article>
+            <article><b>2</b><strong>El cliente abre</strong><p>Escanea el QR o acerca el celular.</p></article>
+            <article><b>3</b><strong>Llega a Google</strong><p>Sin buscar manualmente tu negocio.</p></article>
+          </div>
+        </div>
+        <div className="guidedReviewCard">
+          <span>★★★★★</span>
+          <h2>¿Cómo fue tu experiencia?</h2>
+          <p>Tu opinión ayuda a este negocio.</p>
+          <button onClick={next}>Dejar reseña</button>
+        </div>
       </div>}
 
       {step === "done" && <div className="guidedCopy">
-        <span>DEMO TERMINADA</span><h1>Ahora ya sabes qué hace Nival.</h1><p>Empieza con una herramienta gratis o elige un plan desde la página principal.</p><Link className="guidedLinkButton" href="/#planes">Volver y ver planes →</Link>
+        <span>DEMO TERMINADA</span>
+        <h1>Ya viste cómo se configura y cómo lo usa tu cliente.</h1>
+        <p>Puedes crear tu cuenta gratis y activar solo la herramienta que tenga sentido para tu negocio.</p>
+        <Link className="guidedLinkButton" href="/#planes">Volver a la landing →</Link>
       </div>}
     </section>
   </main>;
