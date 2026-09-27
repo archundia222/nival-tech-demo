@@ -244,9 +244,10 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div>
           <p className="eyebrow">TU NEGOCIO EN NIVAL</p>
           <h1>{business?.name ?? "Tu negocio"}</h1>
-          <p>Cobra más fácil, consigue reseñas y haz que tus clientes regresen desde un solo lugar.</p>
+          <p>Primero deja listo lo esencial. Después usa Nival para cobrar, conseguir reseñas y hacer que tus clientes regresen.</p>
         </div>
       </section>
+      {canManageProgram && <BusinessHealthCard items={businessHealthItems} />}
       <section className="nivalTodayCard">
         <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
         <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
@@ -275,8 +276,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
         <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>
         <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
-      </section>
-      <BusinessHealthCard items={businessHealthItems} /></>}
+      </section></>}
       </>}
       {legacySection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
