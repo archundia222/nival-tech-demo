@@ -68,22 +68,23 @@ export default async function Home() {
 
       <section className="landingHero landingV2Hero">
         <div className="landingHeroCopy">
-          <p className="landingKicker heroReveal heroReveal1"><span /> Hecho para dueños de negocio</p>
+          <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para hacer crecer tu negocio</p>
           <h1 className="heroReveal heroReveal2">
             <span>Cobra fácil.</span>
-            <span>Haz que vuelvan.</span>
+            <span>Fideliza clientes.</span>
+            <span>Crece.</span>
           </h1>
           <p className="landingHeroLead heroReveal heroReveal3">
-            Dos herramientas simples para vender mejor sin complicar tu operación.
+            Nival te ayuda a cobrar mejor y hacer que tus clientes regresen, sin cambiar la forma en que ya trabajas.
           </p>
           <div className="landingHeroActions heroReveal heroReveal4">
             <a className="landingPrimary" href="#planes">Ver planes <b>↓</b></a>
             <a className="landingSecondary" href="#experiencia">Ver la experiencia</a>
           </div>
           <div className="landingOwnerProof heroReveal heroReveal5">
-            <span>Menos explicaciones al cobrar</span>
-            <span>Más razones para que regresen</span>
-            <span>Todo desde tu negocio</span>
+            <span>Tu cliente no instala nada</span>
+            <span>Funciona desde su celular</span>
+            <span>Tú controlas todo desde Nival</span>
           </div>
         </div>
 
@@ -105,19 +106,19 @@ export default async function Home() {
       <section className="landingV2Products scrollReveal" id="productos">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">DOS PRODUCTOS. DOS PROBLEMAS.</p>
-          <h2>Empieza por lo que hoy te quita más tiempo o ventas.</h2>
+          <h2>Dos problemas comunes. Dos soluciones fáciles de entender.</h2>
         </div>
         <div className="landingV2ProductGrid">
           <article>
             <span>COBRAR MEJOR</span>
             <h3>Nival Pay</h3>
-            <p>Haz que tus clientes encuentren tus datos de pago rápido y sin preguntarte lo mismo una y otra vez.</p>
+            <p>Haz que pagar sea más rápido y evita repetir tus datos de cobro una y otra vez.</p>
             <div className="landingOutcomeList"><b>Comparte una sola página</b><b>Actualiza tus datos sin cambiar el acceso</b><b>Úsalo en mostrador, mesa o redes</b></div>
           </article>
           <article>
             <span>HACER QUE REGRESEN</span>
             <h3>Nival Puntos</h3>
-            <p>Dales una razón visible para volver y lleva el control de visitas y recompensas sin tarjetas de papel.</p>
+            <p>Dales una razón clara para regresar y lleva puntos, visitas y recompensas sin tarjetas de papel.</p>
             <div className="landingOutcomeList"><b>Registro sencillo por QR</b><b>Progreso visible en el celular</b><b>Premios y visitas en un solo lugar</b></div>
           </article>
         </div>
@@ -161,7 +162,7 @@ export default async function Home() {
       <section className="landingPlansV2 scrollReveal" id="planes">
         <div className="landingSectionHeading compact">
           <p className="landingEyebrow">PLANES</p>
-          <h2>Elige una herramienta. Empieza gratis o activa la versión completa.</h2>
+          <h2>Elige lo que necesitas. El precio y lo que incluye están aquí mismo.</h2>
         </div>
 
         <div className="landingPlanProduct">
@@ -170,14 +171,14 @@ export default async function Home() {
             <article>
               <span>GRATIS</span>
               <strong>$0</strong>
-              <p>Página de cobro, QR y enlace para compartir.</p>
+              <p>Una página para que tus clientes vean cómo pagarte desde su celular.</p>
               <Link href={payFreeUrl}>Empezar gratis</Link>
             </article>
             <article className="featured">
               <span>COMPLETO</span>
               <strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong>
               <small>pago único</small>
-              <p>Todo lo anterior + acceso físico en tu negocio y 3 apartados de cobro.</p>
+              <p>Todo lo anterior + pago acercando el celular en tu negocio y 3 formas de cobro configurables.</p>
               <Link href={payProUrl}>Comprar Nival Pay</Link>
             </article>
           </div>
@@ -189,14 +190,14 @@ export default async function Home() {
             <article>
               <span>GRATIS</span>
               <strong>$0</strong>
-              <p>Programa de puntos para hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p>
+              <p>Programa de puntos para empezar con hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p>
               <Link href={pointsUrl}>Empezar gratis</Link>
             </article>
             <article className="featured">
               <span>PRO</span>
               <strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong>
               <small>al mes · {NIVAL_TRIAL_DAYS} días de prueba</small>
-              <p>Más capacidad, configuración y herramientas para recuperar clientes.</p>
+              <p>Más capacidad, más control del programa y herramientas para volver a contactar clientes.</p>
               <Link href={pointsUrl}>Probar Nival Puntos Pro</Link>
             </article>
           </div>
@@ -204,9 +205,9 @@ export default async function Home() {
       </section>
 
       <section className="landingV2How scrollReveal">
-        <div><span>1</span><strong>Crea tu cuenta</strong><p>Solo necesitas correo y contraseña.</p></div>
-        <div><span>2</span><strong>Configura tu negocio</strong><p>Nombre, acceso y lo básico para empezar.</p></div>
-        <div><span>3</span><strong>Compártelo</strong><p>Tus clientes usan Nival desde su propio celular.</p></div>
+        <div><span>1</span><strong>Crea tu cuenta</strong><p>Correo, contraseña y nombre de tu negocio.</p></div>
+        <div><span>2</span><strong>Elige Pay o Puntos</strong><p>Empieza gratis o activa el plan de paga cuando quieras.</p></div>
+        <div><span>3</span><strong>Compártelo</strong><p>Tu cliente abre Nival desde su celular y sabe qué hacer.</p></div>
       </section>
 
       <section className="landingFinalCta landingV2Final scrollReveal">
@@ -214,7 +215,7 @@ export default async function Home() {
         <h2>Primero resuelve un problema. Después decides si necesitas más.</h2>
         <div className="landingHeroActions">
           <a className="landingPrimary" href="#planes">Elegir plan</a>
-          <a className="landingSecondary" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Tengo una duda</a>
+          <a className="landingSecondary" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Necesito ayuda por WhatsApp</a>
         </div>
       </section>
 
