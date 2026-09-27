@@ -94,15 +94,30 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const next = safeNext(formData);
-  const supabase = await createClient();
   const origin = await authRedirectOrigin();
   const email = value(formData, "email");
-  const { data, error } = await supabase.auth.signUp({
+
+  // Use an implicit confirmation link so the email can be opened on ANY device.
+  // PKCE confirmation ties the link to the browser that started signup, which
+  // breaks when a user registers on one phone and opens email on another.
+  const signupClient = createSupabaseJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      auth: {
+        flowType: "implicit",
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    },
+  );
+  const { data, error } = await signupClient.auth.signUp({
     email,
     password: value(formData, "password"),
     options: {
       data: { full_name: value(formData, "fullName") },
-      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+      emailRedirectTo: `${origin}/auth/complete-signup?next=${encodeURIComponent(next)}`,
     },
   });
 
@@ -137,13 +152,24 @@ export async function resendConfirmation(formData: FormData) {
     redirect(`/auth?error=${encodeURIComponent("Escribe tu correo para reenviar la confirmación.")}&next=${encodeURIComponent(next)}`);
   }
 
-  const supabase = await createClient();
   const origin = await authRedirectOrigin();
-  const { error } = await supabase.auth.resend({
+  const resendClient = createSupabaseJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      auth: {
+        flowType: "implicit",
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    },
+  );
+  const { error } = await resendClient.auth.resend({
     type: "signup",
     email,
     options: {
-      emailRedirectTo: `${origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+      emailRedirectTo: `${origin}/auth/complete-signup?next=${encodeURIComponent(next)}`,
     },
   });
 
