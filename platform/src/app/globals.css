@@ -5426,3 +5426,28 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .plansFinalAction { align-items:stretch; flex-direction:column; }
   .plansFinalAction a { width:100%; }
 }
+
+
+/* Guided demo V4 */
+.guidedDemoProductStage { width:min(1180px,100%); display:grid; grid-template-columns:minmax(0,.8fr) minmax(420px,1fr); gap:42px; align-items:start; }
+.guidedInlineFields { display:grid; gap:12px; margin:20px 0 10px; }
+.guidedInlineFields label,
+.guidedRewardField { display:grid; gap:8px; color:#a9aeb7; font-size:12px; font-weight:800; }
+.guidedInlineFields input,
+.guidedRewardField input { width:100%; padding:14px; color:#f4f4f1; background:#131418; border:1px solid rgba(255,255,255,.1); border-radius:12px; font:inherit; }
+.guidedAutosave { display:block; margin:8px 0 18px; color:#72c997; font-size:11px; font-weight:800; }
+.guidedExactPreview { min-width:0; padding:12px; overflow:hidden; background:#16171a; border:1px solid rgba(255,255,255,.09); border-radius:24px; }
+.guidedExactPreview > div { border-radius:18px; overflow:hidden; }
+.guidedExactPoints { min-height:0!important; padding:12px!important; background:#101115!important; border:1px solid rgba(255,255,255,.09); border-radius:24px; }
+.guidedExactPoints .pointsCustomerCard { margin:0; }
+.guidedCustomerHint { margin:0 0 10px; color:#cfae67; font-size:10px; font-weight:900; letter-spacing:.14em; }
+.guidedPointsActions { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 16px; }
+.guidedPointsActions button { padding:12px 15px; border:1px solid rgba(207,174,103,.4); border-radius:11px; color:#e4c878; background:transparent; font-weight:900; cursor:pointer; }
+.guidedPointsActions button.rewardAction { color:#111318; background:#dfc16e; border-color:#dfc16e; }
+.guidedPointsActions button:disabled { opacity:.45; cursor:default; }
+.guidedRedeemed { display:grid; gap:3px; margin:0 0 14px; padding:12px; color:#77d09c; background:rgba(100,196,135,.1); border-radius:11px; }
+.guidedRedeemed span { color:#d8dde4; font-size:12px; }
+
+@media(max-width:820px){
+  .guidedDemoProductStage { grid-template-columns:1fr; gap:26px; }
+}
