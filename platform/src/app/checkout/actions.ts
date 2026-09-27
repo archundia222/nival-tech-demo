@@ -150,6 +150,7 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
       .select('id,checkout_url,created_at')
       .eq('business_id', businessId)
       .eq('product_code', product.productCode)
+      .eq('amount_cents', product.amountCents)
       .eq('payment_method', 'mercado_pago')
       .eq('status', 'pending')
       .order('created_at', { ascending: false })
