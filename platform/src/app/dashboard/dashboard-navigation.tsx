@@ -63,6 +63,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const groups = (['usar','clientes','programa'] as const).filter((group) => visiblePointsItems.some((item) => item.group === group));
   const wifiIcon = <NavIcon><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8 15.5a6 6 0 0 1 8 0"/><path d="M10.8 18.3a2 2 0 0 1 2.4 0"/><circle cx="12" cy="20" r=".5" fill="currentColor"/></NavIcon>;
   const reviewIcon = <NavIcon><path d="m12 3 2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2-3.8-3.7 5.2-.8L12 3Z"/></NavIcon>;
+  const wifiHref = '/dashboard?section=perfil-digital#wifi';
 
   return <>
     <aside className="dashboardSidebar professionalSidebar">
@@ -73,7 +74,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         {canManageWorkspace && <details className={styles.productGroup} open={payActive}><summary className={`sidebarMainProduct ${payActive ? 'active' : ''}`}><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h5"/></NavIcon><span>Nival Pay</span><i>⌄</i></summary><div className="sidebarSubmenu">{payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} href={item.href}>{item.label}</Link>)}</div></details>}
         <details className={styles.productGroup} open={pointsActive}><summary className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`}><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon><span>Nival Puntos</span><i>⌄</i></summary><div className="sidebarSubmenu pointsSidebarSubmenu">{groups.map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'usar' ? 'USAR' : group === 'clientes' ? 'CLIENTES' : 'PROGRAMA'}</small>{visiblePointsItems.filter(i => i.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div></details>
         {canManageWorkspace && <Link className={active === 'reseñas' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard/reviews">{reviewIcon}<span>Nival Reseñas</span></Link>}
-        {canManageWorkspace && <Link className={active === 'wifi' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/#wifi">{wifiIcon}<span>Nival WiFi</span></Link>}
+        {canManageWorkspace && <Link className={active === 'wifi' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href={wifiHref}>{wifiIcon}<span>Nival WiFi</span></Link>}
         {canManageWorkspace && <div className={styles.navDivider} />}
         {canManageWorkspace && <Link className={active === 'perfil-digital' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard?section=perfil-digital"><NavIcon><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></NavIcon><span>Configuración de tu negocio</span></Link>}
       </nav>
@@ -87,7 +88,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         {canManageWorkspace && <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>}
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{visiblePointsItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink>}
-        {canManageWorkspace && <MobileAutoCloseLink href="/#wifi">Nival WiFi</MobileAutoCloseLink>}
+        {canManageWorkspace && <MobileAutoCloseLink href={wifiHref}>Nival WiFi</MobileAutoCloseLink>}
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=perfil-digital">Configuración de tu negocio</MobileAutoCloseLink>}
         <form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
