@@ -240,7 +240,7 @@ export default async function NivalPointsPage({
             <div><small>CLIENTES A RECUPERAR</small><strong>18</strong><span>sin visita reciente</span></div>
             <div><small>CLIENTES FRECUENTES</small><strong>42</strong><span>con actividad constante</span></div>
             <div><small>CAMPAÑA DE EJEMPLO</small><strong>+23%</strong><span>regresaron después del mensaje</span></div>
-          </div>
+          </div>}
           {!paid && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Activar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
           {paid && <p className="formMessage successMessage">Nival Puntos Pro ya está activo en este negocio.</p>}
         </section>}
