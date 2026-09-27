@@ -1,64 +1,130 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { PaymentPageView } from "./pay/[token]/payment-page-view";
+
+function useAutoSaveSignal(values: unknown[]) {
+  const [status, setStatus] = useState<"saved" | "saving">("saved");
+  useEffect(() => {
+    setStatus("saving");
+    const timer = window.setTimeout(() => setStatus("saved"), 650);
+    return () => window.clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, values);
+  return status;
+}
 
 export function LandingLivePreviews() {
   const [holder, setHolder] = useState("Café Nival");
   const [bank, setBank] = useState("BBVA");
+  const [points, setPoints] = useState(7);
   const [reward, setReward] = useState("Café gratis");
-  const [goal, setGoal] = useState(10);
+  const [redeemed, setRedeemed] = useState(false);
+  const saveStatus = useAutoSaveSignal([holder, bank]);
+  const clabe = "000000000000000000";
 
-  return <div className="livePreviewStack">
-    <section className="liveProductBlock">
+  const payProfile = useMemo(() => ({
+    business_name: holder || "Tu negocio",
+    business_slug: null,
+    points_enabled: false,
+    logo_url: null,
+    brand_color: "#cdae67",
+    account_holder: holder || "Tu negocio",
+    bank_name: bank || "Tu banco",
+    clabe,
+    concept: "Pago de consumo",
+    payment_url: null,
+    holder_visible: true,
+    bank_visible: true,
+    clabe_visible: true,
+    concept_visible: true,
+    payment_url_visible: false,
+    custom_sections: [],
+  }), [holder, bank]);
+
+  const pointsReady = points >= 10 && !redeemed;
+  const displayedPoints = redeemed ? 0 : Math.min(points, 10);
+
+  function addPoint() {
+    if (redeemed) setRedeemed(false);
+    setPoints((current) => Math.min(10, current + 1));
+  }
+
+  function redeem() {
+    setRedeemed(true);
+    setPoints(0);
+  }
+
+  return <div className="livePreviewStack" id="productos">
+    <section className="liveProductBlock liveProductReal">
       <div className="liveProductCopy">
         <span>NIVAL PAY</span>
         <h2>Deja de dictar tu CLABE.</h2>
-        <p>Tu cliente abre una página clara, copia lo que necesita y paga desde su banco. Tú puedes cambiar los datos después sin cambiar el acceso.</p>
+        <p>Así lo configura el negocio y así lo usa el cliente. Escribe para editar; toca cualquier dato dentro de Nival Pay para copiarlo.</p>
         <div className="liveControls">
           <label>Titular<input value={holder} onChange={(e)=>setHolder(e.target.value)} maxLength={50}/></label>
           <label>Banco<input value={bank} onChange={(e)=>setBank(e.target.value)} maxLength={30}/></label>
         </div>
+        <div className={"landingSaveStatus " + saveStatus}>
+          <i />
+          {saveStatus === "saving" ? "Guardando cambios automáticamente…" : "Cambios guardados"}
+        </div>
       </div>
-      <div className="miniCustomerPhone pay">
-        <div className="miniPayBrand"><span>CN</span><small>Paga a</small><h3>{holder || "Tu negocio"}</h3><p>Transferencia bancaria</p></div>
-        <div className="miniSteps"><b>1 · Copia</b><b>2 · Abre tu banco</b><b>3 · Pega y verifica</b></div>
-        <p className="miniAlert">Confirma el beneficiario antes de transferir.</p>
-        <div className="miniData"><span>Beneficiario</span><strong>{holder}</strong></div>
-        <div className="miniData"><span>Banco</span><strong>{bank}</strong></div>
-        <div className="miniData"><span>CLABE</span><strong>000000000000000000</strong></div>
+      <div className="realProductPreview pay">
+        <div className="previewInstruction"><b>PRUÉBALO</b><span>Edita arriba y toca un dato para copiarlo.</span></div>
+        <PaymentPageView profile={payProfile} embedded />
       </div>
     </section>
 
-    <section className="liveProductBlock reverse">
+    <section className="liveProductBlock liveProductReal reverse">
       <div className="liveProductCopy">
         <span>NIVAL PUNTOS</span>
         <h2>Haz visible la razón para regresar.</h2>
-        <p>Tu cliente ve su progreso y recompensa desde el celular. Tú registras visitas y puedes usar esa actividad real para decidir qué promociones probar.</p>
-        <div className="liveControls">
-          <label>Recompensa<input value={reward} onChange={(e)=>setReward(e.target.value)} maxLength={60}/></label>
-          <label>Meta<input type="number" min={2} max={30} value={goal} onChange={(e)=>setGoal(Math.max(2, Math.min(30, Number(e.target.value)||10)))}/></label>
+        <p>Esta es la tarjeta que verá tu cliente. Prueba el flujo: suma puntos, llega a la meta y canjea la recompensa.</p>
+        <label className="pointsDemoReward">Recompensa<input value={reward} onChange={(e)=>setReward(e.target.value)} maxLength={60}/></label>
+        <div className="pointsDemoActions">
+          <button type="button" onClick={addPoint} disabled={pointsReady}>+ Agregar punto</button>
+          {pointsReady && <button type="button" className="redeem" onClick={redeem}>Canjear premio</button>}
         </div>
+        {redeemed && <div className="redeemedDemoNotice"><span>✓</span><div><b>Premio canjeado</b><small>{reward}</small></div></div>}
       </div>
-      <div className="miniCustomerPhone points">
-        <div className="miniPointsHead"><span>CN</span><div><small>CLIENTES FRECUENTES</small><h3>Café Nival</h3></div></div>
-        <p>Hola, Ana · Tu saldo actual</p>
-        <div className="miniBalance"><strong>{Math.max(1,goal-3)}</strong><span>de {goal} visitas</span></div>
-        <div className="miniProgress"><i style={{width:`${Math.round(((goal-3)/goal)*100)}%`}}/></div>
-        <div className="miniReward"><small>PRÓXIMA RECOMPENSA</small><strong>{reward}</strong><span>Te faltan 3 visitas</span></div>
+
+      <div className="realProductPreview points nivalDashboard">
+        <div className="previewInstruction"><b>ASÍ LO VE TU CLIENTE</b><span>Su progreso se actualiza conforme registras visitas.</span></div>
+        <section className="pointsCustomerCard">
+          <div className="pointsCustomerCardTop">
+            <div className="pointsBusinessIdentity"><span>C</span><div><p className="pointsCustomerProgram">Clientes frecuentes</p><h1>Café Nival</h1></div></div>
+            <span className="pointsCustomerMemberBadge">MIEMBRO</span>
+          </div>
+          <div className="pointsCustomerGreeting"><span>Hola, Ana</span><small>Tu saldo actual</small></div>
+          <div className="pointsBalance"><strong>{displayedPoints}</strong><span>puntos</span></div>
+          <div className="pointsProgressBlock">
+            <div className="pointsProgressMeta"><span>Progreso</span><b>{displayedPoints} / 10</b></div>
+            <div className="pointsProgress"><i style={{ width: `${displayedPoints * 10}%` }} /></div>
+          </div>
+          <div className="pointsReward">
+            <div><span>{pointsReady ? "PREMIO DISPONIBLE" : "PRÓXIMA RECOMPENSA"}</span><strong>{reward || "Café gratis"}</strong></div>
+            {pointsReady ? <b>Lista para usar</b> : <b>Te faltan {Math.max(0,10-displayedPoints)} puntos</b>}
+          </div>
+          {pointsReady && <div className="pointsAvailableNotice"><span>✓</span><div><strong>1 recompensa disponible</strong><small>Ya puede canjearla en caja.</small></div></div>}
+        </section>
       </div>
     </section>
 
-    <section className="liveProductBlock">
+    <section className="liveProductBlock liveProductReal">
       <div className="liveProductCopy">
         <span>NIVAL RESEÑAS</span>
         <h2>Pide la reseña cuando la experiencia todavía está fresca.</h2>
-        <p>Tu cliente escanea o acerca su celular y llega directo al enlace de reseñas de Google de tu negocio.</p>
+        <p>Conectas tu enlace de Google una vez. El cliente escanea el QR o acerca su celular y llega directo a dejar su opinión.</p>
       </div>
-      <div className="miniReviewExperience">
-        <span>★★★★★</span>
-        <h3>¿Cómo fue tu experiencia?</h3>
-        <p>Tu opinión ayuda a este negocio.</p>
-        <button type="button">Dejar reseña</button>
+      <div className="realProductPreview reviews">
+        <div className="previewInstruction"><b>ASÍ LO VE TU CLIENTE</b><span>Un paso directo hacia tu enlace de reseñas.</span></div>
+        <div className="miniReviewExperience">
+          <span>★★★★★</span>
+          <h3>¿Cómo fue tu experiencia?</h3>
+          <p>Tu opinión ayuda a este negocio.</p>
+          <button type="button">Dejar reseña</button>
+        </div>
       </div>
     </section>
   </div>;

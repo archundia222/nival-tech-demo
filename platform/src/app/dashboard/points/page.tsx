@@ -229,6 +229,7 @@ export default async function NivalPointsPage({
             <span>NIVAL PUNTOS PRO</span>
             <h2>Esta es una herramienta Pro.</h2>
             <p>Tu programa Gratis sigue registrando clientes, puntos y recompensas. Pro agrega más capacidad y herramientas para actuar sobre esa información: promociones, configuración avanzada y seguimiento para volver a contactar clientes.</p>
+            <div className="pointsProBundleNote"><b>Además, con Puntos Pro:</b><span>Nival Reseñas Pro queda incluido y Nival Pay Pro obtiene 90% de descuento.</span></div>
           </div>
           <div className="pointsProBenefits">
             <article><b>Más capacidad</b><p>Crece más allá del límite del plan Gratis.</p></article>
