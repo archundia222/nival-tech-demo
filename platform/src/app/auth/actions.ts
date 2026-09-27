@@ -114,7 +114,18 @@ export async function signUp(formData: FormData) {
   if (alreadyRegistered) {
     redirect(`/auth?message=${encodeURIComponent("Ya tenemos una cuenta registrada con este correo. Inicia sesión con tu contraseña; no necesitas registrarte de nuevo.")}&next=${encodeURIComponent(next)}`);
   }
-  if (error) redirect(`/auth?mode=signup&error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(next)}`);
+  if (error) {
+    const rateLimited =
+      error.code === "over_email_send_rate_limit" ||
+      /rate limit|security purposes/i.test(error.message ?? "");
+
+    const message = rateLimited
+      ? "No pudimos enviar el correo de confirmación porque el servicio de correo alcanzó temporalmente su límite. Espera unos minutos e inténtalo de nuevo."
+      : "No pudimos crear tu cuenta en este momento. Revisa tus datos e inténtalo otra vez.";
+
+    console.warn("[auth] Signup failed", { code: error.code ?? null });
+    redirect(`/auth?mode=signup&error=${encodeURIComponent(message)}&next=${encodeURIComponent(next)}`);
+  }
   if (data.session) redirect(next);
   redirect(`/auth?message=${encodeURIComponent(`Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Si el enlace falla, usa “Reenviar confirmación” en esta pantalla.`)}&next=${encodeURIComponent(next)}`);
 }
