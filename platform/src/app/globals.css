@@ -5451,3 +5451,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 @media(max-width:820px){
   .guidedDemoProductStage { grid-template-columns:1fr; gap:26px; }
 }
+
+.pointsProBundleNote{display:grid;gap:5px;margin-top:18px;padding:14px 16px;border:1px solid rgba(207,174,103,.28);border-radius:12px;background:rgba(207,174,103,.06)}
+.pointsProBundleNote b{color:#d7bc78;font-size:12px}
+.pointsProBundleNote span{color:#aeb3bb;font-size:12px;line-height:1.5}
