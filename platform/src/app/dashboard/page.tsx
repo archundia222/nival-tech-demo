@@ -244,7 +244,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div>
           <p className="eyebrow">TU NEGOCIO EN NIVAL</p>
           <h1>{business?.name ?? "Tu negocio"}</h1>
-          <p>Cobra, haz que tus clientes vuelvan y decide qué hacer después desde un solo lugar.</p>
+          <p>Cobra más fácil, consigue reseñas y haz que tus clientes regresen desde un solo lugar.</p>
         </div>
       </section>
       <section className="nivalTodayCard">
