@@ -5,7 +5,7 @@ import { confirmCashPayment } from './actions';
 
 export type AdminSaleRow = {
   id: string; businessName: string; phone: string | null; activatedAt: string;
-  paymentMethod: string; status: string; amountCents: number; publicUrl: string | null;
+  paymentMethod: string; status: string; amountCents: number; productName: string; publicUrl: string | null;
 };
 export type AdminClientRow = {
   id: string; holder: string | null; businessName: string; clabe: string | null;
@@ -25,7 +25,7 @@ export function SalesTable({ rows }: { rows: AdminSaleRow[] }) {
     <section className="adminDataTable">
       <div className="adminTableHead sales"><span>Negocio</span><span>Contacto</span><span>Activación</span><span>Método</span><span>Estado</span><span>Página</span></div>
       {visible.length ? visible.map((row) => <article className="sales" key={row.id}>
-        <strong>{row.businessName}</strong><span>{row.phone || 'Sin teléfono'}</span><time>{date(row.activatedAt)}</time><span>{row.paymentMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}</span>
+        <strong>{row.businessName}<small> · {row.productName} · ${(row.amountCents / 100).toFixed(0)}</small></strong><span>{row.phone || 'Sin teléfono'}</span><time>{date(row.activatedAt)}</time><span>{row.paymentMethod === 'cash' ? 'Efectivo' : 'Mercado Pago'}</span>
         <span>{row.status === 'paid' ? <b className="adminStatus active">Activa</b> : <form action={confirmCashPayment}><input type="hidden" name="orderId" value={row.id} /><button className="adminConfirmButton">Confirmar efectivo</button></form>}</span>
         <span>{row.publicUrl ? <button className="adminCopyButton" onClick={async () => { await navigator.clipboard.writeText(row.publicUrl!); setCopied(row.id); }}>{copied === row.id ? 'Copiado' : 'Copiar link'}</button> : 'Pendiente'}</span>
       </article>) : <p className="adminNoRows">No hay ventas en este estado.</p>}

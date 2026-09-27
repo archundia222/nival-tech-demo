@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 
-export function WifiQr({ ssid, password, security, url }: { ssid: string; password: string; security: string; url: string }) {
+export function WifiQr({ ssid, password, security, url, guest = false }: { ssid: string; password: string; security: string; url: string; guest?: boolean }) {
   const id = `wifi-${useId().replace(/:/g, '')}`;
   const [notice, setNotice] = useState('');
   const escape = (value: string) => value.replace(/([\\;,:"'])/g, '\\$1');
@@ -24,9 +24,9 @@ export function WifiQr({ ssid, password, security, url }: { ssid: string; passwo
     catch { setNotice('No pudimos copiar el enlace.'); }
   }
   return <div className="wifiSharePanel">
-    <div className="qrCanvas"><QRCodeSVG id={id} value={wifiValue} size={220} level="H" marginSize={2} title={`Conectar a ${ssid}`} /></div>
-    <strong>Escanea para conectarte a {ssid}</strong>
-    <p>El QR contiene el nombre y la contraseña de la red. Muéstralo solo a quienes quieras dar acceso.</p>
+    <div className="qrCanvas"><QRCodeSVG id={id} value={guest ? wifiValue : url} size={220} level="H" marginSize={2} title={`Conectar a ${ssid}`} /></div>
+    <strong>{guest ? `Escanea para conectarte a ${ssid}` : 'QR de acceso a tu Nival WiFi'}</strong>
+    <p>{guest ? 'Este QR contiene los datos de la red; compártelo solo con tus invitados.' : 'El QR abre tu página de acceso. El teléfono puede pedir confirmación antes de conectarse.'}</p>
     <div className="businessQrActions"><button className="businessQrPrimary" type="button" onClick={download}>Descargar QR WiFi</button><button className="businessQrSecondary" type="button" onClick={copy}>Copiar página para invitados</button><a className="businessQrSecondary" href={url} target="_blank" rel="noreferrer">Abrir página ↗</a></div>
     <p role="status">{notice}</p>
   </div>;

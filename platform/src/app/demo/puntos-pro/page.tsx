@@ -67,7 +67,7 @@ export default function PointsProPublicDemoPage() {
     <section className="pointsProDemoWhy">
       <span>¿QUÉ CAMBIA CON PRO?</span>
       <h2>Pasas de acumular puntos a saber qué hacer con la actividad.</h2>
-      <div><b>Free</b><p>Programa básico, hasta 15 clientes, tarjeta digital y una recompensa activa.</p></div>
+      <div><b>Free</b><p>Programa básico, hasta 10 clientes, tarjeta digital y una recompensa activa.</p></div>
       <div><b>Pro</b><p>Google Wallet, más capacidad, configuración avanzada, segmentos, promociones y seguimiento de resultados.</p></div>
     </section>
 

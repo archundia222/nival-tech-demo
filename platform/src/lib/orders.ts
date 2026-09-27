@@ -1,17 +1,19 @@
-import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_REVIEWS_PRO_PRICE_CENTS } from './commercial';
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_REVIEWS_PRO_PRICE_CENTS, NIVAL_WIFI_PRO_PRICE_CENTS } from './commercial';
 
 // Production catalog prices.
 export const NIVAL_PAY_PRICE_CENTS = NIVAL_PAY_FOUNDER_PRICE_CENTS;
 export const NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS = Math.round(NIVAL_PAY_FOUNDER_PRICE_CENTS * 0.10);
 export const NIVAL_PAY_PRODUCT = 'nival_pay';
 export const NIVAL_REVIEWS_PRODUCT = 'nival_reviews';
+export const NIVAL_WIFI_PRODUCT = 'nival_wifi';
+export const NIVAL_WIFI_PRICE_CENTS = NIVAL_WIFI_PRO_PRICE_CENTS;
 export const NIVAL_REVIEWS_PRICE_CENTS = NIVAL_REVIEWS_PRO_PRICE_CENTS;
 
 export function money(amountCents: number) {
   return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amountCents / 100);
 }
 
-export const NIVAL_PAY_ADDITIONAL_PRICE_CENTS = 4900;
+export const NIVAL_PAY_ADDITIONAL_PRICE_CENTS = 9900;
 export const NIVAL_PAY_ADDITIONAL_PRODUCT = 'nival_pay_additional';
 
 export const NIVAL_PAY_INCLUDED_SECTIONS = 3;

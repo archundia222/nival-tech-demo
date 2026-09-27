@@ -33,8 +33,7 @@ export function RotatingPointsQr({ accountToken, purpose = "points", rewardId }:
   }, [accountToken, purpose, rewardId]);
 
   useEffect(() => {
-    setOrigin(window.location.origin);
-    const firstRefresh = window.setTimeout(() => { void refresh(); }, 0);
+    const firstRefresh = window.setTimeout(() => { setOrigin(window.location.origin); void refresh(); }, 0);
     return () => window.clearTimeout(firstRefresh);
   }, [refresh]);
 

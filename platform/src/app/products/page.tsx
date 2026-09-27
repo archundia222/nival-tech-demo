@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_PAY_REGULAR_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_PAY_REGULAR_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_POINTS_PRO_TRIAL_DAYS, mxn } from '@/lib/commercial';
 
 export const metadata = {
   title: 'Planes y productos',
@@ -26,19 +26,19 @@ export default function Products() {
       <article className="payProduct">
         <div className="productJob">COBRAR</div>
         <h2>Nival Pay</h2>
-        <p>Tu página de cobro, QR y enlace permanecen gratis. El plan físico agrega NFC y más apartados sin cambiar el QR.</p>
-        <div className="productSimplePrice"><strong>Gratis digital</strong><span>Pro físico: {mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)} pago único</span></div>
+        <p>Tu página de cobro, enlace y QR funcionan 15 días de prueba. Después debes comprar Pro para seguir usando el mismo acceso.</p>
+        <div className="productSimplePrice"><strong>Prueba 15 días</strong><span>Pro físico: {mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)} pago único</span></div>
         <div className="founderPriceNote"><b>PRECIO FUNDADOR</b><span>Precio regular previsto después del lanzamiento: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</span></div>
-        <ul><li>Gratis: página, QR, enlace y 1 apartado</li><li>Pro: 1 tarjeta NFC física + 3 apartados</li><li>Apartados extra por $49 MXN</li></ul>
-        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpay">Crear Nival Pay gratis</Link>
+        <ul><li>Prueba: página, QR, enlace y edición por 15 días</li><li>Pro: 1 tarjeta NFC física + 3 apartados</li><li>Apartados extra por $49 MXN</li></ul>
+        <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpay">Probar Nival Pay 15 días</Link>
       </article>
 
       <article className="payProduct featuredPricingCard">
         <div className="productJob">FIDELIZAR</div>
         <h2>Nival Puntos</h2>
-        <p>Empieza con {NIVAL_TRIAL_DAYS} días de herramientas Pro. Si no pagas, tu programa no desaparece: baja al plan Gratis y conserva hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p>
+        <p>Empieza con {NIVAL_POINTS_PRO_TRIAL_DAYS} días de herramientas Pro. Si no pagas, tu programa no desaparece: baja al plan Gratis y conserva hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p>
         <div className="productSimplePrice"><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</strong><span>precio fundador Pro</span></div>
-        <div className="founderPriceNote"><b>{NIVAL_TRIAL_DAYS} DÍAS PARA PROBAR</b><span>Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</span></div>
+        <div className="founderPriceNote"><b>{NIVAL_POINTS_PRO_TRIAL_DAYS} DÍAS PARA PROBAR</b><span>Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</span></div>
         <ul><li>QR/NFC + tarjeta digital + Google Wallet en Android</li><li>Visitas, puntos, recompensas y configuración Pro</li><li>Después del trial: Free de hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes si no pagas</li></ul>
         <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Probar Nival Puntos</Link>
       </article>
@@ -49,14 +49,14 @@ export default function Products() {
         <p>Nival Puntos + Nival Intelligence en un solo plan. Puntos genera la actividad; Intelligence detecta a quién recuperar, qué campaña probar y qué resultado observar.</p>
         <div className="productSimplePrice"><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><span>Puntos + Intelligence</span></div>
         <div className="founderPriceNote"><b>EXPANSIÓN</b><span>Intelligence no se vende como sistema aislado: usa la actividad real de Puntos.</span></div>
-        <ul><li>Todo Nival Puntos Pro</li><li>Clientes frecuentes, riesgo y oportunidades</li><li>Audiencias, mensajes, campañas y medición</li><li>Si ya pagas Puntos Pro ($199/mes), subir a Growth agrega $250/mes: total $449/mes</li></ul>
+        <ul><li>Todo Nival Puntos Pro</li><li>Clientes frecuentes, riesgo y oportunidades</li><li>Audiencias, mensajes, campañas y medición</li><li>Consulta los planes disponibles desde tu cuenta</li></ul>
         <Link className="payButton" href="/auth?mode=signup&next=%2Fdashboard%2Fintelligence">Probar Nival Growth</Link>
       </article>
     </div>
 
     <section className="productsAccessory">
       <div><span>NIVAL CARD</span><h2>Hardware como extensión, no como dependencia.</h2><p>Programa una tarjeta para Pay, Puntos, reseñas o tu perfil digital. El software sigue funcionando por QR y enlace aunque todavía no tengas una tarjeta física.</p></div>
-      <div><strong>Desde $99 MXN</strong><small>La primera tarjeta de Nival Pay Pro está incluida durante la oferta fundador actual.</small><Link href="/auth?mode=signup&next=%2Fdashboard%2Fpay%2Fphysical">Diseñar una tarjeta →</Link></div>
+      <div><strong>Desde $99 MXN</strong><small>Cada Nival Card Pro de Pay, Reseñas y WiFi incluye una tarjeta física NFC.</small><Link href="/auth?mode=signup&next=%2Fdashboard%2Fpay%2Fphysical">Diseñar una tarjeta →</Link></div>
     </section>
 
     <section className="productsBundle">

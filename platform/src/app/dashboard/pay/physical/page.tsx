@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
@@ -41,19 +41,19 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     });
   }
   const admin = createAdminClient();
-  const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }, { data: reviewSmartLink }] = await Promise.all([
+  const [{ data: paidInitialOrders }, { data: claimedCards }, { data: paymentProfiles }, { data: pointsEntitlement }, { data: loyaltyProgram }, { data: reviewProfile }, { data: wifiProfile }] = await Promise.all([
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', membership.business_id)
-      .eq('product_code', NIVAL_PAY_PRODUCT)
-      .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', membership.business_id),
     admin.from('payment_profiles').select('id, display_name, public_token').eq('business_id', membership.business_id).eq('active', true).order('created_at', { ascending: true }),
     admin.from('business_product_entitlements').select('status').eq('business_id', membership.business_id).eq('product_code', 'nival_points').in('status', ['active','free']).maybeSingle(),
     admin.from('loyalty_programs').select('review_url').eq('business_id', membership.business_id).eq('active', true).limit(1).maybeSingle(),
-    admin.from('smart_links').select('id').eq('business_id', membership.business_id).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
+    admin.from('review_profiles').select('google_review_url').eq('business_id', membership.business_id).maybeSingle(),
+    admin.from('wifi_profiles').select('ssid').eq('business_id', membership.business_id).maybeSingle(),
   ]);
   const claimedOrderIds = new Set((claimedCards ?? []).filter((card) => {
     const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
@@ -68,7 +68,8 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     !claimedOrderIds.has(order.id) && !pendingIncludedOrderIds.has(order.id)
   ));
   const hasPointsDestination = Boolean(pointsEntitlement && loyaltyProgram && business.slug);
-  const hasReviewDestination = Boolean(reviewSmartLink || loyaltyProgram?.review_url);
+  const hasReviewDestination = Boolean(reviewProfile?.google_review_url);
+  const hasWifiDestination = Boolean(wifiProfile?.ssid);
   const primaryPaymentProfileId = paymentProfiles?.[0]?.id ?? '';
   const canPurchase = membership.role === 'owner' || membership.role === 'manager';
   const { data: orders } = await supabase.from('physical_card_orders')
@@ -91,7 +92,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       {params.result === 'failure' && <p role="alert" className="formMessage errorMessage">El pago no se completó. Tu pedido no se activó y puedes intentarlo otra vez.</p>}
       {params.result === 'cash' && <p role="status" className="formMessage">Pedido en efectivo registrado. El total quedó guardado según el diseño que elegiste.</p>}
       {params.result === 'included' && <p role="status" className="formMessage">Tu tarjeta incluida quedó registrada. Revisaremos el diseño y confirmaremos la entrega.</p>}
-      <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra de Nival Pay incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : hasPendingIncludedCard ? 'Ya hay una personalización de tu tarjeta incluida esperando confirmación de Mercado Pago. No necesitas volver a pagar.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
+      <header className="payHeading physicalCardHero"><p className="eyebrow">NIVAL CARD</p><h1>Una tarjeta. La acción que tu negocio necesite.</h1><p>{hasIncludedCard ? 'Tu compra Pro incluye una tarjeta física. Puedes programarla para cobrar, puntos, reseñas o tu perfil. El reverso Nival está incluido; personalizarlo cuesta $10 MXN.' : hasPendingIncludedCard ? 'Ya hay una personalización de tu tarjeta incluida esperando confirmación de Mercado Pago. No necesitas volver a pagar.' : 'Puedes comprar una tarjeta NFC aunque uses Nival Puntos, reseñas o tu perfil digital. Cuesta $99 MXN con reverso Nival o $109 MXN con reverso personalizado.'}</p></header>
       {!canPurchase && <p className="formMessage">Puedes revisar las tarjetas de este negocio, pero solo el propietario o un gerente puede solicitar o comprar una nueva.</p>}
       {canPurchase && (hasPendingIncludedCard && !hasIncludedCard || physicalPaymentConfirming) && <section className="physicalPaymentWaiting" aria-live="polite"><span>CONFIRMANDO PAGO</span><strong>No necesitas volver a comprar.</strong><p>Estamos validando el pago con Mercado Pago. Cuando quede acreditado, tu pedido aparecerá como pagado automáticamente.</p></section>}
       {canPurchase && !physicalPaymentConfirming && (!hasPendingIncludedCard || hasIncludedCard) && <form className="paymentEditor physicalCardForm" action={hasIncludedCard ? claimIncludedPhysicalCard : startPhysicalCardCheckout}>
@@ -101,6 +102,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
             <label className={!primaryPaymentProfileId ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="pay" defaultChecked={Boolean(primaryPaymentProfileId)} disabled={!primaryPaymentProfileId}/><span className="templateMock"><small>PAGAR</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para pagar</em></span><strong>Nival Pay</strong>{!primaryPaymentProfileId && <small>Configura tu página primero</small>}</label>
             <label className={!hasPointsDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="points" defaultChecked={!primaryPaymentProfileId && hasPointsDestination} disabled={!hasPointsDestination}/><span className="templateMock"><small>PUNTOS</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para guardar tus puntos</em></span><strong>Nival Puntos</strong>{!hasPointsDestination && <small>Activa y configura Puntos para usarla</small>}</label>
             <label className={!hasReviewDestination ? 'templateUnavailable' : undefined}><input type="radio" name="frontTemplate" value="reviews" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && hasReviewDestination} disabled={!hasReviewDestination}/><span className="templateMock"><small>RESEÑA</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para dejar tu reseña</em></span><strong>Reseñas</strong>{!hasReviewDestination && <small>Configura tu enlace de reseñas desde Página del negocio</small>}</label>
+          <label className="physicalWifiOption"><input type="radio" name="frontTemplate" value="wifi" disabled={!hasWifiDestination}/><span className="templateMock"><small>WIFI</small><b>)))</b><i>QR</i><em>Acércate o escanea para abrir la conexión</em></span><strong>Nival WiFi</strong></label>
             <label><input type="radio" name="frontTemplate" value="profile" defaultChecked={!primaryPaymentProfileId && !hasPointsDestination && !hasReviewDestination}/><span className="templateMock"><small>NEGOCIO</small>{business.logo_url ? <img src={business.logo_url} alt="" /> : <b>{business.name.slice(0,1).toUpperCase()}</b>}<i>QR</i><em>Escanea o acerca tu celular para ver nuestros enlaces</em></span><strong>Perfil digital</strong></label>
           </div>
           {paymentProfiles && paymentProfiles.length > 1 ? <label>Página Nival Pay<select name="paymentProfileId" defaultValue={primaryPaymentProfileId}>{paymentProfiles.map((profile,index)=><option key={profile.id} value={profile.id}>{profile.display_name || `Nival Pay ${index+1}`}</option>)}</select></label> : <input type="hidden" name="paymentProfileId" value={primaryPaymentProfileId}/>}
@@ -108,7 +110,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           {(!primaryPaymentProfileId || !hasPointsDestination || !hasReviewDestination) && <div className="templateSetupLinks">
             {!primaryPaymentProfileId && <a href="/dashboard/pay">Configurar Nival Pay →</a>}
             {!hasPointsDestination && <a href="/dashboard/points">Activar / configurar Nival Puntos →</a>}
-            {!hasReviewDestination && <a href="/dashboard?section=perfil-digital#reviews">Configurar reseñas →</a>}
+            {!hasReviewDestination && <a href="/dashboard/reviews">Configurar reseñas →</a>}
           </div>}
           <label>Color del frente<select name="design" required defaultValue="black"><option value="black">Negro Nival</option><option value="white">Blanco Nival</option><option value="custom">Color de mi marca</option></select></label>
           <label>Indicaciones del frente<textarea name="designNotes" maxLength={500} placeholder="Ej. usar mi logo blanco, fondo azul, nombre del negocio debajo del QR."/></label>
@@ -125,9 +127,9 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
         </section>
         <section className="chartCard physicalCardSection">
           <h2>3. Entrega</h2>
-          <label>Método<select name="deliveryMethod" required defaultValue="sunday_local"><option value="sunday_local">Entrega local en domingo · sin costo</option><option value="shipping">Paquetería · envío se cotiza aparte</option></select></label>
-          <label>Domingo solicitado<input name="requestedDeliveryDate" type="date" /></label>
-          <p className="payHelp">La fecha se confirma según producción y disponibilidad. Si eliges paquetería, puedes dejarla vacía: este pago cubre la tarjeta y su personalización; el envío se cotiza y confirma aparte antes de enviarse.</p>
+          <label>Método<select name="deliveryMethod" required defaultValue="sunday_local"><option value="sunday_local">Domingo en CDMX · sin costo</option><option value="saturday_local">Sábado en CDMX · sin costo</option><option value="weekday_quote">Entre semana · cotizar por WhatsApp</option><option value="shipping">Paquetería · envío se cotiza aparte</option></select></label>
+          <label>Fecha de fin de semana solicitada<input name="requestedDeliveryDate" type="date" /></label>
+          <p className="payHelp">Entrega gratuita sábados y domingos solo en Ciudad de México, con fecha acordada por WhatsApp. Entre semana, cotiza la entrega personal por WhatsApp antes de confirmarla. La fecha se confirma según producción y disponibilidad. Si eliges paquetería, puedes dejarla vacía: este pago cubre la tarjeta y su personalización; el envío se cotiza y confirma aparte antes de enviarse.</p>
         </section>
         <section className="chartCard physicalCardSection">
           <h2>4. Datos para recibir</h2>
@@ -147,7 +149,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
       </form>}
       {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
         const payment = Array.isArray(order.product_orders) ? order.product_orders[0] : order.product_orders;
-        return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}{order.back_design_url ? ' · archivo recibido' : ''}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega dominical'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
+        return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}{order.back_design_url ? ' · archivo recibido' : ''}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : order.delivery_method === 'weekday_quote' ? 'Entre semana por cotizar' : order.delivery_method === 'saturday_local' ? 'Entrega sábado' : 'Entrega domingo'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
       })}</section> : null}
     </div>
   </main>;

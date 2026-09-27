@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 function useAutoSaveSignal(values: unknown[]) {
   const [status, setStatus] = useState<"saved"|"saving">("saved");
   useEffect(() => {
-    setStatus("saving");
+    const start = window.setTimeout(() => setStatus("saving"), 0);
     const timer = window.setTimeout(() => setStatus("saved"), 700);
-    return () => window.clearTimeout(timer);
+    return () => { window.clearTimeout(start); window.clearTimeout(timer); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, values);
   return status;

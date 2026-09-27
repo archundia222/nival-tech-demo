@@ -20,6 +20,9 @@ async function context() {
 export async function activateFreeNivalReviews() {
   const { membership, admin } = await context();
   const now = new Date().toISOString();
+  const { data: existing } = await admin.from('business_product_entitlements').select('status')
+    .eq('business_id', membership.business_id).eq('product_code', 'nival_reviews').maybeSingle();
+  if (existing?.status === 'active') redirect('/dashboard/reviews');
 
   const { error: entitlementError } = await admin.from('business_product_entitlements').upsert({
     business_id: membership.business_id,
@@ -48,7 +51,7 @@ export async function saveNivalReviews(formData: FormData) {
   let url: URL;
   try {
     url = new URL(raw);
-    if (url.protocol !== 'https:') throw new Error('https required');
+    if (url.protocol !== 'https:' || url.username || url.password || !/(^|\.)google\.[a-z.]+$|^g\.page$|^maps\.app\.goo\.gl$/i.test(url.hostname)) throw new Error('Google review URL required');
   } catch {
     redirect('/dashboard/reviews?error=Escribe+un+enlace+HTTPS+válido+de+reseñas+de+Google.');
   }

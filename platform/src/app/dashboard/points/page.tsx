@@ -14,7 +14,7 @@ import { PointsPromotionsPanel } from './points-promotions';
 import { appleWalletReady } from '@/lib/apple-wallet';
 import { activateFreeNivalPoints } from './free-actions';
 import { getActiveBusinessMembership } from '@/lib/active-business';
-import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from '@/lib/commercial';
+import { NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_POINTS_PRO_TRIAL_DAYS, mxn } from '@/lib/commercial';
 
 export default async function NivalPointsPage({
   searchParams,
@@ -188,9 +188,9 @@ export default async function NivalPointsPage({
               <li>Tarjeta digital y Google Wallet</li>
               <li>Meta configurable, puntos y recompensas</li>
             </ul>
-            <div className="productPrice"><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><span>después puedes seguir gratis hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes</span></div>
+            <div className="productPrice"><strong>{NIVAL_POINTS_PRO_TRIAL_DAYS} días Pro</strong><span>después puedes seguir gratis hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes</span></div>
             <div className="freemiumCtas">
-              <form action={activateFreeNivalPoints}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Pro {NIVAL_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>
+              <form action={activateFreeNivalPoints}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Pro {NIVAL_POINTS_PRO_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>
               <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvSecondaryButton" pendingLabel="Abriendo Mercado Pago…">Precio fundador · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>
               <a className="nvSecondaryButton" href="/demo/puntos-pro">Ver Puntos Pro sin cuenta →</a>
             </div>
@@ -247,7 +247,7 @@ export default async function NivalPointsPage({
             <span>NIVAL PUNTOS PRO</span>
             <h2>Esta es una herramienta Pro.</h2>
             <p>Gratis sirve para arrancar con un programa sencillo. Pro elimina el límite del plan Free, agrega Google Wallet y convierte la actividad de tus clientes en promociones, seguimiento y acciones más útiles.</p>
-            <div className="pointsProBundleNote"><b>Además, con Puntos Pro:</b><span>Nival Reseñas Pro queda incluido y Nival Pay Pro obtiene 90% de descuento.</span></div>
+
           </div>
           <div className="pointsProBenefits">
             <article><b>Google Wallet</b><p>Tu cliente puede llevar su tarjeta y puntos directamente en su celular.</p></article>

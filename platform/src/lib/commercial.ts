@@ -1,18 +1,19 @@
-export const NIVAL_TRIAL_DAYS = 7;
-export const NIVAL_POINTS_FREE_CUSTOMER_LIMIT = 15;
+export const NIVAL_TRIAL_DAYS = 15;
+export const NIVAL_POINTS_FREE_CUSTOMER_LIMIT = 10;
+export const NIVAL_POINTS_PRO_TRIAL_DAYS = 7;
 
 // Launch/founder pricing charged during the current validation phase.
 export const NIVAL_PAY_FOUNDER_PRICE_CENTS = 19900;
-export const NIVAL_POINTS_FOUNDER_PRICE_CENTS = 19900;
+export const NIVAL_POINTS_FOUNDER_PRICE_CENTS = 49900;
 export const NIVAL_REVIEWS_PRO_PRICE_CENTS = 9900;
 export const NIVAL_WIFI_PRO_PRICE_CENTS = 9900;
 
 // Published post-launch reference prices. These are not charged until the launch offer closes.
 export const NIVAL_PAY_REGULAR_PRICE_CENTS = 29900;
-export const NIVAL_POINTS_REGULAR_PRICE_CENTS = 24900;
+export const NIVAL_POINTS_REGULAR_PRICE_CENTS = 49900;
 
 // Nival Growth = Nival Puntos + Nival Intelligence.
-export const NIVAL_GROWTH_PRICE_CENTS = 44900;
+export const NIVAL_GROWTH_PRICE_CENTS = 74900;
 
 export function mxn(amountCents: number) {
   return new Intl.NumberFormat('es-MX', {
@@ -22,6 +23,6 @@ export function mxn(amountCents: number) {
   }).format(amountCents / 100);
 }
 
-export function trialEndsAt(days = NIVAL_TRIAL_DAYS) {
+export function trialEndsAt(days = NIVAL_POINTS_PRO_TRIAL_DAYS) {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }

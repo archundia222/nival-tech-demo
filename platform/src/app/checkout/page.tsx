@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { money, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
+import { money, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT } from '@/lib/orders';
 import { publicSiteUrl } from '@/lib/payment-profile';
 import { requestCashPayment, startMercadoPagoCheckout } from './actions';
 import { CheckoutSubmitButton } from './submit-button';
@@ -18,22 +18,10 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
   if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
-  const [{ data: business }, { data: pointsEntitlement }] = await Promise.all([
-    supabase.from('businesses')
-      .select('name, subscription_status')
-      .eq('id', membership.business_id)
-      .maybeSingle(),
-    supabase.from('business_product_entitlements')
-      .select('status')
-      .eq('business_id', membership.business_id)
-      .eq('product_code', 'nival_points')
-      .maybeSingle(),
-  ]);
+  const { data: business } = await supabase.from('businesses')
+    .select('name, subscription_status').eq('id', membership.business_id).maybeSingle();
   if (!business) redirect('/dashboard');
-  const payPriceCents = pointsEntitlement?.status === 'active'
-    ? NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS
-    : NIVAL_PAY_PRICE_CENTS;
-  const hasPointsProDiscount = payPriceCents === NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS;
+  const payPriceCents = NIVAL_PAY_PRICE_CENTS;
   if (params.result === 'success' || params.result === 'pending') {
     await reconcileLatestMercadoPagoProductOrder(membership.business_id, {
       [NIVAL_PAY_PRODUCT]: payPriceCents,
@@ -82,11 +70,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Nival Pay</Link>
             </section>
           : <>
-          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>{hasPointsProDiscount ? 'Tu Nival Puntos Pro te da 90% de descuento en esta compra. Conservas tu misma página y QR.' : 'Conserva tu misma página y QR. El pago único desbloquea el acceso físico por NFC y puntos de cobro ilimitados.'}</p></section>
+          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único incluye una tarjeta NFC y acceso permanente.</p></section>
           <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
-              <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>{hasPointsProDiscount ? '90% de descuento por Nival Puntos Pro' : 'MXN · Sin mensualidad'}</small></div>
+              <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>MXN · Sin mensualidad</small></div>
               <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>Puntos de cobro ilimitados</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
@@ -98,7 +86,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago procesado por Mercado Pago</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></footer>
+          <footer className="checkoutTrust"><span>Pago en línea procesado por Mercado Pago; Nival confirma el estado antes de activar Pro.</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro · tarjeta NFC física incluida</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link></footer>
         </>}
     </div>
   </main>;

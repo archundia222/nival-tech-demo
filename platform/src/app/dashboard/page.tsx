@@ -151,6 +151,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .limit(1)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
+  const { data: wifiProfile } = await supabase.from("wifi_profiles").select("ssid").eq("business_id", businessId).maybeSingle();
   const { data: paidNivalPayOrder } = businessId
     ? await supabase
         .from("product_orders")
@@ -209,6 +210,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },
     { label: "Perfil del negocio", complete: Boolean(business?.description && business?.phone && business?.logo_url), href: "/dashboard?section=perfil-digital", action: "Agrega descripción, teléfono y logotipo" },
     { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=perfil-digital#reviews", action: "Conecta tu enlace de reseñas" },
+    { label: "Nival WiFi", complete: Boolean(wifiProfile?.ssid), href: "/dashboard/wifi", action: "Configura la red de invitados y descarga su QR" },
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);

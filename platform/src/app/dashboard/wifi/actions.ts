@@ -24,13 +24,14 @@ export async function activateFreeWifi() {
 
 export async function saveWifi(formData: FormData) {
   const { supabase, businessId } = await context();
-  const ssid = String(formData.get('ssid') ?? '').trim();
-  const password = String(formData.get('password') ?? '');
-  const security = formData.get('security') === 'nopass' ? 'nopass' : 'WPA';
-  if (!ssid || ssid.length > 32 || /[\r\n]/.test(ssid)) redirect('/dashboard/wifi?error=Escribe+el+nombre+de+tu+red+(hasta+32+caracteres).');
-  if (security === 'WPA' && (password.length < 8 || password.length > 63)) redirect('/dashboard/wifi?error=La+contraseña+debe+tener+entre+8+y+63+caracteres.');
-  const { error } = await supabase.from('wifi_profiles').update({ ssid, password: security === 'nopass' ? '' : password, security, updated_at: new Date().toISOString() }).eq('business_id', businessId);
-  if (error) redirect('/dashboard/wifi?error=No+pudimos+guardar+tu+red.+Intenta+de+nuevo.');
+  const raw = String(formData.get('accessUrl') ?? '').trim();
+  let accessUrl: URL;
+  try {
+    accessUrl = new URL(raw);
+    if (accessUrl.protocol !== 'https:' || accessUrl.username || accessUrl.password || raw.length > 2000) throw new Error('invalid wifi url');
+  } catch { redirect('/dashboard/wifi?error=Escribe+un+enlace+HTTPS+de+acceso+a+tu+WiFi.'); }
+  const { error } = await supabase.from('wifi_profiles').update({ access_url: accessUrl.toString(), ssid: accessUrl.hostname.slice(0,32), password: '', security: 'nopass', updated_at: new Date().toISOString() }).eq('business_id', businessId);
+  if (error) redirect('/dashboard/wifi?error=No+pudimos+guardar+el+enlace.+Intenta+de+nuevo.');
   revalidatePath('/dashboard/wifi');
-  redirect('/dashboard/wifi?message=Red+guardada.+El+QR+ya+permite+conectarse.');
+  redirect('/dashboard/wifi?message=Enlace+guardado.+Tu+QR+ya+abre+el+acceso+WiFi.');
 }

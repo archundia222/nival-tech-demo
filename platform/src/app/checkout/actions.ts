@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_WIFI_PRODUCT, NIVAL_WIFI_PRICE_CENTS } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
@@ -133,6 +133,11 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     const { data: purchased } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId).eq('product_code', NIVAL_PAY_PRODUCT).eq('status', 'paid').limit(1).maybeSingle();
     if (purchased) redirect('/dashboard/pay?view=manage');
+  }
+  if ([NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT].includes(product.productCode)) {
+    const { data: purchased } = await admin.from('product_orders').select('id')
+      .eq('business_id', businessId).eq('product_code', product.productCode).eq('status', 'paid').limit(1).maybeSingle();
+    if (purchased) redirect(product.returnPath);
   }
   if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
@@ -307,24 +312,10 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
 }
 
 export async function startMercadoPagoCheckout() {
-  const { businessId } = await currentPurchaseContext();
-  const admin = createAdminClient();
-  const { data: pointsEntitlement } = await admin.from('business_product_entitlements')
-    .select('status')
-    .eq('business_id', businessId)
-    .eq('product_code', NIVAL_POINTS_PRODUCT)
-    .maybeSingle();
-
-  const amountCents = pointsEntitlement?.status === 'active'
-    ? NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS
-    : NIVAL_PAY_PRICE_CENTS;
-
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_PRODUCT,
-    amountCents,
-    description: pointsEntitlement?.status === 'active'
-      ? 'Nival Pay Pro · 90% descuento por Nival Puntos Pro'
-      : 'Nival Pay Pro · acceso físico + QR + página',
+    amountCents: NIVAL_PAY_PRICE_CENTS,
+    description: 'Nival Pay Pro · QR permanente + tarjeta NFC incluida',
     returnPath: '/checkout',
   });
 }
@@ -337,6 +328,36 @@ export async function startNivalReviewsCheckout() {
     returnPath: '/dashboard/reviews',
   });
 }
+export async function requestNivalCardCashPayment(form: FormData) {
+  const productCode = String(form.get('productCode') ?? '');
+  const catalog: Record<string, { amount: number; path: string }> = {
+    [NIVAL_REVIEWS_PRODUCT]: { amount: NIVAL_REVIEWS_PRICE_CENTS, path: '/dashboard/reviews' },
+    [NIVAL_WIFI_PRODUCT]: { amount: NIVAL_WIFI_PRICE_CENTS, path: '/dashboard/wifi' },
+  };
+  const product = catalog[productCode];
+  if (!product) redirect('/dashboard');
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: existing } = await admin.from('product_orders').select('status')
+    .eq('business_id', businessId).eq('product_code', productCode)
+    .in('status', ['paid','pending_cash_confirmation']).limit(1).maybeSingle();
+  if (existing) redirect(`${product.path}?message=${encodeURIComponent(existing.status === 'paid' ? 'Este producto ya está activo.' : 'Tu solicitud de efectivo está pendiente de validación.')}`);
+  const { error } = await admin.from('product_orders').insert({ business_id: businessId,
+    product_code: productCode, amount_cents: product.amount,
+    payment_method: 'cash', status: 'pending_cash_confirmation' });
+  if (error && error.code !== '23505') redirect(`${product.path}?error=No+pudimos+registrar+tu+solicitud.`);
+  redirect(`${product.path}?message=Efectivo+pendiente:+paga+en+tu+negocio+y+Nival+confirmara+tu+compra.`);
+}
+
+export async function startNivalWifiCheckout() {
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_WIFI_PRODUCT,
+    amountCents: NIVAL_WIFI_PRICE_CENTS,
+    description: 'Nival WiFi Pro · QR permanente + tarjeta NFC incluida',
+    returnPath: '/dashboard/wifi',
+  });
+}
+
 export async function startAdditionalNivalPayCheckout() {
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_ADDITIONAL_PRODUCT,
@@ -346,26 +367,28 @@ export async function startAdditionalNivalPayCheckout() {
   });
 }
 
+export async function requestAdditionalNivalPayCashPayment() {
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: baseOrder } = await admin.from('product_orders').select('id').eq('business_id', businessId).eq('product_code', NIVAL_PAY_PRODUCT).eq('status', 'paid').limit(1).maybeSingle();
+  if (!baseOrder) redirect('/dashboard/pay?view=add&error=Primero+activa+tu+primera+Nival+Pay+Pro.');
+  const { data: pending } = await admin.from('product_orders').select('id').eq('business_id', businessId).eq('product_code', NIVAL_PAY_ADDITIONAL_PRODUCT).eq('payment_method', 'cash').eq('status', 'pending_cash_confirmation').limit(1).maybeSingle();
+  if (pending) redirect('/dashboard/pay?view=add&error=Ya+tienes+una+compra+en+efectivo+pendiente+de+confirmar.');
+  const { error } = await admin.from('product_orders').insert({ business_id: businessId, product_code: NIVAL_PAY_ADDITIONAL_PRODUCT, amount_cents: NIVAL_PAY_ADDITIONAL_PRICE_CENTS, payment_method: 'cash', status: 'pending_cash_confirmation' });
+  if (error?.code === '23505') redirect('/dashboard/pay?view=add&error=Ya+tienes+una+compra+en+efectivo+pendiente.');
+  if (error) redirect('/dashboard/pay?view=add&error=No+pudimos+registrar+tu+solicitud.+Intenta+de+nuevo.');
+  redirect('/dashboard/pay?view=add&cash=1');
+}
+
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  const [{ data: alreadyPaid }, { data: pointsEntitlement }] = await Promise.all([
-    admin.from('product_orders').select('id')
-      .eq('business_id', businessId)
-      .eq('product_code', NIVAL_PAY_PRODUCT)
-      .eq('status', 'paid')
-      .limit(1)
-      .maybeSingle(),
-    admin.from('business_product_entitlements').select('status')
-      .eq('business_id', businessId)
-      .eq('product_code', NIVAL_POINTS_PRODUCT)
-      .maybeSingle(),
-  ]);
+  const { data: alreadyPaid } = await admin.from('product_orders').select('id')
+    .eq('business_id', businessId).eq('product_code', NIVAL_PAY_PRODUCT)
+    .eq('status', 'paid').limit(1).maybeSingle();
   if (alreadyPaid) redirect('/dashboard/pay?view=manage');
 
-  const amountCents = pointsEntitlement?.status === 'active'
-    ? NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS
-    : NIVAL_PAY_PRICE_CENTS;
+  const amountCents = NIVAL_PAY_PRICE_CENTS;
 
   const { data: existing } = await admin.from('product_orders').select('id,created_at')
     .eq('business_id', businessId)
@@ -724,11 +747,11 @@ export async function startNivalGrowthSubscription() {
 type PhysicalCardInput = {
   design: 'black' | 'white' | 'custom';
   design_notes: string | null;
-  front_template: 'pay' | 'points' | 'reviews' | 'profile';
+  front_template: 'pay' | 'points' | 'reviews' | 'wifi' | 'profile';
   back_style: 'nival' | 'custom';
   back_design_notes: string | null;
   back_design_url: string | null;
-  delivery_method: 'sunday_local' | 'shipping';
+  delivery_method: 'sunday_local' | 'saturday_local' | 'weekday_quote' | 'shipping';
   recipient_name: string;
   phone: string;
   address_line1: string;
@@ -744,10 +767,10 @@ type PhysicalCardInput = {
 function validateRequestedSunday(form: FormData) {
   const delivery = String(form.get('deliveryMethod') ?? '');
   const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
-  if (delivery !== 'sunday_local' || !requestedDate) return;
+  if (!['sunday_local','saturday_local'].includes(delivery) || !requestedDate) return;
   const parsed = new Date(requestedDate + 'T12:00:00Z');
-  if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== 0) {
-    redirect('/dashboard/pay/physical?error=La+entrega+local+solo+se+programa+en+domingo.+Elige+un+domingo+o+deja+la+fecha+vacía.');
+  if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== (delivery === 'saturday_local' ? 6 : 0)) {
+    redirect('/dashboard/pay/physical?error=Elige+un+sabado+o+domingo+segun+el+tipo+de+entrega.');
   }
 }
 
@@ -767,14 +790,15 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const notes = String(form.get('designNotes') ?? '').trim();
   const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
   const targetPaymentProfileId = String(form.get('paymentProfileId') ?? '').trim() || null;
-  if (!['black','white','custom'].includes(design) || !['pay','points','reviews','profile'].includes(frontTemplate)
-    || !['nival','custom'].includes(backStyle) || !['sunday_local','shipping'].includes(delivery)
+  if (!['black','white','custom'].includes(design) || !['pay','points','reviews','wifi','profile'].includes(frontTemplate)
+    || !['nival','custom'].includes(backStyle) || !['sunday_local','saturday_local','weekday_quote','shipping'].includes(delivery)
     || recipient.length < 2 || phone.length < 10 || address1.length < 5 || city.length < 2
     || state.length < 2 || !/^\d{5}$/.test(postalCode) || notes.length > 500 || backDesignNotes.length > 500) return null;
-  if (delivery === 'sunday_local' && requestedDate) {
+  if (['sunday_local','saturday_local'].includes(delivery) && requestedDate) {
     const parsed = new Date(requestedDate + 'T12:00:00Z');
-    if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== 0) return null;
+    if (Number.isNaN(parsed.getTime()) || parsed.getUTCDay() !== (delivery === 'saturday_local' ? 6 : 0)) return null;
   }
+  if (['sunday_local','saturday_local'].includes(delivery) && !/^(ciudad de mexico|cdmx|ciudad de méxico)$/i.test(state)) return null;
   return {
     design: design as PhysicalCardInput['design'], design_notes: notes || null,
     front_template: frontTemplate as PhysicalCardInput['front_template'],
@@ -785,7 +809,7 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
     recipient_name: recipient.slice(0,120), phone: phone.slice(0,20),
     address_line1: address1.slice(0,180), address_line2: address2.slice(0,180) || null,
     city: city.slice(0,100), state: state.slice(0,100), postal_code: postalCode,
-    requested_delivery_date: delivery === 'sunday_local' ? requestedDate || null : null,
+    requested_delivery_date: ['sunday_local','saturday_local'].includes(delivery) ? requestedDate || null : null,
     target_payment_profile_id: targetPaymentProfileId,
     target_url: null,
   };
@@ -841,12 +865,15 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
   }
 
   if (details.front_template === 'reviews') {
-    const [{ data: reviewLink }, { data: program }] = await Promise.all([
-      admin.from('smart_links').select('id').eq('business_id', businessId).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
-      admin.from('loyalty_programs').select('review_url').eq('business_id', businessId).eq('active', true).limit(1).maybeSingle(),
-    ]);
-    if (!reviewLink && !program?.review_url) redirect('/dashboard/pay/physical?error=Configura+primero+el+enlace+de+reseñas+del+negocio.');
-    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/r/${business.slug}` };
+    const { data: profile } = await admin.from('review_profiles').select('public_token,google_review_url').eq('business_id',businessId).maybeSingle();
+    if (!profile?.public_token || !profile.google_review_url) redirect('/dashboard/pay/physical?error=Configura+tu+enlace+de+Nival+Resenas+antes+de+pedir+la+tarjeta.');
+    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/reviews/${profile.public_token}` };
+  }
+
+  if (details.front_template === 'wifi') {
+    const { data: profile } = await admin.from('wifi_profiles').select('public_token,access_url').eq('business_id',businessId).maybeSingle();
+    if (!profile?.public_token || !profile.access_url) redirect('/dashboard/pay/physical?error=Configura+tu+red+Nival+WiFi+antes+de+pedir+la+tarjeta.');
+    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/wifi/${profile.public_token}` };
   }
 
   return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/p/${business.slug}` };
@@ -899,8 +926,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', businessId)
-      .eq('product_code', NIVAL_PAY_PRODUCT)
-      .eq('amount_cents', NIVAL_PAY_PRICE_CENTS)
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at,checkout_url)').eq('business_id', businessId),
