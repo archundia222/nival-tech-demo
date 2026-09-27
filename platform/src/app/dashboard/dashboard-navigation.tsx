@@ -61,7 +61,6 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const pointsActive = pointsItems.some((item) => item.id === active);
   const visiblePointsItems = canManageWorkspace ? pointsItems : pointsItems.filter((item) => item.id === 'puntos-visitas');
   const groups = (['usar','clientes','programa'] as const).filter((group) => visiblePointsItems.some((item) => item.group === group));
-
   const wifiIcon = <NavIcon><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8 15.5a6 6 0 0 1 8 0"/><path d="M10.8 18.3a2 2 0 0 1 2.4 0"/><circle cx="12" cy="20" r=".5" fill="currentColor"/></NavIcon>;
   const reviewIcon = <NavIcon><path d="m12 3 2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2-3.8-3.7 5.2-.8L12 3Z"/></NavIcon>;
 
@@ -69,24 +68,17 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
     <aside className="dashboardSidebar professionalSidebar">
       <Link className="professionalBrand" href="/dashboard"><span>N</span><b>NIVAL</b><small>tech</small></Link>
       {workspaceChoices.length > 1 ? <form action={switchActiveBusiness} className="workspaceSwitcher workspaceSwitcherForm"><span>{businessName.slice(0,1).toUpperCase()}</span><div><small>ESPACIO DE TRABAJO</small><strong>{businessName}</strong><label><span className="srOnly">Cambiar espacio de trabajo</span><select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}</select></label></div><button type="submit">Cambiar</button></form> : <div className="workspaceSwitcher"><span>{businessName.slice(0,1).toUpperCase()}</span><div><small>TU NEGOCIO</small><strong>{businessName}</strong></div></div>}
-
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
         {canManageWorkspace && <Link className={active === 'resumen' ? 'sidebarMainProduct active businessHealthNav' : 'sidebarMainProduct businessHealthNav'} href="/dashboard"><NavIcon><path d="M4 19V9l8-5 8 5v10"/><path d="M8 19v-6h8v6"/></NavIcon><span className="businessHealthNavCopy"><b>Estado del negocio</b><small>{businessHealthPercent}% completado</small><i className="businessHealthMiniBar" aria-hidden="true"><span style={{ width: `${businessHealthPercent}%` }} /></i></span></Link>}
-
         {canManageWorkspace && <details className={styles.productGroup} open={payActive}><summary className={`sidebarMainProduct ${payActive ? 'active' : ''}`}><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h5"/></NavIcon><span>Nival Pay</span><i>⌄</i></summary><div className="sidebarSubmenu">{payItems.map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} href={item.href}>{item.label}</Link>)}</div></details>}
-
         <details className={styles.productGroup} open={pointsActive}><summary className={`sidebarMainProduct ${pointsActive ? 'active' : ''}`}><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></NavIcon><span>Nival Puntos</span><i>⌄</i></summary><div className="sidebarSubmenu pointsSidebarSubmenu">{groups.map((group) => <div className="pointsNavGroup" key={group}><small>{group === 'usar' ? 'USAR' : group === 'clientes' ? 'CLIENTES' : 'PROGRAMA'}</small>{visiblePointsItems.filter(i => i.group === group).map((item) => <Link key={item.id} className={active === item.id ? 'active' : undefined} href={item.href}>{item.label}</Link>)}</div>)}</div></details>
-
         {canManageWorkspace && <Link className={active === 'reseñas' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard/reviews">{reviewIcon}<span>Nival Reseñas</span></Link>}
-        {canManageWorkspace && <Link className={active === 'wifi' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard?section=perfil-digital#wifi">{wifiIcon}<span>Nival WiFi</span><em className={styles.newBadge}>NUEVO</em></Link>}
-
+        {canManageWorkspace && <Link className={active === 'wifi' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/#wifi">{wifiIcon}<span>Nival WiFi</span></Link>}
         {canManageWorkspace && <div className={styles.navDivider} />}
         {canManageWorkspace && <Link className={active === 'perfil-digital' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard?section=perfil-digital"><NavIcon><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></NavIcon><span>Configuración de tu negocio</span></Link>}
       </nav>
-
       <div className="sidebarFooter professionalFooter"><Link href="/support">Ayuda</Link><form action={signOut}><button className="textButton">Cerrar sesión</button></form></div>
     </aside>
-
     <details className="dashboardMobileMenu professionalMobileMenu">
       <summary><span className="hamburgerIcon" aria-hidden="true"><i/><i/><i/></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
       <nav aria-label="Navegación móvil del panel">
@@ -95,7 +87,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         {canManageWorkspace && <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>}
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{visiblePointsItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink>}
-        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=perfil-digital#wifi">Nival WiFi · Nuevo</MobileAutoCloseLink>}
+        {canManageWorkspace && <MobileAutoCloseLink href="/#wifi">Nival WiFi</MobileAutoCloseLink>}
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=perfil-digital">Configuración de tu negocio</MobileAutoCloseLink>}
         <form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
