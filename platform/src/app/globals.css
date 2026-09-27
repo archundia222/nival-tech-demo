@@ -5279,3 +5279,7 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
  .reviewsPlanPair,.pointsProBenefits{grid-template-columns:1fr}
  .guidedDemoStage{padding:34px 0}.guidedCopy h1{font-size:50px}.guidedCopy p{font-size:15px}.guidedUseGrid{grid-template-columns:1fr}.guidedDemoTop{grid-template-columns:auto 1fr}.guidedDemoTop small{display:none}
 }
+
+.productPricingV3 article>form{margin-top:auto}
+.landingPlanPayButton{width:100%;display:flex;align-items:center;justify-content:center;padding:12px;border:0;border-radius:12px;background:#f2efe6;color:#111318;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.landingPlanPayButton:disabled{opacity:.65;cursor:wait}
