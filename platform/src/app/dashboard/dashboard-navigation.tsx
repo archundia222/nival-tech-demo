@@ -70,19 +70,19 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
 
   let businessConfigPercent = 0;
   if (canManageWorkspace && activeMembership?.business_id) {
-    const businessId = activeMembership.business_id;
-    const [{ data: businessConfig }, { data: paymentProfile }, { data: reviewLink }, { data: pointsEntitlement }] = await Promise.all([
-      supabase.from('businesses').select('slug,phone,description,logo_url,website_url').eq('id', businessId).maybeSingle(),
-      supabase.from('payment_profiles').select('active,account_holder,bank_name,clabe').eq('business_id', businessId).eq('active', true).limit(1).maybeSingle(),
-      supabase.from('smart_links').select('id').eq('business_id', businessId).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
-      supabase.from('business_product_entitlements').select('status').eq('business_id', businessId).eq('product_code', 'nival_points').maybeSingle(),
-    ]);
+    const { data: businessConfig } = await supabase
+      .from('businesses')
+      .select('slug,phone,description,logo_url')
+      .eq('id', activeMembership.business_id)
+      .maybeSingle();
+
     const completed = [
-      Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe),
-      Boolean(businessConfig?.description && businessConfig?.phone && businessConfig?.logo_url),
-      Boolean(reviewLink?.id),
-      Boolean(businessConfig?.slug && (paymentProfile?.active || businessConfig?.phone || businessConfig?.website_url || reviewLink?.id || ['free','active'].includes(pointsEntitlement?.status ?? ''))),
+      Boolean(businessConfig?.slug),
+      Boolean(businessConfig?.phone),
+      Boolean(businessConfig?.description),
+      Boolean(businessConfig?.logo_url),
     ].filter(Boolean).length;
+
     businessConfigPercent = Math.round((completed / 4) * 100);
   }
 
