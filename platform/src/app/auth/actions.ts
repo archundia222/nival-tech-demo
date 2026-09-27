@@ -198,12 +198,32 @@ export async function requestPasswordReset(formData: FormData) {
     redirectTo: `${origin}/auth/update-password`,
   });
 
-  // Keep the public response generic so the form does not reveal whether an
-  // email is registered.
   if (error) {
     console.warn("[auth] Password reset request failed", { code: error.code ?? null });
+    const rateLimited =
+      error.code === "over_email_send_rate_limit" ||
+      /rate limit|security purposes/i.test(error.message ?? "");
+
+    if (rateLimited) {
+      redirect(
+        `/auth?error=${encodeURIComponent(
+          "Ya se solicitó un correo de recuperación hace poco. Espera unos minutos y vuelve a intentarlo una sola vez.",
+        )}`,
+      );
+    }
+
+    redirect(
+      `/auth?error=${encodeURIComponent(
+        "No pudimos enviar el correo de recuperación en este momento. Inténtalo de nuevo en unos minutos.",
+      )}`,
+    );
   }
-  redirect(`/auth?message=${encodeURIComponent("Si existe una cuenta con ese correo, recibirás un enlace para cambiar tu contraseña. Revisa también spam.")}`);
+
+  redirect(
+    `/auth?message=${encodeURIComponent(
+      "Te enviamos un enlace para cambiar tu contraseña. Usa únicamente el correo más reciente y revisa también spam.",
+    )}`,
+  );
 }
 
 export async function updatePassword(formData: FormData) {
