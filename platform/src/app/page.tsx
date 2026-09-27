@@ -12,6 +12,7 @@ import {
   NIVAL_POINTS_FOUNDER_PRICE_CENTS,
   NIVAL_POINTS_FREE_CUSTOMER_LIMIT,
   NIVAL_REVIEWS_PRO_PRICE_CENTS,
+  NIVAL_WIFI_PRO_PRICE_CENTS,
   NIVAL_TRIAL_DAYS,
   mxn,
 } from "@/lib/commercial";
@@ -24,6 +25,8 @@ const reviewsFreeUrl = "/auth?mode=signup&next=%2Fdashboard%2Freviews";
 const reviewsProUrl = "/auth?mode=signup&next=%2Fdashboard%2Freviews%3Fplan%3Dpro";
 const pointsFreeUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints";
 const pointsProUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints%3Fview%3Dpro";
+const wifiFreeUrl = "/auth?mode=signup&next=%2Fdashboard";
+const wifiProUrl = "/auth?mode=signup&next=%2Fdashboard";
 const bundleUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints%3Fview%3Dpro%26offer%3Dlaunch_bundle";
 
 const Check = () => <span className="planCheck" aria-hidden="true">✓</span>;
@@ -61,7 +64,6 @@ export default async function Home() {
     <Link className="stickyDemoButton" href="/demo"><span>Ver demo</span><b>→</b></Link>
 
     <LandingLivePreviews />
-
 
     <section className="landingIdentity landingIdentityCompact scrollReveal">
       <div className="landingSectionHeading compact">
@@ -118,13 +120,14 @@ export default async function Home() {
     <section className="landingPlansV4 scrollReveal" id="planes">
       <div className="landingSectionHeading compact">
         <p className="landingEyebrow landingEyebrowLarge">EMPIEZA CON FREE</p>
-        <h2>Prueba Nival gratis. Sube a Pro cuando quieras más alcance y más control.</h2>
+        <h2>Empieza con Free. Cuando quieras dejar tu acceso fijo en el negocio, pasa a Pro.</h2>
+        <p>En Free, Pay, Reseñas y WiFi usan un QR dinámico pensado para probar y compartir desde pantalla. En Pro recibes un QR fijo listo para imprimir y usar con tu Nival Card física.</p>
       </div>
 
       <div className="landingStartSteps">
         <div><span>1</span><strong>Crea tu cuenta</strong><p>Empieza sin pagar.</p></div>
-        <div><span>2</span><strong>Configura lo esencial</strong><p>Tu negocio queda listo en minutos.</p></div>
-        <div><span>3</span><strong>Sube a Pro cuando tenga sentido</strong><p>Activa más capacidad, NFC, Wallet y herramientas avanzadas.</p></div>
+        <div><span>2</span><strong>Prueba desde tu celular</strong><p>Usa tu enlace y QR dinámico mientras decides.</p></div>
+        <div><span>3</span><strong>Hazlo permanente con Pro</strong><p>Obtén QR fijo, NFC y una experiencia lista para tu negocio.</p></div>
       </div>
 
       <div className="planCompareCard">
@@ -134,9 +137,11 @@ export default async function Home() {
             <div className="planHead"><span>FREE</span><strong>$0</strong></div>
             <ul>
               <li><Check/> Página de cobro</li>
-              <li><Check/> QR y enlace para compartir</li>
+              <li><Check/> Enlace para compartir</li>
               <li><Check/> Datos editables</li>
               <li><Check/> 1 punto de cobro</li>
+              <li><Check/> QR dinámico para probar desde pantalla</li>
+              <li><Cross/> QR fijo para imprimir</li>
               <li><Cross/> NFC: acercar el celular a una tarjeta para abrir tu cobro</li>
             </ul>
             <Link href={payFreeUrl}>Iniciar con Free</Link>
@@ -144,11 +149,12 @@ export default async function Home() {
           <article className="pro">
             <div className="planHead"><span>PRO</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>una sola vez</small></div>
             <ul>
-              <li><Check/> Página de cobro</li>
-              <li><Check/> QR y enlace para compartir</li>
+              <li><Check/> Página de cobro y enlace</li>
               <li><Check/> Datos editables</li>
               <li><Check/> Puntos de cobro ilimitados</li>
-              <li><Check/> NFC: tu cliente acerca el celular a una tarjeta y abre tu cobro</li>
+              <li><Check/> QR fijo listo para imprimir</li>
+              <li><Check/> Nival Card física con NFC</li>
+              <li><Check/> Tu cliente acerca el celular y abre tu cobro</li>
             </ul>
             {canBuyDirect
               ? <form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Pagar Pro</CheckoutSubmitButton></form>
@@ -158,25 +164,27 @@ export default async function Home() {
       </div>
 
       <div className="planCompareCard">
-        <header><div><span>NIVAL RESEÑAS</span><h3>Haz más fácil que te recomienden.</h3></div><b>Pago único</b></header>
+        <header><div><span>NIVAL RESEÑAS</span><h3>Convierte una buena experiencia en una reseña.</h3></div><b>Pago único</b></header>
         <div className="planCompareColumns">
           <article>
             <div className="planHead"><span>FREE</span><strong>$0</strong></div>
             <ul>
-              <li><Check/> QR para reseñas</li>
               <li><Check/> Enlace directo a Google</li>
               <li><Check/> Destino editable</li>
-              <li><Cross/> Acceso físico acercando el celular</li>
+              <li><Check/> QR dinámico para usar desde pantalla</li>
+              <li><Cross/> QR fijo para imprimir</li>
+              <li><Cross/> Nival Card física con NFC</li>
             </ul>
             <Link href={reviewsFreeUrl}>Iniciar con Free</Link>
           </article>
           <article className="pro">
             <div className="planHead"><span>PRO</span><strong>{mxn(NIVAL_REVIEWS_PRO_PRICE_CENTS)}</strong><small>una sola vez</small></div>
             <ul>
-              <li><Check/> QR para reseñas</li>
               <li><Check/> Enlace directo a Google</li>
               <li><Check/> Destino editable</li>
-              <li><Check/> Acceso físico acercando el celular</li>
+              <li><Check/> QR fijo listo para imprimir</li>
+              <li><Check/> Nival Card física con NFC</li>
+              <li><Check/> Acercan el celular y llegan directo a dejar su reseña</li>
             </ul>
             {canBuyDirect
               ? <form action={startNivalReviewsCheckout}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Pagar Pro</CheckoutSubmitButton></form>
@@ -209,17 +217,42 @@ export default async function Home() {
               <li><Check/> Detecta clientes frecuentes, inactivos y oportunidades</li>
               <li><Check/> Crea y mide campañas con actividad real</li>
             </ul>
-            {canBuyDirect
-              ? <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Probar Pro</CheckoutSubmitButton></form>
-              : <Link href={pointsProUrl}>Probar Pro</Link>}
-            <Link className="planPreviewLink" href="/demo/puntos-pro">Ver demo Pro sin cuenta</Link>
+            <div style={{display:'grid',gap:'14px',marginTop:'18px'}}>
+              {canBuyDirect
+                ? <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Probar Pro</CheckoutSubmitButton></form>
+                : <Link href={pointsProUrl}>Probar Pro</Link>}
+              <Link className="planPreviewLink" href="/demo/puntos-pro">Ver demo Pro sin cuenta</Link>
+            </div>
           </article>
         </div>
       </div>
 
-      <div className="landingWifiPlanTeaser">
-        <div><span>NIVAL WIFI</span><h3>Haz más fácil que tus clientes se conecten.</h3><p>Acceso por QR o tarjeta NFC. La configuración completa estará disponible próximamente.</p></div>
-        <b>PRÓXIMAMENTE</b>
+      <div className="planCompareCard">
+        <header><div><span>NIVAL WIFI</span><h3>Que conectarse a tu WiFi tome un toque, no una contraseña dictada.</h3></div><b>Pago único</b></header>
+        <div className="planCompareColumns">
+          <article>
+            <div className="planHead"><span>FREE</span><strong>$0</strong></div>
+            <ul>
+              <li><Check/> Enlace de acceso a tu WiFi</li>
+              <li><Check/> Datos de red editables</li>
+              <li><Check/> QR dinámico para probar desde pantalla</li>
+              <li><Cross/> QR fijo para imprimir</li>
+              <li><Cross/> Nival Card física con NFC</li>
+            </ul>
+            <Link href={wifiFreeUrl}>Iniciar con Free</Link>
+          </article>
+          <article className="pro">
+            <div className="planHead"><span>PRO</span><strong>{mxn(NIVAL_WIFI_PRO_PRICE_CENTS)}</strong><small>una sola vez</small></div>
+            <ul>
+              <li><Check/> Enlace de acceso editable</li>
+              <li><Check/> QR fijo listo para imprimir</li>
+              <li><Check/> Nival Card física con NFC</li>
+              <li><Check/> El cliente acerca el celular y abre el acceso</li>
+              <li><Check/> Cambias los datos sin reemplazar la tarjeta</li>
+            </ul>
+            <Link href={wifiProUrl}>Conseguir Nival WiFi Pro</Link>
+          </article>
+        </div>
       </div>
 
       <div className="landingBundle">
