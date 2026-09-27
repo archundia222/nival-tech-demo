@@ -2,6 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { LandingReveal } from "./landing-reveal";
 import { LandingLivePreviews } from "./landing-live-previews";
+import { createClient } from "@/lib/supabase/server";
+import { getActiveBusinessMembership } from "@/lib/active-business";
+import { startMercadoPagoCheckout, startNivalPointsSubscription, startNivalReviewsCheckout } from "@/app/checkout/actions";
+import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
 import {
   NIVAL_PAY_FOUNDER_PRICE_CENTS,
   NIVAL_POINTS_FOUNDER_PRICE_CENTS,
@@ -19,7 +23,12 @@ const reviewsProUrl = "/auth?mode=signup&next=%2Fdashboard%2Freviews";
 const pointsFreeUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints";
 const pointsProUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints%3Fview%3Dpro";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const membership = user ? await getActiveBusinessMembership(user.id) : null;
+  const canBuyDirect = Boolean(membership && ['owner','manager'].includes(membership.role));
+
   return <main className="landing landingV3" id="inicio">
     <LandingReveal />
 
@@ -115,19 +124,25 @@ export default function Home() {
       <div className="productPricingV3">
         <div className="pricingProductTitle"><span>NIVAL PAY</span><h3>Haz más fácil que te paguen.</h3></div>
         <article><span>GRATIS</span><strong>$0</strong><p>Página de cobro, QR y enlace.</p><Link href={payFreeUrl}>Empezar gratis</Link></article>
-        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único</small><p>Todo Gratis + acceso físico para acercar el celular + 3 apartados de cobro.</p><Link href={payProUrl}>Comprar Nival Pay Pro</Link></article>
+        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único</small><p>Todo Gratis + acceso físico para acercar el celular + 3 apartados de cobro.</p>{canBuyDirect
+  ? <form action={startMercadoPagoCheckout}><CheckoutSubmitButton pendingLabel="Abriendo Mercado Pago…">Comprar Nival Pay Pro</CheckoutSubmitButton></form>
+  : <Link href={payProUrl}>Comprar Nival Pay Pro</Link>}</article>
       </div>
 
       <div className="productPricingV3">
         <div className="pricingProductTitle"><span>NIVAL RESEÑAS</span><h3>Haz más fácil que te recomienden.</h3></div>
         <article><span>GRATIS</span><strong>$0</strong><p>QR y enlace directo a tus reseñas de Google.</p><Link href={reviewsFreeUrl}>Crear mi QR gratis</Link></article>
-        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_REVIEWS_PRO_PRICE_CENTS)}</strong><small>pago único</small><p>Todo Gratis + acceso físico para que el cliente acerque el celular.</p><Link href={reviewsProUrl}>Comprar Nival Reseñas Pro</Link></article>
+        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_REVIEWS_PRO_PRICE_CENTS)}</strong><small>pago único</small><p>Todo Gratis + acceso físico para que el cliente acerque el celular.</p>{canBuyDirect
+  ? <form action={startNivalReviewsCheckout}><CheckoutSubmitButton pendingLabel="Abriendo Mercado Pago…">Comprar Nival Reseñas Pro</CheckoutSubmitButton></form>
+  : <Link href={reviewsProUrl}>Comprar Nival Reseñas Pro</Link>}</article>
       </div>
 
       <div className="productPricingV3">
         <div className="pricingProductTitle"><span>NIVAL PUNTOS</span><h3>Dales una razón para volver.</h3></div>
         <article><span>GRATIS</span><strong>$0</strong><p>Programa de puntos para hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><Link href={pointsFreeUrl}>Empezar gratis</Link></article>
-        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · {NIVAL_TRIAL_DAYS} días de prueba</small><p>Más capacidad, promociones y herramientas para actuar sobre la actividad de tus clientes.</p><Link href={pointsProUrl}>Probar Nival Puntos Pro</Link></article>
+        <article className="featured"><span>PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · {NIVAL_TRIAL_DAYS} días de prueba</small><p>Más capacidad, promociones y herramientas para actuar sobre la actividad de tus clientes.</p>{canBuyDirect
+  ? <form action={startNivalPointsSubscription}><CheckoutSubmitButton pendingLabel="Abriendo Mercado Pago…">Activar Nival Puntos Pro</CheckoutSubmitButton></form>
+  : <Link href={pointsProUrl}>Probar Nival Puntos Pro</Link>}</article>
       </div>
 
       <div className="landingPlanHelp"><span>¿No sabes cuál elegir?</span><p>Cuéntame cómo funciona tu negocio y te digo por dónde empezaría.</p><a href={whatsappHref} target="_blank" rel="noreferrer">Escribir por WhatsApp</a></div>
