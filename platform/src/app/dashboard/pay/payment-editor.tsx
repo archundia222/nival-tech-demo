@@ -1,7 +1,6 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { PaymentPageView } from '@/app/pay/[token]/payment-page-view';
 import { savePaymentProfile, type PaymentFormState } from './actions';
 
 type Section = { id: string; title: string; content: string; public: boolean };
@@ -79,7 +78,7 @@ export function PaymentEditor({
   const [paymentUrl, setPaymentUrl] = useState(profile?.payment_url ?? '');
   const [preview, setPreview] = useState<string | null>(null);
   const [removeImage, setRemoveImage] = useState(false);
-  const [active] = useState(profile?.active ?? true);
+  const [active, setActive] = useState(profile?.active ?? true);
   const [fieldVisibility, setFieldVisibility] = useState({
     holder: profile?.holder_visible ?? true,
     bank: profile?.bank_visible ?? true,
@@ -153,29 +152,12 @@ export function PaymentEditor({
 
   const hasPendingChanges = revision > savedRevision;
   const saveStatus = pending
-    ? 'Guardando…'
+    ? 'Guardando cambios…'
     : state.error
       ? 'No se pudo guardar'
       : hasPendingChanges
-        ? 'Cambios pendientes…'
-        : 'Guardado ✓';
-
-  const previewProfile = {
-    business_name: businessName,
-    logo_url: image,
-    brand_color: businessBrandColor,
-    account_holder: holder,
-    bank_name: bank,
-    clabe,
-    concept,
-    payment_url: trialMode ? '' : paymentUrl,
-    holder_visible: fieldVisibility.holder,
-    bank_visible: fieldVisibility.bank,
-    clabe_visible: fieldVisibility.clabe,
-    concept_visible: fieldVisibility.concept,
-    payment_url_visible: trialMode ? false : fieldVisibility.paymentUrl,
-    custom_sections: sections,
-  };
+        ? 'Guardando cambios…'
+        : 'Cambios guardados ✓';
 
   return (
     <form
@@ -210,13 +192,7 @@ export function PaymentEditor({
             >
               {saveStatus}
             </span>
-            <button
-              className="nvPrimaryButton nivalPaySaveButton"
-              type="submit"
-              disabled={pending || (!hasPendingChanges && !state.error)}
-            >
-              {pending ? 'Guardando…' : 'Guardar cambios'}
-            </button>
+            <span className="nivalPayAutosaveHint">Guardado automático</span>
           </div>
         </header>
 
@@ -392,13 +368,28 @@ export function PaymentEditor({
         </div>
       </section>
 
-      <aside className="nivalPayLivePreview" aria-label="Vista previa en vivo de Nival Pay">
-        <div className="nivalPayPhoneFrame">
-          <div className="nivalPayPhoneSpeaker" aria-hidden="true" />
-          <div className="nivalPayPhoneViewport">
-            <PaymentPageView profile={previewProfile} embedded />
+      <aside className="nivalPayLivePreview nivalPayInlineEditor" aria-label="Edita tu Nival Pay directamente">
+        <div className="nivalPayInlineHelp"><b>Edita dentro de tu Nival Pay</b><span>Toca un dato, escribe y listo. Se guarda automáticamente.</span></div>
+        <div className="nivalPayEditableCard">
+          <div className="nivalPayEditableBrand">
+            <div className="nivalPayEditableLogo">{image ? <img src={image} alt="" /> : <span>{businessName.slice(0,2).toUpperCase()}</span>}</div>
+            <div><small>Nival Pay</small><strong>{businessName}</strong></div>
           </div>
+          <div className="nivalPayEditableSteps"><span>1 Copia</span><span>2 Abre tu banco</span><span>3 Pega y verifica</span></div>
+          <label className="nivalPayEditableField"><span>Beneficiario</span><input value={holder} onChange={(e)=>{setHolder(e.target.value);markDirty();}} /></label>
+          <label className="nivalPayEditableField"><span>Banco</span><input value={bank} onChange={(e)=>{setBank(e.target.value);markDirty();}} /></label>
+          <label className="nivalPayEditableField"><span>CLABE interbancaria</span><input inputMode="numeric" value={clabe} onChange={(e)=>{setClabe(e.target.value.replace(/[^0-9 ]/g,'').slice(0,23));markDirty();}} /></label>
+          <label className="nivalPayEditableField"><span>Concepto</span><input value={concept} onChange={(e)=>{setConcept(e.target.value);markDirty();}} placeholder="Opcional" /></label>
+          {!trialMode && <label className="nivalPayEditableField"><span>Enlace de pago</span><input type="url" value={paymentUrl} onChange={(e)=>{setPaymentUrl(e.target.value);markDirty();}} placeholder="https://..." /></label>}
+          <div className="nivalPayEditableStatus"><i className={pending||hasPendingChanges?'saving':'saved'} />{saveStatus}</div>
         </div>
+        <button
+          type="button"
+          className={`nivalPayPublishSticky ${active?'published':'hidden'}`}
+          onClick={()=>{setActive(v=>!v);markDirty();}}
+        >
+          {active ? 'Ocultar mi Nival Pay' : 'Publicar mi Nival Pay'}
+        </button>
       </aside>
     </form>
   );
