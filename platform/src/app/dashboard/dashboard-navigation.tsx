@@ -19,7 +19,11 @@ type ActiveItem =
   | 'puntos-compartir'
   | 'puntos-configuracion'
   | 'puntos-pro'
-  | 'configuracion';
+  | 'configuracion'
+  | 'perfil-digital'
+  | 'inteligencia'
+  | 'clientes'
+  | 'nival-card';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Mi Nival Pay', href: '/dashboard/pay' },
