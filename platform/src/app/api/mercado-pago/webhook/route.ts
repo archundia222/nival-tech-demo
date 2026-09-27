@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       : 'pending';
     const admin = createAdminClient();
     const { data: storedSubscription, error: lookupError } = await admin.from('product_subscriptions')
-      .select('product_code, amount_cents, provider_subscription_id')
+      .select('business_id, product_code, amount_cents, provider_subscription_id')
       .eq('id', subscriptionId)
       .eq('provider', 'mercado_pago')
       .maybeSingle();
