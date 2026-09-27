@@ -68,6 +68,8 @@ export function PaymentPageView({
         <p className={styles.paymentType}>Transferencia bancaria</p>
       </div>
       {profile.payment_url_visible && profile.payment_url && <a className={styles.directPay} href={profile.payment_url} target="_blank" rel="noreferrer"><span>Pagar con enlace</span><b>↗</b></a>}
+      <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
+      <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
       <p className={styles.copyHint}>Toca cualquier dato para copiarlo</p>
       <div className={styles.details}>
         {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="detail" />}
@@ -83,8 +85,6 @@ export function PaymentPageView({
             : <CopyField key={section.id} label={label} value={value} variant="detail" />;
         })}
       </div>
-      <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
-      <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
 
       {!embedded && profile.business_slug && <div className={styles.cardExtras}>
         <div className={styles.extrasHeading}>
