@@ -4,6 +4,7 @@ export const NIVAL_POINTS_FREE_CUSTOMER_LIMIT = 30;
 // Launch/founder pricing charged during the current validation phase.
 export const NIVAL_PAY_FOUNDER_PRICE_CENTS = 19900;
 export const NIVAL_POINTS_FOUNDER_PRICE_CENTS = 19900;
+export const NIVAL_REVIEWS_PRO_PRICE_CENTS = 12900;
 
 // Published post-launch reference prices. These are not charged until the launch offer closes.
 export const NIVAL_PAY_REGULAR_PRICE_CENTS = 29900;
