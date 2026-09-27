@@ -67,6 +67,25 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
     : [[], null];
 
   const canManageWorkspace = activeMembership?.role === 'owner' || activeMembership?.role === 'manager';
+
+  let businessConfigPercent = 0;
+  if (canManageWorkspace && activeMembership?.business_id) {
+    const businessId = activeMembership.business_id;
+    const [{ data: businessConfig }, { data: paymentProfile }, { data: reviewLink }, { data: pointsEntitlement }] = await Promise.all([
+      supabase.from('businesses').select('slug,phone,description,logo_url,website_url').eq('id', businessId).maybeSingle(),
+      supabase.from('payment_profiles').select('active,account_holder,bank_name,clabe').eq('business_id', businessId).eq('active', true).limit(1).maybeSingle(),
+      supabase.from('smart_links').select('id').eq('business_id', businessId).eq('kind', 'google_review').eq('active', true).limit(1).maybeSingle(),
+      supabase.from('business_product_entitlements').select('status').eq('business_id', businessId).eq('product_code', 'nival_points').maybeSingle(),
+    ]);
+    const completed = [
+      Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe),
+      Boolean(businessConfig?.description && businessConfig?.phone && businessConfig?.logo_url),
+      Boolean(reviewLink?.id),
+      Boolean(businessConfig?.slug && (paymentProfile?.active || businessConfig?.phone || businessConfig?.website_url || reviewLink?.id || ['free','active'].includes(pointsEntitlement?.status ?? ''))),
+    ].filter(Boolean).length;
+    businessConfigPercent = Math.round((completed / 4) * 100);
+  }
+
   const payActive = payItems.some((item) => item.id === active);
   const reviewsActive = active === 'reseñas';
   const pointsActive = pointsItems.some((item) => item.id === active);
@@ -102,11 +121,15 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
             </div>)}
           </div>
         </details>
+
+        {canManageWorkspace && <Link className={active === 'configuracion' ? 'sidebarMainProduct active businessConfigNav' : 'sidebarMainProduct businessConfigNav'} href="/dashboard?section=configuracion">
+          <NavIcon><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></NavIcon>
+          <span>Configuración de tu negocio</span><b className="businessConfigPercent">{businessConfigPercent}%</b>
+        </Link>}
       </nav>
 
       <div className="sidebarFooter professionalFooter">
         <Link href="/support">Ayuda</Link>
-        {canManageWorkspace && <Link href="/dashboard?section=configuracion">Configuración</Link>}
         <form action={signOut}><button className="textButton">Cerrar sesión</button></form>
       </div>
     </aside>
@@ -122,7 +145,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         {canManageWorkspace && <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>}
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink>}
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{visiblePointsItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración</MobileAutoCloseLink>}
+        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración de tu negocio · {businessConfigPercent}%</MobileAutoCloseLink>}
         <form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>

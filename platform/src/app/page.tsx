@@ -77,6 +77,7 @@ export default async function Home() {
         <div><span>QUÉ ES</span><strong>Una plataforma de herramientas digitales para cobrar, generar recurrencia y facilitar recomendaciones.</strong></div>
         <div><span>PARA QUIÉN</span><strong>Negocios con clientes recurrentes, cobros por transferencia o una experiencia que vale la pena recomendar.</strong></div>
         <div><span>CÓMO FUNCIONA</span><strong>Tú configuras una vez. Tu cliente abre el acceso desde su celular y sigue una experiencia clara.</strong></div>
+        <div><span>PERFIL PÚBLICO</span><strong>Es la página que sí ven tus clientes: reúne accesos para pagar, ver puntos, contactarte, dejar reseñas y abrir enlaces de tu negocio.</strong></div>
         <div><span>PRODUCTOS</span><strong>Nival Pay · Nival Reseñas · Nival Puntos</strong></div>
         <div><span>OBJETIVO</span><strong>Quitar fricción en momentos que afectan ventas, recurrencia y reputación.</strong></div>
         <div><span>AYUDA</span><strong>Soporte directo por WhatsApp en español.</strong></div>

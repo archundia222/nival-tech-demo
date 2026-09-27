@@ -45,7 +45,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     clientes: "Clientes",
     "nival-card": "Enlaces y reseñas",
     "perfil-digital": "Página del negocio",
-    configuracion: "Configuración",
+    configuracion: "Configuración de tu perfil público",
   };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -347,7 +347,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "perfil-digital" && business?.slug && <>
         <section className="profileDigitalWorkspace">
-          <header className="profileDigitalHeading"><p className="eyebrow">TU PÁGINA DEL NEGOCIO</p><h1>Una sola liga para todo lo importante.</h1><p>Cobro, puntos, contacto, reseñas y enlaces del negocio en una página lista para compartir por QR, NFC o WhatsApp.</p></header>
+          <header className="profileDigitalHeading"><p className="eyebrow">TU PERFIL PÚBLICO</p><h1>La página de tu negocio que sí ven tus clientes.</h1><p>Reúne cobro, puntos, contacto, reseñas y otros accesos en una sola liga. Tú la configuras desde el panel; tus clientes solo ven la parte pública, nunca tu información interna.</p></header>
           <div className="profileDashboardGrid">
             <div className="profileDashboardPreview">
               <ProfilePublicView
@@ -437,9 +437,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {canManageProgram && business && (
         <section className="settingsCard" id="configuracion">
           <div className="settingsIntro">
-            <p className="eyebrow">PERFIL PÚBLICO</p>
-            <h2>Personaliza la experiencia de tu negocio</h2>
-            <p>Estos datos aparecerán en la página que tus clientes abren mediante el QR o la tarjeta NFC.</p>
+            <p className="eyebrow">CONFIGURACIÓN DE TU PERFIL PÚBLICO</p>
+            <h2>Decide qué ve un cliente cuando abre tu negocio en Nival</h2>
+            <p>Tu perfil público es la página que compartes con clientes. Ahí pueden encontrar tus accesos importantes —como pagar, ver puntos, contactarte o dejar una reseña— sin entrar a tu panel privado.</p>
           </div>
           <form action={updateBusinessProfile} className="settingsForm">
             <label>Nombre comercial<input name="businessName" required minLength={2} maxLength={100} defaultValue={business.name} /></label>

@@ -236,6 +236,11 @@ export default async function NivalPointsPage({
             <article><b>Más capacidad</b><p>Crece sin el límite de clientes del plan Gratis.</p></article>
             <article><b>Acciones con datos</b><p>Detecta actividad, prepara promociones y mide qué pasó después.</p></article>
           </div>
+          {!paid && <div className="pointsProDashboardPreview">
+            <div><small>CLIENTES A RECUPERAR</small><strong>18</strong><span>sin visita reciente</span></div>
+            <div><small>CLIENTES FRECUENTES</small><strong>42</strong><span>con actividad constante</span></div>
+            <div><small>CAMPAÑA DE EJEMPLO</small><strong>+23%</strong><span>regresaron después del mensaje</span></div>
+          </div>
           {!paid && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Activar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
           {paid && <p className="formMessage successMessage">Nival Puntos Pro ya está activo en este negocio.</p>}
         </section>}
@@ -302,11 +307,18 @@ export default async function NivalPointsPage({
         </section>}
 
         {canManage && view === 'promotions' && baseFree &&
-          <section className="freemiumLocked">
-            <span>PROMOCIONES PRO</span>
-            <h2>Envía una promoción general a quienes aceptaron recibirla.</h2>
-            <p>La selección inteligente de audiencias, recuperación de clientes y campañas medidas pertenece a Nival Intelligence.</p>
-            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear promociones · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
+          <section className="pointsProPreviewShell">
+            <div className="pointsProPreviewIntro">
+              <span>PROMOCIONES · PRO</span>
+              <h2>Así se vería esta herramienta con Pro.</h2>
+              <p>Usa la actividad real para preparar una promoción, contactar a un grupo concreto y después revisar qué pasó.</p>
+            </div>
+            <div className="pointsProMockup">
+              <div className="pointsProMockupTop"><div><small>AUDIENCIA DE EJEMPLO</small><strong>Clientes que no han vuelto en 14 días</strong></div><span>28 clientes</span></div>
+              <div className="pointsProMockupMessage"><small>MENSAJE SUGERIDO</small><p>“Hola Ana, hace rato que no te vemos. Esta semana tienes café + pan por $79. Muéstranos este mensaje al visitarnos.”</p></div>
+              <div className="pointsProMockupStats"><div><small>Enviados</small><strong>28</strong></div><div><small>Regresaron</small><strong>7</strong></div><div><small>Respuesta</small><strong>25%</strong></div></div>
+            </div>
+            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conseguir Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
         {canManage && view === 'promotions' && proAccess &&
@@ -327,11 +339,20 @@ export default async function NivalPointsPage({
           <PointsShareTools url={`${(process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/b/${business.slug}`} />}
 
         {canManage && program && view === 'settings' && baseFree &&
-          <section className="freemiumLocked">
-            <span>CONFIGURACIÓN PRO</span>
-            <h2>El plan gratis usa una regla simple para que puedas empezar rápido.</h2>
-            <p>Pro te deja cambiar la meta, el premio, límites, tiempos de espera y estrategia de reseñas.</p>
-            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Desbloquear configuración · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
+          <section className="pointsProPreviewShell">
+            <div className="pointsProPreviewIntro">
+              <span>CONFIGURAR PROGRAMA · PRO</span>
+              <h2>Así se verían los controles avanzados.</h2>
+              <p>Free mantiene una regla sencilla. Pro te deja adaptar meta, recompensa, límites y experiencia al funcionamiento real de tu negocio.</p>
+            </div>
+            <div className="pointsProMockup settings">
+              <label><span>Meta de recompensa</span><b>10 visitas</b></label>
+              <label><span>Recompensa</span><b>Café gratis</b></label>
+              <label><span>Máximo de puntos por día</span><b>2</b></label>
+              <label><span>Tiempo mínimo entre visitas</span><b>60 min</b></label>
+              <label><span>Google Wallet</span><b>Activado</b></label>
+            </div>
+            {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conseguir Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
         {canManage && program && view === 'settings' && proAccess &&

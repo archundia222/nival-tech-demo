@@ -5474,3 +5474,31 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .landingV4 .planCompareColumns article>a,
   .landingV4 .planCompareColumns article form button{min-height:44px;padding:10px 8px;font-size:10px}
 }
+
+/* Business configuration progress in main navigation */
+.businessConfigNav{display:flex;align-items:center;gap:10px}
+.businessConfigNav>span{min-width:0;flex:1}
+.businessConfigPercent{margin-left:auto;padding:4px 7px;border:1px solid rgba(207,174,103,.28);border-radius:999px;color:#d7bc78;background:rgba(207,174,103,.07);font-size:10px;font-weight:900}
+
+/* Nival Puntos Pro previews for Free accounts */
+.pointsProPreviewShell{display:grid;gap:22px;margin-top:18px;padding:28px;border:1px solid rgba(207,174,103,.26);border-radius:22px;background:radial-gradient(circle at 90% 0,rgba(207,174,103,.08),transparent 18rem),#121317}
+.pointsProPreviewIntro>span{color:#d0ae63;font-size:10px;font-weight:900;letter-spacing:.14em}
+.pointsProPreviewIntro h2{margin:8px 0 10px;font-size:clamp(28px,3.6vw,42px);letter-spacing:-.04em}
+.pointsProPreviewIntro p{max-width:720px;margin:0;color:#9ea3ac;line-height:1.6}
+.pointsProMockup{display:grid;gap:14px;padding:20px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:#0e0f12}
+.pointsProMockupTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.pointsProMockupTop>div{display:grid;gap:5px}.pointsProMockupTop small,.pointsProMockupMessage small{color:#c9ab6b;font-size:9px;font-weight:900;letter-spacing:.12em}
+.pointsProMockupTop strong{font-size:20px}.pointsProMockupTop>span{padding:7px 9px;border-radius:999px;background:#1d2025;color:#d9dce1;font-size:11px;font-weight:800}
+.pointsProMockupMessage{padding:16px;border-radius:14px;background:#17191d}.pointsProMockupMessage p{margin:7px 0 0;color:#d7d9dd;line-height:1.55}
+.pointsProMockupStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pointsProMockupStats>div{display:grid;gap:5px;padding:14px;border:1px solid rgba(255,255,255,.07);border-radius:12px}.pointsProMockupStats small{color:#8f949d;font-size:10px}.pointsProMockupStats strong{font-size:24px}
+.pointsProMockup.settings{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pointsProMockup.settings label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid rgba(255,255,255,.07);border-radius:12px}
+.pointsProMockup.settings label span{color:#9297a0;font-size:11px}.pointsProMockup.settings label b{font-size:13px}
+.pointsProDashboardPreview{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pointsProDashboardPreview>div{display:grid;gap:5px;padding:18px;border:1px solid var(--line);border-radius:14px;background:#101115}
+.pointsProDashboardPreview small{color:#c8a65a;font-size:9px;font-weight:900;letter-spacing:.11em}.pointsProDashboardPreview strong{font-size:30px}.pointsProDashboardPreview span{color:#9297a0;font-size:11px}
+
+@media(max-width:760px){
+  .pointsProMockupStats,.pointsProDashboardPreview{grid-template-columns:1fr 1fr}
+  .pointsProMockup.settings{grid-template-columns:1fr}
+}
