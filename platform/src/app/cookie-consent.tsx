@@ -1,0 +1,5 @@
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+const KEY="nival_cookie_consent_v1";
+export function CookieConsent(){const [open,setOpen]=useState(false);useEffect(()=>{setOpen(!localStorage.getItem(KEY))},[]);function choose(value:"necessary"|"all"){localStorage.setItem(KEY,JSON.stringify({value,at:new Date().toISOString()}));document.cookie=`nival_cookie_consent=${value}; Max-Age=31536000; Path=/; SameSite=Lax; Secure`;setOpen(false);window.dispatchEvent(new CustomEvent("nival-cookie-consent",{detail:value}))}if(!open)return null;return <aside className="cookieConsent" role="dialog" aria-label="Preferencias de cookies" aria-live="polite"><div><strong>Tu privacidad importa</strong><p>Usamos cookies necesarias para iniciar sesión, seguridad y funcionamiento. Las opcionales de medición solo deben activarse con tu permiso.</p><Link href="/cookies">Ver política de cookies</Link></div><div className="cookieConsentActions"><button type="button" onClick={()=>choose("necessary")}>Solo necesarias</button><button type="button" onClick={()=>choose("all")}>Aceptar opcionales</button></div></aside>}
