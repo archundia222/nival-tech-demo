@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient as createSupabaseJsClient } from "@supabase/supabase-js";
 
 function value(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -180,10 +181,21 @@ export async function requestPasswordReset(formData: FormData) {
     redirect(`/auth?error=${encodeURIComponent("Escribe tu correo para recuperar el acceso.")}`);
   }
 
-  const supabase = await createClient();
   const origin = await authRedirectOrigin();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent("/auth/update-password")}`,
+  const recoveryClient = createSupabaseJsClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      auth: {
+        flowType: "implicit",
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    },
+  );
+  const { error } = await recoveryClient.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/update-password`,
   });
 
   // Keep the public response generic so the form does not reveal whether an
