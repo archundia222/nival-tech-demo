@@ -252,26 +252,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
         <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
       </section>
-      {canManageProgram && <><section className="nivalProductHub" aria-label="Productos Nival">
-        <article className={hasNivalPay ? "activeProduct" : ""}>
-          <div><span>COBRAR</span><b>{paidNivalPay ? "PRO" : freeNivalPay ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
-          <h2>Nival Pay</h2>
-          <p>Haz que tus clientes encuentren cómo pagarte sin pedirte los datos una y otra vez.</p>
-          <a href="/dashboard/pay">{hasNivalPay ? "Administrar Nival Pay →" : "Crear gratis →"}</a>
-        </article>
-        <article className={hasReviews ? "activeProduct" : ""}>
-          <div><span>CONSEGUIR RESEÑAS</span><b>{paidReviews ? "PRO" : freeReviews ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
-          <h2>Nival Reseñas</h2>
-          <p>Lleva a tu cliente directamente al enlace de reseñas cuando la experiencia todavía está fresca.</p>
-          <a href="/dashboard/reviews">{hasReviews ? "Administrar reseñas →" : "Crear gratis →"}</a>
-        </article>
-        <article className={hasPoints ? "activeProduct" : ""}>
-          <div><span>HACER QUE VUELVAN</span><b>{paidPoints ? "PRO" : freePoints ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
-          <h2>Nival Puntos</h2>
-          <p>Registra visitas, muestra el progreso y crea una razón sencilla para que tus clientes regresen.</p>
-          <a href="/dashboard/points">{hasPoints ? "Abrir mi programa →" : "Conocer Nival Puntos →"}</a>
-        </article>
-      </section>
+      {canManageProgram && <>
       <section className="nivalSignals">
         <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
         <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>

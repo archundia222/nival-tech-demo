@@ -27,7 +27,7 @@ const editLabelStyle: CSSProperties = { fontSize: 12, fontWeight: 800, letterSpa
 export function PaymentPageView({ profile, embedded = false, trackingToken, editor }: { profile: PaymentPageViewProfile; embedded?: boolean; trackingToken?: string; editor?: InlineEditor }) {
   const initials = profile.business_name.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
   const publicSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.filter((section) => section.public !== false && section.content.trim().length > 0) : [];
-  const editField = (label: string, value: string, onChange: (value: string) => void, placeholder = '') => <label style={editBoxStyle}><span style={editLabelStyle}>✎ {label} · editar</span><input style={editFieldStyle} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label>;
+  const editField = (label: string, value: string, onChange: (value: string) => void, placeholder = '') => <label style={editBoxStyle}><span style={editLabelStyle}>✎ {label} · editar</span><input className="nivalPayPreviewInput" style={editFieldStyle} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label>;
 
   const content = <>
     <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} style={{ "--blue": profile.brand_color || "#b89a5a" } as CSSProperties} aria-labelledby={embedded ? undefined : "payment-title"}>

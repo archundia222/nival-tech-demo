@@ -7,9 +7,10 @@ interface PaymentProfileQrProps {
   businessName: string;
   url: string;
   views: number;
+  pro?: boolean;
 }
 
-export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrProps) {
+export function PaymentProfileQr({ businessName, url, views, pro = false }: PaymentProfileQrProps) {
   const [notice, setNotice] = useState("");
   const qrId = `payment-profile-${useId().replace(/:/g, "")}`;
 
@@ -74,21 +75,22 @@ export function PaymentProfileQr({ businessName, url, views }: PaymentProfileQrP
     }
   }
 
-  return <div className="paymentQrPanel paymentQrPanelRefined">
-    <div className="paymentQrCopy">
-      <span className="paymentQrEyebrow">PÁGINA DE COBRO</span>
-      <strong>Un mismo destino para QR, NFC y enlace</strong>
-      <p>Descarga el QR solo o un diseño listo para imprimir y pegar en tu tarjeta física.</p>
-      <div className="paymentQrMeta"><span>{views} aperturas</span><a href={url} target="_blank" rel="noreferrer">Abrir página ↗</a></div>
-      <code className="paymentQrUrl">{url}</code>
-      <p className="paymentQrNotice" role="status">{notice}</p>
-      <div className="smartLinkActions paymentShareActions">
-        <button className="nvPrimaryButton" type="button" onClick={copyUrl}>Copiar enlace</button>
-        <button className="nvSecondaryButton" type="button" onClick={shareUrl}>Compartir</button>
-        <button className="nvSecondaryButton" type="button" onClick={downloadQr}>Descargar QR</button>
-        <button className="nvSecondaryButton" type="button" onClick={downloadSticker}>Descargar sticker</button>
+  return <section className="businessQrCard businessQrRefined nivalPayShareCard">
+    <div className="businessQrCopy">
+      <p className="eyebrow">{pro ? 'NIVAL PAY PRO' : 'NIVAL PAY GRATIS · QR DINÁMICO'}</p>
+      <h2>Un enlace para cobrar</h2>
+      <p>Compártelo por WhatsApp o descarga el QR para tu mostrador. Si cambias tus datos, este mismo enlace y QR siguen funcionando.</p>
+      <div className="businessQrUrlRow"><code className="qrUrl">{url}</code><button className="businessQrIconButton" type="button" onClick={copyUrl} aria-label="Copiar enlace">▢</button></div>
+      <div className="businessQrActions">
+        <a className="businessQrPrimary" href={url} target="_blank" rel="noreferrer">Abrir Nival Pay</a>
+        <button className="businessQrSecondary" type="button" onClick={copyUrl}>▢ &nbsp; Copiar enlace</button>
+        <button className="businessQrSecondary" type="button" onClick={shareUrl}>♧ &nbsp; Compartir</button>
+        <button className="businessQrSecondary" type="button" onClick={downloadQr}>↓ &nbsp; Descargar QR</button>
+        {pro && <button className="businessQrSecondary" type="button" onClick={downloadSticker}>↓ &nbsp; Descargar sticker NFC</button>}
       </div>
+      <small>{views} aperturas · {pro ? 'También puedes usar tu tarjeta física NFC.' : 'Tu QR seguirá funcionando si después cambias a Pro.'}</small>
     </div>
-    <div className="miniQr refinedQr"><QRCodeSVG id={qrId} value={url} size={156} level="H" marginSize={2} bgColor="#fff" fgColor="#07100e" title="QR de Nival Pay" /></div>
-  </div>;
+    <div className="qrCanvas"><QRCodeSVG id={qrId} value={url} size={220} level="H" marginSize={2} bgColor="#fff" fgColor="#07100e" title="QR de Nival Pay" /></div>
+    <p className="qrNotice" role="status" aria-live="polite">{notice}</p>
+  </section>;
 }
