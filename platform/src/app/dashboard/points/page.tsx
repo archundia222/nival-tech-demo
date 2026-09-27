@@ -267,11 +267,11 @@ export default async function NivalPointsPage({
 
           <section className="productBridge">
             <div>
-              <span>{hasIntelligence ? 'NIVAL GROWTH CONECTADO' : 'CUANDO QUIERAS IR MÁS ALLÁ'}</span>
-              <h2>{hasIntelligence ? 'Growth usa Intelligence para aprender de los clientes que Nival Puntos registra por ti.' : 'Puntos crea la señal. Growth te dice qué hacer con ella.'}</h2>
-              <p>{hasIntelligence ? 'Visitas, recurrencia, recompensas y ventas alimentan las recomendaciones sin pedirte volver a capturar clientes.' : 'Cuando actives Growth, Intelligence usará automáticamente estos clientes y visitas para detectar frecuentes, personas en riesgo y oportunidades de campaña.'}</p>
+              <span>{paid ? 'NIVAL PUNTOS PRO ACTIVO' : 'CUANDO QUIERAS HACER MÁS CON TUS DATOS'}</span>
+              <h2>{paid ? 'Pro te ayuda a convertir visitas en acciones.' : 'Tu programa ya genera información. Pro te ayuda a aprovecharla.'}</h2>
+              <p>{paid ? 'Usa la actividad real de clientes, visitas y recompensas para orientar promociones y seguimiento.' : 'Activa Pro para tener más capacidad y herramientas de promociones, configuración y seguimiento sobre la actividad de tus clientes.'}</p>
             </div>
-            <a href="/dashboard/intelligence">{hasIntelligence ? 'Abrir Growth →' : 'Conocer Growth →'}</a>
+            <a href="/dashboard/points?view=pro">{paid ? 'Ver herramientas Pro →' : 'Conocer Puntos Pro →'}</a>
           </section>
         </>}
 
