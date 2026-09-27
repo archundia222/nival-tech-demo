@@ -69,7 +69,8 @@ export default async function NivalPointsPage({
   const subscriptionConfirming = params.subscription === 'return' && !paid;
 
   const navActive =
-    view === 'customers' ? 'puntos-clientes'
+    view === 'pro' ? 'puntos-pro'
+      : view === 'customers' ? 'puntos-clientes'
       : view === 'promotions' ? 'puntos-promociones'
         : view === 'redemptions' ? 'puntos-visitas'
           : view === 'share' ? 'puntos-compartir'
@@ -125,7 +126,8 @@ export default async function NivalPointsPage({
   }
 
   const title =
-    view === 'customers' ? 'Clientes'
+    view === 'pro' ? 'Nival Puntos Pro'
+      : view === 'customers' ? 'Clientes'
       : view === 'promotions' ? 'Promociones y notificaciones'
         : view === 'visits' ? 'Registrar visita y premios'
           : view === 'redemptions' ? 'Canjear recompensa'
@@ -134,7 +136,8 @@ export default async function NivalPointsPage({
                 : program?.name ?? 'Tu programa de puntos';
 
   const description =
-    view === 'customers' ? 'Consulta el saldo, visitas y premios de las personas registradas en tu programa.'
+    view === 'pro' ? 'Herramientas para aprovechar mejor los datos y recuperar clientes.'
+      : view === 'customers' ? 'Consulta el saldo, visitas y premios de las personas registradas en tu programa.'
       : view === 'promotions' ? 'Envía descuentos y promociones por Google Wallet o abre WhatsApp con el mensaje listo, únicamente para clientes que aceptaron recibirlos.'
         : view === 'visits' ? 'Escanea una sola vez: registra la visita y, si hay un premio disponible, Nival te pregunta si el cliente quiere canjearlo ahora o guardarlo.'
           : view === 'redemptions' ? 'Valida el código que el cliente generó desde una recompensa disponible y confirma cuando entregues el premio.'
@@ -220,6 +223,21 @@ export default async function NivalPointsPage({
               {view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}
             </a>}
         </section>
+
+        {canManage && view === 'pro' && <section className="pointsProExplainer">
+          <div>
+            <span>NIVAL PUNTOS PRO</span>
+            <h2>Esta es una herramienta Pro.</h2>
+            <p>Tu programa Gratis sigue registrando clientes, puntos y recompensas. Pro agrega más capacidad y herramientas para actuar sobre esa información: promociones, configuración avanzada y seguimiento para volver a contactar clientes.</p>
+          </div>
+          <div className="pointsProBenefits">
+            <article><b>Más capacidad</b><p>Crece más allá del límite del plan Gratis.</p></article>
+            <article><b>Promociones</b><p>Prepara mensajes para volver a contactar a clientes.</p></article>
+            <article><b>Más control</b><p>Ajusta reglas y operación del programa con más herramientas.</p></article>
+          </div>
+          {!paid && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Activar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
+          {paid && <p className="formMessage successMessage">Nival Puntos Pro ya está activo en este negocio.</p>}
+        </section>}
 
         {canManage && view === 'overview' && <>
           <section className="pointsMetricGrid">
