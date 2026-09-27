@@ -68,22 +68,30 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
 
   const canManageWorkspace = activeMembership?.role === 'owner' || activeMembership?.role === 'manager';
 
-  let businessConfigPercent = 0;
+  let businessHealthPercent = 0;
   if (canManageWorkspace && activeMembership?.business_id) {
-    const { data: businessConfig } = await supabase
-      .from('businesses')
-      .select('slug,phone,description,logo_url')
-      .eq('id', activeMembership.business_id)
-      .maybeSingle();
+    const businessId = activeMembership.business_id;
+    const [{ data: businessConfig }, { data: paymentProfile }, { data: smartLinks }, { data: pointsEntitlement }] = await Promise.all([
+      supabase.from('businesses').select('slug,phone,description,logo_url,website_url').eq('id', businessId).maybeSingle(),
+      supabase.from('payment_profiles').select('active,account_holder,bank_name,clabe').eq('business_id', businessId).order('active', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('smart_links').select('kind,active').eq('business_id', businessId),
+      supabase.from('business_product_entitlements').select('status').eq('business_id', businessId).eq('product_code', 'nival_points').maybeSingle(),
+    ]);
 
-    const completed = [
-      Boolean(businessConfig?.slug),
-      Boolean(businessConfig?.phone),
-      Boolean(businessConfig?.description),
-      Boolean(businessConfig?.logo_url),
-    ].filter(Boolean).length;
+    const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
+    const profileReady = Boolean(businessConfig?.description && businessConfig?.phone && businessConfig?.logo_url);
+    const reviewsReady = Boolean(smartLinks?.some((link) => link.kind === 'google_review' && link.active));
+    const hasPublicAction = Boolean(
+      payReady ||
+      businessConfig?.phone ||
+      businessConfig?.website_url ||
+      smartLinks?.some((link) => link.active) ||
+      ['free','active'].includes(pointsEntitlement?.status ?? '')
+    );
+    const publicProfileReady = Boolean(businessConfig?.slug && hasPublicAction);
 
-    businessConfigPercent = Math.round((completed / 4) * 100);
+    const completed = [payReady, profileReady, reviewsReady, publicProfileReady].filter(Boolean).length;
+    businessHealthPercent = Math.round((completed / 4) * 100);
   }
 
   const payActive = payItems.some((item) => item.id === active);
@@ -122,9 +130,14 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
           </div>
         </details>
 
-        {canManageWorkspace && <Link className={active === 'configuracion' ? 'sidebarMainProduct active businessConfigNav' : 'sidebarMainProduct businessConfigNav'} href="/dashboard?section=configuracion">
-          <NavIcon><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></NavIcon>
-          <span>Configuración de tu negocio</span><b className="businessConfigPercent">{businessConfigPercent}%</b>
+        {canManageWorkspace && <Link className={active === 'resumen' ? 'sidebarMainProduct active businessHealthNav' : 'sidebarMainProduct businessHealthNav'} href="/dashboard">
+          <NavIcon><path d="M4 19V9l8-5 8 5v10"/><path d="M8 19v-6h8v6"/></NavIcon>
+          <span className="businessHealthNavCopy"><b>Estado del negocio</b><small>{businessHealthPercent}% completado</small><i className="businessHealthMiniBar" aria-hidden="true"><span style={{ width: `${businessHealthPercent}%` }} /></i></span>
+        </Link>}
+
+        {canManageWorkspace && <Link className={active === 'perfil-digital' ? 'sidebarMainProduct active' : 'sidebarMainProduct'} href="/dashboard?section=perfil-digital">
+          <NavIcon><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></NavIcon>
+          <span>Configuración de tu negocio</span>
         </Link>}
       </nav>
 
@@ -145,7 +158,8 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
         {canManageWorkspace && <details className={styles.mobileGroup} open={payActive}><summary>Nival Pay <i>⌄</i></summary><div className="mobileSubmenu">{payItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>}
         {canManageWorkspace && <MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink>}
         <details className={styles.mobileGroup} open={pointsActive}><summary>Nival Puntos <i>⌄</i></summary><div className="mobileSubmenu">{visiblePointsItems.map((item) => <MobileAutoCloseLink key={item.id} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>
-        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=configuracion">Configuración de tu negocio · {businessConfigPercent}%</MobileAutoCloseLink>}
+        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard">Estado del negocio · {businessHealthPercent}%</MobileAutoCloseLink>}
+        {canManageWorkspace && <MobileAutoCloseLink href="/dashboard?section=perfil-digital">Configuración de tu negocio</MobileAutoCloseLink>}
         <form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
