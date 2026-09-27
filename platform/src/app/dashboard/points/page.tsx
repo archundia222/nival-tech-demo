@@ -418,7 +418,7 @@ export default async function NivalPointsPage({
       </>}
       {baseFree && canManage && ['promotions','settings','pro'].includes(view) && <aside className="pointsProStickyUpgrade">
         <div><small>ESTÁS VIENDO UNA DEMO PRO</small><strong>{view === 'promotions' ? 'Segmenta, contacta y mide.' : view === 'settings' ? 'Personaliza reglas, Wallet y recompensas.' : 'Convierte visitas en decisiones.'}</strong></div>
-        {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton pendingLabel="Abriendo Mercado Pago…">Cambiar a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
+        {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="pointsProStickyButton" pendingLabel="Abriendo Mercado Pago…">Cambiar a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
       </aside>}
     </div>
   </main>;
