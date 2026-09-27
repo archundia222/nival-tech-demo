@@ -6,23 +6,23 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nival-tech-platform
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Nival Tech | Cobra, haz que vuelvan y crece",
+    default: "Nival Tech | Cobra fácil. Fideliza clientes. Crece.",
     template: "%s | Nival Tech",
   },
-  description: "Tecnología simple para negocios locales: cobra con Nival Pay, fideliza con Nival Puntos y convierte esa actividad en acciones con Nival Growth.",
+  description: "Tecnología simple para negocios locales: cobra con Nival Pay, consigue más reseñas con Nival Reseñas y fideliza clientes con Nival Puntos.",
   applicationName: "Nival Tech",
   icons: { icon: "/wallet/nival-logo.svg" },
   openGraph: {
-    title: "Nival Tech | Cobra, haz que vuelvan y crece",
-    description: "Nival ayuda a negocios locales a cobrar, fidelizar clientes y convertir la actividad real en acciones concretas.",
+    title: "Nival Tech | Cobra fácil. Fideliza clientes. Crece.",
+    description: "Nival ayuda a negocios locales a cobrar con menos fricción, conseguir más reseñas y hacer que sus clientes regresen.",
     siteName: "Nival Tech",
     locale: "es_MX",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nival Tech | Cobra, haz que vuelvan y crece",
-    description: "Cobra con Nival Pay, fideliza con Nival Puntos y crece con Nival Growth.",
+    title: "Nival Tech | Cobra fácil. Fideliza clientes. Crece.",
+    description: "Nival Pay · Nival Reseñas · Nival Puntos.",
   },
 };
 
