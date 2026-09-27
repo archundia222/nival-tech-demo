@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { InvalidWebhookSignatureError, WebhookSignatureValidator } from 'mercadopago';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS } from '@/lib/orders';
 
 type MercadoPagoOrderWebhook = {
   type?: string;
@@ -125,6 +125,39 @@ export async function POST(request: NextRequest) {
       console.error('Nival subscription sync failed', { subscriptionId, code: error.code });
       return NextResponse.json({ error: 'Subscription sync failed' }, { status: 500 });
     }
+
+    if (storedSubscription.product_code === NIVAL_POINTS_PRODUCT && mappedStatus === 'authorized') {
+      const now = new Date().toISOString();
+      const { error: reviewEntitlementError } = await admin.from('business_product_entitlements').upsert({
+        business_id: storedSubscription.business_id,
+        product_code: NIVAL_REVIEWS_PRODUCT,
+        status: 'active',
+        updated_at: now,
+      }, { onConflict: 'business_id,product_code', ignoreDuplicates: false });
+
+      if (reviewEntitlementError) {
+        console.error('Nival Points bundle review entitlement failed', {
+          subscriptionId,
+          code: reviewEntitlementError.code,
+        });
+        return NextResponse.json({ error: 'Bundle activation failed' }, { status: 500 });
+      }
+
+      const { error: reviewProfileError } = await admin.from('review_profiles').upsert({
+        business_id: storedSubscription.business_id,
+        active: true,
+        updated_at: now,
+      }, { onConflict: 'business_id', ignoreDuplicates: false });
+
+      if (reviewProfileError) {
+        console.error('Nival Points bundle review profile failed', {
+          subscriptionId,
+          code: reviewProfileError.code,
+        });
+        return NextResponse.json({ error: 'Bundle activation failed' }, { status: 500 });
+      }
+    }
+
     return NextResponse.json({ received: true });
   }
 
@@ -189,7 +222,8 @@ export async function POST(request: NextRequest) {
       || (order.product_code === NIVAL_PAY_PHYSICAL_CARD_PRODUCT && order.amount_cents === NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS)
       || (order.product_code === NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT && order.amount_cents === NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS)
       || (order.product_code === NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT && order.amount_cents === NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS)
-      || (order.product_code === NIVAL_REVIEWS_PRODUCT && order.amount_cents === NIVAL_REVIEWS_PRICE_CENTS))
+      || (order.product_code === NIVAL_REVIEWS_PRODUCT && order.amount_cents === NIVAL_REVIEWS_PRICE_CENTS)
+      || (order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS))
     && Boolean(paymentId);
 
   if (!approved || !paymentId) return NextResponse.json({ received: true });
