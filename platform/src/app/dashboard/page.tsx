@@ -99,6 +99,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const paidPoints = productLevel === 'intelligence' || entitlementMap.get('nival_points') === 'active';
   const freePoints = !paidPoints && entitlementMap.get('nival_points') === 'free';
   const hasPoints = paidPoints || freePoints;
+  const paidReviews = entitlementMap.get('nival_reviews') === 'active';
+  const freeReviews = !paidReviews && entitlementMap.get('nival_reviews') === 'free';
+  const hasReviews = paidReviews || freeReviews;
   if ((!hasPoints && legacySection === 'clientes') || (!hasIntelligence && legacySection === 'inteligencia')) redirect('/dashboard?section=resumen');
   const [{ count: customerCount }, { count: loyaltyCustomerCount }, { count: visitCount }] = businessId
     ? await Promise.all([
@@ -161,7 +164,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const paidNivalPay = Boolean(paidNivalPayOrder);
   const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
   const hasNivalPay = paidNivalPay || freeNivalPay;
-  const workspaceActive = hasNivalPay || hasPoints || hasIntelligence || business?.subscription_status === 'active';
+  const workspaceActive = hasNivalPay || hasReviews || hasPoints || business?.subscription_status === 'active';
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -218,16 +221,16 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     : !payReady
       ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
       : Number(paymentProfile?.view_count ?? 0) === 0
-        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link, descarga el QR o usa la tarjeta NFC. La primera apertura te confirma que el flujo ya está en la calle.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
-        : !hasPoints
-          ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de fidelización que el cliente entienda en segundos", text: "Nival Puntos permite que el cliente se registre desde QR o NFC, lleve su tarjeta en el celular y avance hacia una recompensa.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
-          : Number(loyaltyCustomerCount ?? 0) === 0
-            ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo. Esa primera alta empieza a construir la base que después puede aprovechar Nival Growth.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
-            : Number(visitCount ?? 0) === 0
-              ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita agrega señal real al programa. Con el tiempo, Growth podrá detectar recurrencia y clientes que se están alejando.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
-              : hasIntelligence
-                ? { eyebrow: "NIVAL GROWTH YA TIENE ACTIVIDAD PARA REVISAR", title: "Mira qué vale la pena hacer hoy", text: "Intelligence usa los clientes y visitas de Nival Puntos para priorizar recuperación, recurrencia y campañas sin pedirte capturas adicionales.", href: "/dashboard/intelligence", cta: "Abrir Growth" }
-                : { eyebrow: "PUNTOS YA ESTÁ GENERANDO INFORMACIÓN", title: "Deja que Nival te diga qué hacer con ella", text: "Prueba Intelligence sobre tu actividad de Puntos y, si te sirve, Nival Growth reúne ambos productos en un solo plan.", href: "/dashboard/intelligence", cta: "Probar Growth" };
+        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link o el QR. La primera apertura te confirma que el flujo ya está funcionando fuera del panel.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
+        : !hasReviews
+          ? { eyebrow: "APROVECHA UNA BUENA EXPERIENCIA", title: "Haz más fácil pedir una reseña", text: "Nival Reseñas crea un acceso directo para que tu cliente llegue al enlace correcto sin tener que buscar tu negocio.", href: "/dashboard/reviews", cta: "Crear Nival Reseñas" }
+          : !hasPoints
+            ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de puntos que el cliente entienda en segundos", text: "Nival Puntos muestra el progreso y la recompensa desde el celular para dar una razón visible para regresar.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
+            : Number(loyaltyCustomerCount ?? 0) === 0
+              ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo y tú empiezas a construir actividad real de visitas.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
+              : Number(visitCount ?? 0) === 0
+                ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita alimenta el historial del programa y hace más útil la información para promociones futuras.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
+                : { eyebrow: "TU PROGRAMA YA ESTÁ GENERANDO INFORMACIÓN", title: "Revisa qué puedes hacer con esa actividad", text: "Nival Puntos Pro agrega más capacidad y herramientas para promociones y seguimiento.", href: "/dashboard/points?view=pro", cta: "Ver Nival Puntos Pro" };
 
   return (
     <main className="dashboardApp">
@@ -250,22 +253,22 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </section>
       {canManageProgram && <><section className="nivalProductHub" aria-label="Productos Nival">
         <article className={hasNivalPay ? "activeProduct" : ""}>
-          <div><span>COBRAR</span><b>{paidNivalPay ? "COMPLETO" : freeNivalPay ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
+          <div><span>COBRAR</span><b>{paidNivalPay ? "PRO" : freeNivalPay ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Pay</h2>
-          <p>Una página de cobro clara para NFC y QR. Tu cliente abre, copia y paga sin pedirte datos por mensaje.</p>
-          <a href="/dashboard/pay">{hasNivalPay ? "Administrar cobros →" : "Crear gratis →"}</a>
+          <p>Haz que tus clientes encuentren cómo pagarte sin pedirte los datos una y otra vez.</p>
+          <a href="/dashboard/pay">{hasNivalPay ? "Administrar Nival Pay →" : "Crear gratis →"}</a>
+        </article>
+        <article className={hasReviews ? "activeProduct" : ""}>
+          <div><span>CONSEGUIR RESEÑAS</span><b>{paidReviews ? "PRO" : freeReviews ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
+          <h2>Nival Reseñas</h2>
+          <p>Lleva a tu cliente directamente al enlace de reseñas cuando la experiencia todavía está fresca.</p>
+          <a href="/dashboard/reviews">{hasReviews ? "Administrar reseñas →" : "Crear gratis →"}</a>
         </article>
         <article className={hasPoints ? "activeProduct" : ""}>
           <div><span>HACER QUE VUELVAN</span><b>{paidPoints ? "PRO" : freePoints ? "GRATIS" : "EMPIEZA GRATIS"}</b></div>
           <h2>Nival Puntos</h2>
-          <p>Registra visitas, recompensa recurrencia y crea una razón sencilla para que tus clientes regresen.</p>
+          <p>Registra visitas, muestra el progreso y crea una razón sencilla para que tus clientes regresen.</p>
           <a href="/dashboard/points">{hasPoints ? "Abrir mi programa →" : "Conocer Nival Puntos →"}</a>
-        </article>
-        <article className={"intelligenceProduct " + (hasIntelligence ? "activeProduct" : "")}>
-          <div><span>CRECER</span><b>{paidIntelligence ? "PRO" : freeIntelligence ? "GRATIS" : hasPoints ? "DESDE PUNTOS" : "REQUIERE PUNTOS"}</b></div>
-          <h2>Nival Growth</h2>
-          <p>Combina Puntos + Intelligence para decirte a quién recuperar, qué campaña probar y qué funcionó.</p>
-          <a href="/dashboard/intelligence">{hasIntelligence ? "Ver qué hacer hoy →" : "Conocer Nival Growth →"}</a>
         </article>
       </section>
       <section className="nivalSignals">
