@@ -5166,3 +5166,70 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
     font-size:16px;
   }
 }
+
+
+/* Landing V2 — owner-first, compact, Pay + Puntos only */
+.landingV2Hero{min-height:650px;grid-template-columns:minmax(0,1fr) minmax(380px,.9fr);gap:54px;padding-top:64px;padding-bottom:70px}
+.landingV2Hero h1{max-width:760px;font-size:clamp(58px,7vw,94px)}
+.landingV2Hero .landingHeroLead{max-width:560px;font-size:clamp(18px,1.8vw,21px)}
+.landingOwnerProof{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.landingOwnerProof span{padding:9px 12px;border:1px solid var(--landing-line);border-radius:999px;color:var(--landing-muted);font-size:11px;font-weight:750}
+.landingV2Visual{position:relative;min-height:470px}
+.landingFloatCard{position:absolute;display:flex;flex-direction:column;justify-content:space-between;border:1px solid rgba(255,255,255,.1);border-radius:28px;box-shadow:0 30px 90px rgba(0,0,0,.35);backdrop-filter:blur(16px)}
+.landingFloatCard small{color:#c9ab6b;font-size:10px;font-weight:900;letter-spacing:.14em}
+.landingFloatCard strong{font-size:clamp(25px,3vw,38px);line-height:1.02;letter-spacing:-.045em}
+.landingFloatCard.pay{z-index:2;right:0;top:20px;width:min(92%,390px);min-height:260px;padding:28px;background:linear-gradient(155deg,#191a1e,#111216)}
+.landingFloatCard.pay div{display:flex;flex-wrap:wrap;gap:8px}.landingFloatCard.pay div span{padding:8px 10px;border-radius:999px;background:#f2efe6;color:#111318;font-size:10px;font-weight:900}
+.landingFloatCard.points{left:0;bottom:12px;width:min(86%,350px);min-height:235px;padding:26px;background:radial-gradient(circle at 90% 0,rgba(201,171,107,.16),transparent 13rem),#141518;transform:rotate(-4deg)}
+.landingFloatCard.points>span{color:#b5bac4;font-size:12px}
+.landingMiniProgress{height:9px;overflow:hidden;border-radius:999px;background:#2d3037}.landingMiniProgress i{display:block;width:70%;height:100%;border-radius:inherit;background:#c9ab6b}
+
+.landingV2Products,.landingExperience,.landingPlansV2{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:90px 0;border-top:1px solid var(--landing-line)}
+.landingV2ProductGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:38px}
+.landingV2ProductGrid article{min-height:330px;padding:32px;border:1px solid var(--landing-line);border-radius:26px;background:linear-gradient(145deg,#15161a,#101114)}
+.landingV2ProductGrid article>span{color:#c9ab6b;font-size:10px;font-weight:900;letter-spacing:.14em}
+.landingV2ProductGrid h3{margin:22px 0 12px;font-size:38px;letter-spacing:-.045em}
+.landingV2ProductGrid p{max-width:520px;margin:0;color:#a7abb3;font-size:16px;line-height:1.62}
+.landingOutcomeList{display:grid;gap:10px;margin-top:34px}.landingOutcomeList b{padding:12px 14px;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#e4e5e8;font-size:12px;font-weight:750;background:rgba(255,255,255,.025)}
+
+.landingExperienceGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:38px;align-items:start}
+.landingExperiencePanel{min-width:0;padding:22px;border:1px solid var(--landing-line);border-radius:28px;background:#101115;overflow:hidden}
+.landingExperienceLabel{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}.landingExperienceLabel span{color:#c9ab6b;font-size:10px;font-weight:900;letter-spacing:.13em}.landingExperienceLabel strong{font-size:13px;color:#d8dadd}
+.landingExperiencePanel [class*="embeddedShell"]{min-height:0!important;background:transparent!important;padding:0!important}
+.landingExperiencePanel [class*="embeddedCard"]{max-width:none!important;margin:0!important}
+.landingPointsExact{max-width:520px;margin:0 auto;padding:0!important;background:transparent!important;min-height:0!important}
+.landingPointsExact .pointsCustomerBrand{margin-bottom:12px}
+.landingPointsExact .pointsCustomerCard{margin:0}
+.landingPointsExact .pointsCustomerCard h1{font-size:26px!important}
+
+.landingPlanProduct{display:grid;grid-template-columns:minmax(220px,.65fr) minmax(0,1.35fr);gap:26px;align-items:stretch;margin-top:30px;padding-top:30px;border-top:1px solid var(--landing-line)}
+.landingPlanTitle{display:flex;flex-direction:column;justify-content:center}.landingPlanTitle span{color:#c9ab6b;font-size:10px;font-weight:900;letter-spacing:.14em}.landingPlanTitle h3{max-width:320px;margin:10px 0 0;font-size:34px;line-height:1.03;letter-spacing:-.04em}
+.landingPlanChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.landingPlanChoices article{display:flex;min-height:250px;flex-direction:column;padding:24px;border:1px solid var(--landing-line);border-radius:20px;background:#121317}
+.landingPlanChoices article.featured{border-color:rgba(201,171,107,.45);background:radial-gradient(circle at 95% 0,rgba(201,171,107,.12),transparent 12rem),#151513}
+.landingPlanChoices span{color:#c9ab6b;font-size:9px;font-weight:900;letter-spacing:.13em}.landingPlanChoices strong{margin-top:14px;font-size:36px;letter-spacing:-.05em}.landingPlanChoices small{margin-top:3px;color:#9297a0;font-size:11px}
+.landingPlanChoices p{margin:18px 0 22px;color:#a7abb3;font-size:13px;line-height:1.55}.landingPlanChoices a{margin-top:auto;display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border-radius:12px;background:#f2efe6;color:#111318;font-size:12px;font-weight:900}.landingPlanChoices article:not(.featured) a{background:#1d1f24;color:#f1f2f3;border:1px solid rgba(255,255,255,.1)}
+
+.landingV2How{width:min(1180px,calc(100% - 48px));margin:0 auto;padding:46px 0 90px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--landing-line);border-radius:22px;overflow:hidden}
+.landingV2How>div{display:grid;gap:7px;padding:24px;background:#111215}.landingV2How span{color:#c9ab6b;font-size:11px;font-weight:900}.landingV2How strong{font-size:18px}.landingV2How p{margin:0;color:#9ba0a8;font-size:12px;line-height:1.5}
+.landingV2Final{padding-top:90px;padding-bottom:90px}
+.landingV2Final h2{max-width:850px}
+.landingV2 .landingMobileContact{display:none!important}
+
+@media(max-width:900px){
+  .landingV2Hero{grid-template-columns:1fr;min-height:0}.landingV2Visual{min-height:420px}
+  .landingExperienceGrid,.landingV2ProductGrid{grid-template-columns:1fr}
+  .landingPlanProduct{grid-template-columns:1fr}.landingPlanTitle h3{max-width:none}
+}
+@media(max-width:760px){
+  .landingV2Products,.landingExperience,.landingPlansV2,.landingV2How{width:calc(100% - 28px)}
+  .landingV2Products,.landingExperience,.landingPlansV2{padding:68px 0}
+  .landingV2Hero{width:calc(100% - 28px);padding-top:46px;padding-bottom:58px}
+  .landingV2Hero h1{font-size:clamp(52px,16vw,74px)}
+  .landingV2Hero .landingHeroLead{font-size:17px}
+  .landingOwnerProof{display:grid}.landingOwnerProof span{border-radius:12px}
+  .landingV2Visual{min-height:370px}.landingFloatCard.pay{width:92%;min-height:220px}.landingFloatCard.points{width:84%;min-height:205px}
+  .landingPlanChoices{grid-template-columns:1fr}.landingPlanChoices article{min-height:0}
+  .landingV2How{grid-template-columns:1fr;padding:0;margin-bottom:68px}
+  .landingExperiencePanel{padding:14px}
+}
