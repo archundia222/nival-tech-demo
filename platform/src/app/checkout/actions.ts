@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_INTELLIGENCE_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
@@ -306,10 +306,24 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
 }
 
 export async function startMercadoPagoCheckout() {
+  const { businessId } = await currentPurchaseContext();
+  const admin = createAdminClient();
+  const { data: pointsEntitlement } = await admin.from('business_product_entitlements')
+    .select('status')
+    .eq('business_id', businessId)
+    .eq('product_code', NIVAL_POINTS_PRODUCT)
+    .maybeSingle();
+
+  const amountCents = pointsEntitlement?.status === 'active'
+    ? NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS
+    : NIVAL_PAY_PRICE_CENTS;
+
   return startMercadoPagoProductCheckout({
     productCode: NIVAL_PAY_PRODUCT,
-    amountCents: NIVAL_PAY_PRICE_CENTS,
-    description: 'Nival Pay Pro · acceso físico + QR + página',
+    amountCents,
+    description: pointsEntitlement?.status === 'active'
+      ? 'Nival Pay Pro · 90% descuento por Nival Puntos Pro'
+      : 'Nival Pay Pro · acceso físico + QR + página',
     returnPath: '/checkout',
   });
 }
