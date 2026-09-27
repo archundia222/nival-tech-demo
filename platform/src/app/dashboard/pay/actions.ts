@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { NIVAL_PAY_INCLUDED_SECTIONS } from '@/lib/orders';
 import { createClient } from '@/lib/supabase/server';
 import { isHttpsUrl, isValidClabe } from '@/lib/payment-profile';
 import { redirect } from 'next/navigation';
@@ -49,7 +48,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
     .eq('business_id', businessId).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle();
   const trialMode = !paidOrder;
-  customSections = customSections.slice(0, (trialMode ? 1 : NIVAL_PAY_INCLUDED_SECTIONS) + Number(existing?.extra_sections_purchased ?? 0));
+  if (trialMode) customSections = customSections.slice(0, 1);
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
   let uploadedPath: string | null = null;
   const file = form.get('image');

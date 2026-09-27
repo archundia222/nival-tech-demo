@@ -5459,3 +5459,18 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .pointsProBundleNote{display:grid;gap:5px;margin-top:18px;padding:14px 16px;border:1px solid rgba(207,174,103,.28);border-radius:12px;background:rgba(207,174,103,.06)}
 .pointsProBundleNote b{color:#d7bc78;font-size:12px}
 .pointsProBundleNote span{color:#aeb3bb;font-size:12px;line-height:1.5}
+
+/* Plan comparison: keep Free vs Pro visible as two columns on mobile. */
+@media (max-width:760px){
+  .landingV4 .planCompareColumns{grid-template-columns:1fr 1fr}
+  .landingV4 .planCompareColumns article{min-width:0;padding:16px 11px}
+  .landingV4 .planCompareColumns article+article{border-left:1px solid var(--v4-line);border-top:0}
+  .landingV4 .planHead{display:grid;gap:5px}
+  .landingV4 .planHead>strong{margin-left:0;font-size:26px}
+  .landingV4 .planHead>small{width:auto;text-align:left;font-size:9px}
+  .landingV4 .planCompareColumns ul{gap:10px;margin:20px 0}
+  .landingV4 .planCompareColumns li{align-items:flex-start;gap:7px;font-size:10px;line-height:1.35}
+  .landingV4 .planCheck,.landingV4 .planCross{width:18px;height:18px;flex-basis:18px;font-size:10px}
+  .landingV4 .planCompareColumns article>a,
+  .landingV4 .planCompareColumns article form button{min-height:44px;padding:10px 8px;font-size:10px}
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createGoogleWalletJwt, syncGoogleWalletObject } from "@/lib/google-wallet";
 import { getPublicLoyaltyCard } from "@/app/points/actions";
+import { createPointsAdminClient } from "@/lib/supabase/points-admin";
 
 interface RouteContext {
   params: Promise<{ token: string }>;
@@ -19,6 +20,23 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
 
   if (!card) {
     return NextResponse.json({ error: "Tarjeta no encontrada." }, { status: 404 });
+  }
+
+  const admin = createPointsAdminClient();
+  const { data: account } = await admin.from('loyalty_accounts')
+    .select('business_id')
+    .eq('public_token', token)
+    .maybeSingle();
+  const { data: entitlement } = account?.business_id
+    ? await admin.from('business_product_entitlements')
+        .select('status')
+        .eq('business_id', account.business_id)
+        .eq('product_code', 'nival_points')
+        .maybeSingle()
+    : { data: null };
+
+  if (entitlement?.status !== 'active') {
+    return NextResponse.json({ error: "Google Wallet está disponible con Nival Puntos Pro." }, { status: 403 });
   }
 
   // A returning customer may already have saved this object. Refresh its

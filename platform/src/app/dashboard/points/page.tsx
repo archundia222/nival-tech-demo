@@ -228,13 +228,13 @@ export default async function NivalPointsPage({
           <div>
             <span>NIVAL PUNTOS PRO</span>
             <h2>Esta es una herramienta Pro.</h2>
-            <p>Tu programa Gratis sigue registrando clientes, puntos y recompensas. Pro agrega más capacidad y herramientas para actuar sobre esa información: promociones, configuración avanzada y seguimiento para volver a contactar clientes.</p>
+            <p>Gratis sirve para arrancar con un programa sencillo. Pro elimina el límite del plan Free, agrega Google Wallet y convierte la actividad de tus clientes en promociones, seguimiento y acciones más útiles.</p>
             <div className="pointsProBundleNote"><b>Además, con Puntos Pro:</b><span>Nival Reseñas Pro queda incluido y Nival Pay Pro obtiene 90% de descuento.</span></div>
           </div>
           <div className="pointsProBenefits">
-            <article><b>Más capacidad</b><p>Crece más allá del límite del plan Gratis.</p></article>
-            <article><b>Promociones</b><p>Prepara mensajes para volver a contactar a clientes.</p></article>
-            <article><b>Más control</b><p>Ajusta reglas y operación del programa con más herramientas.</p></article>
+            <article><b>Google Wallet</b><p>Tu cliente puede llevar su tarjeta y puntos directamente en su celular.</p></article>
+            <article><b>Más capacidad</b><p>Crece sin el límite de clientes del plan Gratis.</p></article>
+            <article><b>Acciones con datos</b><p>Detecta actividad, prepara promociones y mide qué pasó después.</p></article>
           </div>
           {!paid && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Activar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
           {paid && <p className="formMessage successMessage">Nival Puntos Pro ya está activo en este negocio.</p>}

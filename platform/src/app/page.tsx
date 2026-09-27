@@ -138,8 +138,8 @@ export default async function Home() {
               <li><Check/> Página de cobro</li>
               <li><Check/> QR y enlace para compartir</li>
               <li><Check/> Datos editables</li>
-              <li><Cross/> Acceso físico acercando el celular</li>
-              <li><Cross/> 3 apartados de cobro</li>
+              <li><Check/> 1 punto de cobro</li>
+              <li><Cross/> NFC: acercar el celular a una tarjeta para abrir tu cobro</li>
             </ul>
             <Link href={payFreeUrl}>Iniciar con Free</Link>
           </article>
@@ -149,8 +149,8 @@ export default async function Home() {
               <li><Check/> Página de cobro</li>
               <li><Check/> QR y enlace para compartir</li>
               <li><Check/> Datos editables</li>
-              <li><Check/> Acceso físico acercando el celular</li>
-              <li><Check/> 3 apartados de cobro</li>
+              <li><Check/> Puntos de cobro ilimitados</li>
+              <li><Check/> NFC: tu cliente acerca el celular a una tarjeta y abre tu cobro</li>
             </ul>
             {canBuyDirect
               ? <form action={startMercadoPagoCheckout}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Pagar Pro</CheckoutSubmitButton></form>
@@ -194,10 +194,10 @@ export default async function Home() {
             <div className="planHead"><span>FREE</span><strong>$0</strong></div>
             <ul>
               <li><Check/> Hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes</li>
-              <li><Check/> Puntos, visitas y recompensas</li>
-              <li><Check/> Tarjeta digital del cliente</li>
-              <li><Cross/> Promociones avanzadas</li>
-              <li><Cross/> Acciones basadas en actividad</li>
+              <li><Check/> Tarjeta digital básica</li>
+              <li><Check/> 1 recompensa activa</li>
+              <li><Cross/> Google Wallet</li>
+              <li><Cross/> Promociones y análisis de actividad</li>
             </ul>
             <Link href={pointsFreeUrl}>Iniciar con Free</Link>
           </article>
@@ -205,10 +205,11 @@ export default async function Home() {
             <div className="planHead"><span>PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · {NIVAL_TRIAL_DAYS} días de prueba</small></div>
             <ul>
               <li><Check/> Todo lo de Free</li>
-              <li><Check/> Más capacidad de clientes</li>
+              <li><Check/> Clientes sin límite del plan Free</li>
+              <li><Check/> Google Wallet</li>
               <li><Check/> Promociones y seguimiento</li>
-              <li><Check/> Actividad para detectar oportunidades</li>
-              <li><Check/> Herramientas para crear y medir campañas</li>
+              <li><Check/> Detecta clientes frecuentes, inactivos y oportunidades</li>
+              <li><Check/> Crea y mide campañas con actividad real</li>
             </ul>
             {canBuyDirect
               ? <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Probar Pro</CheckoutSubmitButton></form>

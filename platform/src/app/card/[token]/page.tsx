@@ -32,20 +32,24 @@ export default async function CardPage({ params }: CardPageProps) {
     }
   }
 
-  const { data: consent } = account ? await admin.from('customers').select('marketing_consent_at').eq('id', account.customer_id).maybeSingle() : { data: null };
+  const [{ data: consent }, { data: pointsEntitlement }] = account ? await Promise.all([
+    admin.from('customers').select('marketing_consent_at').eq('id', account.customer_id).maybeSingle(),
+    admin.from('business_product_entitlements').select('status').eq('business_id', account.business_id).eq('product_code', 'nival_points').maybeSingle(),
+  ]) : [{ data: null }, { data: null }];
+  const pointsPro = pointsEntitlement?.status === 'active';
   const { data: latestPromotion } = consent?.marketing_consent_at
     ? await admin.from('loyalty_wallet_messages').select('title,body').eq('pass_serial', token).maybeSingle()
     : { data: null };
 
   const progress = Math.min(100, Math.round((Number(card.points_balance) / Number(card.reward_threshold)) * 100));
   const availableRewards = rewards.filter((reward: { redeemed_at: string | null }) => !reward.redeemed_at);
-  const googleWalletReady = Boolean(
+  const googleWalletReady = pointsPro && Boolean(
     process.env.GOOGLE_WALLET_ISSUER_ID &&
     process.env.GOOGLE_WALLET_CLASS_SUFFIX &&
     process.env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL &&
     process.env.GOOGLE_WALLET_PRIVATE_KEY
   );
-  const appleReady = appleWalletReady();
+  const appleReady = pointsPro && appleWalletReady();
   return <main className="pointsCustomerShell nivalDashboard" style={{ "--nv-accent": card.business_brand_color || "#C8A65A" } as CSSProperties}>
     <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span></header>
     <section className="pointsCustomerCard">
@@ -65,12 +69,14 @@ export default async function CardPage({ params }: CardPageProps) {
         <strong>Tu tarjeta, donde la necesites</strong>
         <p>{googleWalletReady
           ? "Consulta tus puntos aquí o agrega la tarjeta a Google Wallet. En Android la verás en la app; los avisos requieren tu consentimiento y las notificaciones activadas."
-          : "Google Wallet aún no está habilitado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta para volver a consultar tus puntos."}</p>
+          : pointsPro
+            ? "Google Wallet todavía no está configurado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta."
+            : "Google Wallet forma parte de Nival Puntos Pro. En el plan Gratis puedes seguir usando esta tarjeta desde el navegador."}</p>
       </div>
       <div className="pointsWalletSaveActions">
         {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar o actualizar en Google Wallet →</a>}
         {appleReady && <a href={`/api/wallet/apple/${encodeURIComponent(token)}`}>Agregar a Apple Wallet →</a>}
-        {!googleWalletReady && <span className="pointsMuted">La opción de agregar a Google Wallet estará disponible cuando se complete su configuración.</span>}
+        {!googleWalletReady && <span className="pointsMuted">{pointsPro ? 'La opción de Google Wallet aparecerá cuando se complete su configuración.' : 'Google Wallet está disponible con Nival Puntos Pro.'}</span>}
         <CardSaveActions />
       </div>
     </section>

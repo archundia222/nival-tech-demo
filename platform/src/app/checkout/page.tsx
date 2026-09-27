@@ -82,12 +82,12 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Nival Pay</Link>
             </section>
           : <>
-          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>{hasPointsProDiscount ? 'Tu Nival Puntos Pro te da 90% de descuento en esta compra. Conservas tu misma página y QR.' : 'Conserva tu misma página y QR. El pago único desbloquea el acceso físico, 3 apartados y las herramientas Pro.'}</p></section>
+          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>{hasPointsProDiscount ? 'Tu Nival Puntos Pro te da 90% de descuento en esta compra. Conservas tu misma página y QR.' : 'Conserva tu misma página y QR. El pago único desbloquea el acceso físico por NFC y puntos de cobro ilimitados.'}</p></section>
           <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
               <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>{hasPointsProDiscount ? '90% de descuento por Nival Puntos Pro' : 'MXN · Sin mensualidad'}</small></div>
-              <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>3 apartados incluidos</li><li>Datos editables sin cambiar la tarjeta</li></ul>
+              <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>Puntos de cobro ilimitados</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
               <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>

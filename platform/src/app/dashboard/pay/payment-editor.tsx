@@ -1,10 +1,8 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState, useTransition } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { PaymentPageView } from '@/app/pay/[token]/payment-page-view';
 import { savePaymentProfile, type PaymentFormState } from './actions';
-import { startExtraSectionCheckoutForProfile } from '@/app/checkout/actions';
-import { NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS } from '@/lib/orders';
 
 type Section = { id: string; title: string; content: string; public: boolean };
 type Profile = {
@@ -65,7 +63,6 @@ export function PaymentEditor({
   siteUrl: string;
   trialMode?: boolean;
 }) {
-  const [checkoutPending, startCheckoutTransition] = useTransition();
   const [state, action, pending] = useActionState<PaymentFormState, FormData>(savePaymentProfile, {});
   const formRef = useRef<HTMLFormElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -102,7 +99,7 @@ export function PaymentEditor({
   const newSectionInput = useRef<HTMLInputElement | null>(null);
 
   const addSection = () => {
-    const limit = (trialMode ? 1 : NIVAL_PAY_INCLUDED_SECTIONS) + (profile?.extra_sections_purchased ?? 0);
+    const limit = trialMode ? 1 : Number.POSITIVE_INFINITY;
     if (sections.length >= limit) return;
     markDirty();
     setSections((current) => {
@@ -152,16 +149,7 @@ export function PaymentEditor({
   }, [state]);
 
   const image = preview || (removeImage ? businessLogo : profile?.image_url || businessLogo);
-  const purchasedSectionLimit = profile?.extra_sections_purchased ?? 0;
-  const extraSectionPriceMx = NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS / 100;
-  const includedSectionLimit = trialMode ? 1 : NIVAL_PAY_INCLUDED_SECTIONS;
-  const totalSectionLimit = includedSectionLimit + purchasedSectionLimit;
-  const freeSectionsRemaining = Math.max(0, includedSectionLimit - sections.length);
-
-  const buyExtraSection = () => {
-    if (!profile?.id) return;
-    startCheckoutTransition(() => startExtraSectionCheckoutForProfile(profile.id));
-  };
+  const totalSectionLimit = trialMode ? 1 : Number.POSITIVE_INFINITY;
 
   const hasPendingChanges = revision > savedRevision;
   const saveStatus = pending
@@ -380,10 +368,11 @@ export function PaymentEditor({
         ))}
 
         <div className="nivalPaySectionsAction">
-          <p className="apartadoIntro">{freeSectionsRemaining > 0 ? <>{trialMode ? <>Tu prueba incluye <strong>1 apartado</strong>.</> : <>Tu Nival Pay incluye {NIVAL_PAY_INCLUDED_SECTIONS} apartados. <strong>Te {freeSectionsRemaining === 1 ? 'queda' : 'quedan'} {freeSectionsRemaining} gratis.</strong></>}</> : trialMode ? <>Ya usaste el apartado incluido en la prueba. Al activar Nival Pay tendrás <strong>3 apartados incluidos</strong>.</> : <>Ya usaste tus {NIVAL_PAY_INCLUDED_SECTIONS} apartados incluidos. Cada apartado adicional cuesta <strong>${extraSectionPriceMx} MXN</strong>.</>}</p>
+          <p className="apartadoIntro">{trialMode
+            ? <>Nival Pay Free incluye <strong>1 punto de cobro</strong>. Con Pro puedes crear <strong>puntos de cobro ilimitados</strong>.</>
+            : <>Nival Pay Pro incluye <strong>puntos de cobro ilimitados</strong>. Agrega los que necesites para tu operación.</>}</p>
           {sections.length < totalSectionLimit ? (
             <button
-              key="add-available-section"
               type="button"
               className="nvSecondaryButton nivalPaySecondaryAction"
               onClick={(event) => {
@@ -392,22 +381,14 @@ export function PaymentEditor({
                 addSection();
               }}
             >
-              Agregar apartado
+              Agregar punto de cobro
             </button>
-          ) : trialMode ? (
-            <span className="nivalPayTrialLock">Más apartados al activar Nival Pay</span>
           ) : (
-            <button
-              key="buy-extra-section"
-              type="button"
-              onClick={buyExtraSection}
-              disabled={checkoutPending || !profile?.id}
-              className="nvSecondaryButton nivalPaySecondaryAction"
-            >
-              {checkoutPending ? 'Abriendo Mercado Pago…' : `Agregar apartado · ${extraSectionPriceMx} MXN`}
-            </button>
+            <span className="nivalPayTrialLock">Activa Pro para crear más puntos de cobro</span>
           )}
-          <p className="apartadoFootnote">{trialMode ? 'Tu QR y tu configuración se conservan si activas Nival Pay.' : freeSectionsRemaining > 0 ? 'Los apartados incluidos se pueden editar y ocultar cuando quieras.' : 'Cada compra desbloquea un apartado nuevo y queda ligado a esta Nival Pay.'}</p>
+          <p className="apartadoFootnote">{trialMode
+            ? 'Tu QR y tu configuración se conservan cuando activas Pro.'
+            : 'Cada punto de cobro se puede editar, ocultar o reutilizar cuando quieras.'}</p>
         </div>
       </section>
 
