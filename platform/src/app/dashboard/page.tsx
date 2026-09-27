@@ -44,7 +44,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     inteligencia: "Nival Growth",
     clientes: "Clientes",
     "nival-card": "Enlaces y reseñas",
-    "perfil-digital": "Página del negocio",
+    "perfil-digital": "Configuración de tu negocio",
     configuracion: "Configuración de tu perfil público",
   };
   const supabase = await createClient();
@@ -347,7 +347,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "perfil-digital" && business?.slug && <>
         <section className="profileDigitalWorkspace">
-          <header className="profileDigitalHeading"><p className="eyebrow">TU PERFIL PÚBLICO</p><h1>La página de tu negocio que sí ven tus clientes.</h1><p>Reúne cobro, puntos, contacto, reseñas y otros accesos en una sola liga. Tú la configuras desde el panel; tus clientes solo ven la parte pública, nunca tu información interna.</p></header>
+          <header className="profileDigitalHeading"><p className="eyebrow">CONFIGURACIÓN DE TU NEGOCIO</p><h1>Edita la landing pública de tu negocio.</h1><p>Esta es la página que sí ven tus clientes. Aquí decides cómo se presenta tu negocio y qué accesos aparecen: pagar, ver puntos, contactarte, dejar reseñas y abrir otros enlaces.</p></header>
           <div className="profileDashboardGrid">
             <div className="profileDashboardPreview">
               <ProfilePublicView
