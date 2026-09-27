@@ -349,17 +349,28 @@ export async function startAdditionalNivalPayCheckout() {
 export async function requestCashPayment() {
   const { businessId } = await currentPurchaseContext();
   const admin = createAdminClient();
-  const { data: alreadyPaid } = await admin.from('product_orders').select('id')
-    .eq('business_id', businessId)
-    .eq('product_code', NIVAL_PAY_PRODUCT)
-    .eq('status', 'paid')
-    .limit(1)
-    .maybeSingle();
+  const [{ data: alreadyPaid }, { data: pointsEntitlement }] = await Promise.all([
+    admin.from('product_orders').select('id')
+      .eq('business_id', businessId)
+      .eq('product_code', NIVAL_PAY_PRODUCT)
+      .eq('status', 'paid')
+      .limit(1)
+      .maybeSingle(),
+    admin.from('business_product_entitlements').select('status')
+      .eq('business_id', businessId)
+      .eq('product_code', NIVAL_POINTS_PRODUCT)
+      .maybeSingle(),
+  ]);
   if (alreadyPaid) redirect('/dashboard/pay?view=manage');
+
+  const amountCents = pointsEntitlement?.status === 'active'
+    ? NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS
+    : NIVAL_PAY_PRICE_CENTS;
 
   const { data: existing } = await admin.from('product_orders').select('id,created_at')
     .eq('business_id', businessId)
     .eq('product_code', NIVAL_PAY_PRODUCT)
+    .eq('amount_cents', amountCents)
     .eq('payment_method', 'cash')
     .eq('status', 'pending_cash_confirmation')
     .order('created_at', { ascending: false })
@@ -370,7 +381,7 @@ export async function requestCashPayment() {
   const { error } = await admin.from('product_orders').insert({
     business_id: businessId,
     product_code: NIVAL_PAY_PRODUCT,
-    amount_cents: NIVAL_PAY_PRICE_CENTS,
+    amount_cents: amountCents,
     payment_method: 'cash',
     status: 'pending_cash_confirmation',
   });
