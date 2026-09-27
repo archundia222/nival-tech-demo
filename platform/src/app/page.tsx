@@ -1,31 +1,56 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PayDemo } from "./pay-demo";
 import { LandingReveal } from "./landing-reveal";
+import { PaymentPageView } from "./pay/[token]/payment-page-view";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_PAY_REGULAR_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FREE_CUSTOMER_LIMIT, NIVAL_POINTS_REGULAR_PRICE_CENTS, NIVAL_TRIAL_DAYS, mxn } from "@/lib/commercial";
+import {
+  NIVAL_PAY_FOUNDER_PRICE_CENTS,
+  NIVAL_POINTS_FOUNDER_PRICE_CENTS,
+  NIVAL_POINTS_FREE_CUSTOMER_LIMIT,
+  NIVAL_TRIAL_DAYS,
+  mxn,
+} from "@/lib/commercial";
 
-const signupUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
+const payFreeUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
 const payProUrl = "/auth?mode=signup&next=%2Fcheckout";
+const pointsUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpoints";
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
-  const params = await searchParams;
-  const { data: legal } = await createAdminClient().from('site_legal_settings').select('phone').eq('id', 'default').maybeSingle();
-  const rawSalesPhone = String(legal?.phone ?? '').replace(/\D/g, '');
+const payPreview = {
+  business_name: "Café Nival",
+  business_slug: null,
+  points_enabled: false,
+  logo_url: null,
+  brand_color: "#b89a5a",
+  account_holder: "Café Nival Demo",
+  bank_name: "BBVA",
+  clabe: "012180015022688507",
+  concept: "Pago de consumo",
+  payment_url: null,
+  holder_visible: true,
+  bank_visible: true,
+  clabe_visible: true,
+  concept_visible: true,
+  payment_url_visible: false,
+  custom_sections: [],
+};
+
+export default async function Home() {
+  const { data: legal } = await createAdminClient()
+    .from("site_legal_settings")
+    .select("phone")
+    .eq("id", "default")
+    .maybeSingle();
+
+  const rawSalesPhone = String(legal?.phone ?? "").replace(/\D/g, "");
   const salesPhone = rawSalesPhone.length === 10 ? `52${rawSalesPhone}` : rawSalesPhone;
-  const salesMessage = 'Hola, vi Nival Tech y quiero saber qué solución conviene para mi negocio. Mi negocio es: ';
-  const salesWhatsappHref = salesPhone ? `https://wa.me/${salesPhone}?text=${encodeURIComponent(salesMessage)}` : '/support';
-  const source = params.from === 'nival-pay' || params.from === 'nival-puntos' || params.from === 'perfil-negocio' ? params.from : null;
-  const sourceContext = source === 'nival-pay'
-    ? { eyebrow: 'LLEGASTE DESDE UNA NIVAL PAY', title: '¿Te gustó lo fácil que fue encontrar los datos para pagar?', text: 'Tu negocio puede empezar con una Nival Pay gratis: página, QR y enlace. Si después necesitas NFC y más herramientas, puedes ampliar sin cambiar tu QR.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpay', cta: 'Crear la mía gratis' }
-    : source === 'nival-puntos'
-      ? { eyebrow: 'LLEGASTE DESDE NIVAL PUNTOS', title: '¿Quieres un programa de clientes frecuentes como el que acabas de ver?', text: 'Puedes empezar gratis con clientes reales, puntos y recompensas. Paga cuando necesites más capacidad y herramientas.', href: '/auth?mode=signup&next=%2Fdashboard%2Fpoints', cta: 'Crear mi programa gratis' }
-      : source === 'perfil-negocio'
-        ? { eyebrow: 'LLEGASTE DESDE UNA PÁGINA NIVAL', title: 'Tu negocio también puede tener un acceso simple para cobro, puntos, contacto y enlaces.', text: 'Nival reúne herramientas pensadas para negocios locales sin obligarte a cambiar cómo trabajas.', href: '#productos', cta: 'Ver soluciones' }
-        : null;
+  const salesWhatsappHref = salesPhone
+    ? `https://wa.me/${salesPhone}?text=${encodeURIComponent("Hola, quiero saber qué opción de Nival conviene para mi negocio.")}`
+    : "/support";
+
   return (
-    <main className="landing" id="inicio">
+    <main className="landing landingV2" id="inicio">
       <LandingReveal />
+
       <nav className="landingNav" aria-label="Navegación principal">
         <Link className="landingBrand" href="#inicio" aria-label="Nival Tech, inicio">
           <Image src="/wallet/nival-logo.svg" alt="" width={38} height={38} priority />
@@ -33,256 +58,173 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ f
         </Link>
         <div className="landingNavLinks">
           <a href="#productos">Productos</a>
-          <a href="#como-funciona">Cómo funciona</a>
-          <a href="#precio">Precios</a>
-          <a href="#empieza-gratis">Empieza gratis</a>
+          <a href="#experiencia">Así lo ve tu cliente</a>
+          <a href="#planes">Planes</a>
         </div>
         <div className="landingNavCtas">
-          <a className="landingTalk" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Hablar con Nival</a>
           <Link className="landingLogin" href="/auth">Entrar</Link>
         </div>
       </nav>
 
-      {sourceContext && <section className="sourceArrival" aria-label="Conoce Nival Tech">
-        <div><span>{sourceContext.eyebrow}</span><strong>{sourceContext.title}</strong><p>{sourceContext.text}</p></div>
-        <a href={sourceContext.href}>{sourceContext.cta} <b>→</b></a>
-      </section>}
-
-      <section className="landingHero">
+      <section className="landingHero landingV2Hero">
         <div className="landingHeroCopy">
-          <p className="landingKicker heroReveal heroReveal1"><span /> Tecnología para negocios locales</p>
+          <p className="landingKicker heroReveal heroReveal1"><span /> Hecho para dueños de negocio</p>
           <h1 className="heroReveal heroReveal2">
             <span>Cobra fácil.</span>
-            <span>Haz que tus clientes vuelvan.</span>
-            <span>Crece con más claridad.</span>
+            <span>Haz que vuelvan.</span>
           </h1>
-          <p className="landingHeroLead heroReveal heroReveal3">Nival Tech reúne cobros, lealtad e inteligencia en una sola plataforma para cafeterías, barberías, restaurantes, tiendas y otros negocios locales. Empieza gratis y activa solo lo que necesites.</p>
+          <p className="landingHeroLead heroReveal heroReveal3">
+            Dos herramientas simples para vender mejor sin complicar tu operación.
+          </p>
           <div className="landingHeroActions heroReveal heroReveal4">
-            <Link className="landingPrimary" href={signupUrl}>Empezar gratis <b>→</b></Link>
-            <a className="landingSecondary" href="#demostracion">Ver cómo funciona</a>
+            <a className="landingPrimary" href="#planes">Ver planes <b>↓</b></a>
+            <a className="landingSecondary" href="#experiencia">Ver la experiencia</a>
           </div>
-          <div className="landingHeroPromise heroReveal heroReveal5">
-            <span><b>Pay</b> cobra por QR, link o NFC</span>
-            <span><b>Puntos</b> haz que tus clientes regresen</span>
-            <span><b>Growth</b> convierte actividad en acciones para crecer</span>
+          <div className="landingOwnerProof heroReveal heroReveal5">
+            <span>Menos explicaciones al cobrar</span>
+            <span>Más razones para que regresen</span>
+            <span>Todo desde tu negocio</span>
           </div>
         </div>
 
-        <div className="landingProductVisual heroVisualReveal" aria-label="Vista previa de Nival Pay">
-          <div className="nfcCardMockup">
-            <div className="nfcCardTop">
-              <span className="nfcMonogram">N</span>
-              <span className="nfcSignal" aria-hidden="true">)))</span>
-            </div>
-            <div>
-              <small>NIVAL PAY</small>
-              <strong>Acerca tu celular<br />para pagar</strong>
-            </div>
+        <div className="landingV2Visual heroVisualReveal" aria-label="Vista de Nival Pay y Nival Puntos">
+          <div className="landingFloatCard pay">
+            <small>NIVAL PAY</small>
+            <strong>Tu cliente encuentra cómo pagarte en segundos.</strong>
+            <div><span>QR</span><span>Link</span><span>Acercar celular</span></div>
           </div>
-          <div className="phoneMockup">
-            <div className="phoneSpeaker" />
-            <div className="phoneScreen">
-              <div className="demoAvatar">CN</div>
-              <small>DATOS PARA TRANSFERENCIA</small>
-              <h2>Café Nival</h2>
-              <div className="phoneField"><span>Titular</span><b>Café Nival Demo</b></div>
-              <div className="phoneField"><span>Banco</span><b>Banco Ejemplo</b></div>
-              <div className="phoneField"><span>CLABE</span><b>012 180 015022688507</b></div>
-              <div className="phoneField"><span>Concepto</span><b>Pago de consumo</b></div>
-              <div className="phoneCopy">Copiar CLABE</div>
-            </div>
+          <div className="landingFloatCard points">
+            <small>NIVAL PUNTOS</small>
+            <strong>Cada visita acerca al cliente a una recompensa.</strong>
+            <div className="landingMiniProgress"><i /></div>
+            <span>7 de 10 visitas</span>
           </div>
-          <p className="landingVisualNote">No guardamos NIP, CVV ni contraseñas.</p>
         </div>
       </section>
 
-      <section className="landingSalesAssurance scrollReveal" aria-label="Lo esencial de Nival">
-        <div><strong>Hecho para negocios locales</strong><span>Cafeterías, barberías, restaurantes, tiendas y servicios que quieren vender más sin complicarse.</span></div>
-        <div><strong>Tres herramientas, una plataforma</strong><span>Pay para cobrar, Puntos para fidelizar y Growth para saber qué acción conviene tomar.</span></div>
-        <div><strong>Sin cambiar cómo trabajas</strong><span>Empieza por una necesidad y agrega lo demás solo cuando te haga sentido.</span></div>
-      </section>
-
-      <section className="nivalEcosystem scrollReveal" id="productos">
+      <section className="landingV2Products scrollReveal" id="productos">
         <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">QUÉ HACE NIVAL</p>
-          <h2>Cobra. Fideliza. Crece.</h2>
-          <p>Cada producto resuelve un problema concreto. Puedes usar uno solo o combinarlos conforme crece tu negocio.</p>
+          <p className="landingEyebrow">DOS PRODUCTOS. DOS PROBLEMAS.</p>
+          <h2>Empieza por lo que hoy te quita más tiempo o ventas.</h2>
         </div>
-        <div className="nivalProductCards">
+        <div className="landingV2ProductGrid">
           <article>
-            <span>01 · COBRAR</span>
+            <span>COBRAR MEJOR</span>
             <h3>Nival Pay</h3>
-            <p>Haz que pagar sea rápido: comparte tu página por QR o enlace y, con Pro, también desde una tarjeta NFC física.</p>
-            <ul className="landingProductMiniList"><li>Página digital, QR y enlace</li><li>Datos editables sin cambiar tu QR</li><li>Pro incluye NFC física y 3 apartados</li></ul>
-            <div><strong>Empieza gratis</strong><small>Pro fundador: {mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)} pago único</small></div>
-            <Link href={signupUrl}>Crear Nival Pay gratis <b>→</b></Link>
+            <p>Haz que tus clientes encuentren tus datos de pago rápido y sin preguntarte lo mismo una y otra vez.</p>
+            <div className="landingOutcomeList"><b>Comparte una sola página</b><b>Actualiza tus datos sin cambiar el acceso</b><b>Úsalo en mostrador, mesa o redes</b></div>
           </article>
           <article>
-            <span>02 · HACER QUE VUELVAN</span>
+            <span>HACER QUE REGRESEN</span>
             <h3>Nival Puntos</h3>
-            <p>Crea un programa de lealtad simple para que tus clientes vean sus puntos, recompensas y tengan una razón concreta para regresar.</p>
-            <ul className="landingProductMiniList"><li>Clientes, visitas y puntos</li><li>Tarjeta digital y QR</li><li>Recompensas configurables</li></ul>
-            <div><strong>{NIVAL_TRIAL_DAYS} días Pro</strong><small>Luego {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes o sigue en Free</small></div>
-            <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa <b>→</b></Link>
-          </article>
-          <article className="featured">
-            <span>03 · CRECER</span>
-            <h3>Nival Growth</h3>
-            <p>Convierte la actividad de tus clientes en decisiones: detecta a quién recuperar, a quién cuidar y qué campaña conviene probar.</p>
-            <ul className="landingProductMiniList"><li>Puntos Pro incluido</li><li>Clientes recurrentes, en riesgo e inactivos</li><li>Acciones, campañas y medición</li></ul>
-            <div><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}/mes</strong><small>Puntos Pro + Intelligence</small></div>
-            <Link href="/products#growth">Conocer Growth <b>→</b></Link>
+            <p>Dales una razón visible para volver y lleva el control de visitas y recompensas sin tarjetas de papel.</p>
+            <div className="landingOutcomeList"><b>Registro sencillo por QR</b><b>Progreso visible en el celular</b><b>Premios y visitas en un solo lugar</b></div>
           </article>
         </div>
       </section>
 
-      <section className="landingCustomService scrollReveal">
-        <div>
-          <p className="landingEyebrow">SERVICIO A LA MEDIDA</p>
-          <h2>¿También necesitas una página web para tu negocio?</h2>
-          <p>También podemos diseñar y publicar una página web profesional adaptada a tu marca y al objetivo real del negocio. Se cotiza aparte según el alcance.</p>
-        </div>
-        <div className="landingCustomServiceActions">
-          <span>Landing · catálogo · WhatsApp · formularios · reservas · integraciones</span>
-          <a href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Cotizar por WhatsApp →</a>
-        </div>
-      </section>
-
-      <section className="landingSection landingProblem scrollReveal" id="como-funciona">
-        <div className="landingSectionHeading">
-          <p className="landingEyebrow">ASÍ DE SIMPLE</p>
-          <h2>Tu cliente entiende qué hacer sin preguntarte.</h2>
-        </div>
-        <div className="stepsGrid">
-          <article>
-            <span>01</span>
-            <h3>Configura una vez</h3>
-            <p>Agrega tu negocio y datos. Nival genera tu página, enlace y QR permanente.</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h3>Compártelo donde ya cobras</h3>
-            <p>Usa el QR, enlace o NFC. El cliente abre la experiencia en su propio celular.</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h3>Amplía solo si te sirve</h3>
-            <p>Conserva el mismo QR y activa NFC, más apartados o Puntos cuando tu operación lo necesite.</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="landingDemoSection scrollReveal" id="demostracion">
+      <section className="landingExperience scrollReveal" id="experiencia">
         <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PRUÉBALO</p>
-          <h2>Así lo verá tu cliente.</h2>
-          <p>Esta es una demostración con información de ejemplo. Toca cualquier campo para probar cómo lo verá un cliente real.</p>
+          <p className="landingEyebrow">ASÍ LO VE TU CLIENTE</p>
+          <h2>No te lo imagines. Esto es lo que recibe.</h2>
+          <p>La vista pública está pensada para ser clara incluso para alguien que nunca ha usado Nival.</p>
         </div>
-        <PayDemo />
+
+        <div className="landingExperienceGrid">
+          <article className="landingExperiencePanel">
+            <div className="landingExperienceLabel"><span>NIVAL PAY</span><strong>Datos listos para pagar</strong></div>
+            <PaymentPageView profile={payPreview} embedded />
+          </article>
+
+          <article className="landingExperiencePanel">
+            <div className="landingExperienceLabel"><span>NIVAL PUNTOS</span><strong>Tarjeta digital del cliente</strong></div>
+            <div className="landingPointsExact nivalDashboard">
+              <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <b>NIVAL tech</b></span></header>
+              <section className="pointsCustomerCard">
+                <div className="pointsCustomerCardTop">
+                  <div className="pointsBusinessIdentity"><span>C</span><div><p className="pointsCustomerProgram">Clientes frecuentes</p><h1>Café Nival</h1></div></div>
+                  <span className="pointsCustomerMemberBadge">MIEMBRO</span>
+                </div>
+                <div className="pointsCustomerGreeting"><span>Hola, Ana</span><small>Tu saldo actual</small></div>
+                <div className="pointsBalance"><strong>7</strong><span>puntos</span></div>
+                <div className="pointsProgressBlock">
+                  <div className="pointsProgressMeta"><span>Progreso</span><b>7 / 10</b></div>
+                  <div className="pointsProgress"><i style={{ width: "70%" }} /></div>
+                </div>
+                <div className="pointsReward"><div><span>PRÓXIMA RECOMPENSA</span><strong>Café de la casa gratis</strong></div><b>Te faltan 3 puntos</b></div>
+              </section>
+            </div>
+          </article>
+        </div>
       </section>
 
-      <section className="landingPointsShowcase scrollReveal" aria-labelledby="points-demo-title">
-        <div className="landingPointsCopy">
-          <p className="landingEyebrow">NIVAL PUNTOS EN LA VIDA REAL</p>
-          <h2 id="points-demo-title">“A las 10 visitas, tu recompensa está lista.”</h2>
-          <p>El cliente se registra una sola vez. Después ve su avance desde el celular, muestra su código al visitar y recibe la recompensa cuando llega a la meta.</p>
-          <div className="landingPointsFlow">
-            <span><b>1</b> Escanea tu QR</span>
-            <span><b>2</b> Crea su tarjeta</span>
-            <span><b>3</b> Suma visitas</span>
-            <span><b>4</b> Canjea el premio</span>
+      <section className="landingPlansV2 scrollReveal" id="planes">
+        <div className="landingSectionHeading compact">
+          <p className="landingEyebrow">PLANES</p>
+          <h2>Elige una herramienta. Empieza gratis o activa la versión completa.</h2>
+        </div>
+
+        <div className="landingPlanProduct">
+          <div className="landingPlanTitle"><span>NIVAL PAY</span><h3>Haz más fácil que te paguen.</h3></div>
+          <div className="landingPlanChoices">
+            <article>
+              <span>GRATIS</span>
+              <strong>$0</strong>
+              <p>Página de cobro, QR y enlace para compartir.</p>
+              <Link href={payFreeUrl}>Empezar gratis</Link>
+            </article>
+            <article className="featured">
+              <span>COMPLETO</span>
+              <strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong>
+              <small>pago único</small>
+              <p>Todo lo anterior + acceso físico en tu negocio y 3 apartados de cobro.</p>
+              <Link href={payProUrl}>Comprar Nival Pay</Link>
+            </article>
           </div>
-          <Link className="landingPrimary" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Crear mi programa gratis</Link>
         </div>
-        <div className="landingPointsPhone" aria-label="Ejemplo de tarjeta digital de Nival Puntos">
-          <div className="landingPointsCard">
-            <div className="landingPointsBrand"><span>CN</span><div><small>PROGRAMA DE CLIENTES FRECUENTES</small><strong>Café Nival</strong></div></div>
-            <div className="landingPointsBalance"><strong>7</strong><span>de 10 visitas</span></div>
-            <div className="landingPointsBar"><i /></div>
-            <div className="landingPointsReward"><small>PRÓXIMA RECOMPENSA</small><strong>Café de la casa gratis</strong><span>Te faltan 3 visitas</span></div>
-            <div className="landingPointsButtons"><b>＋ Sumar visita</b><b>★ Mis premios</b></div>
+
+        <div className="landingPlanProduct">
+          <div className="landingPlanTitle"><span>NIVAL PUNTOS</span><h3>Dales una razón para volver.</h3></div>
+          <div className="landingPlanChoices">
+            <article>
+              <span>GRATIS</span>
+              <strong>$0</strong>
+              <p>Programa de puntos para hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p>
+              <Link href={pointsUrl}>Empezar gratis</Link>
+            </article>
+            <article className="featured">
+              <span>PRO</span>
+              <strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong>
+              <small>al mes · {NIVAL_TRIAL_DAYS} días de prueba</small>
+              <p>Más capacidad, configuración y herramientas para recuperar clientes.</p>
+              <Link href={pointsUrl}>Probar Nival Puntos Pro</Link>
+            </article>
           </div>
-          <span className="landingWalletBadge">Tarjeta digital · QR · Google Wallet en Android</span>
         </div>
       </section>
 
-      <section className="landingBusinessPlans scrollReveal" id="precio" aria-labelledby="planes-title">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PRECIOS PENSADOS PARA CRECER</p>
-          <h2 id="planes-title">Precios claros. Sin obligarte a comprar de más.</h2>
-          <p>Sin letras chiquitas: aquí ves qué incluye cada opción, cuánto cuesta y cuándo tiene sentido pagar.</p>
-        </div>
-        <div className="landingBusinessPlanGrid">
-          <article><span>NIVAL PAY</span><strong>{mxn(NIVAL_PAY_FOUNDER_PRICE_CENTS)}</strong><small>pago único · plan Pro fundador</small><p><b>Gratis:</b> página digital, QR y enlace. <b>Pro:</b> primera tarjeta NFC física + 3 apartados de cobro.</p><em>Regular previsto: {mxn(NIVAL_PAY_REGULAR_PRICE_CENTS)}</em><Link className="landingPlanAction" href={signupUrl}>Probar Pay gratis →</Link></article>
-          <article className="featured"><span>NIVAL PUNTOS PRO</span><strong>{mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}</strong><small>al mes · después de {NIVAL_TRIAL_DAYS} días Pro</small><p>Clientes, visitas, puntos, tarjeta digital, QR y recompensas. Si no continúas con Pro, puedes seguir Free hasta {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes.</p><em>Regular previsto: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes</em><Link className="landingPlanAction" href="/auth?mode=signup&next=%2Fdashboard%2Fpoints">Probar Puntos {NIVAL_TRIAL_DAYS} días →</Link></article>
-          <article><span>NIVAL GROWTH</span><strong>{mxn(NIVAL_GROWTH_PRICE_CENTS)}</strong><small>al mes · Puntos Pro + Intelligence</small><p>Segmentación, clientes en riesgo, recomendaciones, campañas y medición de resultados sobre la actividad de Puntos.</p><em>Úsalo cuando ya tengas actividad suficiente para convertir datos en acciones.</em><Link className="landingPlanAction" href="/products#growth">Ver qué incluye Growth →</Link></article>
-        </div>
-        <Link className="landingCompareLink" href="/products">Ver comparación completa de planes →</Link>
-        <a className="landingCompareLink" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>¿No sabes cuál te conviene? Pregúntanos por WhatsApp →</a>
+      <section className="landingV2How scrollReveal">
+        <div><span>1</span><strong>Crea tu cuenta</strong><p>Solo necesitas correo y contraseña.</p></div>
+        <div><span>2</span><strong>Configura tu negocio</strong><p>Nombre, acceso y lo básico para empezar.</p></div>
+        <div><span>3</span><strong>Compártelo</strong><p>Tus clientes usan Nival desde su propio celular.</p></div>
       </section>
 
-      <section className="landingTrust scrollReveal" aria-labelledby="trust-title">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">CONTROL Y CONFIANZA</p>
-          <h2 id="trust-title">Simple por fuera. Serio por dentro.</h2>
-          <p>La experiencia del cliente es sencilla, mientras tu negocio mantiene control sobre acceso, datos y configuración.</p>
-        </div>
-        <div className="landingTrustGrid">
-          <article><span>01</span><strong>Espacios de trabajo separados</strong><p>Cada negocio mantiene su configuración, clientes y productos dentro de su propio contexto operativo.</p></article>
-          <article><span>02</span><strong>Roles para el equipo</strong><p>Propietarios, managers y staff pueden tener responsabilidades distintas dentro de la operación.</p></article>
-          <article><span>03</span><strong>Consentimiento para marketing</strong><p>Las acciones comerciales de Intelligence respetan el consentimiento registrado antes de incluir a una persona en una audiencia.</p></article>
-          <article><span>04</span><strong>Sin secretos bancarios</strong><p>Nival Pay muestra la información que el negocio decide compartir; no necesita NIP, CVV ni contraseñas bancarias.</p></article>
-        </div>
-      </section>
-
-      <section className="landingFaq scrollReveal">
-        <div className="landingSectionHeading compact">
-          <p className="landingEyebrow">PREGUNTAS FRECUENTES</p>
-          <h2>Antes de empezar.</h2>
-        </div>
-        <div className="faqList">
-          <details>
-            <summary>¿Mi cliente necesita instalar algo?</summary>
-            <p>No. Nival abre en el navegador desde QR, enlace o NFC. En Puntos, también puede guardar su tarjeta digital en Google Wallet cuando esté disponible en su dispositivo.</p>
-          </details>
-          <details>
-            <summary>¿Nival Pay procesa mi dinero?</summary>
-            <p>No. Nival Pay muestra los datos que tú decides compartir para que el cliente transfiera directamente desde su banco.</p>
-          </details>
-          <details>
-            <summary>¿Puedo cambiar mis datos después?</summary>
-            <p>Sí. Puedes actualizar banco, titular, CLABE y contenido sin cambiar el enlace, QR o tarjeta ya programada.</p>
-          </details>
-          <details>
-            <summary>¿Qué diferencia hay entre Puntos y Growth?</summary>
-            <p>Puntos registra clientes, visitas y recompensas. Growth incluye Puntos Pro + Intelligence para detectar oportunidades y ayudarte a actuar sobre esa actividad.</p>
-          </details>
-          <details>
-            <summary>¿Qué significa “información de ejemplo” en las demos?</summary>
-            <p>Son datos inventados únicamente para mostrar cómo se verá Nival. No corresponden a clientes, cuentas bancarias ni negocios reales.</p>
-          </details>
-        </div>
-      </section>
-
-      <section className="landingFinalCta scrollReveal" id="empieza-gratis">
-        <p className="landingEyebrow">EMPIEZA POR UN PROBLEMA</p>
-        <h2>No necesitas comprar todo.<br />Empieza por lo que tu negocio necesita hoy.</h2>
-        <p>Pay si quieres cobrar más fácil. Puntos si quieres que regresen. Growth cuando Puntos ya esté generando actividad que puedas convertir en decisiones y campañas.</p>
+      <section className="landingFinalCta landingV2Final scrollReveal">
+        <p className="landingEyebrow">EMPIEZA SIMPLE</p>
+        <h2>Primero resuelve un problema. Después decides si necesitas más.</h2>
         <div className="landingHeroActions">
-          <Link className="landingPrimary" href={signupUrl}>Crear mi cuenta gratis</Link>
-          <a className="landingSecondary" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Hablar con Nival</a>
+          <a className="landingPrimary" href="#planes">Elegir plan</a>
+          <a className="landingSecondary" href={salesWhatsappHref} target={salesPhone ? "_blank" : undefined} rel={salesPhone ? "noreferrer" : undefined}>Tengo una duda</a>
         </div>
       </section>
-
-      <Link className="landingMobileContact" href={signupUrl}>Empezar gratis →</Link>
 
       <footer className="landingFooter">
         <Link className="landingBrand" href="#inicio">
           <Image src="/wallet/nival-logo.svg" alt="" width={34} height={34} />
           <span>Nival Tech</span>
         </Link>
-        <p>Cobra, fideliza y crece con herramientas hechas para negocios locales.</p>
-        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link><Link href="/refunds">Reembolsos</Link><Link href="/auth">Entrar</Link></div>
+        <p>Herramientas simples para cobrar mejor y hacer que tus clientes regresen.</p>
+        <div><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/refunds">Reembolsos</Link><Link href="/auth">Entrar</Link></div>
       </footer>
     </main>
   );
