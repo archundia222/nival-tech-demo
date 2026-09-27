@@ -96,6 +96,7 @@ export default async function Home() {
         <article><span>2</span><strong>Actúa</strong><p>Identifica a quién tiene sentido contactar.</p></article>
         <article><span>3</span><strong>Mide</strong><p>Prueba campañas y revisa qué pasó después.</p></article>
       </div>
+      <Link className="landingProDemoLink" href="/demo/puntos-pro">Ver Puntos Pro con datos de ejemplo →</Link>
     </section>
 
     <section className="landingComparisons landingComparisonsV4 scrollReveal" id="comparar">
@@ -215,6 +216,7 @@ export default async function Home() {
             {canBuyDirect
               ? <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="landingPlanPayButton" pendingLabel="Abriendo Mercado Pago…">Probar Pro</CheckoutSubmitButton></form>
               : <Link href={pointsProUrl}>Probar Pro</Link>}
+            <Link className="planPreviewLink" href="/demo/puntos-pro">Ver demo Pro sin cuenta</Link>
           </article>
         </div>
       </div>

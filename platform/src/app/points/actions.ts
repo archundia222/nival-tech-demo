@@ -16,6 +16,15 @@ async function syncWalletForScanSession(scanSessionId: string) {
     .select("loyalty_account_id, customer_id, business_id")
     .eq("id", scanSessionId).single();
   if (error || !session) throw error ?? new Error("Scan session not found");
+
+  const { data: entitlement } = await admin.from("business_product_entitlements")
+    .select("status")
+    .eq("business_id", session.business_id)
+    .eq("product_code", "nival_points")
+    .maybeSingle();
+
+  if (entitlement?.status !== "active") return false;
+
   const [{ data: account }, { data: customer }, { data: business }, { count }, { data: balance, error: balanceError }] = await Promise.all([
     admin.from("loyalty_accounts").select("public_token").eq("id", session.loyalty_account_id).single(),
     admin.from("customers").select("name").eq("id", session.customer_id).single(),
@@ -28,6 +37,7 @@ async function syncWalletForScanSession(scanSessionId: string) {
     token: account.public_token, businessName: business.name,
     customerName: customer.name, points: Number(balance), visits: count ?? 0,
   });
+  return true;
 }
 
 async function rateKey(endpoint: "enroll" | "card" | "scan_token") {
@@ -69,7 +79,7 @@ export async function enrollPointsCustomer(formData: FormData) {
   });
   if (error || !data?.[0]) {
     const message = error?.message?.includes('free_customer_limit_reached')
-      ? 'Este negocio llegó al límite de 30 clientes de Nival Puntos Gratis. El dueño puede pasar a Pro para seguir agregando clientes.'
+      ? `Este negocio llegó al límite de ${NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes de Nival Puntos Gratis. El dueño puede pasar a Pro para seguir agregando clientes.`
       : error?.message?.includes('points_program_unavailable')
         ? 'Este programa de puntos no está disponible.'
         : error?.message ?? 'No pudimos crear tu tarjeta.';
@@ -151,10 +161,13 @@ export async function awardPoint(scanSessionId: string) {
       : "No pudimos sumar el punto.";
     return { ok: false, error: message };
   }
-  try { await syncWalletForScanSession(scanSessionId); }
+  let walletEnabled = false;
+  try { walletEnabled = await syncWalletForScanSession(scanSessionId); }
   catch (walletError) { console.error("Google Wallet point sync failed", walletError); }
-  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
-  catch (walletError) { console.error('[apple-wallet] point update failed', walletError); }
+  if (walletEnabled) {
+    try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+    catch (walletError) { console.error('[apple-wallet] point update failed', walletError); }
+  }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }
@@ -170,10 +183,13 @@ export async function redeemRewardAfterVisit(scanSessionId: string) {
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
   }
-  try { await syncWalletForScanSession(scanSessionId); }
+  let walletEnabled = false;
+  try { walletEnabled = await syncWalletForScanSession(scanSessionId); }
   catch (walletError) { console.error("Google Wallet post-visit redemption sync failed", walletError); }
-  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
-  catch (walletError) { console.error('[apple-wallet] post-visit redemption update failed', walletError); }
+  if (walletEnabled) {
+    try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+    catch (walletError) { console.error('[apple-wallet] post-visit redemption update failed', walletError); }
+  }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }
@@ -188,10 +204,13 @@ export async function redeemPointReward(scanSessionId: string) {
       : "No pudimos canjear el premio.";
     return { ok: false, error: message };
   }
-  try { await syncWalletForScanSession(scanSessionId); }
+  let walletEnabled = false;
+  try { walletEnabled = await syncWalletForScanSession(scanSessionId); }
   catch (walletError) { console.error("Google Wallet redemption sync failed", walletError); }
-  try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
-  catch (walletError) { console.error('[apple-wallet] redemption update failed', walletError); }
+  if (walletEnabled) {
+    try { const { notifyAppleForScanSession } = await import('@/lib/apple-wallet'); await notifyAppleForScanSession(scanSessionId); }
+    catch (walletError) { console.error('[apple-wallet] redemption update failed', walletError); }
+  }
   revalidatePath("/dashboard/points");
   return { ok: true, result: data?.[0] };
 }
@@ -272,7 +291,7 @@ export async function registerQuickCustomer(formData: FormData) {
     p_marketing_consent: formData.get("marketingConsent") === "on",
   });
   if (error || !data?.[0]) {
-    const message = error?.message?.includes("free_customer_limit_reached") ? "Llegaste al límite de 30 clientes del plan Gratis."
+    const message = error?.message?.includes("free_customer_limit_reached") ? `Llegaste al límite de ${NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes del plan Gratis.`
       : error?.message?.includes("invalid_phone") ? "Revisa el teléfono del cliente."
       : error?.message?.includes("invalid_name") ? "Escribe el nombre del cliente."
       : error?.message?.includes("points_program_unavailable") ? "Configura primero tu programa de Nival Puntos."

@@ -125,6 +125,23 @@ export default async function NivalPointsPage({
     customerActivity.set(reward.customer_id, current);
   }
 
+  let frequentCustomers = 0;
+  let recoveryCustomers = 0;
+  let inactiveCustomers = 0;
+  let customersWithoutVisit = 0;
+  for (const customer of customerRows ?? []) {
+    const activity = customerActivity.get(customer.id);
+    if (!activity?.lastVisit) {
+      customersWithoutVisit += 1;
+      continue;
+    }
+    const daysSinceVisit = Math.max(0, Math.floor((now - new Date(activity.lastVisit).getTime()) / 86400000));
+    if (activity.visits >= 3 && daysSinceVisit <= 30) frequentCustomers += 1;
+    if (daysSinceVisit > 14 && daysSinceVisit <= 45) recoveryCustomers += 1;
+    if (daysSinceVisit > 45) inactiveCustomers += 1;
+  }
+  const promotionConsentCustomers = (customerRows ?? []).filter((customer) => Boolean(customer.marketing_consent_at)).length;
+
   const title =
     view === 'pro' ? 'Nival Puntos Pro'
       : view === 'customers' ? 'Clientes'
@@ -175,6 +192,7 @@ export default async function NivalPointsPage({
             <div className="freemiumCtas">
               <form action={activateFreeNivalPoints}><CheckoutSubmitButton className="productCta" pendingLabel="Activando prueba…">Probar Pro {NIVAL_TRIAL_DAYS} días <span>→</span></CheckoutSubmitButton></form>
               <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvSecondaryButton" pendingLabel="Abriendo Mercado Pago…">Precio fundador · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>
+              <a className="nvSecondaryButton" href="/demo/puntos-pro">Ver Puntos Pro sin cuenta →</a>
             </div>
             <small>Sin tarjeta para empezar. Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes.</small>
           </div>
@@ -252,6 +270,20 @@ export default async function NivalPointsPage({
             <article><span>Premios listos</span><strong>{availableRewards}</strong><small>por entregar</small></article>
             <article><span>Premios canjeados</span><strong>{redeemedRewards}</strong><small>ya entregados</small></article>
           </section>
+
+          {proAccess && <section className="pointsActionIntelligence">
+            <div className="pointsSectionHeading">
+              <div><span>QUÉ HACER HOY</span><h2>Convierte actividad en acciones.</h2></div>
+              <p>No necesitas interpretar tablas: Nival resume qué grupo merece atención y qué puedes hacer después.</p>
+            </div>
+            <div className="pointsActionSegments">
+              <article><small>CLIENTES FRECUENTES</small><strong>{frequentCustomers}</strong><p>Premia a quienes ya tienen el hábito de volver.</p><a href="/dashboard/points?view=promotions">Preparar promoción →</a></article>
+              <article><small>POR RECUPERAR</small><strong>{recoveryCustomers}</strong><p>Llevan más de 14 días sin visita. Este es el grupo más fácil de reactivar.</p><a href="/dashboard/points?view=promotions">Crear mensaje →</a></article>
+              <article><small>INACTIVOS</small><strong>{inactiveCustomers}</strong><p>Llevan más de 45 días sin volver. Prueba una oferta distinta o deja de insistir.</p><a href="/dashboard/points?view=customers">Ver clientes →</a></article>
+              <article><small>SIN PRIMERA VISITA</small><strong>{customersWithoutVisit}</strong><p>Se registraron, pero todavía no generan actividad. Dales una razón simple para empezar.</p><a href="/dashboard/points?view=share">Revisar experiencia →</a></article>
+            </div>
+            <div className="pointsActionFooter"><span>{promotionConsentCustomers} clientes aceptaron promociones.</span><a href="/dashboard/points?view=promotions">Abrir Promociones Pro →</a></div>
+          </section>}
 
           <section className="pointsTodayAction">
             <div>
@@ -384,6 +416,10 @@ export default async function NivalPointsPage({
 
         {canManage && view === 'overview' && metrics && <p className="pointsDataSourceNote">Hoy: {metrics.visits_today ?? 0} visitas · {metrics.new_customers_today ?? 0} clientes nuevos · {metrics.rewards_redeemed_today ?? 0} premios canjeados. Para análisis, segmentos y decisiones, abre Nival Intelligence.</p>}
       </>}
+      {baseFree && canManage && ['promotions','settings','pro'].includes(view) && <aside className="pointsProStickyUpgrade">
+        <div><small>ESTÁS VIENDO UNA DEMO PRO</small><strong>{view === 'promotions' ? 'Segmenta, contacta y mide.' : view === 'settings' ? 'Personaliza reglas, Wallet y recompensas.' : 'Convierte visitas en decisiones.'}</strong></div>
+        {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton pendingLabel="Abriendo Mercado Pago…">Cambiar a Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
+      </aside>}
     </div>
   </main>;
 }

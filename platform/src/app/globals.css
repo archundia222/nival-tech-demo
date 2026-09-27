@@ -5510,3 +5510,63 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .businessHealthNavCopy>small{color:#8f949d;font-size:9px;line-height:1.2}
 .businessHealthMiniBar{display:block;width:100%;height:5px;overflow:hidden;border-radius:999px;background:#2a2d31}
 .businessHealthMiniBar>span{display:block;height:100%;border-radius:inherit;background:#45c878;box-shadow:0 0 14px rgba(69,200,120,.28)}
+
+
+/* Nival Puntos value overhaul */
+.pointsActionIntelligence{display:grid;gap:18px;margin-top:22px;padding:24px;border:1px solid rgba(207,174,103,.22);border-radius:20px;background:radial-gradient(circle at 100% 0,rgba(207,174,103,.08),transparent 18rem),#111216}
+.pointsActionSegments{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pointsActionSegments article{display:grid;gap:8px;align-content:start;padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:#0d0e11}
+.pointsActionSegments small{color:#c8a65a;font-size:9px;font-weight:900;letter-spacing:.12em}
+.pointsActionSegments strong{font-size:32px;letter-spacing:-.04em}
+.pointsActionSegments p{margin:0;color:#9ba0a8;font-size:12px;line-height:1.5}
+.pointsActionSegments a,.pointsActionSegments button{margin-top:auto;border:0;background:transparent;color:#e1c26f;font-weight:900;text-align:left;padding:6px 0;cursor:pointer}
+.pointsActionFooter{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-top:4px;color:#9ba0a8;font-size:12px}
+.pointsActionFooter a{color:#e1c26f;font-weight:900}
+
+.pointsProStickyUpgrade{position:fixed;z-index:70;right:22px;bottom:22px;display:flex;align-items:center;gap:16px;max-width:min(680px,calc(100vw - 44px));padding:12px 12px 12px 16px;border:1px solid rgba(207,174,103,.34);border-radius:999px;background:rgba(16,17,20,.96);box-shadow:0 18px 50px rgba(0,0,0,.38);backdrop-filter:blur(18px)}
+.pointsProStickyUpgrade>div{display:grid;gap:2px}.pointsProStickyUpgrade small{color:#c9ab6b;font-size:8px;font-weight:900;letter-spacing:.11em}.pointsProStickyUpgrade strong{font-size:12px}
+.pointsProStickyUpgrade form{margin-left:auto}.pointsProStickyUpgrade button{min-height:44px;padding:10px 16px;border:0;border-radius:999px;background:#e3c66f;color:#111318;font-weight:950;white-space:nowrap}
+
+.landingProDemoLink,.planPreviewLink{display:inline-flex;align-items:center;gap:8px;margin-top:16px;color:#e1c26f;font-size:12px;font-weight:900}
+.planPreviewLink{justify-content:center;width:100%;margin-top:10px;color:#b9bdc5}
+
+.pointsProPublicDemo{min-height:100vh;padding:28px 24px 140px;background:#090a0c;color:#f5f3ee}
+.pointsProDemoHero,.pointsProDemoSection,.pointsProDemoWhy{width:min(1080px,100%);margin:0 auto}
+.pointsProDemoHero{display:grid;gap:54px;padding:10px 0 72px}
+.pointsProDemoBrand{display:inline-flex;align-items:center;gap:10px;width:max-content;color:#f5f3ee;font-weight:900}.pointsProDemoBrand>span{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#d0ae63;color:#111318}
+.pointsProDemoHero h1{max-width:860px;margin:14px 0 18px;font-size:clamp(48px,8vw,90px);line-height:.92;letter-spacing:-.06em}.pointsProDemoHero p{max-width:760px;color:#9ca1aa;font-size:17px;line-height:1.6}
+.pointsProDemoSection{display:grid;gap:20px;padding:58px 0;border-top:1px solid rgba(255,255,255,.08)}
+.pointsProDemoHeading span{color:#c9a85e;font-size:11px;font-weight:900;letter-spacing:.13em}.pointsProDemoHeading h2{max-width:780px;margin:8px 0 10px;font-size:clamp(32px,5vw,54px);letter-spacing:-.04em}.pointsProDemoHeading p{max-width:720px;margin:0;color:#9aa0aa;line-height:1.55}
+.pointsActionSegments.demo button{font:inherit}
+.pointsWalletDemoCard{max-width:520px;display:grid;gap:10px;padding:28px;border-radius:24px;background:linear-gradient(145deg,#f8f6f0,#ece7db);color:#121316;box-shadow:0 26px 70px rgba(0,0,0,.28)}
+.pointsWalletDemoCard>div:first-child{display:flex;align-items:center;justify-content:space-between}.pointsWalletDemoCard>div:first-child span{color:#9a7c39;font-size:10px;font-weight:900;letter-spacing:.12em}.pointsWalletDemoCard>strong{margin-top:24px;font-size:72px;letter-spacing:-.05em}.pointsWalletDemoCard>small{color:#706c63;font-weight:900}.pointsWalletDemoCard>p{margin:0;color:#68655d}
+.pointsWalletDemoProgress{height:9px;border-radius:999px;background:#dad5cb;overflow:hidden}.pointsWalletDemoProgress i{display:block;height:100%;border-radius:inherit;background:#caa95f}.pointsWalletDemoBadge{width:max-content;margin-top:8px;padding:7px 10px;border-radius:999px;background:#111318;color:white;font-size:10px;font-weight:900}
+.pointsProResultsDemo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.pointsProResultsDemo article{display:grid;gap:8px;padding:20px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#101115}.pointsProResultsDemo small{color:#c7a65d;font-size:9px;font-weight:900}.pointsProResultsDemo strong{font-size:26px}
+.pointsProDemoWhy{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:58px 0}.pointsProDemoWhy>span,.pointsProDemoWhy>h2{grid-column:1/-1}.pointsProDemoWhy>span{color:#c7a65d;font-size:10px;font-weight:900;letter-spacing:.12em}.pointsProDemoWhy>h2{max-width:760px;margin:0 0 10px;font-size:clamp(34px,5vw,56px);letter-spacing:-.04em}.pointsProDemoWhy>div{padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:#101115}.pointsProDemoWhy>div b{font-size:24px}.pointsProDemoWhy>div p{color:#a0a5ad;line-height:1.55}
+.pointsProPublicSticky{position:fixed;z-index:80;left:50%;bottom:20px;transform:translateX(-50%);width:min(680px,calc(100% - 28px));display:flex;align-items:center;gap:18px;padding:12px 12px 12px 18px;border:1px solid rgba(207,174,103,.38);border-radius:999px;background:rgba(15,16,19,.96);box-shadow:0 20px 60px rgba(0,0,0,.42);backdrop-filter:blur(18px)}
+.pointsProPublicSticky>div{display:grid;gap:2px}.pointsProPublicSticky small{color:#c7a65d;font-size:8px;font-weight:900;letter-spacing:.12em}.pointsProPublicSticky strong{font-size:16px}.pointsProPublicSticky>a{margin-left:auto;padding:13px 18px;border-radius:999px;background:#e1c26f;color:#111318;font-size:12px;font-weight:950;white-space:nowrap}
+
+/* Public customer points card: lighter, Wallet-like surface */
+.pointsCustomerShell .pointsCustomerCard{background:linear-gradient(160deg,#fbfaf6,#f0ece2)!important;color:#151619!important;border-color:#e3dccd!important}
+.pointsCustomerShell .pointsCustomerProgram,.pointsCustomerShell .pointsCustomerGreeting small,.pointsCustomerShell .pointsProgressMeta span{color:#757169!important}
+.pointsCustomerShell .pointsCustomerCard h1,.pointsCustomerShell .pointsCustomerGreeting span,.pointsCustomerShell .pointsBalance strong,.pointsCustomerShell .pointsProgressMeta b,.pointsCustomerShell .pointsReward strong{color:#151619!important}
+.pointsCustomerShell .pointsCustomerMemberBadge{background:#ebe3d1!important;color:#7f682f!important}
+.pointsCustomerShell .pointsProgress{background:#d8d4cb!important}.pointsCustomerShell .pointsProgress i{background:linear-gradient(90deg,#b89343,#e0c575)!important}
+.pointsCustomerShell .pointsReward{background:#e8e3d9!important;border-color:#d8d0c0!important}.pointsCustomerShell .pointsReward span,.pointsCustomerShell .pointsReward b{color:#746b5c!important}
+.pointsCustomerShell .pointsAvailableNotice{background:#e7f4eb!important;border-color:#badcc5!important;color:#174d2b!important}
+
+@media(max-width:800px){
+  .pointsActionSegments{grid-template-columns:1fr 1fr}
+  .pointsProResultsDemo{grid-template-columns:1fr 1fr}
+  .pointsProDemoWhy{grid-template-columns:1fr}
+  .pointsProDemoWhy>span,.pointsProDemoWhy>h2{grid-column:auto}
+}
+@media(max-width:600px){
+  .pointsActionSegments,.pointsProResultsDemo{grid-template-columns:1fr}
+  .pointsProStickyUpgrade{left:14px;right:14px;bottom:14px;max-width:none;border-radius:18px;align-items:stretch}
+  .pointsProStickyUpgrade form button{width:100%}
+  .pointsProStickyUpgrade{flex-direction:column}
+  .pointsProPublicSticky{bottom:12px}
+  .pointsProPublicSticky strong{font-size:14px}
+  .pointsProPublicSticky>a{padding:12px 14px}
+}
