@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Nival Tech — Cobra, haz que vuelvan y crece";
+export const alt = "Nival Tech — Cobra fácil. Fideliza clientes. Crece.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -25,8 +25,8 @@ export default function OpenGraphImage() {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 980 }}>
         <div style={{ color: "#bfa363", fontSize: 20, fontWeight: 800, letterSpacing: ".12em" }}>TECNOLOGÍA PARA NEGOCIOS</div>
-        <div style={{ fontSize: 68, lineHeight: 1.02, fontWeight: 800, letterSpacing: "-0.055em" }}>Cobra mejor. Haz que vuelvan. Sabe qué hacer para crecer.</div>
-        <div style={{ color: "#aaa59b", fontSize: 27, lineHeight: 1.4 }}>Nival Pay · Nival Puntos · Nival Intelligence</div>
+        <div style={{ fontSize: 68, lineHeight: 1.02, fontWeight: 800, letterSpacing: "-0.055em" }}>Cobra fácil. Fideliza clientes. Crece.</div>
+        <div style={{ color: "#aaa59b", fontSize: 27, lineHeight: 1.4 }}>Nival Pay · Nival Reseñas · Nival Puntos</div>
       </div>
     </div>,
     size,
