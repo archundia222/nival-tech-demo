@@ -1,8 +1,10 @@
-import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS } from './commercial';
+import { NIVAL_GROWTH_PRICE_CENTS, NIVAL_PAY_FOUNDER_PRICE_CENTS, NIVAL_POINTS_FOUNDER_PRICE_CENTS, NIVAL_REVIEWS_PRO_PRICE_CENTS } from './commercial';
 
 // Production catalog prices.
 export const NIVAL_PAY_PRICE_CENTS = NIVAL_PAY_FOUNDER_PRICE_CENTS;
 export const NIVAL_PAY_PRODUCT = 'nival_pay';
+export const NIVAL_REVIEWS_PRODUCT = 'nival_reviews';
+export const NIVAL_REVIEWS_PRICE_CENTS = NIVAL_REVIEWS_PRO_PRICE_CENTS;
 
 export function money(amountCents: number) {
   return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amountCents / 100);
