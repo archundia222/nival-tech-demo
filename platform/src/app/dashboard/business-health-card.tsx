@@ -13,6 +13,6 @@ export function BusinessHealthCard({ items }: { items: HealthItem[] }) {
       <strong>{completed}/{items.length}</strong>
     </div>
     <div className={styles.progress} aria-label={`${percent}% completado`}><i style={{ width: `${percent}%` }} /></div>
-    <div className={styles.items}>{items.map((item, index) => <Link className={item.complete ? styles.complete : styles.pending} href={item.href} key={item.label}><span aria-hidden="true">{item.complete ? '✓' : index + 1}</span><div><b>{item.label}</b><small>{item.complete ? 'Listo' : item.action}</small></div><i aria-hidden="true">→</i></Link>)}</div>
+
   </section>;
 }

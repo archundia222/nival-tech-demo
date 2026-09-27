@@ -34,11 +34,13 @@ export function ProductInteractiveDemo({ mode }: { mode: Mode }) {
 
 function PointsInteractiveDemo() {
   const [points, setPoints] = useState(7);
+  const [redeemed, setRedeemed] = useState(false);
   const [message, setMessage] = useState('Faltan 3 puntos para la recompensa.');
   const rewardReady = points >= 10;
   const progress = Math.min(points * 10, 100);
 
   function addVisit() {
+    setRedeemed(false);
     setPoints((current) => {
       const next = Math.min(current + 1, 10);
       setMessage(next >= 10 ? 'Recompensa desbloqueada. El cliente ya puede canjearla.' : `Faltan ${10 - next} punto${10 - next === 1 ? '' : 's'} para la recompensa.`);
@@ -49,11 +51,13 @@ function PointsInteractiveDemo() {
   function redeem() {
     if (!rewardReady) return;
     setPoints(0);
-    setMessage('Recompensa canjeada. El cliente empieza un nuevo ciclo.');
+    setRedeemed(true);
+    setMessage('Premio canjeado y entregado: bebida mediana gratis. El cliente comienza un nuevo ciclo.');
   }
 
   function reset() {
     setPoints(7);
+    setRedeemed(false);
     setMessage('Faltan 3 puntos para la recompensa.');
   }
 
@@ -74,8 +78,8 @@ function PointsInteractiveDemo() {
         <div className="interactivePointsValue"><small>TUS PUNTOS</small><strong>{points}</strong><span>de 10</span></div>
         <div className="interactiveProgress"><i style={{ width: `${progress}%` }} /></div>
         <div className={`interactiveRewardState ${rewardReady ? 'ready' : ''}`}>
-          <small>{rewardReady ? 'RECOMPENSA LISTA' : 'PRÓXIMA RECOMPENSA'}</small>
-          <b>Bebida mediana gratis</b>
+          <small>{redeemed ? 'PREMIO CANJEADO · ENTREGADO' : rewardReady ? 'RECOMPENSA LISTA PARA ENTREGAR' : 'PRÓXIMA RECOMPENSA'}</small>
+          <b>☕ Bebida mediana gratis</b>
           <p>{message}</p>
         </div>
       </article>

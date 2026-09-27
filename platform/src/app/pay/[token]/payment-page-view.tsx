@@ -27,7 +27,7 @@ const editLabelStyle: CSSProperties = { fontSize: 12, fontWeight: 800, letterSpa
 export function PaymentPageView({ profile, embedded = false, trackingToken, editor }: { profile: PaymentPageViewProfile; embedded?: boolean; trackingToken?: string; editor?: InlineEditor }) {
   const initials = profile.business_name.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
   const publicSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.filter((section) => section.public !== false && section.content.trim().length > 0) : [];
-  const editField = (label: string, value: string, onChange: (value: string) => void, placeholder = '') => <label style={editBoxStyle}><span style={editLabelStyle}>{label}</span><input style={editFieldStyle} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label>;
+  const editField = (label: string, value: string, onChange: (value: string) => void, placeholder = '') => <label style={editBoxStyle}><span style={editLabelStyle}>✎ {label} · editar</span><input style={editFieldStyle} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label>;
 
   const content = <>
     <section className={embedded ? `${styles.payCard} ${styles.embeddedCard}` : styles.payCard} style={{ "--blue": profile.brand_color || "#b89a5a" } as CSSProperties} aria-labelledby={embedded ? undefined : "payment-title"}>
@@ -36,7 +36,7 @@ export function PaymentPageView({ profile, embedded = false, trackingToken, edit
       {!editor && profile.payment_url_visible && profile.payment_url && <a className={styles.directPay} href={profile.payment_url} target="_blank" rel="noreferrer"><span>Pagar con enlace</span><b>↗</b></a>}
       <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
-      <p className={styles.copyHint}>{editor ? 'Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
+      <p className={styles.copyHint}>{editor ? '✎ Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
       <div className={styles.details}>
         {editor ? <>
           {profile.holder_visible && editField('Beneficiario', editor.holder, editor.onHolder)}

@@ -5624,3 +5624,18 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
   .landingComparisonTable header strong,.landingComparisonTable header span,.landingComparisonTable>div b,.landingComparisonTable>div span{padding:13px 11px;font-size:10px}
   .landingWifiPlanTeaser{align-items:flex-start;flex-direction:column}
 }
+
+/* Sharing choices and gated Puntos previews */
+.sharePlanCards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0 24px}
+.sharePlanCards article{display:grid;align-content:start;gap:9px;padding:20px;border:1px solid #343438;border-radius:18px;background:#171719}
+.sharePlanCards span,.pointsDemoSticker{color:#c8aa68;font-size:13px;font-weight:800}
+.sharePlanCards h2{margin:0;color:#f7f7f6;font-size:20px}
+.sharePlanCards p{margin:0;color:#b4b4b8;font-size:15px;line-height:1.5}
+.sharePlanCards a,.pointsDemoSticker a{color:#ebcd83;text-decoration:underline;text-underline-offset:3px}
+.pointsDemoSticker{display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:fit-content;margin:16px 0;padding:10px 14px;border:1px solid #a98743;border-radius:999px;background:#28251e}
+.pointsDemoCustomers{display:grid;gap:12px}.pointsDemoCustomers article{display:flex;justify-content:space-between;gap:12px;padding:15px;border:1px solid #3b3932;border-radius:12px}.pointsDemoCustomers small{color:#aaa}
+@media(max-width:600px){.pointsDemoCustomers article{flex-direction:column}}
+/* Show the customer-facing editor first, with extra settings below. */
+.nivalPayEditorShell{display:flex!important;flex-direction:column;gap:20px}
+.nivalPayEditorShell .nivalPayLivePreview,.nivalPayEditorShell .nivalPayEditorPanel{width:100%;max-width:900px;margin-inline:auto}
+.nivalPayInlineHelp b{font-size:16px}.nivalPayInlineHelp span{font-size:14px}

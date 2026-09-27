@@ -63,7 +63,7 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const groups = (['usar','clientes','programa'] as const).filter((group) => visiblePointsItems.some((item) => item.group === group));
   const wifiIcon = <NavIcon><path d="M5 12.5a10 10 0 0 1 14 0"/><path d="M8 15.5a6 6 0 0 1 8 0"/><path d="M10.8 18.3a2 2 0 0 1 2.4 0"/><circle cx="12" cy="20" r=".5" fill="currentColor"/></NavIcon>;
   const reviewIcon = <NavIcon><path d="m12 3 2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.4-4.6 2.4.9-5.2-3.8-3.7 5.2-.8L12 3Z"/></NavIcon>;
-  const wifiHref = '/dashboard?section=perfil-digital#wifi';
+  const wifiHref = '/dashboard/wifi';
 
   return <>
     <aside className="dashboardSidebar professionalSidebar">

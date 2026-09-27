@@ -350,6 +350,7 @@ export default async function NivalPointsPage({
               <div className="pointsProMockupMessage"><small>MENSAJE SUGERIDO</small><p>“Hola Ana, hace rato que no te vemos. Esta semana tienes café + pan por $79. Muéstranos este mensaje al visitarnos.”</p></div>
               <div className="pointsProMockupStats"><div><small>Enviados</small><strong>28</strong></div><div><small>Regresaron</small><strong>7</strong></div><div><small>Respuesta</small><strong>25%</strong></div></div>
             </div>
+            <div className="pointsDemoSticker">Vista de demostración · <a href="/dashboard/points?view=pro">Cambiar a Pro para obtener esta herramienta →</a></div>
             {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conseguir Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
@@ -384,6 +385,7 @@ export default async function NivalPointsPage({
               <label><span>Tiempo mínimo entre visitas</span><b>60 min</b></label>
               <label><span>Google Wallet</span><b>Activado</b></label>
             </div>
+            <div className="pointsDemoSticker">Vista de demostración · <a href="/dashboard/points?view=pro">Cambiar a Pro para obtener esta herramienta →</a></div>
             {!subscriptionConfirming && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Conseguir Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes →</CheckoutSubmitButton></form>}
           </section>}
 
