@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
   }
   if (!order) return NextResponse.json({ received: true });
 
-  if (order.provider_preference_id && order.provider_preference_id !== dataId) {
+  if (!order.provider_preference_id || order.provider_preference_id !== dataId) {
     console.error('Nival Pay provider order mismatch', { orderId });
     return NextResponse.json({ error: 'Order mismatch' }, { status: 409 });
   }
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
   const paymentId = payment?.id ? String(payment.id) : null;
   const approved = payload.status === 'processed'
     && payload.status_detail === 'accredited'
-    && (!payload.currency_id || payload.currency_id === order.currency)
+    && payload.currency_id === 'MXN' && payload.currency_id === order.currency
     && amountCents === order.amount_cents
     && paidAmountCents === order.amount_cents
     && ((order.product_code === NIVAL_PAY_PRODUCT && order.amount_cents === NIVAL_PAY_PRICE_CENTS)
