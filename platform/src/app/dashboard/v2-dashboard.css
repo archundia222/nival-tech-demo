@@ -154,3 +154,45 @@
  .nivalPayCatalogCard,.nivalPayAddCard{width:100%!important;max-width:330px!important}.nivalPayCatalog{justify-items:center!important}
 }
 @media(max-width:420px){.businessQrActions{grid-template-columns:1fr!important}.businessQrUrlRow{grid-template-columns:minmax(0,1fr) 42px!important}.businessQrCopy{width:100%!important}.dashboardContentTopbar{font-size:12px!important}}
+
+/* Nival workspace: balanced editor, complete preview and consistent light controls. */
+.dashboardApp .dashboardPayContent .payHeading,
+.dashboardApp .profileDigitalWorkspace .profileDigitalHeading{width:100%!important;max-width:1180px!important;margin:0 auto 18px!important}
+.dashboardApp .nivalPayEditorShell{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:22px!important;width:100%!important;max-width:1180px!important;margin:0 auto 30px!important;align-items:start!important}
+.dashboardApp .nivalPayEditorPanel{grid-column:1!important;grid-row:1!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:24px!important}
+.dashboardApp .nivalPayLivePreview{grid-column:2!important;grid-row:1!important;position:relative!important;top:auto!important;width:100%!important;max-width:none!important;min-width:0!important;margin:0!important}
+.dashboardApp .nivalPayPreviewPhone{height:auto!important;max-height:none!important;overflow:visible!important}
+.dashboardApp .nivalPayPreviewLabel{gap:8px;flex-wrap:wrap!important}
+.dashboardApp .nivalPayFieldGroup,.dashboardApp .nivalPayCustomSection{width:100%!important;min-width:0!important}
+.dashboardApp .nivalPayFileControl input[type="file"]{width:100%!important;min-height:50px!important;padding:8px!important;background:#fff!important;color:#173c2c!important;border:1px solid #b9d6c2!important;border-radius:10px!important;font-size:13px!important}
+.dashboardApp .nivalPayFileControl input[type="file"]::file-selector-button{background:#eaf5ed!important;color:#145839!important;border:1px solid #a9cdb4!important;border-radius:8px!important;padding:7px 10px!important;cursor:pointer}
+.dashboardApp .nivalPayCatalog{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(260px,320px))!important;justify-content:center!important;justify-items:stretch!important;align-items:stretch!important;gap:18px!important;width:100%!important;max-width:1180px!important;margin:0 auto 28px!important}
+.dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalPayAddCard{width:100%!important;max-width:none!important;min-height:340px!important;margin:0!important}
+.dashboardApp .nivalPayAddCard .nivalAddCardVisual{aspect-ratio:1.586/1!important}
+.dashboardApp .landingEditOnly{max-width:1180px!important;margin:0 auto 48px!important}
+.dashboardApp .landingEditOnly .profileDigitalHeading{width:100%!important;max-width:1180px!important;margin:0 auto 20px!important}
+.dashboardApp .landingEditorGrid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:start!important;gap:22px!important;width:100%!important}
+.dashboardApp .landingEditForm{display:grid;gap:13px;padding:24px;border:1px solid #d5e8da;border-radius:20px;background:#fff;color:#173c2c}
+.dashboardApp .landingEditForm h2{margin:0;font-size:26px}.dashboardApp .landingEditForm p{margin:0 0 6px;color:#50685c}
+.dashboardApp .landingEditForm label{display:grid;gap:7px;font-size:13px;font-weight:800}
+.dashboardApp .landingEditForm input,.dashboardApp .landingEditForm textarea{min-width:0;width:100%;padding:12px;border:1px solid #b9d6c2;border-radius:10px;background:#fff;color:#173c2c;font:inherit}
+.dashboardApp .landingEditForm input[type="color"]{height:48px;padding:4px}
+.dashboardApp .landingEditForm input[type="file"]::file-selector-button{padding:7px 10px;border:1px solid #a9cdb4;border-radius:8px;background:#eaf5ed;color:#145839}
+.dashboardApp .landingEditForm button{min-height:48px;background:#18784c!important;color:#fff!important;border-radius:10px}
+.dashboardApp .landingEditorGrid .profileDashboardPreview{width:100%!important;max-width:none!important;margin:0!important}
+.dashboardApp .professionalSidebar,.dashboardApp .sidebarNav,.dashboardApp .professionalNav{background:#fff!important;color:#173c2c!important}
+.dashboardApp .professionalNav .sidebarMainProduct.active,.dashboardApp .professionalNav details[open]>.sidebarMainProduct,.dashboardApp .professionalNav .sidebarMainProduct:hover,.dashboardApp .professionalNav .sidebarSubmenu a:hover,.dashboardApp .professionalNav .sidebarSubmenu a.active{background:#eaf5ed!important;color:#145839!important;border-color:#b9d6c2!important}
+.dashboardApp button:active,.dashboardApp a:active,.dashboardApp summary:active{background-color:#d7eddf!important;color:#145839!important}
+.dashboardApp .nvPrimaryButton:active,.dashboardApp .primaryButton:active,.dashboardApp .nivalSingleEdit:active{background:#13653f!important;color:#fff!important}
+@media(max-width:900px){
+ .dashboardApp .nivalPayEditorShell,.dashboardApp .landingEditorGrid{grid-template-columns:1fr!important;max-width:700px!important}
+ .dashboardApp .nivalPayEditorPanel,.dashboardApp .nivalPayLivePreview{grid-column:1!important;grid-row:auto!important}
+ .dashboardApp .nivalPayEditorPanel{order:1!important}.dashboardApp .nivalPayLivePreview{order:2!important}
+ .dashboardApp .nivalPayCatalog{grid-template-columns:repeat(auto-fit,minmax(240px,320px))!important}
+}
+@media(max-width:620px){
+ .dashboardApp .nivalPayEditorShell{display:flex!important;flex-direction:column!important}
+ .dashboardApp .nivalPayCatalog{grid-template-columns:minmax(0,1fr)!important;justify-items:center!important}
+ .dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalPayAddCard{max-width:360px!important;min-height:0!important}
+ .dashboardApp .landingEditForm{padding:18px!important}
+}

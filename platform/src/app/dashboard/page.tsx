@@ -1,4 +1,3 @@
-import './v2-dashboard.css';
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
@@ -16,7 +15,7 @@ interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
 }
 
-type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "perfil-compartir" | "analiticas" | "configuracion";
+type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "perfil-compartir" | "configuracion";
 
 interface TeamMember {
   member_email: string;
@@ -36,7 +35,7 @@ interface IntelligenceRecommendation {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
-  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "perfil-compartir", "analiticas", "configuracion"];
+  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "perfil-compartir", "configuracion"];
   const currentSection: DashboardSection = dashboardSections.includes(params.section as DashboardSection)
     ? params.section as DashboardSection
     : "resumen";
@@ -47,7 +46,6 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     "nival-card": "Enlaces y reseñas",
     "perfil-digital": "Editar landing page",
     "perfil-compartir": "Compartir landing page",
-    analiticas: "Analíticas",
     configuracion: "Configuración de tu perfil público",
   };
   const supabase = await createClient();
@@ -314,10 +312,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       </>}
       {currentSection === "perfil-digital" && business?.slug && <section className="profileDigitalWorkspace landingEditOnly">
         <header className="profileDigitalHeading"><p className="eyebrow">EDITAR LANDING PAGE</p><h1>Así se presenta tu negocio.</h1><p>Edita la información y revisa la vista previa. Para QR, enlace y opciones de envío usa «Compartir» en el menú.</p></header>
-        <div className="profileDashboardGrid landingEditorGrid"><div className="profileDashboardPreview"><ProfilePublicView businessName={business.name} slug={business.slug} description={business.description} logoUrl={business.logo_url} brandColor={business.brand_color} actions={profilePreviewActions} verifiedLabel="PERFIL DEL NEGOCIO" embedded showQuickActions={false} showFooter={false}/><div className="profileDashboardFooter"><span>Vista previa</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver landing ↗</a></div></div></div>
+        <div className="profileDashboardGrid landingEditorGrid"><form action={updateBusinessProfile} className="landingEditForm"><h2>Editar información</h2><p>Estos datos aparecen en la página pública de tu negocio.</p><label>Nombre del negocio<input name="businessName" defaultValue={business.name} required minLength={2} maxLength={100}/></label><label>Descripción<textarea name="businessDescription" defaultValue={business.description ?? ''} rows={4}/></label><label>Teléfono<input name="businessPhone" type="tel" defaultValue={business.phone ?? ''}/></label><label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ''} placeholder="https://..."/></label><label>Color de tu marca<input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? '#18784c'}/></label><input name="businessLogoUrl" type="hidden" defaultValue={business.logo_url ?? ''}/><label>Logotipo<input name="businessLogoFile" type="file" accept="image/jpeg,image/png,image/webp"/></label><button type="submit" className="nvPrimaryButton">Guardar cambios</button></form><div className="profileDashboardPreview"><ProfilePublicView businessName={business.name} slug={business.slug} description={business.description} logoUrl={business.logo_url} brandColor={business.brand_color} actions={profilePreviewActions} verifiedLabel="PERFIL DEL NEGOCIO" embedded showQuickActions={false} showFooter={false}/><div className="profileDashboardFooter"><span>Vista previa</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver landing ↗</a></div></div></div>
       </section>}
       {currentSection === "perfil-compartir" && business?.slug && <section className="landingShareOnly"><header className="profileDigitalHeading"><p className="eyebrow">COMPARTIR LANDING PAGE</p><h1>Tu enlace y QR, en un solo lugar.</h1><p>Esta sección es únicamente para compartir la landing de tu negocio.</p></header><BusinessQr businessName={business.name} url={`${publicOrigin}/p/${business.slug}`} qrId="business-digital-profile-qr" eyebrow="COMPARTE TU NEGOCIO" title="Un enlace para todo" description="Copia el enlace, compártelo o descarga el QR." fileSuffix="perfil-digital"/></section>}
-      {currentSection === "analiticas" && <section className="nivalAnalyticsSection"><div className="profileDigitalHeading"><p className="eyebrow">ANALÍTICAS</p><h1>Aperturas de tus Nival Cards</h1><p>Aquí se separa la actividad por producto para que puedas ver cuántas veces se abrió cada enlace.</p></div><div className="nivalProductOverview">{homeCards.map(item=><article key={item.key} className={`nivalProductMetric ${item.active ? "" : "trial"}`}><span>{item.name}</span><strong>{item.active ? item.views : "—"}</strong><small>{item.active ? "aperturas registradas" : "Producto no activo"}</small>{!item.active && <a href={item.href}>Probar gratis →</a>}</article>)}</div></section>}
       {legacySection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>

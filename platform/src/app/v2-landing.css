@@ -114,3 +114,31 @@
 @media(max-width:800px){.nv4ShowcaseBody:after{left:54%!important;top:47%!important}}
 
 .nv4BrandCard{width:100%;aspect-ratio:1.76;border-radius:24px;background:linear-gradient(145deg,#19724f,#073923);box-shadow:inset 1px 1px 2px #ffffff69,inset -5px -10px 20px #002c1f77,0 24px 38px #002e1e44;color:#fff;display:flex;align-items:flex-start;justify-content:space-between;padding:12%;transform:rotate(-8deg);font-size:clamp(22px,3vw,42px);font-weight:900;letter-spacing:-.05em}.nv4BrandCard span{align-self:flex-end;transform:rotate(90deg);font-size:28px;letter-spacing:-.2em}
+
+/* Keep both the physical card and the real Pay preview visible in the showcase. */
+.nv4ShowcaseBody{gap:48px;justify-content:center;padding:22px 32px}
+.nv4CardPhoto{flex:0 1 350px;max-width:350px;min-width:0}
+.nv4BrandCard{font-size:clamp(18px,2.2vw,30px)}
+.nv4PhoneActual{flex:0 0 225px;height:350px;margin-top:0;align-self:center}
+@keyframes nv5TapCard{0%,18%,100%{transform:translate(0,0) rotate(-1deg)}42%,62%{transform:translate(35px,-5px) rotate(3deg)}76%{transform:translate(12px,0) rotate(0)}}
+@media(max-width:800px){
+  .nv4ShowcaseBody{gap:8px;padding:12px;height:300px}
+  .nv4CardPhoto{position:relative;left:auto;width:auto;flex:0 1 48%;max-width:240px;margin:0}
+  .nv4PhoneActual{position:relative;right:auto;top:auto;flex:0 0 170px;width:170px;height:270px;margin:0}
+  .nv4BrandCard{border-radius:15px;font-size:clamp(13px,3vw,20px);padding:10%}
+  @keyframes nv5TapCard{0%,18%,100%{transform:translate(0,0) rotate(-1deg)}42%,62%{transform:translate(14px,0) rotate(2deg)}76%{transform:translate(5px,0)}}
+}
+@media(max-width:480px){
+  .nv4ShowcaseBody{height:238px;gap:0;padding:10px 5px}
+  .nv4CardPhoto{flex-basis:52%;max-width:185px}
+  .nv4PhoneActual{flex-basis:132px;width:132px;height:218px;border-width:4px;border-radius:20px}
+  .nv4BrandCard{font-size:14px;border-radius:12px}
+}
+
+/* The landing and its interactive states use the same light green palette. */
+.nv3 .nv2Pricing,.nv3 .nv2Footer{background:#f1f8f3!important;color:#102a21!important}
+.nv3 .nv2PriceGrid article,.nv3 .nv2PriceGrid article.featured{background:#fff!important;color:#102a21!important;border:1px solid #cfe5d5!important;box-shadow:0 12px 30px #102a210d!important}
+.nv3 .nv2PriceGrid h3,.nv3 .nv2PriceGrid li,.nv3 .nv2PriceGrid p,.nv3 .nv2PriceGrid small,.nv3 .nv2Footer strong,.nv3 .nv2Footer a{color:#173c2c!important}
+.nv3 .nv2Pricing .nv2Eyebrow,.nv3 .nv2PriceGrid li span{color:#18784c!important}
+.nv3 .nv2PriceGrid .nv2OutlineButton{border-color:#a9cdb4!important;color:#176541!important;background:#fff!important}
+.nv3 a:active,.nv3 button:active{background:#d7eddf!important;color:#145839!important}
