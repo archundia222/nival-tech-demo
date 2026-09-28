@@ -51,3 +51,58 @@
 /* Showcase NFC gesture: card moves toward the phone */
 .nv4ShowcaseBody{position:relative;overflow:hidden}.nv4CardPhoto{transform-origin:70% 50%;animation:nv5TapCard 4.8s cubic-bezier(.55,.05,.3,1) infinite!important}.nv4PhoneActual{animation:nv5PhoneReact 4.8s ease-in-out infinite}.nv4ShowcaseBody:after{content:"ACERCA";position:absolute;left:52%;top:48%;z-index:5;padding:7px 10px;border-radius:999px;background:#18784c;color:#fff;font-size:9px;font-weight:900;letter-spacing:.12em;opacity:0;animation:nv5TapHint 4.8s ease-in-out infinite;pointer-events:none}
 @keyframes nv5TapCard{0%,18%,100%{transform:translate(0,0) rotate(-1deg)}42%,62%{transform:translate(105px,-5px) rotate(4deg)}76%{transform:translate(22px,0) rotate(0)}}@keyframes nv5PhoneReact{0%,38%,100%{filter:none}48%,64%{filter:drop-shadow(0 0 13px #36a56b55)}}@keyframes nv5TapHint{0%,28%,72%,100%{opacity:0;transform:translateY(5px) scale(.9)}40%,62%{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:800px){@keyframes nv5TapCard{0%,18%,100%{transform:translate(0,0) rotate(-1deg)}42%,62%{transform:translate(34px,0) rotate(3deg)}76%{transform:translate(8px,0)}}.nv4ShowcaseBody:after{left:47%;top:47%}}@media(prefers-reduced-motion:reduce){.nv4CardPhoto,.nv4PhoneActual,.nv4ShowcaseBody:after{animation:none!important}}
+
+
+/* Mobile-first polish: Toke landing, product previews and guided demo */
+@media(max-width:600px){
+  .nv3{overflow-x:hidden}
+  .nv3 .nv2Nav{min-height:58px;padding:8px 14px;flex-wrap:nowrap}
+  .nv3 .nv2Brand{font-size:20px}.nv3BrandMark{width:33px;height:33px}
+  .nv3 .nv2NavLinks{display:none}.nv3 .nv2NavActions{gap:8px}.nv3 .nv2NavActions>a:first-child{font-size:12px}
+
+  .nv3Hero{padding:30px 16px 24px}.nv3Hero:before{inset:-40px -90px -60px}
+  .nv3Hero h1{font-size:clamp(43px,14vw,61px);line-height:.98;margin:14px 0 16px}
+  .nv3Hero p{font-size:15px;line-height:1.55}
+  .nv3HeroActions{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;margin:22px 0 13px}
+  .nv3HeroActions a{min-width:0;min-height:48px;padding:11px 10px;font-size:13px}
+  .nv3Hero small{font-size:11px}
+
+  .nv3Showcase{padding:0 12px;margin-bottom:24px}.nv3ShowcaseHeading{padding:0 5px 9px;align-items:end}
+  .nv3ShowcaseHeading span+span{max-width:150px;text-align:right}
+  .nv4ShowcaseBody{height:265px;padding:0 8px;border-radius:20px;overflow:hidden}
+  .nv4CardPhoto{position:absolute;width:64%;left:-7%;max-width:none;margin:0;flex:none;z-index:3}
+  .nv4PhoneActual{position:absolute;width:154px;right:2%;top:9px;height:300px;margin:0;flex:none;border-width:5px;border-radius:24px;transform:rotate(3deg)}
+  .nv4PhoneStatus{height:18px;padding:3px 10px;font-size:7px}.nv4PhoneViewport>div{width:300%;transform:scale(.33)}
+  .nv4ShowcaseBody:after{left:42%;top:45%;font-size:7px;padding:5px 7px}
+  @keyframes nv5TapCard{0%,18%,100%{transform:translate(0,0) rotate(-2deg)}42%,62%{transform:translate(42px,-2px) rotate(3deg)}76%{transform:translate(8px,0) rotate(0)}}
+
+  .nv2Section{padding:52px 16px}.nv2SectionHead{margin-bottom:23px}.nv2Section h2,.nv2Final h2{font-size:clamp(32px,10vw,43px)}
+  .nv2SectionHead p,.nv4About p{font-size:15px}
+  .nv4AboutCard{padding:24px 20px;border-radius:19px}.nv4AboutCard strong{font-size:29px;margin:22px 0 12px}
+
+  .nv5TabDemo{padding:14px;border-radius:18px;gap:18px}.nv5TabLeft{gap:13px}
+  .nv2Tabs{grid-template-columns:repeat(3,1fr);gap:6px}.nv2Tabs button{display:flex;flex-direction:column;gap:3px;padding:10px 7px;text-align:center;align-items:center}
+  .nv2Tabs button>span{font-size:20px}.nv2Tabs button strong{font-size:11px}.nv2Tabs button small{display:none}
+  .nv5InlineExplain{padding:14px 2px 0}.nv5InlineExplain p{font-size:13px}.nv5InlineExplain ol{font-size:12px;padding-left:19px}
+  .nv5RealPhone{width:min(300px,92vw);height:510px;border-width:7px;border-radius:31px}.nv5PhoneBar{height:23px;padding:4px 14px;font-size:9px}
+
+  .nv4TapCompare{gap:8px}.nv4TapCompare article{padding:20px 16px}.nv4TapSteps{gap:7px}.nv4TapSteps div{min-height:84px;padding:10px}.nv4CompareArrow{font-size:27px}
+  .nv2Steps{grid-template-columns:1fr;gap:5px}.nv2Steps>div{padding:14px 3px}
+  .nv2Pricing,.nv2Points{padding:52px 16px}.nv2PriceGrid article{padding:22px 18px}.nv2PriceSteps{margin:18px 0}
+  .nv2Final{padding:58px 16px}.nv2Footer{padding:30px 16px}.nv2Footer>div{gap:12px;font-size:12px}
+
+  .nv3DemoPage .nv2Section{padding:34px 12px 70px}.nv4Walkthrough{margin:20px 0;border-radius:17px}
+  .nv4DemoProgress{padding:11px 12px}.nv4DemoSidebar{padding:11px 9px}.nv4DemoSidebar>strong{font-size:17px}
+  .nv4DemoSidebar ol{gap:4px}.nv4DemoSidebar li button{padding:7px 8px;font-size:11px}.nv4DemoSidebar li button span{width:20px;height:20px}
+  .nv4DemoMain{padding:0 11px 14px}.nv4DemoTop{height:44px;overflow:hidden}.nv4DemoIntro{padding:18px 0}
+  .nv4IntroTiles{margin:14px 0 24px}.nv4IntroTiles>div{padding:16px}.nv4EditorGrid{gap:12px}
+  .nv4DemoPay,.nv4DemoPublic{max-height:430px}.nv4DemoSimple{padding:25px 15px}
+  .nv5Coach{position:relative;top:auto;margin:12px 0 0;padding:13px;grid-template-columns:25px 1fr;gap:9px;border-radius:12px}
+  .nv5CoachPointer{width:25px;height:25px}.nv5Coach b{font-size:13px}.nv5Coach p{font-size:12px!important}.nv5Coach small{font-size:9px}
+  .nv4DemoActions{position:sticky;bottom:0;margin-left:-11px;margin-right:-11px;padding:10px 11px calc(10px + env(safe-area-inset-bottom))!important;background:#fff;box-shadow:0 -8px 20px #102a210d}
+  .nv4DemoActions button,.nv4DemoActions a{padding:11px 9px!important;font-size:12px!important}
+
+  .nv5GooglePlace{padding:16px 13px 10px}.nv5GoogleLogo{width:46px;height:46px}.nv5GooglePlace h3{font-size:18px}
+  .nv5GoogleRating{padding:14px}.nv5GoogleRating>strong{font-size:36px}
+  .nv5Wifi section{padding:35px 18px!important}.nv5Wifi h1{font-size:25px}
+}
