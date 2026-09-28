@@ -72,3 +72,17 @@
 .profileDigitalWorkspace{background:transparent!important}.profileDashboardGrid{gap:18px!important}
 .dashboardApp button,.dashboardApp input,.dashboardApp textarea,.dashboardApp select{font-family:inherit}
 @media(max-width:760px){.dashboardContent{padding:14px!important}.payHeading,.profileDigitalHeading{padding:20px 17px!important}.nivalPayEditorPanel{padding:18px 14px!important;border-radius:17px!important}.nivalPayFieldGroup{padding:14px!important}.profileDashboardGrid{grid-template-columns:1fr!important}.nivalPayCatalog{grid-template-columns:1fr!important}}
+
+
+/* Layout correction pass: strict separation of edit/share and proportional cards */
+.dashboardApp,.dashboardContent,.dashboardContent *{box-sizing:border-box}
+.dashboardContent{min-width:0!important;color:#102a21!important}
+.landingEditOnly,.landingShareOnly{max-width:1050px;margin:0 auto 50px}.landingEditorGrid{grid-template-columns:minmax(0,720px)!important;justify-content:center!important}.landingShareOnly>.businessQrCard{max-width:760px!important;margin:0 auto!important}
+.businessQrCard{display:grid!important;grid-template-columns:minmax(0,1fr) 240px!important;gap:28px!important;padding:28px!important;align-items:center!important}.businessQrCard canvas,.businessQrCard img,.businessQrCard svg{max-width:220px!important;max-height:220px!important}
+.businessQrCard button,.businessQrCard a{min-height:42px!important;width:auto!important;max-width:240px!important;background:#fff!important;color:#176541!important;border:1px solid #a9cdb4!important}.businessQrCard a:first-of-type{background:#18784c!important;color:#fff!important;border-color:#18784c!important}
+.profileDashboardPreview{overflow:hidden!important;border-radius:20px!important}.profileDashboardPreview>*{max-width:100%}
+.nivalPayCatalogCard{overflow:hidden!important}.nivalCardDirectLink{display:block!important}.nivalPhysicalCard{aspect-ratio:1.586/1!important;width:100%!important;height:auto!important;padding:18px!important;border-radius:16px!important;box-shadow:0 12px 25px #123b2a1a!important}.nivalCatalogActions{display:flex;gap:8px;margin-top:12px}.nivalCatalogActions a{flex:1;text-align:center;padding:10px;border-radius:10px;border:1px solid #a9cdb4;color:#176541;font-weight:800;font-size:12px}.nivalCatalogActions a:first-child{background:#18784c;color:#fff;border-color:#18784c}
+.sharePagesRefined{max-width:850px!important;margin:0 auto!important}.sharePageItem{padding:24px!important}.sharePageItem button,.sharePageItem a{color:#176541!important}.sharePageItem .nvPrimaryButton,.sharePageItem .primaryButton{color:#fff!important}
+.dashboardPayContent .payHeading{max-width:900px!important;margin-left:auto!important;margin-right:auto!important}.dashboardPayContent .dashboardContentTopbar{max-width:100%!important}
+.nivalPayEditorPanel{overflow:hidden!important}.nivalPayEditorHeader{gap:14px!important;flex-wrap:wrap!important}.nivalPaySaveCluster{flex-wrap:wrap!important}
+@media(max-width:700px){.businessQrCard{grid-template-columns:1fr!important;padding:18px!important}.businessQrCard canvas,.businessQrCard img,.businessQrCard svg{justify-self:center!important;max-width:190px!important}.landingEditOnly,.landingShareOnly{width:100%!important}.nivalPhysicalCard{padding:15px!important}.nivalCatalogActions{flex-direction:column}.dashboardPayContent .payHeading{width:100%!important}}
