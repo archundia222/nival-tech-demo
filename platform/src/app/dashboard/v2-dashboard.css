@@ -46,3 +46,29 @@
 .dashboardApp .nivalProductOverview,.dashboardApp .nivalLandingIncluded{margin-left:22px!important;margin-right:22px!important}
 .dashboardApp .nivalAnalyticsSection{margin:22px!important}
 @media(max-width:800px){.dashboardApp .dashboardContentTopbar{margin:10px 12px 0!important}.dashboardApp .nivalHomeHero{margin:12px 12px 0!important;padding:22px 18px!important}.dashboardApp .nivalProductOverview,.dashboardApp .nivalLandingIncluded{margin-left:12px!important;margin-right:12px!important}.dashboardApp .profileDigitalWorkspace{padding:14px!important;margin:12px!important}.dashboardApp .profileDashboardGrid{grid-template-columns:1fr!important}.dashboardApp .nivalAnalyticsSection{margin:12px!important;padding:16px!important}.dashboardApp .payHeading{padding:24px 16px 14px!important}}
+
+
+/* Dashboard visual reset — one Toke/Nival Cards system, no legacy black/gold panels */
+.dashboardContent{background:#f6faf6!important;padding-top:22px!important}
+.dashboardContent .eyebrow,.dashboardContent .payHeading .eyebrow,.dashboardContent .reviewsSetup .eyebrow{color:#18784c!important}
+.dashboardContent h1,.dashboardContent h2,.dashboardContent h3{color:#102a21!important}
+.dashboardContent p,.dashboardContent small{color:#5a7165}
+.payHeading,.profileDigitalHeading{padding:26px 28px!important;background:#fff!important;border:1px solid #d5e8da!important;border-radius:20px!important;margin:0 0 18px!important}
+.payHeading h1,.profileDigitalHeading h1{margin:5px 0 8px!important}
+.nivalPayEditorShell{display:block!important;max-width:900px!important;margin:0 auto 40px!important;background:transparent!important}
+.nivalPayEditorPanel{width:100%!important;max-width:none!important;background:#fff!important;color:#102a21!important;border:1px solid #d5e8da!important;border-radius:22px!important;padding:28px!important;box-shadow:0 14px 36px #123b2a0b!important}
+.nivalPayEditorHeader{border-color:#d5e8da!important}.nivalPayEditorHeader h2,.nivalPayFormSectionTitle span,.nivalPayField span,.nivalPayFieldHeading span{color:#102a21!important}
+.nivalPayTextInput,.nivalPayField input,.nivalPayFileControl{background:#f9fcfa!important;color:#102a21!important;border-color:#cfe2d4!important}
+.nivalPayFieldGroup,.nivalPayCustomSection{border-color:#d5e8da!important;background:#fbfdfb!important}
+.nivalPayVisibility{border-color:#a9cdb4!important;color:#176541!important;background:#fff!important}.nivalPayVisibility.isVisible{background:#e6f4ea!important}
+.nivalPaySaveStatus,.nivalPayAutosaveHint{color:#18784c!important}.nivalPayFormSectionTitle{border-color:#d5e8da!important}
+.nvPrimaryLink,.primaryButton,.nvPrimaryButton{background:#18784c!important;color:#fff!important;border-color:#18784c!important;box-shadow:none!important}
+.nvSecondaryButton{background:#fff!important;color:#176541!important;border-color:#a9cdb4!important}
+.nivalPayCatalog{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(230px,280px))!important;gap:16px!important}.nivalPayCatalogCard{background:#fff!important;border:1px solid #d5e8da!important;border-radius:18px!important;padding:16px!important}
+.nivalPhysicalCard{background:linear-gradient(145deg,#18784c,#0e4e31)!important;color:#fff!important;border:0!important}.nivalCardMark{background:#fff!important;color:#18784c!important}
+.nivalAddProduct,.sharePageItem,.reviewsWorkspace,.reviewsIntro,.profileDashboardPreview,.businessQrCard{background:#fff!important;color:#102a21!important;border:1px solid #d5e8da!important;border-radius:20px!important;box-shadow:none!important}
+.reviewsSetup,.reviewsPreview{background:#fff!important;color:#102a21!important;border-color:#d5e8da!important}
+.dashboardContentTopbar{border-radius:16px!important;margin-bottom:18px!important;box-shadow:none!important}
+.profileDigitalWorkspace{background:transparent!important}.profileDashboardGrid{gap:18px!important}
+.dashboardApp button,.dashboardApp input,.dashboardApp textarea,.dashboardApp select{font-family:inherit}
+@media(max-width:760px){.dashboardContent{padding:14px!important}.payHeading,.profileDigitalHeading{padding:20px 17px!important}.nivalPayEditorPanel{padding:18px 14px!important;border-radius:17px!important}.nivalPayFieldGroup{padding:14px!important}.profileDashboardGrid{grid-template-columns:1fr!important}.nivalPayCatalog{grid-template-columns:1fr!important}}
