@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_WIFI_PRODUCT, NIVAL_WIFI_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_CARDS_BUNDLE_PRICE_CENTS, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_WIFI_PRODUCT, NIVAL_WIFI_PRICE_CENTS } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
 import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
@@ -129,20 +129,20 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
   }
   const admin = createAdminClient();
   await reconcileLatestMercadoPagoProductOrder(businessId, { [product.productCode]: product.amountCents });
-  if (product.productCode === NIVAL_PAY_PRODUCT) {
+  if (product.productCode === NIVAL_PAY_PRODUCT || product.productCode === NIVAL_CARDS_BUNDLE_PRODUCT) {
     const { data: purchased } = await admin.from('product_orders').select('id')
-      .eq('business_id', businessId).eq('product_code', NIVAL_PAY_PRODUCT).eq('status', 'paid').limit(1).maybeSingle();
-    if (purchased) redirect('/dashboard/pay?view=manage');
+      .eq('business_id', businessId).in('product_code', product.productCode === NIVAL_PAY_PRODUCT ? [NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT] : [NIVAL_CARDS_BUNDLE_PRODUCT]).eq('status', 'paid').limit(1).maybeSingle();
+    if (purchased) redirect(product.productCode === NIVAL_CARDS_BUNDLE_PRODUCT ? '/dashboard' : '/dashboard/pay?view=manage');
   }
   if ([NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT].includes(product.productCode)) {
     const { data: purchased } = await admin.from('product_orders').select('id')
-      .eq('business_id', businessId).eq('product_code', product.productCode).eq('status', 'paid').limit(1).maybeSingle();
+      .eq('business_id', businessId).in('product_code', [product.productCode, NIVAL_CARDS_BUNDLE_PRODUCT]).eq('status', 'paid').limit(1).maybeSingle();
     if (purchased) redirect(product.returnPath);
   }
   if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId)
-      .eq('product_code', NIVAL_PAY_PRODUCT)
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
       .eq('status', 'paid')
       .limit(1)
       .maybeSingle();
@@ -317,6 +317,15 @@ export async function startMercadoPagoCheckout() {
     amountCents: NIVAL_PAY_PRICE_CENTS,
     description: 'Nival Pay Pro · QR permanente + tarjeta NFC incluida',
     returnPath: '/checkout',
+  });
+}
+
+export async function startNivalCardsBundleCheckout() {
+  return startMercadoPagoProductCheckout({
+    productCode: NIVAL_CARDS_BUNDLE_PRODUCT,
+    amountCents: NIVAL_CARDS_BUNDLE_PRICE_CENTS,
+    description: 'Nival Completa · Pay + Reseñas + WiFi · tarjeta NFC',
+    returnPath: '/dashboard',
   });
 }
 

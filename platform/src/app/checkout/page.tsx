@@ -34,7 +34,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   }
   const { data: orders } = await supabase.from('product_orders')
     .select('id, status, payment_method, amount_cents, created_at').eq('business_id', membership.business_id)
-    .eq('product_code', 'nival_pay').order('created_at', { ascending: false }).limit(5);
+    .in('product_code', ['nival_pay','nival_cards_bundle']).order('created_at', { ascending: false }).limit(5);
   const paid = orders?.find((order) => order.status === 'paid');
   const { data: paymentProfile } = paid
     ? await supabase.from('payment_profiles').select('public_token, account_holder, bank_name, clabe')

@@ -25,7 +25,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
 
   const { data: orders } = await admin.from('product_orders')
     .select('id, business_id, product_code, amount_cents, payment_method, status, created_at, paid_at, businesses(name, phone)')
-    .in('product_code', ['nival_pay','nival_pay_additional','nival_reviews','nival_wifi'])
+    .in('product_code', ['nival_pay','nival_pay_additional','nival_reviews','nival_wifi','nival_cards_bundle'])
     .in('status', ['paid', 'pending_cash_confirmation'])
     .order('created_at', { ascending: false })
     .limit(500);
@@ -41,7 +41,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
     return {
       id: order.id, businessName: business?.name ?? 'Negocio sin nombre', phone: business?.phone ?? null,
       activatedAt: order.paid_at ?? order.created_at, paymentMethod: order.payment_method, status: order.status,
-      amountCents: order.amount_cents, productName: order.product_code === 'nival_reviews' ? 'Nival Reseñas' : order.product_code === 'nival_wifi' ? 'Nival WiFi' : order.product_code === 'nival_pay_additional' ? 'Nival Pay adicional' : 'Nival Pay',
+      amountCents: order.amount_cents, productName: order.product_code === 'nival_cards_bundle' ? 'Nival Completa' : order.product_code === 'nival_reviews' ? 'Nival Reseñas' : order.product_code === 'nival_wifi' ? 'Nival WiFi' : order.product_code === 'nival_pay_additional' ? 'Nival Pay adicional' : 'Nival Pay',
       publicUrl: profile?.public_token ? `https://nival-tech-platform.vercel.app/pay/${profile.public_token}` : null,
     };
   });

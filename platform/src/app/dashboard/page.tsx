@@ -1,4 +1,9 @@
 import { redirect } from "next/navigation";
+import { startMercadoPagoCheckout, startNivalReviewsCheckout, startNivalWifiCheckout, startNivalCardsBundleCheckout } from "@/app/checkout/actions";
+import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
+import { PaymentStatusPoller } from "@/app/checkout/payment-status-poller";
+import { NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_CARDS_BUNDLE_PRICE_CENTS } from "@/lib/orders";
+import { reconcileLatestMercadoPagoProductOrder, cancelLatestTerminalMercadoPagoProductOrder } from "@/lib/reconcile-mercado-pago-order";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
 import { createLoyaltyProgram, createSmartLink, createTeamInvitation, dismissRecommendation, recordVisit, redeemReward, refreshRecommendations, updateBusinessProfile, updateLoyaltyProgram } from "./actions";
@@ -12,7 +17,7 @@ import { BusinessHealthCard } from "./business-health-card";
 import { getActiveBusinessMembership } from "@/lib/active-business";
 
 interface DashboardPageProps {
-  searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string; result?: string }>;
 }
 
 type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "perfil-compartir" | "configuracion";
@@ -84,6 +89,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const legacySection = currentSection as DashboardSection;
 
   const businessId = membership.business_id;
+  if (params.result === 'success' || params.result === 'pending') await reconcileLatestMercadoPagoProductOrder(businessId, { [NIVAL_CARDS_BUNDLE_PRODUCT]: NIVAL_CARDS_BUNDLE_PRICE_CENTS });
+  if (params.result === 'failure') await cancelLatestTerminalMercadoPagoProductOrder(businessId, { [NIVAL_CARDS_BUNDLE_PRODUCT]: NIVAL_CARDS_BUNDLE_PRICE_CENTS });
   const publicOrigin = (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
   const { data: business } = await supabase
     .from("businesses")
@@ -159,11 +166,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .from("product_orders")
         .select("id")
         .eq("business_id", businessId)
-        .eq("product_code", "nival_pay")
+        .in("product_code", ["nival_pay", NIVAL_CARDS_BUNDLE_PRODUCT])
         .eq("status", "paid")
         .limit(1)
         .maybeSingle()
     : { data: null };
+  const { data: paidBundleOrder } = await supabase.from("product_orders").select("id").eq("business_id", businessId).eq("product_code", NIVAL_CARDS_BUNDLE_PRODUCT).eq("status", "paid").limit(1).maybeSingle();
+  const paidBundle = Boolean(paidBundleOrder);
+  const { data: paidWifiOrder } = await supabase.from("product_orders").select("id").eq("business_id", businessId).in("product_code", ["nival_wifi", NIVAL_CARDS_BUNDLE_PRODUCT]).eq("status", "paid").limit(1).maybeSingle();
+  const paidWifi = Boolean(paidWifiOrder);
   const paidNivalPay = Boolean(paidNivalPayOrder);
   const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
   const hasNivalPay = paidNivalPay || freeNivalPay;
@@ -241,6 +252,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <section className="nivalProductOverview">
         {homeCards.map((item) => item.active ? <article key={item.key} className="nivalProductMetric"><span>{item.name}</span><strong>{item.views}</strong><small>aperturas del enlace</small><a href={item.href}>{item.cta} →</a></article> : <article key={item.key} className="nivalProductMetric trial"><span>{item.name}</span><strong>—</strong><small>Todavía no tienes este producto.</small><a href={item.href}>Probar gratis →</a></article>)}
       </section>
+      {canManageProgram && <section className="nivalShop" aria-labelledby="nivalShopHeading">
+        <div className="nivalShopHeading"><span>ELIGE CUANDO ESTÉS LISTO</span><h2 id="nivalShopHeading">Activa tus productos</h2><p>Tu cuenta es gratis. Compra cada acceso por separado o los tres en un paquete. Pago único con Mercado Pago.</p></div>
+        {params.result === 'success' && !paidBundle && <><p className="formMessage">Estamos confirmando el pago del paquete. No vuelvas a pagar.</p><PaymentStatusPoller active /></>}
+        {params.result === 'pending' && <p className="formMessage">Tu pago está pendiente de aprobación en Mercado Pago.</p>}
+        {params.result === 'failure' && <p className="formMessage errorMessage">El pago no se completó. Puedes intentarlo de nuevo.</p>}
+        <div className="nivalShopGrid">
+          {[
+            { key:'pay', title:'Nival Pay', price:'$199', detail:'Página de cobro, QR y tarjeta NFC', active:paidNivalPay, action:startMercadoPagoCheckout, href:'/dashboard/pay' },
+            { key:'reviews', title:'Nival Reseñas', price:'$99', detail:'Reseñas de Google, QR y tarjeta NFC', active:paidReviews, action:startNivalReviewsCheckout, href:'/dashboard/reviews' },
+            { key:'wifi', title:'Nival WiFi', price:'$99', detail:'Acceso WiFi, QR y tarjeta NFC', active:paidWifi, action:startNivalWifiCheckout, href:'/dashboard/wifi' },
+            { key:'bundle', title:'Paquete completo', price:'$199', detail:'Pay + Reseñas + WiFi y una tarjeta NFC', active:paidBundle, action:startNivalCardsBundleCheckout, href:'/dashboard/pay' },
+          ].map((item)=><article className={item.key==='bundle'?'nivalShopCard featured':'nivalShopCard'} key={item.key}><span>{item.key==='bundle'?'TRES ACCESOS':'UN ACCESO'}</span><h3>{item.title}</h3><p>{item.detail}</p><strong>{item.price} <small>MXN · pago único</small></strong>{item.active?<a className="nivalShopOwned" href={item.href}>Activo · Administrar →</a>:<form action={item.action}><CheckoutSubmitButton className="nivalShopBuy" pendingLabel="Abriendo Mercado Pago…">Comprar {item.key==='bundle'?'paquete':item.title} →</CheckoutSubmitButton></form>}</article>)}
+        </div>
+      </section>}
       <section className="nivalLandingIncluded"><div><span>INCLUIDA CON CUALQUIER PRODUCTO</span><h2>Landing page de tu negocio</h2><p>Al comprar cualquier Nival Card tienes una landing page para presentar tu negocio y compartir tus accesos desde un solo lugar.</p></div><div><a href="/dashboard?section=perfil-digital">Editar landing</a>{business?.slug && <a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Compartir ↗</a>}</div></section>
       </>}
       {legacySection === "inteligencia" && <>

@@ -19,7 +19,7 @@ export const currentPricing = {
 } as const;
 export const pricingV2 = {
   cards: {
-    essential: { name: 'Esencial', priceCents: 9900, description: 'Elige Pay, Reseñas o WiFi.', features: ['Un apartado a elegir', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
+    essential: { name: 'Esencial', priceCents: 9900, description: 'Elige Reseñas o WiFi.', features: ['Reseñas o WiFi a elegir', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
     complete: { name: 'Completa', priceCents: 19900, description: 'Las tres acciones en una tarjeta.', features: ['Pay + Reseñas + WiFi', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
     trialDays: 15,
     upgradeCents: 10000,

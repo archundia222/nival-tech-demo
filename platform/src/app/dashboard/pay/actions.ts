@@ -46,7 +46,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   if (readError) return { error: 'No pudimos leer tu configuración. Intenta de nuevo.' };
   if (!existing) return { error: 'No encontramos esta página Nival Pay.' };
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
-    .eq('business_id', businessId).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle();
+    .eq('business_id', businessId).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle();
   const trialMode = !paidOrder;
   if (trialMode) customSections = customSections.slice(0, 1);
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
@@ -145,7 +145,7 @@ export async function prepareFreeNivalPay() {
 
   const [{ data: paidOrder }, { data: existing }] = await Promise.all([
     supabase.from('product_orders').select('id')
-      .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle(),
+      .eq('business_id', membership.business_id).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle(),
     supabase.from('payment_profiles').select('id')
       .eq('business_id', membership.business_id).order('created_at').limit(1).maybeSingle(),
   ]);
@@ -176,7 +176,7 @@ export async function publishFreeNivalPay(formData: FormData) {
   if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
 
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
-    .eq('business_id', membership.business_id).eq('product_code', 'nival_pay').eq('status', 'paid').limit(1).maybeSingle();
+    .eq('business_id', membership.business_id).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle();
   if (paidOrder) redirect('/dashboard/pay');
 
   const { data: profile } = await supabase.from('payment_profiles')

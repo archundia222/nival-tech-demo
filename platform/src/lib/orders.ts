@@ -5,6 +5,8 @@ import { currentPricing } from './pricing';
 export const NIVAL_PAY_PRICE_CENTS = NIVAL_PAY_FOUNDER_PRICE_CENTS;
 export const NIVAL_PAY_POINTS_PRO_DISCOUNT_PRICE_CENTS = Math.round(NIVAL_PAY_FOUNDER_PRICE_CENTS * 0.10);
 export const NIVAL_PAY_PRODUCT = 'nival_pay';
+export const NIVAL_CARDS_BUNDLE_PRODUCT = 'nival_cards_bundle';
+export const NIVAL_CARDS_BUNDLE_PRICE_CENTS = 19900;
 export const NIVAL_REVIEWS_PRODUCT = 'nival_reviews';
 export const NIVAL_WIFI_PRODUCT = 'nival_wifi';
 export const NIVAL_WIFI_PRICE_CENTS = NIVAL_WIFI_PRO_PRICE_CENTS;
