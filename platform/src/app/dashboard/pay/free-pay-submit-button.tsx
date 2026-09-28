@@ -7,7 +7,7 @@ export function FreePaySubmitButton() {
 
   return (
     <button className="loginLink" type="submit" disabled={pending} aria-disabled={pending}>
-      {pending ? 'Creando tu Nival Pay…' : 'Crear mi Nival Pay Gratis →'}
+      {pending ? 'Creando tu Tocario Pay…' : 'Crear mi Tocario Pay Gratis →'}
     </button>
   );
 }

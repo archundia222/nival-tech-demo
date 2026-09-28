@@ -16,5 +16,5 @@ export default async function GuestWifiPage({ params }: { params: Promise<{ toke
   const business = Array.isArray(data.businesses) ? data.businesses[0] : data.businesses;
   const name = business?.name ?? 'Este negocio';
   const url = `${(process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/wifi/${token}`;
-  return <main className="wifiGuestPage"><section><span>NIVAL WIFI</span><h1>Conéctate al WiFi de {name}</h1><p>Abre el enlace de la red de invitados. El teléfono puede pedirte confirmar la conexión.</p>{data.access_url ? <a className="nvPrimaryLink" href={data.access_url} rel="nofollow noreferrer">Abrir acceso WiFi →</a> : <WifiQr guest ssid={data.ssid} password={data.password} security={data.security} url={url} />}</section></main>;
+  return <main className="wifiGuestPage"><section><span>TOCARIO WIFI</span><h1>Conéctate al WiFi de {name}</h1><p>Abre el enlace de la red de invitados. El teléfono puede pedirte confirmar la conexión.</p>{data.access_url ? <a className="nvPrimaryLink" href={data.access_url} rel="nofollow noreferrer">Abrir acceso WiFi →</a> : <WifiQr guest ssid={data.ssid} password={data.password} security={data.security} url={url} />}</section></main>;
 }

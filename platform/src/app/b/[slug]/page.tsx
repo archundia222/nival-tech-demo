@@ -25,7 +25,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
     <main className="customerShell brandedCustomerShell" style={{ "--business-accent": business.brand_color } as CSSProperties}>
       <header className="customerBrand">
         {business.logo_url ? <img className="businessLogo" src={business.logo_url} alt={`Logo de ${business.business_name}`} /> : <span className="brandmark">N</span>}
-        <span>Programa impulsado por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span>
+        <span>Programa impulsado por <Link href="/?from=nival-puntos"><b>TOCARIO</b></Link></span>
       </header>
       <section className="customerHero">
         <p className="eyebrow">PROGRAMA DE CLIENTES FRECUENTES</p>
@@ -54,7 +54,7 @@ export default async function BusinessPage({ params, searchParams }: BusinessPag
           </form>
       </section>
       <Link className="publicBusinessHub" href={`/p/${business.slug}`}><span><small>MÁS DE {business.business_name.toUpperCase()}</small><strong>Contacto y otros accesos del negocio</strong></span><b>→</b></Link>
-      <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Nival Puntos.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
+      <aside className="publicNivalPromo"><div><span>PARA NEGOCIOS</span><strong>Haz que tus clientes quieran volver.</strong><p>Crea un programa como este con Tocario Puntos.</p></div><Link href="/?from=nival-puntos#productos">Conocer Tocario →</Link></aside>
       {(business.phone || business.website_url) && <footer className="businessContact">
         {business.phone && <a href={`tel:${business.phone}`}>Llamar al negocio</a>}
         {business.website_url && <a href={business.website_url} target="_blank" rel="noreferrer">Visitar sitio web</a>}

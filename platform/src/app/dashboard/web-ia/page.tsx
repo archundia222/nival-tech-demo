@@ -23,7 +23,7 @@ export default async function AiWebsiteServicePage() {
   const rawPhone = String(legal?.phone ?? '').replace(/\D/g, '');
   const whatsappPhone = rawPhone.length === 10 ? `52${rawPhone}` : rawPhone;
   const message = [
-    'Hola, quiero cotizar una página web con inteligencia artificial con Nival Tech.',
+    'Hola, quiero cotizar una página web con inteligencia artificial con Tocario.',
     `Mi negocio es: ${businessName}.`,
     'Me gustaría saber qué incluye, tiempos de entrega y precio.',
   ].join('\n');

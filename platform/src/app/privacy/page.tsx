@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata = {
   title: "Privacidad",
-  description: "Aviso de privacidad de la plataforma Nival Tech.",
+  description: "Aviso de privacidad de la plataforma Tocario.",
 };
 
 export default async function PrivacyPage() {
@@ -12,14 +12,14 @@ export default async function PrivacyPage() {
     .select("legal_name,trade_name,legal_address,phone,support_email")
     .eq("id", "default")
     .maybeSingle();
-  const legalName = legal?.legal_name ?? "Proveedor de Nival Tech";
-  const tradeName = legal?.trade_name ?? "Nival Tech";
+  const legalName = legal?.legal_name ?? "Proveedor de Tocario";
+  const tradeName = legal?.trade_name ?? "Tocario";
   const address = legal?.legal_address ?? "Ciudad de México, México";
   const supportEmail = legal?.support_email ?? "rodrigoarchundia379@gmail.com";
 
   return (
     <main className="legalShell">
-      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
+      <Link className="brand" href="/"><span className="brandmark">N</span>TOCARIO</Link>
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 24 DE SEPTIEMBRE DE 2026</p>
         <h1>Aviso de privacidad</h1>
@@ -32,10 +32,10 @@ export default async function PrivacyPage() {
           <p>{supportEmail}{legal?.phone ? ` · ${legal.phone}` : ""}</p>
         </div>
 
-        <p>Nival Tech ofrece herramientas digitales para negocios, incluyendo páginas de cobro informativas, programas de lealtad, perfiles digitales y funciones de análisis y recomendaciones. Este aviso explica qué datos podemos tratar, para qué los utilizamos y cómo puedes ejercer tus derechos.</p>
+        <p>Tocario ofrece herramientas digitales para negocios, incluyendo páginas de cobro informativas, programas de lealtad, perfiles digitales y funciones de análisis y recomendaciones. Este aviso explica qué datos podemos tratar, para qué los utilizamos y cómo puedes ejercer tus derechos.</p>
 
         <h2>Datos que podemos tratar</h2>
-        <p>Dependiendo del producto utilizado, podemos tratar nombre, teléfono, correo electrónico, consentimientos, negocio asociado, visitas, puntos, recompensas, ventas o importes que el negocio decida registrar, la relación opcional de esas ventas con clientes, configuraciones del negocio y datos técnicos necesarios para operar el servicio. Nival Pay puede mostrar los datos de transferencia que el propio negocio decide publicar; Nival Tech no solicita NIP, CVV ni contraseñas bancarias para esa función.</p>
+        <p>Dependiendo del producto utilizado, podemos tratar nombre, teléfono, correo electrónico, consentimientos, negocio asociado, visitas, puntos, recompensas, ventas o importes que el negocio decida registrar, la relación opcional de esas ventas con clientes, configuraciones del negocio y datos técnicos necesarios para operar el servicio. Tocario Pay puede mostrar los datos de transferencia que el propio negocio decide publicar; Tocario no solicita NIP, CVV ni contraseñas bancarias para esa función.</p>
 
         <h2>Finalidades</h2>
         <ul>

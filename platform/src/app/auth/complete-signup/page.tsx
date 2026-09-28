@@ -56,7 +56,7 @@ export default function CompleteSignupPage() {
 
   return (
     <main className="authShell">
-      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
+      <Link className="brand" href="/"><span className="brandmark">N</span>TOCARIO</Link>
       <section className="authCard">
         {status === "loading" ? (
           <>

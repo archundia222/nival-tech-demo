@@ -13,17 +13,17 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const signup = params.mode === "signup";
   const next = params.next ?? "/dashboard";
   const signupContext = next.includes("/dashboard/points")
-    ? { label: "NIVAL PUNTOS", title: "Crea tu programa de clientes frecuentes", text: "Después de confirmar tu correo, crea tu negocio y podrás compartir tu QR, registrar visitas y mostrar la tarjeta digital del cliente." }
+    ? { label: "TOCARIO PUNTOS", title: "Crea tu programa de clientes frecuentes", text: "Después de confirmar tu correo, crea tu negocio y podrás compartir tu QR, registrar visitas y mostrar la tarjeta digital del cliente." }
     : next.includes("/dashboard/intelligence")
-      ? { label: "NIVAL INTELLIGENCE", title: "Prepara Nival para entender a tus clientes", text: "Intelligence funciona sobre Nival Puntos. Si todavía no lo tienes activo, primero te guiaremos para crear tu programa de fidelización." }
+      ? { label: "NIVAL INTELLIGENCE", title: "Prepara Nival para entender a tus clientes", text: "Intelligence funciona sobre Tocario Puntos. Si todavía no lo tienes activo, primero te guiaremos para crear tu programa de fidelización." }
       : next.includes("/checkout") || next.includes("/dashboard/pay")
-        ? { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y podrás preparar tu página de cobro, QR y enlace." }
+        ? { label: "TOCARIO PAY", title: "Crea tu Tocario Pay", text: "Después de confirmar tu correo, crea tu negocio y podrás preparar tu página de cobro, QR y enlace." }
         : { label: "NIVAL TECH", title: "Crea tu acceso a Nival", text: "Crea tu negocio una sola vez y desde ahí activa las herramientas que necesites." };
 
   return (
     <main className="authShell">
       <Link className="brand" href="/">
-        <span className="brandmark">N</span>NIVAL tech
+        <span className="brandmark">N</span>TOCARIO
       </Link>
       <section className="authCard">
         <p className="eyebrow">{signup ? signupContext.label : "ACCESO PARA NEGOCIOS"}</p>
@@ -31,7 +31,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <p className="authIntro">
           {signup
             ? signupContext.text
-            : "Administra Nival Pay, Nival Puntos y Nival Growth desde la misma cuenta."}
+            : "Administra Tocario Pay, Tocario Puntos y Nival Growth desde la misma cuenta."}
         </p>
         {signup && <>
           <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay puede quedarse gratis. Puntos empieza con prueba Pro y después puede seguir en Free; Growth se construye sobre Puntos.</span></div>

@@ -44,7 +44,7 @@ export function BusinessOnboardingForm({ next }: { next: string }) {
         aria-describedby="business-slug-preview"
       />
       <small id="business-slug-preview" className="slugPreview">
-        Usaremos este enlace para tus páginas públicas. Puedes dejar el sugerido: <strong>nival-tech-platform.vercel.app/p/{slug || "tu-negocio"}</strong>
+        Usaremos este enlace para tus páginas públicas. Puedes dejar el sugerido: <strong>tu-dominio/p/{slug || "tu-negocio"}</strong>
       </small>
     </label>
     <CheckoutSubmitButton className="primaryButton" pendingLabel="Creando tu negocio…">Continuar</CheckoutSubmitButton>

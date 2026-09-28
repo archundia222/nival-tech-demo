@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata = {
   title: "Política de reembolsos",
-  description: "Política de cancelaciones, incidencias y reembolsos de Nival Tech.",
+  description: "Política de cancelaciones, incidencias y reembolsos de Tocario.",
 };
 
 export default async function RefundsPage() {
@@ -13,14 +13,14 @@ export default async function RefundsPage() {
     .eq("id", "default")
     .maybeSingle();
 
-  const legalName = legal?.legal_name ?? "Proveedor de Nival Tech";
-  const tradeName = legal?.trade_name ?? "Nival Tech";
+  const legalName = legal?.legal_name ?? "Proveedor de Tocario";
+  const tradeName = legal?.trade_name ?? "Tocario";
   const address = legal?.legal_address ?? "Ciudad de México, México";
   const supportEmail = legal?.support_email ?? "rodrigoarchundia379@gmail.com";
 
   return (
     <main className="legalShell">
-      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
+      <Link className="brand" href="/"><span className="brandmark">N</span>TOCARIO</Link>
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 26 DE SEPTIEMBRE DE 2026</p>
         <h1>Política de reembolsos</h1>

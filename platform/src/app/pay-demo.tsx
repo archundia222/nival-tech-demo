@@ -42,7 +42,7 @@ export function PayDemo() {
           </button>
         ))}
       </div>
-      <p className="payDemoSecurity">Nival Tech nunca solicitará NIP, CVV, contraseña ni códigos de seguridad.</p>
+      <p className="payDemoSecurity">Tocario nunca solicitará NIP, CVV, contraseña ni códigos de seguridad.</p>
     </div>
   );
 }

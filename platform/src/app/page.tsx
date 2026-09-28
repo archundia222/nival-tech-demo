@@ -16,7 +16,7 @@ import {
   mxn,
 } from "@/lib/commercial";
 
-const whatsappHref = "https://wa.me/525539044788?text=" + encodeURIComponent("Hola, vi Nival Tech y quiero información para mi negocio.");
+const whatsappHref = "https://wa.me/525539044788?text=" + encodeURIComponent("Hola, vi Tocario y quiero información para mi negocio.");
 const signupUrl = "/auth?mode=signup";
 const payFreeUrl = "/auth?mode=signup&next=%2Fdashboard%2Fpay";
 const payProUrl = "/auth?mode=signup&next=%2Fcheckout";
@@ -40,7 +40,7 @@ export default async function Home() {
     <LandingReveal />
 
     <nav className="landingNav landingV3Nav" aria-label="Navegación principal">
-      <Link className="landingBrand" href="#inicio"><Image src="/wallet/nival-logo.svg" alt="" width={38} height={38} priority/><span>Nival Tech</span></Link>
+      <Link className="landingBrand" href="#inicio"><Image src="/wallet/tocario-logo.svg" alt="" width={38} height={38} priority/><span>Tocario</span></Link>
       <div className="landingNavLinks"><a href="#productos">Productos</a><a href="#comparar">Comparar</a><a href="#planes">Planes</a></div>
       <div className="landingNavCtas"><Link className="landingLogin" href="/auth">Entrar</Link></div>
     </nav>
@@ -49,7 +49,7 @@ export default async function Home() {
       <div className="landingV4HeroCopy">
         <p className="landingKicker heroReveal heroReveal1"><span/> Tecnología para negocios que quieren crecer</p>
         <h1 className="heroReveal heroReveal2">Haz más fácil que te paguen, vuelvan y te recomienden.</h1>
-        <p className="heroReveal heroReveal3">Pagos, lealtad, reseñas y acceso WiFi en experiencias simples para tu negocio y para tus clientes.</p>
+        <p className="heroReveal heroReveal3">Una tarjeta física que tu cliente toca con su celular para abrir tus datos de pago, reseñas de Google, programa de puntos o WiFi. También funciona con QR.</p>
         <div className="landingHeroActions heroReveal heroReveal4">
           <a className="landingPrimary" href="#planes">Ver planes</a>
           <Link className="landingSecondary landingDemoPrimary" href="/demo"><span>▶</span> Ver demo guiada</Link>
@@ -65,25 +65,25 @@ export default async function Home() {
 
     <section className="landingIdentity landingIdentityCompact scrollReveal">
       <div className="landingSectionHeading compact">
-        <p className="landingEyebrow landingEyebrowLarge">¿QUÉ ES NIVAL TECH?</p>
+        <p className="landingEyebrow landingEyebrowLarge">¿QUÉ ES TOCARIO?</p>
         <h2>Herramientas simples para momentos que ya pasan todos los días.</h2>
       </div>
       <div className="landingIdentityPills">
         <article><span>COBRA</span><strong>Tu cliente encuentra cómo pagarte sin preguntarte los datos.</strong></article>
         <article><span>HAZ QUE VUELVAN</span><strong>Convierte visitas en progreso, recompensas y actividad útil.</strong></article>
         <article><span>CONSIGUE RESEÑAS</span><strong>Llévalos directo a Google cuando la experiencia todavía está fresca.</strong></article>
-        <article><span>CONECTA</span><strong>Nival WiFi simplifica el acceso a internet con QR o NFC.</strong></article>
+        <article><span>CONECTA</span><strong>Tocario WiFi simplifica el acceso a internet con QR o NFC.</strong></article>
       </div>
       <div className="landingNfcExplainer">
         <div className="nfcTechIcon">)))</div>
-        <div><span>¿QUÉ ES NFC?</span><h3>Acercas el celular y se abre una acción.</h3><p>Es la tecnología que usa una Nival Card para abrir Pay, Puntos, Reseñas o WiFi sin escribir una dirección ni buscar una app.</p></div>
+        <div><span>¿QUÉ ES NFC?</span><h3>Acercas el celular y se abre una acción.</h3><p>Es la tecnología que usa una Tocario Card para abrir Pay, Puntos, Reseñas o WiFi sin escribir una dirección ni buscar una app.</p></div>
       </div>
       <a className="landingWhatsAppButton" href={whatsappHref} target="_blank" rel="noreferrer">Hablar por WhatsApp →</a>
     </section>
 
     <section className="landingPointsFocus landingPointsFocusV4 scrollReveal">
       <div>
-        <p className="landingEyebrow landingEyebrowLarge">NIVAL PUNTOS PRO</p>
+        <p className="landingEyebrow landingEyebrowLarge">TOCARIO PUNTOS PRO</p>
         <h2>Los puntos son solo el inicio.</h2>
         <p>Ve quién vuelve, a quién recuperar y qué pasó después de una campaña.</p>
       </div>
@@ -99,7 +99,7 @@ export default async function Home() {
       <div className="landingSectionHeading compact"><p className="landingEyebrow landingEyebrowLarge">LA DIFERENCIA, SIN ROLLOS</p><h2>Compara en segundos.</h2></div>
 
       <div className="landingComparisonTable">
-        <header><strong>Nival Pay</strong><span>Forma tradicional</span></header>
+        <header><strong>Tocario Pay</strong><span>Forma tradicional</span></header>
         <div><b>Abre y copia</b><span>Pregunta y captura</span></div>
         <div><b>Editas una vez</b><span>Vuelves a explicar</span></div>
         <div><b>Compartes un enlace</b><span>Mandas datos sueltos</span></div>
@@ -107,7 +107,7 @@ export default async function Home() {
       </div>
 
       <div className="landingComparisonTable">
-        <header><strong>Nival Puntos Pro</strong><span>Programa básico</span></header>
+        <header><strong>Tocario Puntos Pro</strong><span>Programa básico</span></header>
         <div><b>El cliente ve progreso</b><span>Solo acumula</span></div>
         <div><b>Ves actividad real</b><span>Registro básico</span></div>
         <div><b>Segmentas promociones</b><span>Mandas mensajes generales</span></div>
@@ -117,9 +117,9 @@ export default async function Home() {
 
     <section className="landingPlansV4 scrollReveal" id="planes">
       <div className="landingSectionHeading compact">
-        <p className="landingEyebrow landingEyebrowLarge">PRUEBA LAS NIVAL CARDS</p>
+        <p className="landingEyebrow landingEyebrowLarge">PRUEBA LAS TARJETAS TOCARIO</p>
         <h2>Prueba Pay, Reseñas y WiFi durante 15 días. Después, compra tu acceso permanente.</h2>
-        <p>Cada Nival Card funciona durante 15 días con enlace y QR, sin tarjeta física. Al terminar la prueba, el acceso se suspende hasta comprar Pro. Pro incluye una tarjeta NFC física sin costo adicional.</p>
+        <p>Cada Tocario Card funciona durante 15 días con enlace y QR, sin tarjeta física. Al terminar la prueba, el acceso se suspende hasta comprar Pro. Pro incluye una tarjeta NFC física sin costo adicional.</p>
       </div>
 
       <div className="landingStartSteps">
@@ -129,7 +129,7 @@ export default async function Home() {
       </div>
 
       <div className="planCompareCard">
-        <header><div><span>NIVAL PAY</span><h3>Haz más fácil que te paguen.</h3></div><b>Pago único</b></header>
+        <header><div><span>TOCARIO PAY</span><h3>Haz más fácil que te paguen.</h3></div><b>Pago único</b></header>
         <div className="planCompareColumns">
           <article>
             <div className="planHead"><span>PRUEBA 15 DÍAS</span><strong>$0</strong></div>
@@ -151,8 +151,8 @@ export default async function Home() {
               <li><Check/> Datos editables</li>
               <li><Check/> Puntos de cobro ilimitados</li>
               <li><Check/> QR fijo listo para imprimir</li>
-              <li><Check/> Nival Card física con NFC incluida</li>
-              <li><Check/> Páginas Nival Pay adicionales: $99 cada una</li>
+              <li><Check/> Tocario Card física con NFC incluida</li>
+              <li><Check/> Páginas Tocario Pay adicionales: $99 cada una</li>
               <li><Check/> Tu cliente acerca el celular y abre tu cobro</li>
             </ul>
             {canBuyDirect
@@ -163,7 +163,7 @@ export default async function Home() {
       </div>
 
       <div className="planCompareCard">
-        <header><div><span>NIVAL RESEÑAS</span><h3>Convierte una buena experiencia en una reseña.</h3></div><b>Pago único</b></header>
+        <header><div><span>TOCARIO RESEÑAS</span><h3>Convierte una buena experiencia en una reseña.</h3></div><b>Pago único</b></header>
         <div className="planCompareColumns">
           <article>
             <div className="planHead"><span>PRUEBA 15 DÍAS</span><strong>$0</strong></div>
@@ -182,7 +182,7 @@ export default async function Home() {
               <li><Check/> Enlace directo a Google</li>
               <li><Check/> Destino editable</li>
               <li><Check/> QR fijo listo para imprimir</li>
-              <li><Check/> Nival Card física con NFC incluida</li>
+              <li><Check/> Tocario Card física con NFC incluida</li>
               <li><Check/> Acercan el celular y llegan directo a dejar su reseña</li>
             </ul>
             {canBuyDirect
@@ -193,7 +193,7 @@ export default async function Home() {
       </div>
 
       <div className="planCompareCard">
-        <header><div><span>NIVAL PUNTOS</span><h3>Dales una razón para regresar.</h3></div><b>Mensual</b></header>
+        <header><div><span>TOCARIO PUNTOS</span><h3>Dales una razón para regresar.</h3></div><b>Mensual</b></header>
         <div className="planCompareColumns">
           <article>
             <div className="planHead"><span>FREE</span><strong>$0</strong></div>
@@ -227,7 +227,7 @@ export default async function Home() {
       </div>
 
       <div className="planCompareCard">
-        <header><div><span>NIVAL WIFI</span><h3>Comparte un enlace para acceder al WiFi de invitados.</h3></div><b>Pago único</b></header>
+        <header><div><span>TOCARIO WIFI</span><h3>Comparte un enlace para acceder al WiFi de invitados.</h3></div><b>Pago único</b></header>
         <div className="planCompareColumns">
           <article>
             <div className="planHead"><span>PRUEBA 15 DÍAS</span><strong>$0</strong></div>
@@ -245,11 +245,11 @@ export default async function Home() {
             <ul>
               <li><Check/> Enlace de acceso editable</li>
               <li><Check/> QR fijo listo para imprimir</li>
-              <li><Check/> Nival Card física con NFC incluida</li>
+              <li><Check/> Tocario Card física con NFC incluida</li>
               <li><Check/> El cliente acerca el celular y abre el acceso a tu red</li>
               <li><Check/> Cambias el enlace sin reemplazar la tarjeta</li>
             </ul>
-            <Link href={wifiProUrl}>Conseguir Nival WiFi Pro</Link>
+            <Link href={wifiProUrl}>Conseguir Tocario WiFi Pro</Link>
           </article>
         </div>
       </div>
@@ -261,7 +261,7 @@ export default async function Home() {
     </section>
 
     <footer className="landingFooter">
-      <Link className="landingBrand" href="#inicio"><Image src="/wallet/nival-logo.svg" alt="" width={34} height={34}/><span>Nival Tech</span></Link>
+      <Link className="landingBrand" href="#inicio"><Image src="/wallet/tocario-logo.svg" alt="" width={34} height={34}/><span>Tocario</span></Link>
       <p>Cobrar mejor. Conseguir más reseñas. Hacer que tus clientes regresen.</p>
       <div><a href={whatsappHref} target="_blank" rel="noreferrer">WhatsApp</a><Link href="/support">Soporte</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/refunds">Reembolsos</Link><Link href="/auth">Entrar</Link></div>
     </footer>

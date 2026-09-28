@@ -76,8 +76,8 @@ export function ProfilePublicView({
         </section>}
 
         {showFooter && <>
-          <aside className="profileNivalPromo"><div><span>¿TIENES UN NEGOCIO?</span><strong>Tu negocio también puede tener una página así.</strong><p>Cobros, lealtad y herramientas para hacer crecer clientes frecuentes.</p></div><Link href="/?from=perfil-negocio#productos">Conocer Nival Tech →</Link></aside>
-          <footer className="profileFooter"><span>Información proporcionada por el negocio</span><Link href="/?from=perfil-negocio"><b>NIVAL tech</b></Link></footer>
+          <aside className="profileNivalPromo"><div><span>¿TIENES UN NEGOCIO?</span><strong>Tu negocio también puede tener una página así.</strong><p>Cobros, lealtad y herramientas para hacer crecer clientes frecuentes.</p></div><Link href="/?from=perfil-negocio#productos">Conocer Tocario →</Link></aside>
+          <footer className="profileFooter"><span>Información proporcionada por el negocio</span><Link href="/?from=perfil-negocio"><b>TOCARIO</b></Link></footer>
         </>}
       </article>
     </>;

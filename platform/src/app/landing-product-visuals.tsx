@@ -10,15 +10,15 @@ export function LandingProductVisuals() {
         <span>Paga a</span>
         <strong>Café Nival</strong>
         <small>Transferencia bancaria</small>
-        <div className="heroPhoneAction">Abrir Nival Pay</div>
+        <div className="heroPhoneAction">Abrir Tocario Pay</div>
       </div>
     </div>
     <div className="heroNfcCard">
       <span className="heroNfcBrand">N</span>
-      <div><strong>Nival Card</strong><small>NFC</small></div>
+      <div><strong>Tocario Card</strong><small>NFC</small></div>
       <b>)))</b>
     </div>
     <div className="heroNfcSignal"><i/><i/><i/></div>
-    <div className="heroVisualCaption"><b>Acerca el celular</b><span>y abre Nival Pay al instante.</span></div>
+    <div className="heroVisualCaption"><b>Acerca el celular</b><span>y abre Tocario Pay al instante.</span></div>
   </div>;
 }

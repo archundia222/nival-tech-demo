@@ -4,9 +4,9 @@ import { NIVAL_POINTS_FOUNDER_PRICE_CENTS, mxn } from "@/lib/commercial";
 export default function PointsProPublicDemoPage() {
   return <main className="pointsProPublicDemo">
     <header className="pointsProDemoHero">
-      <Link href="/" className="pointsProDemoBrand"><span>N</span><b>Nival Tech</b></Link>
+      <Link href="/" className="pointsProDemoBrand"><span>N</span><b>Tocario</b></Link>
       <div>
-        <p className="landingEyebrow landingEyebrowLarge">DEMO PÚBLICA · NIVAL PUNTOS PRO</p>
+        <p className="landingEyebrow landingEyebrowLarge">DEMO PÚBLICA · TOCARIO PUNTOS PRO</p>
         <h1>Mira lo que desbloqueas antes de pagar.</h1>
         <p>Todos los datos de esta página son ficticios. La idea es que puedas recorrer cómo se vería Pro sin tener una cuenta ni contratar nada.</p>
       </div>
@@ -25,7 +25,7 @@ export default function PointsProPublicDemoPage() {
     <section className="pointsProDemoSection">
       <div className="pointsProDemoHeading"><span>02 · GOOGLE WALLET</span><h2>La tarjeta vive donde tu cliente ya guarda pases.</h2><p>El saldo y las visitas se actualizan cuando registras actividad. Esta vista es una simulación.</p></div>
       <div className="pointsWalletDemoCard">
-        <div><span>NIVAL PUNTOS</span><b>Café Nival</b></div>
+        <div><span>TOCARIO PUNTOS</span><b>Café Nival</b></div>
         <strong>7</strong><small>PUNTOS</small>
         <div className="pointsWalletDemoProgress"><i style={{width:"70%"}} /></div>
         <p>3 puntos para tu próxima recompensa</p>

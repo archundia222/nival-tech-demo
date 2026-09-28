@@ -22,7 +22,7 @@ export function PointsShareTools({ url }: { url: string }) {
   }
   return <section className="pointsShareCard">
     <div ref={qrRef} className="pointsQrBox"><QRCodeSVG value={url} size={190} level="H" includeMargin /></div>
-    <div className="pointsShareCopy"><span>REGISTRO DE CLIENTES</span><h2>Comparte tu programa</h2><p>Este QR abre directamente el registro de Nival Puntos. Puedes imprimirlo, ponerlo en mostrador o programarlo en NFC.</p>
+    <div className="pointsShareCopy"><span>REGISTRO DE CLIENTES</span><h2>Comparte tu programa</h2><p>Este QR abre directamente el registro de Tocario Puntos. Puedes imprimirlo, ponerlo en mostrador o programarlo en NFC.</p>
       <label>Enlace público</label><div className="pointsShareLink"><input value={url} readOnly /><button type="button" onClick={copyLink}>{copied ? 'Copiado' : 'Copiar'}</button></div>
       <div className="pointsShareActions"><button type="button" className="nvPrimaryButton" onClick={downloadQr}>Descargar QR</button><a className="nvSecondaryButton" href={url} target="_blank" rel="noreferrer">Abrir enlace</a></div>
     </div>

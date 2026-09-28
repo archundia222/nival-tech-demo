@@ -48,7 +48,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   const siteUrl = publicSiteUrl();
 
   return <main className="checkoutExperience">
-    <header className="checkoutBrand"><Link href="/"><span>N</span><b>NIVAL</b> tech</Link><small>Compra segura</small></header>
+    <header className="checkoutBrand"><Link href="/"><span>T</span><b>TOCARIO</b> tech</Link><small>Compra segura</small></header>
     <div className="checkoutFrame">
       {params.error && <p className="checkoutStatus errorMessage" role="alert">{params.error}</p>}
       {params.result === 'success' && !paid && <><p className="checkoutStatus">Estamos confirmando tu pago. Esta pantalla se actualizará sola.</p><PaymentStatusPoller active /></>}
@@ -67,14 +67,14 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <h1>No vuelvas a pagar.</h1>
               <p>Mercado Pago ya nos devolvió a Nival y estamos verificando la acreditación. Esta pantalla se actualiza automáticamente; cuando termine, continuaremos con la activación.</p>
               <div className="checkoutConfirmingSteps"><span>1 · Pago enviado</span><span>2 · Validando con Mercado Pago</span><span>3 · Activación automática</span></div>
-              <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Nival Pay</Link>
+              <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Tocario Pay</Link>
             </section>
           : <>
-          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único incluye una tarjeta NFC y acceso permanente.</p></section>
+          <section className="checkoutIntro"><p className="checkoutKicker">TOCARIO PAY PRO</p><h1>Lleva tu Tocario Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único incluye una tarjeta NFC y acceso permanente.</p></section>
           <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
-              <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>MXN · Sin mensualidad</small></div>
+              <div><span>Tocario Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>MXN · Sin mensualidad</small></div>
               <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>Puntos de cobro ilimitados</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
@@ -86,7 +86,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago en línea procesado por Mercado Pago; Nival confirma el estado antes de activar Pro.</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro · tarjeta NFC física incluida</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link></footer>
+          <footer className="checkoutTrust"><span>Pago en línea procesado por Mercado Pago; Nival confirma el estado antes de activar Pro.</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Tocario Pay Pro · tarjeta NFC física incluida</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link></footer>
         </>}
     </div>
   </main>;

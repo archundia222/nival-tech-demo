@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata = {
   title: "Política de cookies",
-  description: "Información sobre cookies y tecnologías similares utilizadas por Nival Tech.",
+  description: "Información sobre cookies y tecnologías similares utilizadas por Tocario.",
 };
 
 export default async function CookiesPage() {
@@ -13,14 +13,14 @@ export default async function CookiesPage() {
     .eq("id", "default")
     .maybeSingle();
 
-  const legalName = legal?.legal_name ?? "Proveedor de Nival Tech";
-  const tradeName = legal?.trade_name ?? "Nival Tech";
+  const legalName = legal?.legal_name ?? "Proveedor de Tocario";
+  const tradeName = legal?.trade_name ?? "Tocario";
   const address = legal?.legal_address ?? "Ciudad de México, México";
   const supportEmail = legal?.support_email ?? "rodrigoarchundia379@gmail.com";
 
   return (
     <main className="legalShell">
-      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
+      <Link className="brand" href="/"><span className="brandmark">N</span>TOCARIO</Link>
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 26 DE SEPTIEMBRE DE 2026</p>
         <h1>Política de cookies</h1>
@@ -34,10 +34,10 @@ export default async function CookiesPage() {
         </div>
 
         <h2>Cookies que utilizamos actualmente</h2>
-        <p>Nival Tech utiliza cookies técnicas y de sesión necesarias para funciones como autenticación, mantenimiento de sesión, seguridad y operación del panel. Estas cookies son necesarias para prestar el servicio solicitado.</p>
+        <p>Tocario utiliza cookies técnicas y de sesión necesarias para funciones como autenticación, mantenimiento de sesión, seguridad y operación del panel. Estas cookies son necesarias para prestar el servicio solicitado.</p>
 
         <h2>Analítica y publicidad</h2>
-        <p>Al momento de esta actualización, Nival Tech no utiliza cookies publicitarias ni herramientas propias de seguimiento comercial en el sitio. Si incorporamos analítica, publicidad u otras tecnologías no esenciales, actualizaremos esta política y aplicaremos los mecanismos de consentimiento que correspondan antes de utilizarlas.</p>
+        <p>Al momento de esta actualización, Tocario no utiliza cookies publicitarias ni herramientas propias de seguimiento comercial en el sitio. Si incorporamos analítica, publicidad u otras tecnologías no esenciales, actualizaremos esta política y aplicaremos los mecanismos de consentimiento que correspondan antes de utilizarlas.</p>
 
         <h2>Proveedores tecnológicos</h2>
         <p>Algunas funciones pueden depender de proveedores externos como Supabase, Vercel, Mercado Pago o Google Wallet. Cuando visitas o utilizas servicios de terceros, esos proveedores pueden aplicar sus propias tecnologías y políticas de privacidad.</p>

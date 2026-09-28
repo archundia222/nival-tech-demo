@@ -51,7 +51,7 @@ export default async function CardPage({ params }: CardPageProps) {
   );
   const appleReady = pointsPro && appleWalletReady();
   return <main className="pointsCustomerShell nivalDashboard" style={{ "--nv-accent": card.business_brand_color || "#C8A65A" } as CSSProperties}>
-    <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <Link href="/?from=nival-puntos"><b>NIVAL tech</b></Link></span></header>
+    <header className="pointsCustomerBrand"><span className="pointsCustomerNivalMark">N</span><span>Beneficios digitales por <Link href="/?from=nival-puntos"><b>TOCARIO</b></Link></span></header>
     <section className="pointsCustomerCard">
       <div className="pointsCustomerCardTop"><div className="pointsBusinessIdentity">{card.business_logo_url ? <img src={card.business_logo_url} alt={`Logo de ${card.business_name}`}/> : <span>{card.business_name.slice(0,1).toUpperCase()}</span>}<div><p className="pointsCustomerProgram">{card.program_name}</p><h1>{card.business_name}</h1></div></div><span className="pointsCustomerMemberBadge">MIEMBRO</span></div>
       <div className="pointsCustomerGreeting"><span>Hola, {card.customer_first_name}</span><small>Tu saldo actual</small></div>
@@ -71,18 +71,18 @@ export default async function CardPage({ params }: CardPageProps) {
           ? "Consulta tus puntos aquí o agrega la tarjeta a Google Wallet. En Android la verás en la app; los avisos requieren tu consentimiento y las notificaciones activadas."
           : pointsPro
             ? "Google Wallet todavía no está configurado para este negocio. Mientras tanto puedes guardar el enlace de tu tarjeta."
-            : "Google Wallet forma parte de Nival Puntos Pro. En el plan Gratis puedes seguir usando esta tarjeta desde el navegador."}</p>
+            : "Google Wallet forma parte de Tocario Puntos Pro. En el plan Gratis puedes seguir usando esta tarjeta desde el navegador."}</p>
       </div>
       <div className="pointsWalletSaveActions">
         {googleWalletReady && <a href={`/api/wallet/google/${encodeURIComponent(token)}`}>Agregar o actualizar en Google Wallet →</a>}
         {appleReady && <a href={`/api/wallet/apple/${encodeURIComponent(token)}`}>Agregar a Apple Wallet →</a>}
-        {!googleWalletReady && <span className="pointsMuted">{pointsPro ? 'La opción de Google Wallet aparecerá cuando se complete su configuración.' : 'Google Wallet está disponible con Nival Puntos Pro.'}</span>}
+        {!googleWalletReady && <span className="pointsMuted">{pointsPro ? 'La opción de Google Wallet aparecerá cuando se complete su configuración.' : 'Google Wallet está disponible con Tocario Puntos Pro.'}</span>}
         <CardSaveActions />
       </div>
     </section>
     <CustomerPointsActions accountToken={token} rewards={rewards} pointsRemaining={Number(card.points_remaining)} />
     <p className="pointsPrivacyNote">Tu teléfono no se muestra en esta tarjeta. Para registrar visitas, muestra tu tarjeta de Google Wallet. Si quieres canjear un premio sin registrar una visita nueva, abre Mis recompensas, toca el premio y muestra su QR en caja.</p>
     {card.business_slug && <Link className="publicBusinessHub" href={`/p/${card.business_slug}`}><span><small>MÁS DE {card.business_name.toUpperCase()}</small><strong>Pagar, contactar o ver otros accesos del negocio</strong></span><b>→</b></Link>}
-    <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Nival Puntos te ayuda a registrar visitas y premiar la recurrencia con una tarjeta digital sencilla.</p></div><Link href="/?from=nival-puntos#productos">Conocer Nival Tech →</Link></aside>
+    <aside className="publicNivalPromo"><div><span>¿TAMBIÉN TIENES UN NEGOCIO?</span><strong>Crea tu propio programa de lealtad.</strong><p>Tocario Puntos te ayuda a registrar visitas y premiar la recurrencia con una tarjeta digital sencilla.</p></div><Link href="/?from=nival-puntos#productos">Conocer Tocario →</Link></aside>
   </main>;
 }

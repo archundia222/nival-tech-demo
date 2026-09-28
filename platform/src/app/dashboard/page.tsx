@@ -61,7 +61,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     ) ? requestedNext : "/dashboard";
     return (
       <main className="dashboardShell">
-        <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>NIVAL tech</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
+        <header className="dashboardTopbar"><span className="brand"><span className="brandmark">N</span>TOCARIO</span><form action={signOut}><button className="textButton">Cerrar sesión</button></form></header>
         <section className="onboardingCard">
           <p className="eyebrow">CONFIGURACIÓN INICIAL</p>
           <h1>Crea tu primer negocio</h1>
@@ -148,7 +148,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .eq("business_id", businessId)
         .order("active", { ascending: false })
         .order("created_at", { ascending: true })
-        .limit(1)
+        .limit(100)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
   const { data: wifiProfile } = await supabase.from("wifi_profiles").select("ssid").eq("business_id", businessId).maybeSingle();
@@ -210,7 +210,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Página de cobro", complete: Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe), href: "/dashboard/pay", action: "Completa y activa tus datos de cobro" },
     { label: "Perfil del negocio", complete: Boolean(business?.description && business?.phone && business?.logo_url), href: "/dashboard?section=perfil-digital", action: "Agrega descripción, teléfono y logotipo" },
     { label: "Reseñas de Google", complete: Boolean(smartLinks?.some((link) => link.kind === "google_review" && link.active)), href: "/dashboard?section=perfil-digital#reviews", action: "Conecta tu enlace de reseñas" },
-    { label: "Nival WiFi", complete: Boolean(wifiProfile?.ssid), href: "/dashboard/wifi", action: "Configura la red de invitados y descarga su QR" },
+    { label: "Tocario WiFi", complete: Boolean(wifiProfile?.ssid), href: "/dashboard/wifi", action: "Configura la red de invitados y descarga su QR" },
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
@@ -219,20 +219,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       ? { eyebrow: "OPERACIÓN", title: "Registra la siguiente visita", text: "Escanea la tarjeta del cliente y Nival reconocerá si corresponde sumar visita o canjear una recompensa.", href: "/dashboard/points?view=visits", cta: "Abrir escáner" }
       : { eyebrow: "ACCESO DE PERSONAL", title: "Todavía no hay un programa de Puntos activo", text: "El propietario o un gerente debe activar y configurar los productos del negocio. Tu cuenta de personal no puede hacer compras ni cambiar la configuración.", href: "/support", cta: "Ver ayuda" }
     : !hasNivalPay
-    ? { eyebrow: "EMPIEZA GRATIS", title: "Crea tu primera Nival Pay", text: "Publica un QR y enlace de cobro sin pagar. Si después quieres NFC física y más herramientas, activas la versión completa sin cambiar tu QR.", href: "/dashboard/pay", cta: "Crear Nival Pay Gratis" }
+    ? { eyebrow: "EMPIEZA GRATIS", title: "Crea tu primera Tocario Pay", text: "Publica un QR y enlace de cobro sin pagar. Si después quieres NFC física y más herramientas, activas la versión completa sin cambiar tu QR.", href: "/dashboard/pay", cta: "Crear Tocario Pay Gratis" }
     : !payReady
-      ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
+      ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Tocario Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
       : Number(paymentProfile?.view_count ?? 0) === 0
-        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link o el QR. La primera apertura te confirma que el flujo ya está funcionando fuera del panel.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
+        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Tocario Pay frente a un cliente", text: "Comparte el link o el QR. La primera apertura te confirma que el flujo ya está funcionando fuera del panel.", href: "/dashboard/pay?view=share", cta: "Compartir mi Tocario Pay" }
         : !hasReviews
-          ? { eyebrow: "APROVECHA UNA BUENA EXPERIENCIA", title: "Haz más fácil pedir una reseña", text: "Nival Reseñas crea un acceso directo para que tu cliente llegue al enlace correcto sin tener que buscar tu negocio.", href: "/dashboard/reviews", cta: "Crear Nival Reseñas" }
+          ? { eyebrow: "APROVECHA UNA BUENA EXPERIENCIA", title: "Haz más fácil pedir una reseña", text: "Tocario Reseñas crea un acceso directo para que tu cliente llegue al enlace correcto sin tener que buscar tu negocio.", href: "/dashboard/reviews", cta: "Crear Tocario Reseñas" }
           : !hasPoints
-            ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de puntos que el cliente entienda en segundos", text: "Nival Puntos muestra el progreso y la recompensa desde el celular para dar una razón visible para regresar.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
+            ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de puntos que el cliente entienda en segundos", text: "Tocario Puntos muestra el progreso y la recompensa desde el celular para dar una razón visible para regresar.", href: "/dashboard/points", cta: "Conocer Tocario Puntos" }
             : Number(loyaltyCustomerCount ?? 0) === 0
               ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo y tú empiezas a construir actividad real de visitas.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
               : Number(visitCount ?? 0) === 0
                 ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita alimenta el historial del programa y hace más útil la información para promociones futuras.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
-                : { eyebrow: "TU PROGRAMA YA ESTÁ GENERANDO INFORMACIÓN", title: "Revisa qué puedes hacer con esa actividad", text: "Nival Puntos Pro agrega más capacidad y herramientas para promociones y seguimiento.", href: "/dashboard/points?view=pro", cta: "Ver Nival Puntos Pro" };
+                : { eyebrow: "TU PROGRAMA YA ESTÁ GENERANDO INFORMACIÓN", title: "Revisa qué puedes hacer con esa actividad", text: "Tocario Puntos Pro agrega más capacidad y herramientas para promociones y seguimiento.", href: "/dashboard/points?view=pro", cta: "Ver Tocario Puntos Pro" };
 
   return (
     <main className="dashboardApp">
@@ -244,22 +244,29 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       {currentSection === "resumen" && <>
       <section className="dashboardHero nivalHomeHero" id="resumen">
         <div>
-          <p className="eyebrow">TU NEGOCIO EN NIVAL</p>
+          <p className="eyebrow">TU NEGOCIO EN TOCARIO</p>
           <h1>{business?.name ?? "Tu negocio"}</h1>
-          <p>Primero deja listo lo esencial. Después usa Nival para cobrar, conseguir reseñas y hacer que tus clientes regresen.</p>
+          <p>Primero deja listo lo esencial. Después usa Tocario para cobrar, conseguir reseñas y hacer que tus clientes regresen.</p>
         </div>
       </section>
+      {canManageProgram && <section className="homeCardSections" aria-label="Tarjetas de tu negocio">
+        <div className="homeCardsHeader"><p className="eyebrow">TUS TARJETAS</p><h2>Todo lo que compartes con tus clientes</h2></div>
+        {[
+          { name: "Pay", count: paymentProfiles?.length ?? 0, href: "/dashboard/pay?view=add", description: "Datos para recibir transferencias" },
+          { name: "Reseñas de Google", count: (smartLinks ?? []).filter(link => link.kind === "google_review" && link.active).length, href: "/dashboard/reviews?view=add", description: "Acceso a tus reseñas" },
+          { name: "WiFi", count: wifiProfile?.ssid ? 1 : 0, href: "/dashboard/wifi?view=add", description: "Acceso a la red de invitados" },
+          { name: "Puntos", count: hasPoints ? 1 : 0, href: "/dashboard/points", description: "Programa de lealtad" },
+        ].filter(section => section.count > 0).map(section => <article className="homeCardSection" key={section.name}><div><span>{section.name}</span><strong>{section.count} {section.count === 1 ? "tarjeta" : "tarjetas"}</strong><small>{section.description}</small></div><a href={section.href}>Ver mis tarjetas →</a></article>)}
+        <a className="homeCardEmpty" href="/#planes"><span>+</span><strong>Obtener la mía</strong><small>Elige una tarjeta para tu negocio</small></a>
+      </section>}
       {canManageProgram && <BusinessHealthCard items={businessHealthItems} />}
+      {canManageProgram && <section className="homeDailyTip"><span>CONSEJO DE HOY · RESEÑAS DE GOOGLE</span><h2>Pídela al terminar una buena experiencia</h2><p>Empieza con un cliente que acaba de recibir su pedido o servicio. Puedes decir: «¿Nos compartes cómo te fue en Google?». Muéstrale la tarjeta para que abra el enlace en su teléfono. Pide una opinión honesta, sin ofrecer premios por la calificación.</p><a href="/dashboard/reviews">Preparar mi tarjeta de reseñas →</a></section>}
       <section className="nivalTodayCard">
         <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
         <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
       </section>
-      {canManageProgram && <>
-      <section className="nivalSignals">
-        <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
-        <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>
-        <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
-      </section></>}
+
+      {canManageProgram && business.slug && <section className="homeLandingLink"><div><span>LANDING PAGE DE TU NEGOCIO</span><h2>{business.name} en un solo enlace</h2><p>Edita la presentación, el contacto y los accesos que ven tus clientes.</p></div><a href="/dashboard?section=perfil-digital">Editar landing page →</a></section>}
       </>}
       {legacySection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
@@ -303,7 +310,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <div className="settingsIntro">
             <p className="eyebrow">NIVAL CARD · NFC Y RESEÑAS</p>
             <h2>Crea un enlace inteligente</h2>
-            <p>Programa este enlace de Nival Tech en una tarjeta NFC. Podrás medir sus aperturas y conservar la misma tarjeta física.</p>
+            <p>Programa este enlace de Tocario en una tarjeta NFC. Podrás medir sus aperturas y conservar la misma tarjeta física.</p>
           </div>
           <form action={createSmartLink} className="settingsForm">
             <label>Nombre<input name="linkName" required minLength={2} maxLength={80} placeholder="Ej. Reseñas de Google" /></label>
@@ -358,6 +365,25 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             />
           </div>
         </section>
+      {canManageProgram && business && (
+        <section className="settingsCard" id="configuracion">
+          <div className="settingsIntro">
+            <p className="eyebrow">EDITAR LANDING PAGE</p>
+            <h2>Edita la página de tu negocio</h2>
+            <p>Cambia los datos aquí, guarda y mira la vista previa de arriba. El enlace para compartir seguirá en la sección Compartir.</p>
+          </div>
+          <form action={updateBusinessProfile} className="settingsForm">
+            <label>Nombre comercial<input name="businessName" required minLength={2} maxLength={100} defaultValue={business.name} /></label>
+            <label>Descripción<textarea name="businessDescription" minLength={2} maxLength={240} defaultValue={business.description ?? ""} placeholder="Explica brevemente qué ofrece tu negocio." /></label>
+            <label>Teléfono<input name="businessPhone" type="tel" minLength={10} maxLength={18} defaultValue={business.phone ?? ""} /></label>
+            <label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ""} placeholder="https://..." /></label>
+            <label>Sube tu logotipo <small>JPG, PNG o WebP · máximo 4 MB</small><input name="businessLogoFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
+            <label>URL alternativa del logo <small>opcional</small><input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
+            <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b59a61"} /><code>{business.brand_color ?? "#b59a61"}</code></span></label>
+            <button className="primaryButton" type="submit">Guardar perfil</button>
+          </form>
+        </section>
+      )}
         <section className="profileReviewSetup" id="reviews">
           <div className="settingsIntro">
             <p className="eyebrow">RESEÑAS</p>
@@ -417,28 +443,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           </form>
         </section>
       )}
-      {canManageProgram && business && (
-        <section className="settingsCard" id="configuracion">
-          <div className="settingsIntro">
-            <p className="eyebrow">CONFIGURACIÓN DE TU PERFIL PÚBLICO</p>
-            <h2>Decide qué ve un cliente cuando abre tu negocio en Nival</h2>
-            <p>Tu perfil público es la página que compartes con clientes. Ahí pueden encontrar tus accesos importantes —como pagar, ver puntos, contactarte o dejar una reseña— sin entrar a tu panel privado.</p>
-          </div>
-          <form action={updateBusinessProfile} className="settingsForm">
-            <label>Nombre comercial<input name="businessName" required minLength={2} maxLength={100} defaultValue={business.name} /></label>
-            <label>Descripción<textarea name="businessDescription" minLength={2} maxLength={240} defaultValue={business.description ?? ""} placeholder="Explica brevemente qué ofrece tu negocio." /></label>
-            <label>Teléfono<input name="businessPhone" type="tel" minLength={10} maxLength={18} defaultValue={business.phone ?? ""} /></label>
-            <label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ""} placeholder="https://..." /></label>
-            <label>Sube tu logotipo <small>JPG, PNG o WebP · máximo 4 MB</small><input name="businessLogoFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
-            <label>URL alternativa del logo <small>opcional</small><input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
-            <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b59a61"} /><code>{business.brand_color ?? "#b59a61"}</code></span></label>
-            <button className="primaryButton" type="submit">Guardar perfil</button>
-          </form>
-        </section>
-      )}
       {hasPoints && canManageProgram && !loyaltyProgram && (
         <section className="settingsCard">
-          <div className="settingsIntro"><p className="eyebrow">NIVAL PUNTOS</p><h2>Configura tu programa de lealtad</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes.</p></div>
+          <div className="settingsIntro"><p className="eyebrow">TOCARIO PUNTOS</p><h2>Configura tu programa de lealtad</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes.</p></div>
           <form action={createLoyaltyProgram} className="settingsForm">
             <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue="Programa de lealtad" /></label>
             <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={1} /></label>

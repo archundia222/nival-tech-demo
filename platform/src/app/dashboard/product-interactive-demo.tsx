@@ -65,7 +65,7 @@ function PointsInteractiveDemo() {
     <section className="interactiveProductDemo pointsInteractiveDemo">
       <div className="interactiveDemoCopy">
         <span>PRUÉBALO</span>
-        <h2>Así se siente Nival Puntos en una visita real.</h2>
+        <h2>Así se siente Tocario Puntos en una visita real.</h2>
         <p>Simula una visita, desbloquea la recompensa y mira cómo el progreso cambia frente al cliente.</p>
         <div className="interactiveDemoActions">
           <button type="button" className="nvSecondaryButton" onClick={addVisit} disabled={rewardReady}>Registrar visita +1</button>
@@ -74,7 +74,7 @@ function PointsInteractiveDemo() {
         </div>
       </div>
       <article className="interactiveLoyaltyCard">
-        <div className="interactiveCardTop"><span>NIVAL PUNTOS</span><b>CAFÉ DEL CENTRO</b></div>
+        <div className="interactiveCardTop"><span>TOCARIO PUNTOS</span><b>CAFÉ DEL CENTRO</b></div>
         <div className="interactivePointsValue"><small>TUS PUNTOS</small><strong>{points}</strong><span>de 10</span></div>
         <div className="interactiveProgress"><i style={{ width: `${progress}%` }} /></div>
         <div className={`interactiveRewardState ${rewardReady ? 'ready' : ''}`}>

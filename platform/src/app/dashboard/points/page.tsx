@@ -143,7 +143,7 @@ export default async function NivalPointsPage({
   const promotionConsentCustomers = (customerRows ?? []).filter((customer) => Boolean(customer.marketing_consent_at)).length;
 
   const title =
-    view === 'pro' ? 'Nival Puntos Pro'
+    view === 'pro' ? 'Tocario Puntos Pro'
       : view === 'customers' ? 'Clientes'
       : view === 'promotions' ? 'Promociones y notificaciones'
         : view === 'visits' ? 'Registrar visita y premios'
@@ -169,18 +169,18 @@ export default async function NivalPointsPage({
     <DashboardNavigation businessName={business.name} active={navActive} />
     <div className={`dashboardContent ${!available ? 'nivalPointsDark' : ''}`}>
       <header className="dashboardContentTopbar">
-        <div><span>Nival Puntos</span><b>Fidelización sin complicaciones</b></div>
+        <div><span>Tocario Puntos</span><b>Fidelización sin complicaciones</b></div>
         <span className="ready">{paid ? 'Pro' : trialActive ? `Prueba Pro · ${trialDaysLeft}d` : freePlan ? 'Gratis' : 'Empieza gratis'}</span>
       </header>
 
       {params.error && <p className="formMessage errorMessage">{params.error}</p>}
-      {params.subscription && <p className={`formMessage ${paid ? 'successMessage' : ''}`}>{paid ? 'Suscripción confirmada. Nival Puntos Pro ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>}
+      {params.subscription && <p className={`formMessage ${paid ? 'successMessage' : ''}`}>{paid ? 'Suscripción confirmada. Tocario Puntos Pro ya está activo.' : 'Estamos confirmando tu suscripción con Mercado Pago. No vuelvas a pagar mientras termina la validación.'}</p>}
       {subscriptionConfirming && <section className="subscriptionConfirming"><span>VALIDANDO SUSCRIPCIÓN</span><strong>Ya recibimos tu regreso de Mercado Pago.</strong><p>Nival está confirmando la autorización. No necesitas iniciar otro pago; la pantalla se actualizará automáticamente.</p></section>}
 
       {!available ? <>
         <section className="productShowcase pointsShowcase">
           <div className="productShowcaseCopy">
-            <span className="productPill">NIVAL PUNTOS</span>
+            <span className="productPill">TOCARIO PUNTOS</span>
             <h1>Una tarjeta digital<br/>para hacer que vuelvan.</h1>
             <p>El cliente escanea tu QR, se registra una vez y lleva su progreso en el celular. Tú solo registras visitas y entregas el premio cuando llegue a la meta.</p>
             <ul className="productBenefits">
@@ -197,9 +197,9 @@ export default async function NivalPointsPage({
             <small>Sin tarjeta para empezar. Precio regular previsto después del lanzamiento: {mxn(NIVAL_POINTS_REGULAR_PRICE_CENTS)}/mes.</small>
           </div>
           <div className="pointsVisual">
-            <div className="walletCard walletCardBack"><span>NIVAL</span></div>
+            <div className="walletCard walletCardBack"><span>TOCARIO</span></div>
             <div className="walletCard">
-              <div className="walletTop"><b>NIVAL PUNTOS</b><span>●</span></div>
+              <div className="walletTop"><b>TOCARIO PUNTOS</b><span>●</span></div>
               <div className="walletBusiness">TU NEGOCIO</div>
               <strong>7</strong><small>DE 10 VISITAS</small>
               <div className="walletProgress"><i style={{ width: '70%' }} /></div>
@@ -227,7 +227,7 @@ export default async function NivalPointsPage({
         </section>}
         {baseFree && <section className="freemiumBanner">
           <div>
-            <span>NIVAL PUNTOS GRATIS</span>
+            <span>TOCARIO PUNTOS GRATIS</span>
             <strong>{Math.min(loyaltyCustomers ?? 0, NIVAL_POINTS_FREE_CUSTOMER_LIMIT)} de {NIVAL_POINTS_FREE_CUSTOMER_LIMIT} clientes usados</strong>
             <p>Tu programa, tarjetas, puntos y recompensas siguen funcionando. Pro aumenta capacidad y recupera configuración y promociones.</p>
           </div>
@@ -235,7 +235,7 @@ export default async function NivalPointsPage({
         </section>}
 
         <section className="pointsV1Hero">
-          <div><p className="eyebrow">NIVAL PUNTOS</p><h1>{title}</h1><p>{description}</p></div>
+          <div><p className="eyebrow">TOCARIO PUNTOS</p><h1>{title}</h1><p>{description}</p></div>
           {(view === 'share' || view === 'overview') && business.slug &&
             <a className="nvSecondaryButton" href={`/b/${business.slug}`} target="_blank" rel="noreferrer">
               {view === 'overview' ? 'Ver experiencia del cliente ↗' : 'Abrir registro ↗'}
@@ -244,7 +244,7 @@ export default async function NivalPointsPage({
 
         {canManage && view === 'pro' && <section className="pointsProExplainer">
           <div>
-            <span>NIVAL PUNTOS PRO</span>
+            <span>TOCARIO PUNTOS PRO</span>
             <h2>Esta es una herramienta Pro.</h2>
             <p>Gratis sirve para arrancar con un programa sencillo. Pro elimina el límite del plan Free, agrega Google Wallet y convierte la actividad de tus clientes en promociones, seguimiento y acciones más útiles.</p>
 
@@ -260,7 +260,7 @@ export default async function NivalPointsPage({
             <div><small>CAMPAÑA DE EJEMPLO</small><strong>+23%</strong><span>regresaron después del mensaje</span></div>
           </div>}
           {!paid && <form action={startNivalPointsSubscription}><CheckoutSubmitButton className="nvPrimaryLink" pendingLabel="Abriendo Mercado Pago…">Activar Pro · {mxn(NIVAL_POINTS_FOUNDER_PRICE_CENTS)}/mes</CheckoutSubmitButton></form>}
-          {paid && <p className="formMessage successMessage">Nival Puntos Pro ya está activo en este negocio.</p>}
+          {paid && <p className="formMessage successMessage">Tocario Puntos Pro ya está activo en este negocio.</p>}
         </section>}
 
         {canManage && view === 'overview' && <>
@@ -305,7 +305,7 @@ export default async function NivalPointsPage({
 
           <section className="productBridge">
             <div>
-              <span>{paid ? 'NIVAL PUNTOS PRO ACTIVO' : 'CUANDO QUIERAS HACER MÁS CON TUS DATOS'}</span>
+              <span>{paid ? 'TOCARIO PUNTOS PRO ACTIVO' : 'CUANDO QUIERAS HACER MÁS CON TUS DATOS'}</span>
               <h2>{paid ? 'Pro te ayuda a convertir visitas en acciones.' : 'Tu programa ya genera información. Pro te ayuda a aprovecharla.'}</h2>
               <p>{paid ? 'Usa la actividad real de clientes, visitas y recompensas para orientar promociones y seguimiento.' : 'Activa Pro para tener más capacidad y herramientas de promociones, configuración y seguimiento sobre la actividad de tus clientes.'}</p>
             </div>

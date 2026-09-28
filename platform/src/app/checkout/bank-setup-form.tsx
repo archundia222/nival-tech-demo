@@ -64,13 +64,13 @@ export function ActiveCard({ businessName, url }: { businessName: string; url: s
   const [copied, setCopied] = useState(false);
   return <section className="checkoutFinal">
     <span className="checkoutFinalCheck" aria-hidden="true">✓</span>
-    <p className="checkoutKicker">NIVAL PAY ACTIVO</p>
+    <p className="checkoutKicker">TOCARIO PAY ACTIVO</p>
     <h1>Tu tarjeta ya está activa</h1>
     <p>La página de cobro de {businessName} está lista para compartir.</p>
     <div className="checkoutPublicLink"><span>Tu página</span><a href={url} target="_blank" rel="noreferrer">{url}</a>
       <button type="button" onClick={async () => { await navigator.clipboard.writeText(url); setCopied(true); }}>{copied ? 'Enlace copiado' : 'Copiar enlace'}</button>
     </div>
-    <a className="checkoutQuietLink" href="/dashboard/pay">Administrar Nival Pay</a>
+    <a className="checkoutQuietLink" href="/dashboard/pay">Administrar Tocario Pay</a>
     <a className="checkoutQuietLink" href="/dashboard/pay/physical">Solicitar mi tarjeta NFC incluida</a>
   </section>;
 }

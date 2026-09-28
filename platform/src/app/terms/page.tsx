@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata = {
   title: "Términos de servicio",
-  description: "Términos aplicables al uso de Nival Tech.",
+  description: "Términos aplicables al uso de Tocario.",
 };
 
 export default async function TermsPage() {
@@ -12,19 +12,19 @@ export default async function TermsPage() {
     .select("legal_name,trade_name,legal_address,phone,support_email,rfc")
     .eq("id", "default")
     .maybeSingle();
-  const legalName = legal?.legal_name ?? "Proveedor de Nival Tech";
-  const tradeName = legal?.trade_name ?? "Nival Tech";
+  const legalName = legal?.legal_name ?? "Proveedor de Tocario";
+  const tradeName = legal?.trade_name ?? "Tocario";
   const address = legal?.legal_address ?? "Ciudad de México, México";
   const supportEmail = legal?.support_email ?? "rodrigoarchundia379@gmail.com";
   const phone = legal?.phone ?? "";
 
   return (
     <main className="legalShell">
-      <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
+      <Link className="brand" href="/"><span className="brandmark">N</span>TOCARIO</Link>
       <section className="legalCard">
         <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 24 DE SEPTIEMBRE DE 2026</p>
         <h1>Términos de servicio</h1>
-        <p>Estos términos describen las reglas generales para usar Nival Tech y sus productos. Al crear una cuenta o contratar una función de pago, aceptas utilizar el servicio de forma lícita y proporcionar información correcta.</p>
+        <p>Estos términos describen las reglas generales para usar Tocario y sus productos. Al crear una cuenta o contratar una función de pago, aceptas utilizar el servicio de forma lícita y proporcionar información correcta.</p>
 
         <div className="legalIdentity" aria-label="Datos del proveedor">
           <span>PROVEEDOR DEL SERVICIO</span>
@@ -34,13 +34,13 @@ export default async function TermsPage() {
         </div>
 
         <h2>Productos Nival</h2>
-        <p>Nival Tech puede ofrecer Nival Pay, Nival Puntos, Nival Growth —que integra Puntos e Intelligence—, perfiles digitales y otras herramientas relacionadas. Algunas funciones tienen plan gratis y otras requieren pago único o suscripción. El precio y alcance aplicable se muestran antes de confirmar una compra.</p>
+        <p>Tocario puede ofrecer Tocario Pay, Tocario Puntos, Nival Growth —que integra Puntos e Intelligence—, perfiles digitales y otras herramientas relacionadas. Algunas funciones tienen plan gratis y otras requieren pago único o suscripción. El precio y alcance aplicable se muestran antes de confirmar una compra.</p>
 
         <h2>Pruebas y planes gratuitos</h2>
         <p>Cuando se ofrezca una prueba temporal de funciones Pro, la duración se mostrará antes de activarla. Al terminar una prueba sin una suscripción vigente, ciertas funciones pueden volver al nivel gratuito disponible; los datos que el producto indique como conservables no se eliminan únicamente por terminar la prueba.</p>
 
-        <h2>Nival Pay y transferencias</h2>
-        <p>Nival Pay facilita que un negocio publique datos para recibir una transferencia o comparta un enlace de pago. Nival Tech no es una institución financiera y no recibe, retiene ni transfiere el dinero de la operación bancaria entre el negocio y su cliente. El negocio es responsable de revisar que beneficiario, banco, CLABE y demás información publicada sean correctos.</p>
+        <h2>Tocario Pay y transferencias</h2>
+        <p>Tocario Pay facilita que un negocio publique datos para recibir una transferencia o comparta un enlace de pago. Tocario no es una institución financiera y no recibe, retiene ni transfiere el dinero de la operación bancaria entre el negocio y su cliente. El negocio es responsable de revisar que beneficiario, banco, CLABE y demás información publicada sean correctos.</p>
 
         <h2>Pagos de productos Nival</h2>
         <p>Los pagos de productos o suscripciones Nival pueden procesarse mediante proveedores externos como Mercado Pago. El monto final se muestra antes de confirmar la operación. Una suscripción puede perder funciones Pro y volver al plan disponible cuando sea cancelada, pausada o deje de estar vigente conforme se sincronice su estado.</p>
@@ -67,7 +67,7 @@ export default async function TermsPage() {
         <p>El tratamiento de datos personales se describe en nuestro <Link href="/privacy">Aviso de privacidad</Link>.</p>
 
         <h2>Contacto</h2>
-        <p>Para soporte, aclaraciones o solicitudes relacionadas con estos términos, escribe a <a href={`mailto:${supportEmail}`}>{supportEmail}</a> o utiliza el <Link href="/support">Centro de ayuda de Nival Tech</Link>.</p>
+        <p>Para soporte, aclaraciones o solicitudes relacionadas con estos términos, escribe a <a href={`mailto:${supportEmail}`}>{supportEmail}</a> o utiliza el <Link href="/support">Centro de ayuda de Tocario</Link>.</p>
       </section>
     </main>
   );

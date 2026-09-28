@@ -38,14 +38,14 @@ export function LandingLivePreviews() {
 
   return <section className="landingProductShowcase" id="productos">
     <div className="landingSectionHeading compact">
-      <p className="landingEyebrow landingEyebrowLarge">PRODUCTOS NIVAL</p>
+      <p className="landingEyebrow landingEyebrowLarge">PRODUCTOS TOCARIO</p>
       <h2>Ve cómo funciona antes de contratarlo.</h2>
       <p>Cada producto enseña la experiencia real que verá tu cliente. Prueba los controles y decide qué necesitas.</p>
     </div>
 
     <article className="landingProductCard landingProductPay">
       <header className="landingProductCardHeader">
-        <div><span>01 · NIVAL PAY</span><h3>Haz más fácil que te paguen.</h3><p>Deja de repetir datos. Tu cliente abre, copia y paga.</p></div>
+        <div><span>01 · TOCARIO PAY</span><h3>Haz más fácil que te paguen.</h3><p>Deja de repetir datos. Tu cliente abre, copia y paga.</p></div>
         <div className="productNfcMini"><div className="miniCardNival">N <small>NFC</small></div><div className="miniPhoneNival">▯</div><i>)))</i></div>
       </header>
 
@@ -53,7 +53,7 @@ export function LandingLivePreviews() {
         <div className="landingPayInlineDemo">
           <div className="landingDemoTopline"><span>DEMO EDITABLE</span><b className={paySave}>{paySave==="saving"?"Guardando cambios…":"Cambios guardados ✓"}</b></div>
           <div className="landingPayCard">
-            <div className="landingPayBrand"><span>NP</span><div><small>Nival Pay</small><strong>{holder||"Tu negocio"}</strong></div></div>
+            <div className="landingPayBrand"><span>NP</span><div><small>Tocario Pay</small><strong>{holder||"Tu negocio"}</strong></div></div>
             <label><span>Beneficiario</span><input value={holder} onChange={e=>setHolder(e.target.value)} /></label>
             <label><span>Banco</span><input value={bank} onChange={e=>setBank(e.target.value)} /></label>
             <label><span>CLABE</span><input inputMode="numeric" value={clabe} onChange={e=>setClabe(e.target.value.replace(/\D/g,"").slice(0,18))} /></label>
@@ -61,13 +61,13 @@ export function LandingLivePreviews() {
             <small className="landingInlineHint">Escribe directamente aquí. Los cambios se guardan automáticamente.</small>
           </div>
         </div>
-        <VideoPlaceholder label="Nival Pay"/>
+        <VideoPlaceholder label="Tocario Pay"/>
       </div>
     </article>
 
     <article className="landingProductCard landingProductPoints">
       <header className="landingProductCardHeader">
-        <div><span>02 · NIVAL PUNTOS</span><h3>Haz más fácil que regresen.</h3><p>Tu cliente ve su progreso y entiende cuánto le falta para su premio.</p></div>
+        <div><span>02 · TOCARIO PUNTOS</span><h3>Haz más fácil que regresen.</h3><p>Tu cliente ve su progreso y entiende cuánto le falta para su premio.</p></div>
         <div className="productPointsMini">★ <small>7 / 10</small></div>
       </header>
       <div className="landingProductDemoGrid">
@@ -86,13 +86,13 @@ export function LandingLivePreviews() {
             <input value={reward} onChange={e=>setReward(e.target.value)} aria-label="Recompensa de ejemplo"/>
           </div>
         </div>
-        <VideoPlaceholder label="Nival Puntos"/>
+        <VideoPlaceholder label="Tocario Puntos"/>
       </div>
     </article>
 
     <article className="landingProductCard landingProductReviews">
       <header className="landingProductCardHeader">
-        <div><span>03 · NIVAL RESEÑAS</span><h3>Pide la reseña en el momento correcto.</h3><p>Un toque o un escaneo lleva al cliente directo a Google.</p></div>
+        <div><span>03 · TOCARIO RESEÑAS</span><h3>Pide la reseña en el momento correcto.</h3><p>Un toque o un escaneo lleva al cliente directo a Google.</p></div>
         <div className="productStarsMini">★★★★★</div>
       </header>
       <div className="landingProductDemoGrid">
@@ -103,25 +103,25 @@ export function LandingLivePreviews() {
           <button type="button">Dejar reseña en Google</button>
           <div className="reviewPulseDot one">♥</div><div className="reviewPulseDot two">★</div>
         </div>
-        <VideoPlaceholder label="Nival Reseñas"/>
+        <VideoPlaceholder label="Tocario Reseñas"/>
       </div>
     </article>
 
     <article className="landingProductCard landingProductWifi">
       <header className="landingProductCardHeader">
-        <div><span>04 · NIVAL WIFI</span><h3>Haz más fácil que se conecten.</h3><p>El cliente acerca su celular o escanea el QR y abre el acceso a tu WiFi.</p></div>
+        <div><span>04 · TOCARIO WIFI</span><h3>Haz más fácil que se conecten.</h3><p>El cliente acerca su celular o escanea el QR y abre el acceso a tu WiFi.</p></div>
         <div className="productWifiMini">⌁</div>
       </header>
       <div className="landingProductDemoGrid">
         <div className="landingWifiDemo">
           <span className="wifiIcon">⌁</span>
-          <small>NIVAL WIFI</small>
+          <small>TOCARIO WIFI</small>
           <h4>Café Nival</h4>
           <p>WiFi para clientes</p>
           <button type="button">Conectarme</button>
           <em>Demo visual · configuración disponible próximamente</em>
         </div>
-        <VideoPlaceholder label="Nival WiFi"/>
+        <VideoPlaceholder label="Tocario WiFi"/>
       </div>
     </article>
   </section>;

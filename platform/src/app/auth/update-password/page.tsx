@@ -92,7 +92,7 @@ export default function UpdatePasswordPage() {
   return (
     <main className="authShell">
       <Link className="brand" href="/">
-        <span className="brandmark">N</span>NIVAL tech
+        <span className="brandmark">N</span>TOCARIO
       </Link>
       <section className="authCard">
         <p className="eyebrow">SEGURIDAD DE TU CUENTA</p>

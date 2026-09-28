@@ -41,7 +41,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
     return {
       id: order.id, businessName: business?.name ?? 'Negocio sin nombre', phone: business?.phone ?? null,
       activatedAt: order.paid_at ?? order.created_at, paymentMethod: order.payment_method, status: order.status,
-      amountCents: order.amount_cents, productName: order.product_code === 'nival_reviews' ? 'Nival Reseñas' : order.product_code === 'nival_wifi' ? 'Nival WiFi' : order.product_code === 'nival_pay_additional' ? 'Nival Pay adicional' : 'Nival Pay',
+      amountCents: order.amount_cents, productName: order.product_code === 'nival_reviews' ? 'Tocario Reseñas' : order.product_code === 'nival_wifi' ? 'Tocario WiFi' : order.product_code === 'nival_pay_additional' ? 'Tocario Pay adicional' : 'Tocario Pay',
       publicUrl: profile?.public_token ? `https://nival-tech-platform.vercel.app/pay/${profile.public_token}` : null,
     };
   });
@@ -75,7 +75,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
   return <main className="adminApp">
     <AdminNavigation active={currentSection} email={user.email ?? 'Administrador'} />
     <section className="adminWorkspace">
-      <header className="adminTopbar"><div><p>OPERACIÓN NIVAL TECH</p><h1>{currentSection === 'nival-pay' ? 'Nival Pay' : currentSection === 'nival-card' ? 'Nival Card' : currentSection.charAt(0).toUpperCase() + currentSection.slice(1)}</h1></div><span>Administrador</span></header>
+      <header className="adminTopbar"><div><p>OPERACIÓN NIVAL TECH</p><h1>{currentSection === 'nival-pay' ? 'Tocario Pay' : currentSection === 'nival-card' ? 'Tocario Card' : currentSection.charAt(0).toUpperCase() + currentSection.slice(1)}</h1></div><span>Administrador</span></header>
       {params.error && <p className="adminAlert" role="alert">{params.error}</p>}
       {currentSection === 'nival-pay' && <SalesTable rows={saleRows} />}
       {currentSection === 'clientes' && <ClientsTable rows={clientRows} />}
@@ -92,10 +92,10 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
         {(physicalCards ?? []).length ? <div className="adminCardList">{physicalCards!.map(card => {
           const business = Array.isArray(card.businesses) ? card.businesses[0] : card.businesses;
           const payment = Array.isArray(card.product_orders) ? card.product_orders[0] : card.product_orders;
-          const front = card.front_template === 'wifi' ? 'WiFi' : card.front_template === 'points' ? 'Puntos' : card.front_template === 'reviews' ? 'Reseñas' : card.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay';
+          const front = card.front_template === 'wifi' ? 'WiFi' : card.front_template === 'points' ? 'Puntos' : card.front_template === 'reviews' ? 'Reseñas' : card.front_template === 'profile' ? 'Perfil digital' : 'Tocario Pay';
           return <article key={card.id}>
             <div className="adminCardIdentity"><span>{front}</span><strong>{business?.name ?? 'Negocio'}</strong><small>{card.back_style === 'custom' ? 'Reverso personalizado' : 'Reverso Nival'} · {card.design === 'custom' ? 'color de marca' : card.design}</small></div>
-            <div className="adminCardMeta"><span>Recibe <b>{card.recipient_name}</b></span><span>{card.phone}</span><a href={`https://wa.me/${card.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${card.recipient_name}, te escribo de Nival Tech para acordar la entrega de tu tarjeta ${front}.`)}`} target="_blank" rel="noreferrer">Acordar entrega por WhatsApp ↗</a><span>{card.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega local'}{card.requested_delivery_date ? ` · ${card.requested_delivery_date}` : ''}</span><span>Pago <b>{payment?.status === 'paid' ? 'confirmado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : payment?.status === 'cancelled' ? 'cancelado' : 'pendiente'}</b> · {money(Number(payment?.amount_cents ?? 0))}</span>{payment?.status === 'pending_cash_confirmation' && <form action={confirmCashPayment}><input type="hidden" name="orderId" value={card.product_order_id}/><button className="adminConfirmButton" type="submit">Confirmar efectivo</button></form>}</div>
+            <div className="adminCardMeta"><span>Recibe <b>{card.recipient_name}</b></span><span>{card.phone}</span><a href={`https://wa.me/${card.phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola ${card.recipient_name}, te escribo de Tocario para acordar la entrega de tu tarjeta ${front}.`)}`} target="_blank" rel="noreferrer">Acordar entrega por WhatsApp ↗</a><span>{card.delivery_method === 'shipping' ? 'Paquetería' : 'Entrega local'}{card.requested_delivery_date ? ` · ${card.requested_delivery_date}` : ''}</span><span>Pago <b>{payment?.status === 'paid' ? 'confirmado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : payment?.status === 'cancelled' ? 'cancelado' : 'pendiente'}</b> · {money(Number(payment?.amount_cents ?? 0))}</span>{payment?.status === 'pending_cash_confirmation' && <form action={confirmCashPayment}><input type="hidden" name="orderId" value={card.product_order_id}/><button className="adminConfirmButton" type="submit">Confirmar efectivo</button></form>}</div>
             <div className="adminCardTarget"><small>DESTINO NFC / QR</small>{card.target_url ? <a href={card.target_url} target="_blank" rel="noreferrer">{card.target_url.replace(/^https?:\/\//,'')}</a> : <span>Pendiente de definir</span>}{card.back_design_url && <a href={card.back_design_url} target="_blank" rel="noreferrer">Abrir archivo del reverso ↗</a>}{card.design_notes && <span><b>Frente:</b> {card.design_notes}</span>}{card.back_design_notes && <span><b>Reverso:</b> {card.back_design_notes}</span>}</div>
             <div className="adminCardDelivery"><small>ENTREGA</small><strong>{card.recipient_name}</strong><span>{card.address_line1}{card.address_line2 ? ` · ${card.address_line2}` : ''}</span><span>{card.city}, {card.state} · C.P. {card.postal_code}</span><span>{card.phone}</span></div>
             <form action={updatePhysicalCardFulfillment} className="adminCardStatusForm">
