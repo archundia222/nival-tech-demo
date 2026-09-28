@@ -15,7 +15,7 @@ export type PaymentPageViewProfile = {
 };
 
 type InlineEditor = {
-  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; trialMode?: boolean;
+  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; trialMode?: boolean; demo?: boolean;
   onHolder: (value: string) => void; onBank: (value: string) => void; onClabe: (value: string) => void;
   onConcept: (value: string) => void; onPaymentUrl: (value: string) => void;
 };
@@ -36,7 +36,7 @@ export function PaymentPageView({ profile, embedded = false, trackingToken, edit
       {!editor && profile.payment_url_visible && profile.payment_url && <a className={styles.directPay} href={profile.payment_url} target="_blank" rel="noreferrer"><span>Pagar con enlace</span><b>↗</b></a>}
       <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
-      <p className={styles.copyHint}>{editor ? '✎ Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
+      <p className={styles.copyHint}>{editor ? editor.demo ? '✎ Toca un dato para editarlo · esta demo no guarda cambios' : '✎ Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
       <div className={styles.details}>
         {editor ? <>
           {profile.holder_visible && editField('Beneficiario', editor.holder, editor.onHolder)}
