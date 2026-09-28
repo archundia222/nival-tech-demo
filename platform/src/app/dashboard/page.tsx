@@ -207,7 +207,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
     ...(paymentProfile?.active ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
-    ...(hasPoints ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
+    
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
     ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
@@ -340,7 +340,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
             />
           </div>
         </section>
-        <section className="profileReviewSetup" id="reviews">
+        <section className="profileReviewSetup legacyProfileReviews" id="reviews">
           <div className="settingsIntro">
             <p className="eyebrow">RESEÑAS</p>
             <h2>Haz que dejar una reseña tome un toque.</h2>
