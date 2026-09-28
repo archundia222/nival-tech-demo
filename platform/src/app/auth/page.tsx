@@ -18,12 +18,12 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
       ? { label: "NIVAL INTELLIGENCE", title: "Prepara Nival para entender a tus clientes", text: "Intelligence funciona sobre Nival Puntos. Si todavía no lo tienes activo, primero te guiaremos para crear tu programa de fidelización." }
       : next.includes("/checkout") || next.includes("/dashboard/pay")
         ? { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y podrás preparar tu página de cobro, QR y enlace." }
-        : { label: "NIVAL TECH", title: "Crea tu acceso a Nival", text: "Crea tu negocio una sola vez y desde ahí activa las herramientas que necesites." };
+        : { label: "NIVAL TECH", title: "Crea tu cuenta de Nival Tech", text: "Configura tu negocio y administra Pay, Reseñas de Google y WiFi desde un solo panel." };
 
   return (
-    <main className="authShell">
+    <main className="authShell tokeAuth">
       <Link className="brand" href="/">
-        <span className="brandmark">N</span>NIVAL tech
+        <span className="tokeAuthMark">⌁</span>Nival Tech
       </Link>
       <section className="authCard">
         <p className="eyebrow">{signup ? signupContext.label : "ACCESO PARA NEGOCIOS"}</p>
@@ -31,10 +31,10 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <p className="authIntro">
           {signup
             ? signupContext.text
-            : "Administra Nival Pay, Nival Puntos y Nival Growth desde la misma cuenta."}
+            : "Entra al panel de Nival Tech para administrar los accesos de tu negocio."}
         </p>
         {signup && <>
-          <div className="authPromise"><strong>No necesitas tarjeta bancaria para crear tu cuenta.</strong><span>Pay puede quedarse gratis. Puntos empieza con prueba Pro y después puede seguir en Free; Growth se construye sobre Puntos.</span></div>
+
           <div className="authPath"><span><b>1</b> Crea tu acceso</span><span><b>2</b> Confirma tu correo</span><span><b>3</b> Configura tu negocio</span></div>
         </>}
         {params.error && <div className="formMessage errorMessage">{params.error}</div>}

@@ -15,7 +15,7 @@ export type PaymentPageViewProfile = {
 };
 
 type InlineEditor = {
-  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; trialMode?: boolean;
+  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; trialMode?: boolean; demo?: boolean;
   onHolder: (value: string) => void; onBank: (value: string) => void; onClabe: (value: string) => void;
   onConcept: (value: string) => void; onPaymentUrl: (value: string) => void;
 };
@@ -36,7 +36,7 @@ export function PaymentPageView({ profile, embedded = false, trackingToken, edit
       {!editor && profile.payment_url_visible && profile.payment_url && <a className={styles.directPay} href={profile.payment_url} target="_blank" rel="noreferrer"><span>Pagar con enlace</span><b>↗</b></a>}
       <div className={styles.paymentSteps}><span><b>1</b> Copia la CLABE</span><span><b>2</b> Abre tu banco</span><span><b>3</b> Pega y verifica</span></div>
       <p className={styles.helpText}>Antes de transferir, confirma que el beneficiario coincida con el nombre mostrado arriba.</p>
-      <p className={styles.copyHint}>{editor ? '✎ Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
+      <p className={styles.copyHint}>{editor ? editor.demo ? '✎ Toca un dato para editarlo · esta demo no guarda cambios' : '✎ Toca un dato para editarlo · se guarda automáticamente' : 'Toca cualquier dato para copiarlo'}</p>
       <div className={styles.details}>
         {editor ? <>
           {profile.holder_visible && editField('Beneficiario', editor.holder, editor.onHolder)}
@@ -52,7 +52,6 @@ export function PaymentPageView({ profile, embedded = false, trackingToken, edit
         </>}
         {publicSections.map((section) => { const label = section.title.trim() || "Información"; const value = section.content.trim(); const isHttpsLink = /^https:\/\//i.test(value); return isHttpsLink ? <a key={section.id} className={styles.customSectionLink} href={value} target="_blank" rel="noreferrer"><span><small>{label}</small><strong>Abrir enlace</strong></span><b aria-hidden="true">↗</b></a> : <CopyField key={section.id} label={label} value={value} variant="detail" />; })}
       </div>
-      {!embedded && profile.business_slug && <div className={styles.cardExtras}><div className={styles.extrasHeading}><span>CONTINÚA CON {profile.business_name.toUpperCase()}</span><small>Accesos útiles del negocio</small></div>{profile.points_enabled && <Link className={`${styles.serviceAction} ${styles.loyaltyAction}`} href={`/b/${profile.business_slug}`}><span className={styles.serviceIcon} aria-hidden="true">★</span><span className={styles.serviceCopy}><small>NIVAL PUNTOS</small><strong>Tus puntos y recompensas</strong><em>Guarda tu tarjeta digital y revisa tu avance.</em></span><b aria-hidden="true">→</b></Link>}<Link className={styles.serviceAction} href={`/p/${profile.business_slug}`}><span className={styles.serviceIcon} aria-hidden="true">+</span><span className={styles.serviceCopy}><small>MÁS DEL NEGOCIO</small><strong>Contacto y otros accesos</strong><em>Información, enlaces y formas de contactar.</em></span><b aria-hidden="true">→</b></Link></div>}
     </section>
     {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech"><div><span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span><strong>Tu negocio también puede cobrar así.</strong><p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p></div><Link href="/?from=nival-pay">Conocer Nival Tech <b>→</b></Link></aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <Link href="/?from=nival-pay">Nival Tech</Link>}</footer>

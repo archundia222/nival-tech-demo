@@ -1,3 +1,4 @@
+import './v2-dashboard.css';
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
@@ -15,7 +16,7 @@ interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
 }
 
-type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "configuracion";
+type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "perfil-compartir" | "analiticas" | "configuracion";
 
 interface TeamMember {
   member_email: string;
@@ -35,7 +36,7 @@ interface IntelligenceRecommendation {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
-  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "configuracion"];
+  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "perfil-compartir", "analiticas", "configuracion"];
   const currentSection: DashboardSection = dashboardSections.includes(params.section as DashboardSection)
     ? params.section as DashboardSection
     : "resumen";
@@ -44,7 +45,9 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     inteligencia: "Nival Growth",
     clientes: "Clientes",
     "nival-card": "Enlaces y reseñas",
-    "perfil-digital": "Configuración de tu negocio",
+    "perfil-digital": "Editar landing page",
+    "perfil-compartir": "Compartir landing page",
+    analiticas: "Analíticas",
     configuracion: "Configuración de tu perfil público",
   };
   const supabase = await createClient();
@@ -76,7 +79,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   if (membership.role === 'staff' && currentSection !== 'resumen') redirect('/dashboard');
   if (currentSection === "inteligencia") redirect('/dashboard/intelligence');
   if (currentSection === "clientes") redirect('/dashboard/points?view=customers');
-  if (currentSection === "nival-card") redirect('/dashboard?section=perfil-digital#reviews');
+  if (currentSection === "nival-card") redirect('/dashboard?section=perfil-digital');
+  if (currentSection === "configuracion") redirect('/dashboard?section=perfil-digital');
   // Keep the legacy render union wide below while old sections remain in this file.
   // The redirects above make these branches unreachable at runtime.
   const legacySection = currentSection as DashboardSection;
@@ -85,7 +89,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const publicOrigin = (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled")
+    .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled, nival_pay_trial_started_at")
     .eq("id", businessId)
     .maybeSingle();
   if (!business) throw new Error("No se pudo cargar el negocio.");
@@ -166,6 +170,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
   const hasNivalPay = paidNivalPay || freeNivalPay;
   const workspaceActive = hasNivalPay || hasReviews || hasPoints || business?.subscription_status === 'active';
+  const trialEndsAt = business.nival_pay_trial_started_at ? new Date(business.nival_pay_trial_started_at).getTime() + 15 * 86400000 : null;
+  const payTrialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86400000)) : null;
+  const payStatusLabel = paidNivalPay ? 'Pay activo' : freeNivalPay && payTrialDaysLeft !== null
+    ? payTrialDaysLeft > 0 ? `Prueba Pay · ${payTrialDaysLeft} días` : 'Prueba Pay en pausa'
+    : workspaceActive ? 'Productos activos' : 'Configuración pendiente';
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -200,7 +209,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const reviewLink = smartLinks?.find((link) => link.kind === "google_review" && link.active);
   const profilePreviewActions: ProfileActionItem[] = business?.slug ? [
     ...(paymentProfile?.active ? [{ key: `payment-${paymentProfile.public_token}`, label: "Pagar", description: "Ver datos para transferir", href: `/pay/${paymentProfile.public_token}`, icon: "＄", featured: true }] : []),
-    ...(hasPoints ? [{ key: "loyalty", label: "Mis puntos", description: "Ver puntos y recompensas", href: `/b/${business.slug}`, icon: "★" }] : []),
+
     ...(business.phone ? [{ key: "contact", label: "Llamar", description: "Contactar al negocio", href: `tel:${business.phone}`, icon: "☎" }] : []),
     ...(reviewLink ? [{ key: "reviews", label: "Reseñas", description: "Califica tu experiencia", href: `/go/${reviewLink.public_token}`, icon: "☆", external: true }] : []),
     ...(business.website_url ? [{ key: "website", label: "Sitio web", description: "Información y servicios", href: business.website_url, icon: "↗", external: true }] : []),
@@ -214,52 +223,27 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
-  const homeNextAction = !canManageProgram
-    ? hasPoints
-      ? { eyebrow: "OPERACIÓN", title: "Registra la siguiente visita", text: "Escanea la tarjeta del cliente y Nival reconocerá si corresponde sumar visita o canjear una recompensa.", href: "/dashboard/points?view=visits", cta: "Abrir escáner" }
-      : { eyebrow: "ACCESO DE PERSONAL", title: "Todavía no hay un programa de Puntos activo", text: "El propietario o un gerente debe activar y configurar los productos del negocio. Tu cuenta de personal no puede hacer compras ni cambiar la configuración.", href: "/support", cta: "Ver ayuda" }
-    : !hasNivalPay
-    ? { eyebrow: "EMPIEZA GRATIS", title: "Crea tu primera Nival Pay", text: "Publica un QR y enlace de cobro sin pagar. Si después quieres NFC física y más herramientas, activas la versión completa sin cambiar tu QR.", href: "/dashboard/pay", cta: "Crear Nival Pay Gratis" }
-    : !payReady
-      ? { eyebrow: "TE FALTA UN PASO", title: "Termina tu página de cobro", text: "Completa beneficiario, banco y CLABE para que tu Nival Pay quede lista para compartir.", href: "/dashboard/pay", cta: "Terminar configuración" }
-      : Number(paymentProfile?.view_count ?? 0) === 0
-        ? { eyebrow: "YA ESTÁ LISTA", title: "Ahora pon tu Nival Pay frente a un cliente", text: "Comparte el link o el QR. La primera apertura te confirma que el flujo ya está funcionando fuera del panel.", href: "/dashboard/pay?view=share", cta: "Compartir mi Nival Pay" }
-        : !hasReviews
-          ? { eyebrow: "APROVECHA UNA BUENA EXPERIENCIA", title: "Haz más fácil pedir una reseña", text: "Nival Reseñas crea un acceso directo para que tu cliente llegue al enlace correcto sin tener que buscar tu negocio.", href: "/dashboard/reviews", cta: "Crear Nival Reseñas" }
-          : !hasPoints
-            ? { eyebrow: "EL SIGUIENTE PASO ES HACER QUE VUELVAN", title: "Crea un programa de puntos que el cliente entienda en segundos", text: "Nival Puntos muestra el progreso y la recompensa desde el celular para dar una razón visible para regresar.", href: "/dashboard/points", cta: "Conocer Nival Puntos" }
-            : Number(loyaltyCustomerCount ?? 0) === 0
-              ? { eyebrow: "TU PROGRAMA YA ESTÁ LISTO", title: "Pon el QR de Puntos frente a tu primer cliente", text: "El cliente se registra solo y tú empiezas a construir actividad real de visitas.", href: "/dashboard/points?view=share", cta: "Compartir QR de Puntos" }
-              : Number(visitCount ?? 0) === 0
-                ? { eyebrow: "YA TIENES CLIENTES EN PUNTOS", title: "Registra la primera visita", text: "Cada visita alimenta el historial del programa y hace más útil la información para promociones futuras.", href: "/dashboard/points?view=visits", cta: "Registrar visita" }
-                : { eyebrow: "TU PROGRAMA YA ESTÁ GENERANDO INFORMACIÓN", title: "Revisa qué puedes hacer con esa actividad", text: "Nival Puntos Pro agrega más capacidad y herramientas para promociones y seguimiento.", href: "/dashboard/points?view=pro", cta: "Ver Nival Puntos Pro" };
+  const homeCards = [
+    { key: "pay", name: "Nival Pay", active: hasNivalPay, views: Number(paymentProfile?.view_count ?? 0), href: hasNivalPay ? "/dashboard/pay" : "/dashboard/pay", cta: hasNivalPay ? "Administrar" : "Probar gratis" },
+    { key: "reviews", name: "Nival Reseñas", active: hasReviews, views: Number(reviewLink?.click_count ?? 0), href: "/dashboard/reviews", cta: hasReviews ? "Administrar" : "Probar gratis" },
+    { key: "wifi", name: "Nival WiFi", active: Boolean(wifiProfile?.ssid), views: 0, href: "/dashboard/wifi", cta: wifiProfile?.ssid ? "Administrar" : "Probar gratis" },
+  ];
 
   return (
     <main className="dashboardApp">
       <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
-      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{workspaceActive ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
+      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{payStatusLabel}</span></header>
       {params.error && <div className="formMessage errorMessage dashboardMessage dashboardMessageTop">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage dashboardMessageTop">{params.message}</div>}
       {currentSection === "resumen" && <>
       <section className="dashboardHero nivalHomeHero" id="resumen">
-        <div>
-          <p className="eyebrow">TU NEGOCIO EN NIVAL</p>
-          <h1>{business?.name ?? "Tu negocio"}</h1>
-          <p>Primero deja listo lo esencial. Después usa Nival para cobrar, conseguir reseñas y hacer que tus clientes regresen.</p>
-        </div>
+        <div><p className="eyebrow">PANEL DEL NEGOCIO</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Consulta las aperturas de tus productos y entra directamente a administrar cada Nival Card.</p></div>
       </section>
-      {canManageProgram && <BusinessHealthCard items={businessHealthItems} />}
-      <section className="nivalTodayCard">
-        <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
-        <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
+      <section className="nivalProductOverview">
+        {homeCards.map((item) => item.active ? <article key={item.key} className="nivalProductMetric"><span>{item.name}</span><strong>{item.views}</strong><small>aperturas del enlace</small><a href={item.href}>{item.cta} →</a></article> : <article key={item.key} className="nivalProductMetric trial"><span>{item.name}</span><strong>—</strong><small>Todavía no tienes este producto.</small><a href={item.href}>Probar gratis →</a></article>)}
       </section>
-      {canManageProgram && <>
-      <section className="nivalSignals">
-        <div><span>Vistas de Nival Pay</span><strong>{paymentProfile ? Number(paymentProfile.view_count) : 0}</strong><small>personas abrieron tu página de cobro</small></div>
-        <div><span>{hasPoints ? "Clientes en Puntos" : "Clientes registrados"}</span><strong>{hasPoints ? (loyaltyCustomerCount ?? 0) : (customerCount ?? 0)}</strong><small>{hasPoints ? "personas inscritas al programa" : "en la base del negocio"}</small></div>
-        <div><span>Visitas registradas</span><strong>{visitCount ?? 0}</strong><small>actividad que puede alimentar decisiones</small></div>
-      </section></>}
+      <section className="nivalLandingIncluded"><div><span>INCLUIDA CON CUALQUIER PRODUCTO</span><h2>Landing page de tu negocio</h2><p>Al comprar cualquier Nival Card tienes una landing page para presentar tu negocio y compartir tus accesos desde un solo lugar.</p></div><div><a href="/dashboard?section=perfil-digital">Editar landing</a>{business?.slug && <a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Compartir ↗</a>}</div></section>
       </>}
       {legacySection === "inteligencia" && <>
       {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">NIVAL INTELLIGENCE</p><h1>Configura tu programa de lealtad</h1><p>Tu nivel Intelligence está activo, pero todavía necesitas un programa de lealtad activo para comenzar a registrar clientes, visitas, puntos y generar inteligencia con datos reales.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <>
@@ -328,165 +312,12 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />)}</div>
       </section>}
       </>}
-      {currentSection === "perfil-digital" && business?.slug && <>
-        <section className="profileDigitalWorkspace">
-          <header className="profileDigitalHeading"><p className="eyebrow">CONFIGURACIÓN DE TU NEGOCIO</p><h1>Edita la landing pública de tu negocio.</h1><p>Esta es la página que sí ven tus clientes. Aquí decides cómo se presenta tu negocio y qué accesos aparecen: pagar, ver puntos, contactarte, dejar reseñas y abrir otros enlaces.</p></header>
-          <div className="profileDashboardGrid">
-            <div className="profileDashboardPreview">
-              <ProfilePublicView
-                businessName={business.name}
-                slug={business.slug}
-                description={business.description}
-                logoUrl={business.logo_url}
-                brandColor={business.brand_color}
-                actions={profilePreviewActions}
-                verifiedLabel="PERFIL DEL NEGOCIO"
-                embedded
-                showQuickActions={false}
-                showFooter={false}
-              />
-              <div className="profileDashboardFooter"><span>Vista previa del perfil público</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver perfil completo ↗</a></div>
-            </div>
-            <BusinessQr
-              businessName={business.name}
-              url={`${publicOrigin}/p/${business.slug}`}
-              qrId="business-digital-profile-qr"
-              eyebrow="COMPARTE TU NEGOCIO"
-              title="Un enlace para todo"
-              description="Copia el enlace, compártelo por WhatsApp o descarga el QR para mostrador, redes e impresos."
-              fileSuffix="perfil-digital"
-            />
-          </div>
-        </section>
-        <section className="profileReviewSetup" id="reviews">
-          <div className="settingsIntro">
-            <p className="eyebrow">RESEÑAS</p>
-            <h2>Haz que dejar una reseña tome un toque.</h2>
-            <p>Guarda aquí el enlace de reseñas de tu negocio. Nival crea un destino estable para tu perfil, QR y tarjetas NFC; si cambias el enlace más adelante, no necesitas reimprimir la tarjeta.</p>
-            {reviewLink ? <div className="reviewStatus"><span>ACTIVO</span><strong>{reviewLink.name}</strong><small>{Number(reviewLink.click_count ?? 0)} aperturas registradas</small></div> : <div className="reviewStatus pending"><span>PENDIENTE</span><strong>Aún no conectas reseñas</strong><small>Agrega el enlace que Google u otra plataforma te da para recibir opiniones.</small></div>}
-          </div>
-          {canManageProgram ? <form action={createSmartLink} className="settingsForm">
-            <input type="hidden" name="returnTo" value="/dashboard?section=perfil-digital" />
-            <input type="hidden" name="linkKind" value="google_review" />
-            <input type="hidden" name="linkName" value="Reseñas del negocio" />
-            <label>Enlace de reseñas<input name="targetUrl" type="url" required defaultValue={reviewLink?.target_url ?? ""} placeholder="https://..." /></label>
-            <button className="primaryButton" type="submit">{reviewLink ? "Actualizar enlace de reseñas" : "Conectar reseñas"}</button>
-          </form> : <p className="formMessage">Solo el propietario o un gerente puede cambiar el enlace de reseñas.</p>}
-        </section>
-        {!!smartLinks?.filter((link) => link.kind !== "google_review").length && <section className="smartLinksCard profileSmartLinks">
-          <div><p className="eyebrow">OTROS ENLACES</p><h2>Accesos del negocio</h2></div>
-          <div className="smartLinksList">{smartLinks.filter((link) => link.kind !== "google_review").map((link) => <SmartLinkQr
-            key={link.id}
-            id={link.id}
-            name={link.name}
-            kind={link.kind}
-            targetUrl={link.target_url}
-            url={`${publicOrigin}/go/${link.public_token}`}
-            clicks={Number(link.click_count)}
-            active={link.active}
-            editable={canManageProgram}
-            returnTo="/dashboard?section=perfil-digital"
-          />)}</div>
-        </section>}
-      </>}
-      {currentSection === "configuracion" && <>
-      {hasIntelligence && canManageProgram && business && (
-        <section className="settingsCard teamCard">
-          <div className="settingsIntro">
-            <p className="eyebrow">EQUIPO</p>
-            <h2>Invita a quienes atienden tu negocio</h2>
-            <p>Cada persona entra con su propia cuenta. Los administradores configuran el programa; el personal registra visitas y canjes.</p>
-            <div className="teamList">
-              {(teamMembers as TeamMember[] | null)?.map((member) => <div className="teamMember" key={member.member_email}>
-                <div><strong>{member.member_name || member.member_email}</strong><span>{member.member_name ? member.member_email : "Cuenta activa"}</span></div>
-                <b>{member.member_role === "owner" ? "Propietario" : member.member_role === "manager" ? "Administrador" : "Personal"}</b>
-              </div>)}
-              {pendingInvitations?.map((invitation) => <div className="teamMember" key={invitation.id}>
-                <div><strong>{invitation.email}</strong><span>Invitación pendiente · vence {new Intl.DateTimeFormat("es-MX", { dateStyle: "medium" }).format(new Date(invitation.expires_at))}</span></div>
-                <InvitationLink url={`${publicOrigin}/invite/${invitation.token}`} />
-              </div>)}
-            </div>
-          </div>
-          <form action={createTeamInvitation} className="settingsForm">
-            <label>Correo de la persona<input name="inviteEmail" type="email" required autoComplete="email" placeholder="persona@negocio.com" /></label>
-            <label>Rol<select name="inviteRole" defaultValue="staff">
-              {membership.role === "owner" && <option value="manager">Administrador</option>}
-              <option value="staff">Personal</option>
-            </select></label>
-            <button className="primaryButton" type="submit">Crear invitación</button>
-          </form>
-        </section>
-      )}
-      {canManageProgram && business && (
-        <section className="settingsCard" id="configuracion">
-          <div className="settingsIntro">
-            <p className="eyebrow">CONFIGURACIÓN DE TU PERFIL PÚBLICO</p>
-            <h2>Decide qué ve un cliente cuando abre tu negocio en Nival</h2>
-            <p>Tu perfil público es la página que compartes con clientes. Ahí pueden encontrar tus accesos importantes —como pagar, ver puntos, contactarte o dejar una reseña— sin entrar a tu panel privado.</p>
-          </div>
-          <form action={updateBusinessProfile} className="settingsForm">
-            <label>Nombre comercial<input name="businessName" required minLength={2} maxLength={100} defaultValue={business.name} /></label>
-            <label>Descripción<textarea name="businessDescription" minLength={2} maxLength={240} defaultValue={business.description ?? ""} placeholder="Explica brevemente qué ofrece tu negocio." /></label>
-            <label>Teléfono<input name="businessPhone" type="tel" minLength={10} maxLength={18} defaultValue={business.phone ?? ""} /></label>
-            <label>Sitio web<input name="businessWebsiteUrl" type="url" defaultValue={business.website_url ?? ""} placeholder="https://..." /></label>
-            <label>Sube tu logotipo <small>JPG, PNG o WebP · máximo 4 MB</small><input name="businessLogoFile" type="file" accept="image/jpeg,image/png,image/webp" /></label>
-            <label>URL alternativa del logo <small>opcional</small><input name="businessLogoUrl" type="url" defaultValue={business.logo_url ?? ""} placeholder="https://..." /></label>
-            <label>Color de marca<span className="colorField"><input name="businessBrandColor" type="color" defaultValue={business.brand_color ?? "#b59a61"} /><code>{business.brand_color ?? "#b59a61"}</code></span></label>
-            <button className="primaryButton" type="submit">Guardar perfil</button>
-          </form>
-        </section>
-      )}
-      {hasPoints && canManageProgram && !loyaltyProgram && (
-        <section className="settingsCard">
-          <div className="settingsIntro"><p className="eyebrow">NIVAL PUNTOS</p><h2>Configura tu programa de lealtad</h2><p>Define cómo se acumulan puntos y qué recompensa recibirán tus clientes.</p></div>
-          <form action={createLoyaltyProgram} className="settingsForm">
-            <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue="Programa de lealtad" /></label>
-            <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={1} /></label>
-            <label>Meta de puntos<input name="rewardThreshold" type="number" required min={1} max={1000} step={1} defaultValue={10} /></label>
-            <label>Recompensa<textarea name="rewardDescription" required minLength={2} maxLength={160} defaultValue="Recompensa disponible" /></label>
-            <button className="primaryButton" type="submit">Activar programa de lealtad</button>
-          </form>
-        </section>
-      )}
-      {hasPoints && canManageProgram && loyaltyProgram && (
-        <section className="settingsCard">
-          <div className="settingsIntro">
-            <p className="eyebrow">PROGRAMA DE LEALTAD</p>
-            <h2>Configura cómo ganas clientes frecuentes</h2>
-            <p>Los cambios se aplican a las próximas visitas. Los puntos que tus clientes ya acumularon no se modifican.</p>
-          </div>
-          <form action={updateLoyaltyProgram} className="settingsForm">
-            <label>Nombre del programa<input name="programName" required minLength={2} maxLength={80} defaultValue={loyaltyProgram.name} /></label>
-            <label>Puntos por visita<input name="pointsPerVisit" type="number" required min={1} max={100} step={1} defaultValue={loyaltyProgram.points_per_visit} /></label>
-            <label>Meta de puntos<input name="rewardThreshold" type="number" required min={1} max={1000} step={1} defaultValue={loyaltyProgram.reward_threshold} /></label>
-            <label>Recompensa<textarea name="rewardDescription" required minLength={2} maxLength={160} defaultValue={loyaltyProgram.reward_description} /></label>
-            <button className="primaryButton" type="submit">Guardar configuración</button>
-          </form>
-        </section>
-      )}
-      </>}
-      {legacySection === "clientes" && <>
-      {!loyaltyProgram ? <section className="onboardingCard"><p className="eyebrow">CLIENTES</p><h1>Configura tu programa de lealtad</h1><p>Antes de registrar clientes, visitas y puntos, configura y activa el programa de lealtad de este workspace.</p><a className="primaryButton" href="/dashboard?section=configuracion">Ir a configuración</a></section> : <section className="customerTableCard" id="clientes">
-        <div><p className="eyebrow">CLIENTES</p><h2>Visitas y puntos</h2></div>
-        {!customers?.length ? <p className="emptyState">Aún no hay clientes registrados.</p> : (
-          <div className="customerList">{customers.map((customer) => {
-            const account = Array.isArray(customer.loyalty_accounts) ? customer.loyalty_accounts[0] : customer.loyalty_accounts;
-            const visits = customer.visits ?? [];
-            return <article key={customer.id} className="customerRow">
-              <div><strong>{customer.name}</strong><span>{customer.phone ?? customer.email}</span></div>
-              <div className="customerStats"><span>{visits.length} visitas</span><b>{account?.points_balance ?? 0} / {loyaltyProgram?.reward_threshold ?? "—"} puntos</b></div>
-              <div className="customerActions">
-                {account?.public_token && <a className="visitButton" href={`/card/${account.public_token}`}>Ver tarjeta</a>}
-                <form action={recordVisit}><input type="hidden" name="customerId" value={customer.id} /><button className="visitButton">Registrar visita</button></form>
-                {loyaltyProgram && Number(account?.points_balance ?? 0) >= loyaltyProgram.reward_threshold && (
-                  <form action={redeemReward}><input type="hidden" name="customerId" value={customer.id} /><button className="redeemButton">Canjear premio</button></form>
-                )}
-              </div>
-            </article>;
-          })}</div>
-        )}
+      {currentSection === "perfil-digital" && business?.slug && <section className="profileDigitalWorkspace landingEditOnly">
+        <header className="profileDigitalHeading"><p className="eyebrow">EDITAR LANDING PAGE</p><h1>Así se presenta tu negocio.</h1><p>Edita la información y revisa la vista previa. Para QR, enlace y opciones de envío usa «Compartir» en el menú.</p></header>
+        <div className="profileDashboardGrid landingEditorGrid"><div className="profileDashboardPreview"><ProfilePublicView businessName={business.name} slug={business.slug} description={business.description} logoUrl={business.logo_url} brandColor={business.brand_color} actions={profilePreviewActions} verifiedLabel="PERFIL DEL NEGOCIO" embedded showQuickActions={false} showFooter={false}/><div className="profileDashboardFooter"><span>Vista previa</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver landing ↗</a></div></div></div>
       </section>}
-      </>}
+      {currentSection === "perfil-compartir" && business?.slug && <section className="landingShareOnly"><header className="profileDigitalHeading"><p className="eyebrow">COMPARTIR LANDING PAGE</p><h1>Tu enlace y QR, en un solo lugar.</h1><p>Esta sección es únicamente para compartir la landing de tu negocio.</p></header><BusinessQr businessName={business.name} url={`${publicOrigin}/p/${business.slug}`} qrId="business-digital-profile-qr" eyebrow="COMPARTE TU NEGOCIO" title="Un enlace para todo" description="Copia el enlace, compártelo o descarga el QR." fileSuffix="perfil-digital"/></section>}
+      {currentSection === "analiticas" && <section className="nivalAnalyticsSection"><div className="profileDigitalHeading"><p className="eyebrow">ANALÍTICAS</p><h1>Aperturas de tus Nival Cards</h1><p>Aquí se separa la actividad por producto para que puedas ver cuántas veces se abrió cada enlace.</p></div><div className="nivalProductOverview">{homeCards.map(item=><article key={item.key} className={`nivalProductMetric ${item.active ? "" : "trial"}`}><span>{item.name}</span><strong>{item.active ? item.views : "—"}</strong><small>{item.active ? "aperturas registradas" : "Producto no activo"}</small>{!item.active && <a href={item.href}>Probar gratis →</a>}</article>)}</div></section>}
       {legacySection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
         <div>
           <p className="eyebrow">HISTORIAL DE CANJES</p>
