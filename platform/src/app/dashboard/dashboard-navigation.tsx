@@ -32,16 +32,6 @@ const wifiItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'wifi-share', label: 'Compartir / acceso WiFi', href: '/dashboard/wifi?view=share' },
 ];
 
-const pointsItems: Array<{ id: ActiveItem; label: string; href: string; group: 'usar' | 'clientes' | 'programa' }> = [
-  { id: 'puntos', label: 'Hoy', href: '/dashboard/points', group: 'usar' },
-  { id: 'puntos-visitas', label: 'Registrar visita', href: '/dashboard/points?view=visits', group: 'usar' },
-  { id: 'puntos-clientes', label: 'Clientes', href: '/dashboard/points?view=customers', group: 'clientes' },
-  { id: 'puntos-promociones', label: 'Promociones', href: '/dashboard/points?view=promotions', group: 'clientes' },
-  { id: 'puntos-compartir', label: 'Compartir programa', href: '/dashboard/points?view=share', group: 'programa' },
-  { id: 'puntos-configuracion', label: 'Configurar programa', href: '/dashboard/points?view=settings', group: 'programa' },
-  { id: 'puntos-pro', label: 'Nival Puntos Pro', href: '/dashboard/points?view=pro', group: 'programa' },
-];
-
 function NavIcon({ children }: { children: React.ReactNode }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>;
 }
@@ -55,8 +45,6 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
   const payActive = payItems.some((item) => item.id === active);
   const reviewActive = reviewItems.some((item) => item.id === active);
   const wifiActive = wifiItems.some((item) => item.id === active);
-  const pointsActive = pointsItems.some((item) => item.id === active);
-  const visiblePointsItems = canManageWorkspace ? pointsItems : pointsItems.filter((item) => item.id === 'puntos-visitas');
   const cardsActive = payActive || reviewActive || wifiActive;
   return <>
     <aside className="dashboardSidebar professionalSidebar v2Sidebar">
@@ -65,10 +53,13 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
       {workspaceChoices.length > 1 && <form action={switchActiveBusiness} className="workspaceSwitcherForm"><label className="srOnly" htmlFor="v2Business">Cambiar negocio</label><select id="v2Business" name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select><button type="submit">Cambiar</button></form>}
       <nav className="sidebarNav professionalNav" aria-label="Navegación del panel">
         {canManageWorkspace && <Link className={active==='resumen'?'sidebarMainProduct active':'sidebarMainProduct'} href="/dashboard"><NavIcon><path d="M4 19V9l8-5 8 5v10"/><path d="M8 19v-6h8v6"/></NavIcon><span>Inicio</span></Link>}
-        {canManageWorkspace && <details className={styles.productGroup} open={cardsActive}><summary className="sidebarMainProduct"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10"/></NavIcon><span>Mis tarjetas</span><i>⌄</i></summary><div className="sidebarSubmenu"><Link href="/dashboard/pay">Pay</Link><Link href="/dashboard/reviews">Reseñas</Link><Link href="/dashboard/wifi">WiFi</Link><Link href="/dashboard/pay?view=share">Compartir Pay</Link></div></details>}
-        <details className={styles.productGroup} open={pointsActive}><summary className="sidebarMainProduct"><NavIcon><circle cx="12" cy="12" r="9"/><path d="M9 12h6"/></NavIcon><span>Puntos</span><i>⌄</i></summary><div className="sidebarSubmenu">{visiblePointsItems.map(item=><Link key={item.id} href={item.href}>{item.label}</Link>)}</div></details>
-        {canManageWorkspace && <Link className="sidebarMainProduct" href="/dashboard/pay/physical"><NavIcon><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12h8"/></NavIcon><span>Pedidos</span></Link>}
-        {canManageWorkspace && <Link className="sidebarMainProduct" href="/dashboard?section=perfil-digital"><NavIcon><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/></NavIcon><span>Ajustes</span></Link>}
+        {canManageWorkspace && <><div className="sidebarSectionLabel">MI NEGOCIO</div><details className={styles.productGroup}><summary className="sidebarMainProduct"><NavIcon><path d="M4 5h16v14H4z"/><path d="M7 9h10M7 13h7"/></NavIcon><span>Landing page</span><i>⌄</i></summary><div className="sidebarSubmenu"><Link href="/dashboard?section=perfil-digital">Editar</Link><Link href="/dashboard?section=perfil-digital#share">Compartir</Link></div></details><p className="sidebarFreeNote">Incluida gratis al comprar cualquier producto.</p></>}
+        {canManageWorkspace && <div className="sidebarSectionLabel">NIVAL CARDS</div>}
+        {canManageWorkspace && <details className={styles.productGroup} open={payActive}><summary className="sidebarMainProduct"><NavIcon><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10"/></NavIcon><span>Nival Pay</span><i>⌄</i></summary><div className="sidebarSubmenu"><Link href="/dashboard/pay">Editar</Link><Link href="/dashboard/pay?view=add">Mis tarjetas Pay</Link><Link href="/dashboard/pay?view=add">Observar o agregar tarjeta</Link><Link href="/dashboard/pay?view=share">Compartir</Link></div></details>}
+        {canManageWorkspace && <details className={styles.productGroup} open={reviewActive}><summary className="sidebarMainProduct"><NavIcon><path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></NavIcon><span>Nival Reseñas</span><i>⌄</i></summary><div className="sidebarSubmenu"><Link href="/dashboard/reviews">Editar</Link><Link href="/dashboard/reviews?view=add">Mis tarjetas Reseñas</Link><Link href="/dashboard/reviews?view=add">Observar o agregar tarjeta</Link><Link href="/dashboard/reviews?view=share">Compartir</Link></div></details>}
+        {canManageWorkspace && <details className={styles.productGroup} open={wifiActive}><summary className="sidebarMainProduct"><NavIcon><path d="M5 10a11 11 0 0114 0M8 14a6 6 0 018 0M11 18a2 2 0 012 0"/></NavIcon><span>Nival WiFi</span><i>⌄</i></summary><div className="sidebarSubmenu"><Link href="/dashboard/wifi">Editar</Link><Link href="/dashboard/wifi?view=add">Mis tarjetas WiFi</Link><Link href="/dashboard/wifi?view=add">Observar o agregar tarjeta</Link><Link href="/dashboard/wifi?view=share">Compartir</Link></div></details>}
+        {canManageWorkspace && <Link className="sidebarMainProduct" href="/dashboard?section=analiticas"><NavIcon><path d="M5 19V9M12 19V5M19 19v-7"/></NavIcon><span>Analíticas</span></Link>}
+        {canManageWorkspace && <Link className="sidebarMainProduct" href="/dashboard?section=configuracion"><NavIcon><circle cx="12" cy="12" r="9"/><path d="M12 8v8"/></NavIcon><span>Ajustes</span></Link>}
       </nav>
       <div className="sidebarFooter professionalFooter"><Link href="/support">Ayuda</Link><form action={signOut}><button className="textButton" type="submit">Cerrar sesión</button></form></div>
     </aside>
@@ -77,10 +68,9 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
       <nav aria-label="Más opciones del panel">
         {workspaceChoices.length>1 && <form action={switchActiveBusiness} className="mobileWorkspaceSwitcher"><label>NEGOCIO<select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label><button type="submit">Cambiar</button></form>}
         <MobileAutoCloseLink href="/dashboard">Inicio</MobileAutoCloseLink>
-        {canManageWorkspace && <><MobileAutoCloseLink href="/dashboard/pay">Pay</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/reviews">Reseñas</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/wifi">WiFi</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/pay/physical">Pedidos</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Ajustes</MobileAutoCloseLink></>}
-        <MobileAutoCloseLink href="/dashboard/points">Puntos</MobileAutoCloseLink><form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
+        {canManageWorkspace && <><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Landing page</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/pay">Nival Pay</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/wifi">Nival WiFi</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=analiticas">Analíticas</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard?section=configuracion">Ajustes</MobileAutoCloseLink></>}<form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
-    <nav className="v2BottomNav" aria-label="Navegación principal móvil"><Link href="/dashboard">Inicio</Link>{canManageWorkspace && <Link href="/dashboard/pay">Mi tarjeta</Link>}<Link href="/dashboard/points">Puntos</Link><MobileMoreToggle/></nav>
+    <nav className="v2BottomNav" aria-label="Navegación principal móvil"><Link href="/dashboard">Inicio</Link>{canManageWorkspace && <Link href="/dashboard/pay">Pay</Link>}{canManageWorkspace && <Link href="/dashboard?section=analiticas">Analíticas</Link>}<MobileMoreToggle/></nav>
   </>;
 }
