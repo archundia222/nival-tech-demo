@@ -217,3 +217,17 @@
   @keyframes nv6MobileTap{0%,17%,100%{transform:translateX(0) rotate(-6deg)}42%,61%{transform:translateX(34px) rotate(1deg)}78%{transform:translateX(5px) rotate(-4deg)}}
 }
 @media(prefers-reduced-motion:reduce){.nv3 .nv4CardPhoto,.nv3 .nv4ShowcaseBody:after{animation:none!important}}
+
+/* Guided demo must never inherit the minimum-content width of the full Pay page. */
+@media(max-width:800px){
+  .nv3DemoPage,.nv3DemoPage .nv2Section,.nv3DemoPage .nv4Walkthrough,.nv3DemoPage .nv4DemoLayout,.nv3DemoPage .nv4DemoMain{width:100%;max-width:100%;min-width:0}
+  .nv3DemoPage .nv2Section{overflow:hidden}
+  .nv3DemoPage .nv4DemoLayout{display:block}
+  .nv3DemoPage .nv4DemoMain{overflow:hidden;padding-inline:14px}
+  .nv3DemoPage .nv4EditorGrid,.nv3DemoPage .nv4FormView{display:block;width:100%;min-width:0}
+  .nv3DemoPage .nv4DemoField,.nv3DemoPage .nv4DemoField input{display:block;width:100%;max-width:100%;min-width:0}
+  .nv3DemoPage .nv4DemoPay,.nv3DemoPage .nv4DemoPublic{width:100%;max-width:100%;min-width:0;margin-top:14px;overflow:hidden}
+  .nv3DemoPage .nv4DemoIntro,.nv3DemoPage .nv4DemoIntro h2,.nv3DemoPage .nv4DemoIntro p{width:100%;max-width:100%;min-width:0;white-space:normal;overflow-wrap:break-word}
+  .nv3DemoPage .nv4DemoIntro h2{font-size:clamp(25px,7vw,34px);line-height:1.12}
+  .nv3DemoPage .nv4DemoIntro p{font-size:15px;line-height:1.55}
+}

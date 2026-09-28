@@ -60,3 +60,8 @@
   .compactPreview .bankBadge{display:none}
   .compactPreview .clabeValue{white-space:normal;overflow-wrap:anywhere}
 }
+@media(max-width:800px){
+  .compactPreview,.compactPreview .embeddedCard,.compactPreview .profile,.compactPreview .details{width:100%;max-width:100%;min-width:0}
+  .compactPreview .brandRow{min-width:0;flex-wrap:wrap}
+  .compactPreview .profile>*{max-width:100%;min-width:0;overflow-wrap:anywhere}
+}
