@@ -160,10 +160,11 @@
 .nv3 .nv4BeforeCard{opacity:1}
 .nv3Showcase{width:min(100%,1080px)}
 .nv3 .nv4ShowcaseBody{height:auto;min-height:390px;gap:clamp(18px,4vw,52px);padding:24px clamp(18px,4vw,44px);overflow:hidden}
-.nv3 .nv4CardPhoto{flex:0 1 330px;width:min(43%,330px);max-width:330px;animation:none!important}
+.nv3 .nv4CardPhoto{flex:0 1 330px;width:min(43%,330px);max-width:330px;animation:nv5TapCard 4.8s cubic-bezier(.55,.05,.3,1) infinite!important}
 .nv3 .nv4BrandCard{font-size:clamp(18px,2.3vw,29px)}
 .nv3 .nv4PhoneActual{flex:0 0 225px;width:225px;height:350px;margin:0;transform:none}
 .nv3 .nv4ShowcaseBody:after{display:none}
+@media(prefers-reduced-motion:reduce){.nv3 .nv4CardPhoto{animation:none!important}}
 @media(max-width:800px){
   .nv3 .nv2Section{padding:52px 20px}
   .nv3 .nv2Pricing,.nv3 .nv2Points{padding:52px 20px}

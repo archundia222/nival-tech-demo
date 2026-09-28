@@ -5110,6 +5110,15 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 
 /* 2026-09-25 mobile dashboard navigation hardening */
 @media(max-width:850px){
+  .dashboardMobileMenu:not([open])>nav{display:none}
+  .dashboardMobileMenu.professionalMobileMenu{background:#f1f8f3;color:#102a21;border-color:#cfe5d5}
+  .dashboardMobileMenu.professionalMobileMenu>summary{background:#f1f8f3;color:#102a21;border-color:#cfe5d5}
+  .dashboardMobileMenu.professionalMobileMenu>summary strong{color:#375b48}
+  .dashboardMobileMenu.professionalMobileMenu .hamburgerIcon i{background:#176541}
+  .dashboardMobileMenu.professionalMobileMenu>nav{background:#f1f8f3}
+  .dashboardMobileMenu.professionalMobileMenu>nav>a{color:#173c2c;border-color:#cfe5d5}
+  .dashboardMobileMenu.professionalMobileMenu .mobileSignOut{background:#f1f8f3}
+  .dashboardMobileMenu.professionalMobileMenu .mobileSignOut button{background:#fff;color:#173c2c;border-color:#cfe5d5}
   .professionalMobileMenu{position:sticky;top:0;z-index:80}
   .professionalMobileMenu[open]{max-height:100dvh;overflow:auto;overscroll-behavior:contain}
   .professionalMobileMenu>summary{position:sticky;top:0;z-index:2;background:#090a0c;border-bottom:1px solid #25272b}
@@ -5128,6 +5137,12 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 }
 
 .nivalPayDeleteSection{justify-self:start;margin-top:2px;padding:8px 0;border:0;background:transparent;color:#d7a6a2;font-size:11px;font-weight:800;cursor:pointer}
+
+@media(max-width:850px){
+  .dashboardMobileMenu.professionalMobileMenu>summary{background:#f1f8f3;color:#102a21;border-color:#cfe5d5}
+  .dashboardMobileMenu.professionalMobileMenu .mobileSignOut{background:#f1f8f3}
+  .dashboardMobileMenu.professionalMobileMenu .mobileSignOut button{background:#fff;color:#173c2c;border-color:#cfe5d5}
+}
 .nivalPayDeleteSection:hover{color:#ffd0cc;text-decoration:underline}
 .nivalPayDeleteSection:focus-visible{outline:3px solid #d8b868;outline-offset:3px;border-radius:6px}
 .nivalPaySaveStatus.isPending{border-color:rgba(216,184,104,.35);background:rgba(216,184,104,.08);color:#e1c57f}
