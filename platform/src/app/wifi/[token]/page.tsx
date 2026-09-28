@@ -13,6 +13,7 @@ export default async function GuestWifiPage({ params }: { params: Promise<{ toke
   const { data: order } = await admin.from('product_orders').select('id').eq('business_id', data.business_id).in('product_code', ['nival_wifi','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle();
   // eslint-disable-next-line react-hooks/purity -- A server request checks access against its current timestamp.
   if (!order && (!data.trial_started_at || Date.now() - new Date(data.trial_started_at).getTime() >= 15 * 86400000)) notFound();
+  await admin.rpc('increment_nival_card_view', { p_kind: 'wifi', p_token: token });
   const business = Array.isArray(data.businesses) ? data.businesses[0] : data.businesses;
   const name = business?.name ?? 'Este negocio';
   const url = `${(process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '')}/wifi/${token}`;

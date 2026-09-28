@@ -1,6 +1,4 @@
 import { redirect } from "next/navigation";
-import { startMercadoPagoCheckout, startNivalReviewsCheckout, startNivalWifiCheckout, startNivalCardsBundleCheckout } from "@/app/checkout/actions";
-import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
 import { PaymentStatusPoller } from "@/app/checkout/payment-status-poller";
 import { NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_CARDS_BUNDLE_PRICE_CENTS } from "@/lib/orders";
 import { reconcileLatestMercadoPagoProductOrder, cancelLatestTerminalMercadoPagoProductOrder } from "@/lib/reconcile-mercado-pago-order";
@@ -61,7 +59,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   if (!membership) {
     const requestedNext = params.next ?? "";
-    const allowedProductDestinations = ["/dashboard/pay", "/dashboard/points", "/dashboard/intelligence", "/checkout"];
+    const allowedProductDestinations = ["/dashboard/pay", "/dashboard/cards/add", "/dashboard/points", "/dashboard/intelligence", "/checkout"];
     const onboardingNext = allowedProductDestinations.some((prefix) =>
       requestedNext === prefix || requestedNext.startsWith(prefix + "/") || requestedNext.startsWith(prefix + "?")
     ) ? requestedNext : "/dashboard";
@@ -153,17 +151,15 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const { data: paymentProfiles } = businessId
     ? await supabase
         .from("payment_profiles")
-        .select("account_holder, bank_name, clabe, public_token, active, view_count, created_at")
+        .select("id, display_name, account_holder, bank_name, clabe, public_token, active, view_count, created_at")
         .eq("business_id", businessId)
         .order("active", { ascending: false })
         .order("created_at", { ascending: true })
-        .limit(1)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
-  const [{ data: wifiProfile }, { data: reviewProfile }, { data: physicalCards }] = await Promise.all([
-    supabase.from("wifi_profiles").select("ssid,access_url").eq("business_id", businessId).maybeSingle(),
-    supabase.from("review_profiles").select("google_review_url").eq("business_id", businessId).maybeSingle(),
-    supabase.from("physical_card_orders").select("fulfillment_status,tracking_code,delivery_method,requested_delivery_date").eq("business_id", businessId).order("created_at", { ascending: false }).limit(1),
+  const [{ data: wifiProfile }, { data: reviewProfile }] = await Promise.all([
+    supabase.from("wifi_profiles").select("ssid,access_url,public_token,trial_started_at,view_count").eq("business_id", businessId).maybeSingle(),
+    supabase.from("review_profiles").select("google_review_url,public_token,active,trial_started_at,view_count").eq("business_id", businessId).maybeSingle(),
   ]);
   const { data: paidNivalPayOrder } = businessId
     ? await supabase
@@ -236,25 +232,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
-  const purchasedCard = paidNivalPay || paidReviews || paidWifi;
-  const missingConfiguration = paidNivalPay && !payReady ? { name: 'Pay', href: '/dashboard/pay' }
-    : paidReviews && !reviewProfile?.google_review_url ? { name: 'Reseñas', href: '/dashboard/reviews' }
-    : paidWifi && !wifiProfile?.access_url ? { name: 'WiFi', href: '/dashboard/wifi' }
-    : null;
-  const configuredCard = purchasedCard && !missingConfiguration;
-  const latestCard = physicalCards?.[0];
-  const cardStatus: Record<string, string> = { new: 'Pedido recibido', confirmed: 'Diseño confirmado', producing: 'En producción', ready: 'Lista para entregar', shipped: 'En camino', delivered: 'Entregada', cancelled: 'Pedido cancelado' };
-  const nextAction = !purchasedCard
-    ? { title: 'Elige tu primera Nival Card', description: 'Puedes explorar la prueba gratis y comprar cuando estés listo.', href: '#comprar', label: 'Ver productos' }
-    : !configuredCard
-      ? { title: `Configura Nival ${missingConfiguration?.name ?? 'Card'}`, description: 'Agrega el enlace o los datos que abrirán tus clientes.', href: missingConfiguration?.href ?? '/dashboard', label: 'Configurar ahora' }
-      : !latestCard || latestCard.fulfillment_status === 'cancelled'
-        ? { title: 'Solicita tu tarjeta NFC incluida', description: 'Elige su diseño y deja los datos para coordinar la entrega.', href: '/dashboard/pay/physical', label: 'Diseñar mi tarjeta' }
-        : { title: cardStatus[latestCard.fulfillment_status] ?? 'Tarjeta en proceso', description: latestCard.tracking_code ? `Seguimiento: ${latestCard.tracking_code}` : 'Consulta el diseño y la entrega de tu tarjeta.', href: '/dashboard/pay/physical', label: 'Ver mi pedido' };
-  const homeCards = [
-    { key: "pay", name: "Nival Pay", active: hasNivalPay, views: Number(paymentProfile?.view_count ?? 0), href: hasNivalPay ? "/dashboard/pay" : "/dashboard/pay", cta: hasNivalPay ? "Administrar" : "Probar gratis" },
-    { key: "reviews", name: "Nival Reseñas", active: hasReviews, views: Number(reviewLink?.click_count ?? 0), href: "/dashboard/reviews", cta: hasReviews ? "Administrar" : "Probar gratis" },
-    { key: "wifi", name: "Nival WiFi", active: Boolean(wifiProfile?.ssid), views: 0, href: "/dashboard/wifi", cta: wifiProfile?.ssid ? "Administrar" : "Probar gratis" },
+  const remainingTrialDays = (startedAt: string | null | undefined) => startedAt
+    ? Math.max(0, 15 - Math.floor((Date.now() - new Date(startedAt).getTime()) / 86400000)) : 0;
+  const reviewsTrialDays = freeReviews ? remainingTrialDays(reviewProfile?.trial_started_at) : 0;
+  const wifiTrialDays = !paidWifi ? remainingTrialDays(wifiProfile?.trial_started_at) : 0;
+  const payTrialDays = freeNivalPay ? remainingTrialDays(business.nival_pay_trial_started_at) : 0;
+  const productSummary = [
+    { key: 'pay', name: 'Nival Pay', paid: paidNivalPay, trialDays: payTrialDays, trialStarted: freeNivalPay, href: '/dashboard/pay' },
+    { key: 'reviews', name: 'Nival Reseñas', paid: paidReviews, trialDays: reviewsTrialDays, trialStarted: freeReviews, href: '/dashboard/reviews' },
+    { key: 'wifi', name: 'Nival WiFi', paid: paidWifi, trialDays: wifiTrialDays, trialStarted: Boolean(wifiProfile?.trial_started_at), href: '/dashboard/wifi' },
+  ];
+  const activeCards = [
+    ...(paidNivalPay || payTrialDays > 0 ? (paymentProfiles ?? []).filter((profile) => profile.active).map((profile, index) => ({ key: `pay-${profile.id}`, name: profile.display_name || `Nival Pay ${index + 1}`, kind: 'Pay', views: Number(profile.view_count ?? 0), href: `/dashboard/pay?profile=${profile.id}` })) : []),
+    ...(paidReviews || reviewsTrialDays > 0 ? reviewProfile?.active && reviewProfile.google_review_url ? [{ key: 'reviews', name: 'Nival Reseñas', kind: 'Reseñas', views: Number(reviewProfile.view_count ?? 0), href: '/dashboard/reviews' }] : [] : []),
+    ...(paidWifi || wifiTrialDays > 0 ? wifiProfile?.access_url ? [{ key: 'wifi', name: 'Nival WiFi', kind: 'WiFi', views: Number(wifiProfile.view_count ?? 0), href: '/dashboard/wifi' }] : [] : []),
   ];
 
   return (
@@ -268,33 +259,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <section className="dashboardHero nivalHomeHero" id="resumen">
         <div><p className="eyebrow">PANEL DEL NEGOCIO</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Consulta las aperturas de tus productos y entra directamente a administrar cada Nival Card.</p></div>
       </section>
-      {canManageProgram && <section className="nivalJourney" aria-labelledby="nivalJourneyTitle">
-        <div className="nivalJourneyIntro"><span>TU CAMINO EN NIVAL TECH</span><h2 id="nivalJourneyTitle">Todo en orden, paso a paso.</h2><p>Compra, configura tu enlace y prepara la tarjeta física desde el mismo panel.</p></div>
-        <ol className="nivalJourneySteps">
-          <li className={purchasedCard ? 'done' : 'current'}><span>1</span><div><strong>Elegir y comprar</strong><small>{purchasedCard ? 'Compra confirmada' : 'Pay, Reseñas, WiFi o paquete'}</small></div></li>
-          <li className={configuredCard ? 'done' : purchasedCard ? 'current' : ''}><span>2</span><div><strong>Configurar</strong><small>{configuredCard ? 'Acceso preparado' : 'Datos o enlace de tu negocio'}</small></div></li>
-          <li className={latestCard && latestCard.fulfillment_status !== 'cancelled' ? 'done' : configuredCard ? 'current' : ''}><span>3</span><div><strong>Diseñar tarjeta</strong><small>{latestCard && latestCard.fulfillment_status !== 'cancelled' ? 'Solicitud registrada' : 'Una incluida con tu compra'}</small></div></li>
-          <li className={latestCard?.fulfillment_status === 'delivered' ? 'done' : latestCard ? 'current' : ''}><span>4</span><div><strong>Entrega</strong><small>{latestCard ? cardStatus[latestCard.fulfillment_status] ?? 'En seguimiento' : 'Sigue el estado del pedido'}</small></div></li>
-        </ol>
-        <div className="nivalJourneyNext"><div><span>SIGUIENTE PASO</span><strong>{nextAction.title}</strong><p>{nextAction.description}</p></div><a href={nextAction.href}>{nextAction.label} <span aria-hidden="true">→</span></a></div>
-      </section>}
-      <section className="nivalProductOverview">
-        {homeCards.map((item) => item.active ? <article key={item.key} className="nivalProductMetric"><span>{item.name}</span><strong>{item.views}</strong><small>aperturas del enlace</small><a href={item.href}>{item.cta} →</a></article> : <article key={item.key} className="nivalProductMetric trial"><span>{item.name}</span><strong>—</strong><small>Todavía no tienes este producto.</small><a href={item.href}>Probar gratis →</a></article>)}
+      {params.result === 'success' && !paidBundle && <p className="formMessage nivalHomeNotice" role="status">Estamos confirmando el pago del paquete. No necesitas volver a comprar.<PaymentStatusPoller active /></p>}
+      {params.result === 'pending' && <p className="formMessage nivalHomeNotice" role="status">El pago del paquete sigue pendiente de aprobación.</p>}
+      {params.result === 'failure' && <p className="formMessage errorMessage nivalHomeNotice" role="alert">El pago no se completó. Revisa el pedido en Agregar Nival Card.</p>}
+      <section className="nivalHomeSection" aria-labelledby="nivalProductsTitle">
+        <div className="nivalHomeSectionHead"><div><span>TUS PRODUCTOS</span><h2 id="nivalProductsTitle">Lo que tienes en Nival Tech</h2><p>Consulta el estado de cada producto y cuánto dura su prueba.</p></div></div>
+        <div className="nivalProductStatusGrid">{productSummary.map((item) => {
+          const status = item.paid ? 'Pro activo' : item.trialDays > 0 ? `Prueba gratis · ${item.trialDays} ${item.trialDays === 1 ? 'día' : 'días'} restantes` : item.trialStarted ? 'Prueba terminada' : 'Inactivo';
+          return <article key={item.key} className="nivalProductStatus"><div className="nivalProductStatusTop"><span>{item.name}</span><b className={item.paid || item.trialDays > 0 ? 'active' : 'inactive'}>{status}</b></div><p>{item.paid ? 'Tu acceso Pro está disponible.' : item.trialDays > 0 ? 'Tu enlace y QR funcionan durante la prueba.' : item.trialStarted ? 'La prueba terminó; el acceso público está pausado.' : 'Todavía no has activado este producto.'}</p><a href={item.href}>Ver producto <span aria-hidden="true">→</span></a></article>;
+        })}</div>
       </section>
-      {canManageProgram && <section className="nivalShop" id="comprar" aria-labelledby="nivalShopHeading">
-        <div className="nivalShopHeading"><span>ELIGE CUANDO ESTÉS LISTO</span><h2 id="nivalShopHeading">Activa tus productos</h2><p>Tu cuenta es gratis. Compra cada acceso por separado o los tres en un paquete. Pago único con Mercado Pago.</p></div>
-        {params.result === 'success' && !paidBundle && <><p className="formMessage">Estamos confirmando el pago del paquete. No vuelvas a pagar.</p><PaymentStatusPoller active /></>}
-        {params.result === 'pending' && <p className="formMessage">Tu pago está pendiente de aprobación en Mercado Pago.</p>}
-        {params.result === 'failure' && <p className="formMessage errorMessage">El pago no se completó. Puedes intentarlo de nuevo.</p>}
-        <div className="nivalShopGrid">
-          {[
-            { key:'pay', title:'Nival Pay', price:'$199', detail:'Página de cobro, QR y tarjeta NFC', active:paidNivalPay, action:startMercadoPagoCheckout, href:'/dashboard/pay' },
-            { key:'reviews', title:'Nival Reseñas', price:'$99', detail:'Reseñas de Google, QR y tarjeta NFC', active:paidReviews, action:startNivalReviewsCheckout, href:'/dashboard/reviews' },
-            { key:'wifi', title:'Nival WiFi', price:'$99', detail:'Acceso WiFi, QR y tarjeta NFC', active:paidWifi, action:startNivalWifiCheckout, href:'/dashboard/wifi' },
-            { key:'bundle', title:'Paquete completo', price:'$199', detail:'Pay + Reseñas + WiFi y una tarjeta NFC', active:paidBundle, action:startNivalCardsBundleCheckout, href:'/dashboard/pay' },
-          ].map((item)=><article className={item.key==='bundle'?'nivalShopCard featured':'nivalShopCard'} key={item.key}><span>{item.key==='bundle'?'TRES ACCESOS':'UN ACCESO'}</span><h3>{item.title}</h3><p>{item.detail}</p><strong>{item.price} <small>MXN · pago único</small></strong>{item.active?<a className="nivalShopOwned" href={item.href}>Activo · Administrar →</a>:<form action={item.action}><CheckoutSubmitButton className="nivalShopBuy" pendingLabel="Abriendo Mercado Pago…">Comprar {item.key==='bundle'?'paquete':item.title} →</CheckoutSubmitButton></form>}</article>)}
-        </div>
-      </section>}
+      <section className="nivalHomeSection" aria-labelledby="nivalCardsTitle">
+        <div className="nivalHomeSectionHead"><div><span>NIVAL CARDS</span><h2 id="nivalCardsTitle">Tus tarjetas activas <small>{activeCards.length}</small></h2><p>Accesos configurados que tus clientes pueden abrir ahora.</p></div>{canManageProgram && <a className="nivalCardsAddLink" href="/dashboard/cards/add"><span aria-hidden="true">＋</span> Agregar Nival Card</a>}</div>
+        {activeCards.length ? <div className="nivalActiveCards">{activeCards.map((card) => <article className="nivalActiveCard" key={card.key}><span>{card.kind}</span><strong>{card.name}</strong><div><b>{card.views}</b><small>{card.views === 1 ? 'apertura' : 'aperturas'}</small></div><a href={card.href}>Administrar tarjeta <span aria-hidden="true">→</span></a></article>)}</div> : <div className="nivalCardsEmpty"><span aria-hidden="true">▣</span><strong>Aún no hay Nival Cards activas.</strong><p>Cuando configures un acceso aparecerá aquí con sus aperturas.</p></div>}
+      </section>
       <section className="nivalLandingIncluded"><div><span>INCLUIDA CON CUALQUIER PRODUCTO</span><h2>Landing page de tu negocio</h2><p>Al comprar cualquier Nival Card tienes una landing page para presentar tu negocio y compartir tus accesos desde un solo lugar.</p></div><div><a href="/dashboard?section=perfil-digital">Editar landing</a>{business?.slug && <a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Compartir ↗</a>}</div></section>
       </>}
       {legacySection === "inteligencia" && <>

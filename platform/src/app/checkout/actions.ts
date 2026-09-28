@@ -325,7 +325,7 @@ export async function startNivalCardsBundleCheckout() {
     productCode: NIVAL_CARDS_BUNDLE_PRODUCT,
     amountCents: NIVAL_CARDS_BUNDLE_PRICE_CENTS,
     description: 'Nival Completa · Pay + Reseñas + WiFi · tarjeta NFC',
-    returnPath: '/dashboard',
+    returnPath: '/dashboard/cards/add',
   });
 }
 
