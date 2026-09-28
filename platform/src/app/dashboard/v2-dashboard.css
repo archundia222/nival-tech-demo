@@ -19,3 +19,30 @@
 .nivalAnalyticsSection{border:1px solid var(--tokeLine);border-radius:22px;padding:28px}.nivalAnalyticsSection .nivalProductOverview{margin-bottom:0}
 .dashboardApp .nivalTodayCard,.dashboardApp .businessHealthCard,.dashboardApp .nivalSignals{background:#fff!important;color:#102a21!important;border-color:var(--tokeLine)!important}
 @media(max-width:900px){.nivalProductOverview{grid-template-columns:1fr}.nivalLandingIncluded{align-items:flex-start;flex-direction:column}.nivalAnalyticsSection{padding:18px}}
+
+
+/* Dashboard visual reset — Toke/Nival Cards only */
+.dashboardApp{background:#f6faf6!important}
+.dashboardContent{background:#f6faf6!important}
+.dashboardApp .dashboardContentTopbar{background:rgba(255,255,255,.94)!important;border:1px solid #d8e9dc!important;border-radius:16px!important;margin:18px 22px 0!important;padding:15px 18px!important;box-shadow:0 8px 28px #143b2b0a!important}
+.dashboardApp .ready{background:#e3f3e8!important;color:#176541!important;border:1px solid #c7e2cf!important}
+.dashboardApp .eyebrow{color:#18784c!important}
+.dashboardApp .payHeading{padding:30px 26px 18px!important}.dashboardApp .payHeading h1{color:#102a21!important}.dashboardApp .payHeading p,.dashboardApp .payHeading small{color:#5b7166!important}
+.dashboardApp .nvPrimaryLink,.dashboardApp .nvPrimaryButton,.dashboardApp .primaryButton{background:#18784c!important;color:#fff!important;border-color:#18784c!important;box-shadow:none!important}
+.dashboardApp .nvSecondaryButton{background:#fff!important;color:#176541!important;border:1px solid #a9cdb4!important}
+.dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalAddProduct,.dashboardApp .sharePageItem,.dashboardApp .reviewsWorkspace,.dashboardApp .reviewsIntro,.dashboardApp .settingsCard{background:#fff!important;color:#102a21!important;border:1px solid #d8e9dc!important;box-shadow:0 12px 35px #123b2a0a!important}
+.dashboardApp .nivalPhysicalCard{background:linear-gradient(145deg,#1d8a59,#125f3d)!important;color:#fff!important;border-color:#5db886!important}
+.dashboardApp .nivalCardMark{background:#fff!important;color:#18784c!important}
+.dashboardApp .reviewsSetup,.dashboardApp .reviewsPreview{background:#fff!important;color:#102a21!important;border-color:#d8e9dc!important}
+.dashboardApp input,.dashboardApp textarea,.dashboardApp select{background:#fff!important;color:#102a21!important;border-color:#bfd8c6!important}
+.dashboardApp input:focus,.dashboardApp textarea:focus,.dashboardApp select:focus{outline:2px solid #18784c33!important;border-color:#18784c!important}
+.dashboardApp .legacyProfileReviews{display:none!important}
+.dashboardApp .profileDigitalWorkspace{background:#fff!important;border:1px solid #d8e9dc!important;border-radius:22px!important;padding:26px!important;margin-top:22px!important}
+.dashboardApp .profileDashboardPreview{overflow:hidden!important;border-radius:20px!important;border:1px solid #d8e9dc!important}
+.dashboardApp .profileDashboardGrid{align-items:start!important}
+.dashboardApp .profileDashboardPreview>*{max-width:100%!important}
+.dashboardApp .nivalProductOverview{gap:16px!important}.dashboardApp .nivalProductMetric{min-height:190px;justify-content:start}.dashboardApp .nivalProductMetric strong{color:#102a21!important}.dashboardApp .nivalProductMetric a{align-self:end}
+.dashboardApp .nivalHomeHero{margin:22px 22px 0!important;border-radius:22px!important;padding:32px!important}.dashboardApp .nivalHomeHero h1{font-size:clamp(30px,4vw,48px)!important;margin:8px 0!important}.dashboardApp .nivalHomeHero p{max-width:700px!important;color:#50685c!important}
+.dashboardApp .nivalProductOverview,.dashboardApp .nivalLandingIncluded{margin-left:22px!important;margin-right:22px!important}
+.dashboardApp .nivalAnalyticsSection{margin:22px!important}
+@media(max-width:800px){.dashboardApp .dashboardContentTopbar{margin:10px 12px 0!important}.dashboardApp .nivalHomeHero{margin:12px 12px 0!important;padding:22px 18px!important}.dashboardApp .nivalProductOverview,.dashboardApp .nivalLandingIncluded{margin-left:12px!important;margin-right:12px!important}.dashboardApp .profileDigitalWorkspace{padding:14px!important;margin:12px!important}.dashboardApp .profileDashboardGrid{grid-template-columns:1fr!important}.dashboardApp .nivalAnalyticsSection{margin:12px!important;padding:16px!important}.dashboardApp .payHeading{padding:24px 16px 14px!important}}
