@@ -311,3 +311,20 @@
  .dashboardApp .businessQrIconButton{width:44px!important;max-width:44px!important;height:44px!important}
  .dashboardApp .landingEditForm,.dashboardApp .nivalPayEditorPanel{padding:16px!important}
 }
+
+/* Compact, readable mobile navigation with progressive disclosure. */
+@media(max-width:850px){
+  .dashboardApp .v2MobileMenu .nvMobileHome,.dashboardApp .v2MobileMenu .nvMobileGroup>summary{display:flex!important;align-items:center!important;gap:12px!important;min-height:52px!important;padding:8px 12px!important;border:0!important;border-radius:12px!important;color:#173c2c!important;font-size:14px!important;font-weight:800!important;cursor:pointer}
+  .dashboardApp .v2MobileMenu .nvMobileGroup>summary{list-style:none!important}
+  .dashboardApp .v2MobileMenu .nvMobileGroup>summary::-webkit-details-marker{display:none}
+  .dashboardApp .v2MobileMenu .nvMobileIcon{flex:0 0 34px;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#e4f2e9;color:#176541}
+  .dashboardApp .v2MobileMenu .nvMobileIcon svg{width:19px;height:19px}
+  .dashboardApp .v2MobileMenu .nvMobileChevron{margin-left:auto;font-size:20px;font-weight:500;transition:transform .22s ease}
+  .dashboardApp .v2MobileMenu .nvMobileGroup[open] .nvMobileChevron{transform:rotate(180deg)}
+  .dashboardApp .v2MobileMenu .nvMobileGroup[open]>summary{background:#eaf5ed!important}
+  .dashboardApp .v2MobileMenu .nvMobileGroupLinks{display:grid!important;margin:0 0 4px 47px;padding:0 0 0 12px;border-left:2px solid #c7e2d0;animation:nvMobileLinksIn .22s ease both}
+  .dashboardApp .v2MobileMenu .nvMobileGroupLinks>a{min-height:40px!important;display:flex!important;align-items:center!important;width:100%!important;padding:8px 12px!important;color:#355b47!important;font-size:13px!important;font-weight:650!important;text-decoration:none!important}
+  .dashboardApp .v2MobileMenu .nvMobileGroupLinks>a:active,.dashboardApp .v2MobileMenu .nvMobileGroupLinks>a:focus-visible{background:#dcefe3!important;border-radius:9px}
+  @keyframes nvMobileLinksIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+}
+@media(prefers-reduced-motion:reduce){.dashboardApp .v2MobileMenu .nvMobileGroupLinks{animation:none!important}.dashboardApp .v2MobileMenu .nvMobileChevron{transition:none!important}}

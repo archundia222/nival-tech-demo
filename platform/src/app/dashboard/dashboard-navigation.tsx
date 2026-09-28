@@ -36,6 +36,10 @@ function NavIcon({ children }: { children: React.ReactNode }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>;
 }
 
+function MobileGroup({ title, icon, items, open }: { title: string; icon: React.ReactNode; items: Array<{ label: string; href: string }>; open?: boolean }) {
+  return <details className="nvMobileGroup" open={open}><summary><span className="nvMobileIcon"><NavIcon>{icon}</NavIcon></span><span>{title}</span><span className="nvMobileChevron" aria-hidden="true">⌄</span></summary><div className="nvMobileGroupLinks">{items.map(item=><MobileAutoCloseLink key={item.href} href={item.href}>{item.label}</MobileAutoCloseLink>)}</div></details>;
+}
+
 export async function DashboardNavigation({ businessName, active }: { businessName: string; active: ActiveItem; productLevel?: 'pay' | 'intelligence' }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -65,8 +69,13 @@ export async function DashboardNavigation({ businessName, active }: { businessNa
       <summary><span className="hamburgerIcon" aria-hidden="true"><i/><i/><i/></span><span>NIVAL tech</span><strong>{businessName}</strong></summary>
       <nav aria-label="Más opciones del panel">
         {workspaceChoices.length>1 && <form action={switchActiveBusiness} className="mobileWorkspaceSwitcher"><label>NEGOCIO<select name="businessId" defaultValue={activeMembership?.business_id ?? ''}>{workspaceChoices.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></label><button type="submit">Cambiar</button></form>}
-        <MobileAutoCloseLink href="/dashboard">Inicio</MobileAutoCloseLink>
-        {canManageWorkspace && <><MobileAutoCloseLink href="/dashboard?section=perfil-digital">Landing page</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/pay">Nival Pay</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/reviews">Nival Reseñas</MobileAutoCloseLink><MobileAutoCloseLink href="/dashboard/wifi">Nival WiFi</MobileAutoCloseLink></>}<form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
+        <MobileAutoCloseLink className="nvMobileHome" href="/dashboard"><span className="nvMobileIcon"><NavIcon><path d="M4 19V9l8-5 8 5v10"/><path d="M8 19v-6h8v6"/></NavIcon></span>Inicio</MobileAutoCloseLink>
+        {canManageWorkspace && <>
+          <MobileGroup title="Landing page" icon={<><path d="M4 5h16v14H4z"/><path d="M7 9h10M7 13h7"/></>} items={[{label:'Editar página',href:'/dashboard?section=perfil-digital'},{label:'Compartir página',href:'/dashboard?section=perfil-compartir'}]}/>
+          <MobileGroup title="Nival Pay" icon={<><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10"/></>} items={[{label:'Editar tarjeta',href:'/dashboard/pay'},{label:'Mis tarjetas y comprar otra',href:'/dashboard/pay?view=add'},{label:'Compartir acceso',href:'/dashboard/pay?view=share'}]} open={payActive}/>
+          <MobileGroup title="Nival Reseñas" icon={<path d="M12 3l2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>} items={[{label:'Editar tarjeta',href:'/dashboard/reviews'},{label:'Mis tarjetas y comprar otra',href:'/dashboard/reviews?view=add'},{label:'Compartir acceso',href:'/dashboard/reviews?view=share'}]} open={reviewActive}/>
+          <MobileGroup title="Nival WiFi" icon={<><path d="M5 10a11 11 0 0114 0M8 14a6 6 0 018 0M11 18a2 2 0 012 0"/></>} items={[{label:'Editar tarjeta',href:'/dashboard/wifi'},{label:'Mis tarjetas y comprar otra',href:'/dashboard/wifi?view=add'},{label:'Compartir acceso',href:'/dashboard/wifi?view=share'}]} open={wifiActive}/>
+        </>}<form action={signOut} className="mobileSignOut"><button type="submit">Cerrar sesión</button></form>
       </nav>
     </details>
     <nav className="v2BottomNav" aria-label="Navegación principal móvil"><Link href="/dashboard">Inicio</Link>{canManageWorkspace && <Link href="/dashboard/pay">Pay</Link>}<MobileMoreToggle/></nav>

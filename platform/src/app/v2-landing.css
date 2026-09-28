@@ -198,3 +198,18 @@
   .nv3 .nv4AboutCard{padding:24px}.nv3 .nv4AboutCard strong{font-size:27px;margin:22px 0 12px}
 }
 @media(max-width:360px){.nv3 .nv2Steps{grid-template-columns:1fr}.nv3 .nv4PhoneActual{height:205px}.nv3 .nv4ShowcaseBody{min-height:230px}}
+
+/* The preview is a scaled sample of the full public page, not a cropped phone. */
+.nv3 .nv5PreviewWiFi .nv5Wifi,.nv3 .nv5PreviewWiFi .nv5Wifi>section{background:#f5faf6!important;color:#102a21!important}
+.nv3 .nv5PreviewWiFi .nv5WifiData{background:#fff!important;color:#102a21!important}
+.nv3 .nv5PreviewWiFi .nv5WifiData b{color:#102a21!important}
+@media(max-width:540px){
+  .nv3 .nv5RealPhone{width:min(300px,100%);max-width:100%}
+  .nv3 .nv5PreviewPay{overflow:hidden}
+  .nv3 .nv5PreviewPay>div{width:133.333%!important;min-width:0!important;transform:scale(.75);transform-origin:top left}
+  .nv3 .nv5PreviewPay>div>section{min-width:0}
+  .nv3 .nv4ShowcaseBody:after{display:block;left:48%!important;top:51%!important}
+  .nv3 .nv4CardPhoto{animation:nv6MobileTap 4.8s ease-in-out infinite!important}
+  @keyframes nv6MobileTap{0%,17%,100%{transform:translateX(0) rotate(-6deg)}42%,61%{transform:translateX(34px) rotate(1deg)}78%{transform:translateX(5px) rotate(-4deg)}}
+}
+@media(prefers-reduced-motion:reduce){.nv3 .nv4CardPhoto,.nv3 .nv4ShowcaseBody:after{animation:none!important}}
