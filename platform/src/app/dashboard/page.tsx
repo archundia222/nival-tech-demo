@@ -16,7 +16,7 @@ interface DashboardPageProps {
   searchParams: Promise<{ error?: string; message?: string; next?: string; section?: string }>;
 }
 
-type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "analiticas" | "configuracion";
+type DashboardSection = "resumen" | "inteligencia" | "clientes" | "nival-card" | "perfil-digital" | "perfil-compartir" | "analiticas" | "configuracion";
 
 interface TeamMember {
   member_email: string;
@@ -36,7 +36,7 @@ interface IntelligenceRecommendation {
 
 export default async function DashboardPage({ searchParams }: DashboardPageProps) {
   const params = await searchParams;
-  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "analiticas", "configuracion"];
+  const dashboardSections: DashboardSection[] = ["resumen", "inteligencia", "clientes", "nival-card", "perfil-digital", "perfil-compartir", "analiticas", "configuracion"];
   const currentSection: DashboardSection = dashboardSections.includes(params.section as DashboardSection)
     ? params.section as DashboardSection
     : "resumen";
@@ -45,7 +45,8 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     inteligencia: "Nival Growth",
     clientes: "Clientes",
     "nival-card": "Enlaces y reseñas",
-    "perfil-digital": "Landing page",
+    "perfil-digital": "Editar landing page",
+    "perfil-compartir": "Compartir landing page",
     analiticas: "Analíticas",
     configuracion: "Configuración de tu perfil público",
   };
@@ -311,67 +312,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         />)}</div>
       </section>}
       </>}
-      {currentSection === "perfil-digital" && business?.slug && <>
-        <section className="profileDigitalWorkspace">
-          <header className="profileDigitalHeading"><p className="eyebrow">CONFIGURACIÓN DE TU NEGOCIO</p><h1>Edita la landing pública de tu negocio.</h1><p>Esta es la página que sí ven tus clientes. Aquí decides cómo se presenta tu negocio y qué accesos aparecen: pagar, ver puntos, contactarte, dejar reseñas y abrir otros enlaces.</p></header>
-          <div className="profileDashboardGrid">
-            <div className="profileDashboardPreview">
-              <ProfilePublicView
-                businessName={business.name}
-                slug={business.slug}
-                description={business.description}
-                logoUrl={business.logo_url}
-                brandColor={business.brand_color}
-                actions={profilePreviewActions}
-                verifiedLabel="PERFIL DEL NEGOCIO"
-                embedded
-                showQuickActions={false}
-                showFooter={false}
-              />
-              <div className="profileDashboardFooter"><span>Vista previa del perfil público</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver perfil completo ↗</a></div>
-            </div>
-            <BusinessQr
-              businessName={business.name}
-              url={`${publicOrigin}/p/${business.slug}`}
-              qrId="business-digital-profile-qr"
-              eyebrow="COMPARTE TU NEGOCIO"
-              title="Un enlace para todo"
-              description="Copia el enlace, compártelo por WhatsApp o descarga el QR para mostrador, redes e impresos."
-              fileSuffix="perfil-digital"
-            />
-          </div>
-        </section>
-        <section className="profileReviewSetup legacyProfileReviews" id="reviews">
-          <div className="settingsIntro">
-            <p className="eyebrow">RESEÑAS</p>
-            <h2>Haz que dejar una reseña tome un toque.</h2>
-            <p>Guarda aquí el enlace de reseñas de tu negocio. Nival crea un destino estable para tu perfil, QR y tarjetas NFC; si cambias el enlace más adelante, no necesitas reimprimir la tarjeta.</p>
-            {reviewLink ? <div className="reviewStatus"><span>ACTIVO</span><strong>{reviewLink.name}</strong><small>{Number(reviewLink.click_count ?? 0)} aperturas registradas</small></div> : <div className="reviewStatus pending"><span>PENDIENTE</span><strong>Aún no conectas reseñas</strong><small>Agrega el enlace que Google u otra plataforma te da para recibir opiniones.</small></div>}
-          </div>
-          {canManageProgram ? <form action={createSmartLink} className="settingsForm">
-            <input type="hidden" name="returnTo" value="/dashboard?section=perfil-digital" />
-            <input type="hidden" name="linkKind" value="google_review" />
-            <input type="hidden" name="linkName" value="Reseñas del negocio" />
-            <label>Enlace de reseñas<input name="targetUrl" type="url" required defaultValue={reviewLink?.target_url ?? ""} placeholder="https://..." /></label>
-            <button className="primaryButton" type="submit">{reviewLink ? "Actualizar enlace de reseñas" : "Conectar reseñas"}</button>
-          </form> : <p className="formMessage">Solo el propietario o un gerente puede cambiar el enlace de reseñas.</p>}
-        </section>
-        {!!smartLinks?.filter((link) => link.kind !== "google_review").length && <section className="smartLinksCard profileSmartLinks">
-          <div><p className="eyebrow">OTROS ENLACES</p><h2>Accesos del negocio</h2></div>
-          <div className="smartLinksList">{smartLinks.filter((link) => link.kind !== "google_review").map((link) => <SmartLinkQr
-            key={link.id}
-            id={link.id}
-            name={link.name}
-            kind={link.kind}
-            targetUrl={link.target_url}
-            url={`${publicOrigin}/go/${link.public_token}`}
-            clicks={Number(link.click_count)}
-            active={link.active}
-            editable={canManageProgram}
-            returnTo="/dashboard?section=perfil-digital"
-          />)}</div>
-        </section>}
-      </>}
+      {currentSection === "perfil-digital" && business?.slug && <section className="profileDigitalWorkspace landingEditOnly">
+        <header className="profileDigitalHeading"><p className="eyebrow">EDITAR LANDING PAGE</p><h1>Así se presenta tu negocio.</h1><p>Edita la información y revisa la vista previa. Para QR, enlace y opciones de envío usa «Compartir» en el menú.</p></header>
+        <div className="profileDashboardGrid landingEditorGrid"><div className="profileDashboardPreview"><ProfilePublicView businessName={business.name} slug={business.slug} description={business.description} logoUrl={business.logo_url} brandColor={business.brand_color} actions={profilePreviewActions} verifiedLabel="PERFIL DEL NEGOCIO" embedded showQuickActions={false} showFooter={false}/><div className="profileDashboardFooter"><span>Vista previa</span><a href={`/p/${business.slug}`} target="_blank" rel="noreferrer">Ver landing ↗</a></div></div></div>
+      </section>}
+      {currentSection === "perfil-compartir" && business?.slug && <section className="landingShareOnly"><header className="profileDigitalHeading"><p className="eyebrow">COMPARTIR LANDING PAGE</p><h1>Tu enlace y QR, en un solo lugar.</h1><p>Esta sección es únicamente para compartir la landing de tu negocio.</p></header><BusinessQr businessName={business.name} url={`${publicOrigin}/p/${business.slug}`} qrId="business-digital-profile-qr" eyebrow="COMPARTE TU NEGOCIO" title="Un enlace para todo" description="Copia el enlace, compártelo o descarga el QR." fileSuffix="perfil-digital"/></section>}
       {currentSection === "analiticas" && <section className="nivalAnalyticsSection"><div className="profileDigitalHeading"><p className="eyebrow">ANALÍTICAS</p><h1>Aperturas de tus Nival Cards</h1><p>Aquí se separa la actividad por producto para que puedas ver cuántas veces se abrió cada enlace.</p></div><div className="nivalProductOverview">{homeCards.map(item=><article key={item.key} className={`nivalProductMetric ${item.active ? "" : "trial"}`}><span>{item.name}</span><strong>{item.active ? item.views : "—"}</strong><small>{item.active ? "aperturas registradas" : "Producto no activo"}</small>{!item.active && <a href={item.href}>Probar gratis →</a>}</article>)}</div></section>}
       {legacySection === "clientes" && loyaltyProgram && <section className="redemptionHistoryCard">
         <div>
