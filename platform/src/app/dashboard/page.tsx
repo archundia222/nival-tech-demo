@@ -160,7 +160,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
         .limit(1)
     : { data: [] };
   const paymentProfile = paymentProfiles?.[0];
-  const { data: wifiProfile } = await supabase.from("wifi_profiles").select("ssid").eq("business_id", businessId).maybeSingle();
+  const [{ data: wifiProfile }, { data: reviewProfile }, { data: physicalCards }] = await Promise.all([
+    supabase.from("wifi_profiles").select("ssid,access_url").eq("business_id", businessId).maybeSingle(),
+    supabase.from("review_profiles").select("google_review_url").eq("business_id", businessId).maybeSingle(),
+    supabase.from("physical_card_orders").select("fulfillment_status,tracking_code,delivery_method,requested_delivery_date").eq("business_id", businessId).order("created_at", { ascending: false }).limit(1),
+  ]);
   const { data: paidNivalPayOrder } = businessId
     ? await supabase
         .from("product_orders")
@@ -232,6 +236,21 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     { label: "Enlace público", complete: Boolean(business?.slug && profilePreviewActions.length), href: business?.slug ? `/p/${business.slug}` : "/dashboard?section=perfil-digital", action: "Prepara tu perfil público" },
   ];
   const payReady = Boolean(paymentProfile?.active && paymentProfile.account_holder && paymentProfile.bank_name && paymentProfile.clabe);
+  const purchasedCard = paidNivalPay || paidReviews || paidWifi;
+  const missingConfiguration = paidNivalPay && !payReady ? { name: 'Pay', href: '/dashboard/pay' }
+    : paidReviews && !reviewProfile?.google_review_url ? { name: 'Reseñas', href: '/dashboard/reviews' }
+    : paidWifi && !wifiProfile?.access_url ? { name: 'WiFi', href: '/dashboard/wifi' }
+    : null;
+  const configuredCard = purchasedCard && !missingConfiguration;
+  const latestCard = physicalCards?.[0];
+  const cardStatus: Record<string, string> = { new: 'Pedido recibido', confirmed: 'Diseño confirmado', producing: 'En producción', ready: 'Lista para entregar', shipped: 'En camino', delivered: 'Entregada', cancelled: 'Pedido cancelado' };
+  const nextAction = !purchasedCard
+    ? { title: 'Elige tu primera Nival Card', description: 'Puedes explorar la prueba gratis y comprar cuando estés listo.', href: '#comprar', label: 'Ver productos' }
+    : !configuredCard
+      ? { title: `Configura Nival ${missingConfiguration?.name ?? 'Card'}`, description: 'Agrega el enlace o los datos que abrirán tus clientes.', href: missingConfiguration?.href ?? '/dashboard', label: 'Configurar ahora' }
+      : !latestCard || latestCard.fulfillment_status === 'cancelled'
+        ? { title: 'Solicita tu tarjeta NFC incluida', description: 'Elige su diseño y deja los datos para coordinar la entrega.', href: '/dashboard/pay/physical', label: 'Diseñar mi tarjeta' }
+        : { title: cardStatus[latestCard.fulfillment_status] ?? 'Tarjeta en proceso', description: latestCard.tracking_code ? `Seguimiento: ${latestCard.tracking_code}` : 'Consulta el diseño y la entrega de tu tarjeta.', href: '/dashboard/pay/physical', label: 'Ver mi pedido' };
   const homeCards = [
     { key: "pay", name: "Nival Pay", active: hasNivalPay, views: Number(paymentProfile?.view_count ?? 0), href: hasNivalPay ? "/dashboard/pay" : "/dashboard/pay", cta: hasNivalPay ? "Administrar" : "Probar gratis" },
     { key: "reviews", name: "Nival Reseñas", active: hasReviews, views: Number(reviewLink?.click_count ?? 0), href: "/dashboard/reviews", cta: hasReviews ? "Administrar" : "Probar gratis" },
@@ -249,10 +268,20 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
       <section className="dashboardHero nivalHomeHero" id="resumen">
         <div><p className="eyebrow">PANEL DEL NEGOCIO</p><h1>{business?.name ?? "Tu negocio"}</h1><p>Consulta las aperturas de tus productos y entra directamente a administrar cada Nival Card.</p></div>
       </section>
+      {canManageProgram && <section className="nivalJourney" aria-labelledby="nivalJourneyTitle">
+        <div className="nivalJourneyIntro"><span>TU CAMINO EN NIVAL TECH</span><h2 id="nivalJourneyTitle">Todo en orden, paso a paso.</h2><p>Compra, configura tu enlace y prepara la tarjeta física desde el mismo panel.</p></div>
+        <ol className="nivalJourneySteps">
+          <li className={purchasedCard ? 'done' : 'current'}><span>1</span><div><strong>Elegir y comprar</strong><small>{purchasedCard ? 'Compra confirmada' : 'Pay, Reseñas, WiFi o paquete'}</small></div></li>
+          <li className={configuredCard ? 'done' : purchasedCard ? 'current' : ''}><span>2</span><div><strong>Configurar</strong><small>{configuredCard ? 'Acceso preparado' : 'Datos o enlace de tu negocio'}</small></div></li>
+          <li className={latestCard && latestCard.fulfillment_status !== 'cancelled' ? 'done' : configuredCard ? 'current' : ''}><span>3</span><div><strong>Diseñar tarjeta</strong><small>{latestCard && latestCard.fulfillment_status !== 'cancelled' ? 'Solicitud registrada' : 'Una incluida con tu compra'}</small></div></li>
+          <li className={latestCard?.fulfillment_status === 'delivered' ? 'done' : latestCard ? 'current' : ''}><span>4</span><div><strong>Entrega</strong><small>{latestCard ? cardStatus[latestCard.fulfillment_status] ?? 'En seguimiento' : 'Sigue el estado del pedido'}</small></div></li>
+        </ol>
+        <div className="nivalJourneyNext"><div><span>SIGUIENTE PASO</span><strong>{nextAction.title}</strong><p>{nextAction.description}</p></div><a href={nextAction.href}>{nextAction.label} <span aria-hidden="true">→</span></a></div>
+      </section>}
       <section className="nivalProductOverview">
         {homeCards.map((item) => item.active ? <article key={item.key} className="nivalProductMetric"><span>{item.name}</span><strong>{item.views}</strong><small>aperturas del enlace</small><a href={item.href}>{item.cta} →</a></article> : <article key={item.key} className="nivalProductMetric trial"><span>{item.name}</span><strong>—</strong><small>Todavía no tienes este producto.</small><a href={item.href}>Probar gratis →</a></article>)}
       </section>
-      {canManageProgram && <section className="nivalShop" aria-labelledby="nivalShopHeading">
+      {canManageProgram && <section className="nivalShop" id="comprar" aria-labelledby="nivalShopHeading">
         <div className="nivalShopHeading"><span>ELIGE CUANDO ESTÉS LISTO</span><h2 id="nivalShopHeading">Activa tus productos</h2><p>Tu cuenta es gratis. Compra cada acceso por separado o los tres en un paquete. Pago único con Mercado Pago.</p></div>
         {params.result === 'success' && !paidBundle && <><p className="formMessage">Estamos confirmando el pago del paquete. No vuelvas a pagar.</p><PaymentStatusPoller active /></>}
         {params.result === 'pending' && <p className="formMessage">Tu pago está pendiente de aprobación en Mercado Pago.</p>}

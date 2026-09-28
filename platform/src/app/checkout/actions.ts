@@ -935,7 +935,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', businessId)
-      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT])
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at,checkout_url)').eq('business_id', businessId),

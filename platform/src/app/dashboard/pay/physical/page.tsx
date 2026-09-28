@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
@@ -45,7 +45,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', membership.business_id)
-      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT])
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', membership.business_id),
@@ -147,10 +147,13 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
           <p className="payHelp">El total de este pago depende únicamente del reverso: estándar $0 extra · personalizado +$10 MXN. La paquetería, si la eliges, no está incluida y se cotiza aparte.</p>
         </div>
       </form>}
-      {orders?.length ? <section className="chartCard"><h2>Tus pedidos recientes</h2>{orders.map((order) => {
+      {orders?.length ? <section className="chartCard nivalOrderHistory"><div className="nivalOrderHistoryHead"><span>LOGÍSTICA</span><h2>Tus tarjetas y entregas</h2><p>Revisa el pago, la producción y los datos de entrega de cada pedido.</p></div><div className="nivalOrderList">{orders.map((order) => {
         const payment = Array.isArray(order.product_orders) ? order.product_orders[0] : order.product_orders;
-        return <p key={order.id}><strong>{order.front_template === 'points' ? 'Puntos' : order.front_template === 'reviews' ? 'Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay'} · {order.design === 'custom' ? 'color de marca' : order.design === 'white' ? 'blanca' : 'negra'} · {order.back_style === 'custom' ? 'reverso personalizado' : 'reverso Nival'}{order.back_design_url ? ' · archivo recibido' : ''}</strong> · {order.delivery_method === 'shipping' ? 'Paquetería' : order.delivery_method === 'weekday_quote' ? 'Entre semana por cotizar' : order.delivery_method === 'saturday_local' ? 'Entrega sábado' : 'Entrega domingo'} · Pago: {payment?.status === 'paid' ? 'pagado' : payment?.status === 'pending_cash_confirmation' ? 'efectivo pendiente' : 'pendiente'} · Pedido: {order.fulfillment_status}</p>;
-      })}</section> : null}
+        const title = order.front_template === 'points' ? 'Nival Puntos' : order.front_template === 'reviews' ? 'Nival Reseñas' : order.front_template === 'profile' ? 'Perfil digital' : 'Nival Pay';
+        const status: Record<string,string> = { new: 'Pedido recibido', confirmed: 'Diseño confirmado', producing: 'En producción', ready: 'Lista para entrega', shipped: 'En camino', delivered: 'Entregada', cancelled: 'Cancelado' };
+        const delivery = order.delivery_method === 'shipping' ? 'Paquetería' : order.delivery_method === 'weekday_quote' ? 'Entre semana por cotizar' : order.delivery_method === 'saturday_local' ? 'Entrega sábado' : 'Entrega domingo';
+        return <article className="nivalOrderItem" key={order.id}><div className="nivalOrderItemTop"><div><span>TARJETA NFC</span><h3>{title}</h3></div><strong className="nivalOrderStatus">{status[order.fulfillment_status] ?? 'En seguimiento'}</strong></div><p>{order.design === 'custom' ? 'Color de marca' : order.design === 'white' ? 'Blanca' : 'Negra'} · {order.back_style === 'custom' ? 'Reverso personalizado' : 'Reverso Nival'}{order.back_design_url ? ' · Diseño recibido' : ''}</p><div className="nivalOrderDetails"><span><b>Pago</b>{payment?.status === 'paid' ? 'Confirmado' : payment?.status === 'pending_cash_confirmation' ? 'Efectivo por confirmar' : 'Pendiente'}</span><span><b>Entrega</b>{delivery}{order.requested_delivery_date ? ` · ${order.requested_delivery_date}` : ''}</span>{order.tracking_code && <span><b>Seguimiento</b>{order.tracking_code}</span>}</div></article>;
+      })}</div></section> : null}
     </div>
   </main>;
 }
