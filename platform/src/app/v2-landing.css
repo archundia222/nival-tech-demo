@@ -205,9 +205,13 @@
 .nv3 .nv5PreviewWiFi .nv5WifiData b{color:#102a21!important}
 @media(max-width:540px){
   .nv3 .nv5RealPhone{width:min(300px,100%);max-width:100%}
-  .nv3 .nv5PreviewPay{overflow:hidden}
-  .nv3 .nv5PreviewPay>div{width:133.333%!important;min-width:0!important;transform:scale(.75);transform-origin:top left}
-  .nv3 .nv5PreviewPay>div>section{min-width:0}
+  .nv3 .nv5PreviewPay{overflow:auto}
+  .nv3 .nv5PreviewPay>div{width:100%!important;min-width:0!important;transform:none}
+  .nv3 .nv5RealPhone{height:560px}
+  .nv3DemoPage .nv4DemoPay,.nv3DemoPage .nv4DemoPublic{max-height:none;overflow:visible}
+  .nv3DemoPage .nv4DemoActions{position:sticky;bottom:0;z-index:30;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:18px -11px -14px;padding:12px 11px calc(12px + env(safe-area-inset-bottom))!important;background:#fff}
+  .nv3DemoPage .nv4DemoActions button,.nv3DemoPage .nv4DemoActions a{min-width:0;white-space:normal;font-size:12px!important}
+  .nv3DemoPage .nv4DemoActions button:only-child,.nv3DemoPage .nv4DemoActions a:only-child{grid-column:1/-1}
   .nv3 .nv4ShowcaseBody:after{display:block;left:48%!important;top:51%!important}
   .nv3 .nv4CardPhoto{animation:nv6MobileTap 4.8s ease-in-out infinite!important}
   @keyframes nv6MobileTap{0%,17%,100%{transform:translateX(0) rotate(-6deg)}42%,61%{transform:translateX(34px) rotate(1deg)}78%{transform:translateX(5px) rotate(-4deg)}}

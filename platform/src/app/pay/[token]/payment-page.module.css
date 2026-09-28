@@ -40,3 +40,23 @@
 .customSectionLink{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:64px;padding:14px 16px;border:1px solid rgba(25,25,25,.11);border-radius:14px;background:#fff;color:#171717;text-decoration:none;box-shadow:0 8px 24px rgba(40,34,24,.04)}
 .customSectionLink span{display:grid;gap:4px;min-width:0}.customSectionLink small{color:#7b756c;font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}.customSectionLink strong{overflow:hidden;text-overflow:ellipsis;color:#171717;font-size:14px;white-space:nowrap}.customSectionLink>b{flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:#171717;color:#f4d98f;font-size:14px}.customSectionLink:hover{border-color:rgba(184,154,90,.5);transform:translateY(-1px)}.customSectionLink:focus-visible{outline:3px solid #b89a5a;outline-offset:3px}
 @media(max-width:520px){.customSectionLink{min-height:60px;padding:13px 14px}.customSectionLink strong{font-size:13px}}
+
+/* Demo previews adapt to the narrow frame while the real public page keeps its layout. */
+@media(max-width:540px){
+  .compactPreview{width:100%;min-width:0;min-height:0;display:block;overflow:hidden}
+  .compactPreview .embeddedCard{width:100%;min-width:0;padding:15px;border-radius:0;overflow:hidden}
+  .compactPreview .brandRow{flex-wrap:wrap;gap:7px}
+  .compactPreview .brandName{font-size:.96rem}
+  .compactPreview .securePill{margin-left:0;font-size:.62rem;padding:5px 8px}
+  .compactPreview .profile{padding:20px 0 17px}
+  .compactPreview .logoWrap{width:78px;height:78px;margin-bottom:12px}
+  .compactPreview .monogram{font-size:25px}
+  .compactPreview .businessTitle{font-size:1.45rem}
+  .compactPreview .paymentSteps{grid-template-columns:1fr;gap:5px}
+  .compactPreview .paymentSteps span{min-height:30px;padding:5px 8px;font-size:.65rem}
+  .compactPreview .helpText{margin:12px 0;font-size:.69rem}
+  .compactPreview .detailRow{min-height:64px;padding:10px;gap:7px}
+  .compactPreview .copyIcon{width:32px;height:32px}
+  .compactPreview .bankBadge{display:none}
+  .compactPreview .clabeValue{white-space:normal;overflow-wrap:anywhere}
+}
