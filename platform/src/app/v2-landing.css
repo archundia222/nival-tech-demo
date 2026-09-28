@@ -142,3 +142,58 @@
 .nv3 .nv2Pricing .nv2Eyebrow,.nv3 .nv2PriceGrid li span{color:#18784c!important}
 .nv3 .nv2PriceGrid .nv2OutlineButton{border-color:#a9cdb4!important;color:#176541!important;background:#fff!important}
 .nv3 a:active,.nv3 button:active{background:#d7eddf!important;color:#145839!important}
+
+/* A stable scale for the landing, including narrow phones and enlarged text. */
+.nv3{overflow-wrap:anywhere}
+.nv3 .nv2Section{width:min(100%,1180px);padding:clamp(48px,6vw,76px) clamp(18px,3vw,30px)}
+.nv3 .nv2SectionHead{margin-bottom:28px}
+.nv3 .nv2Section h2,.nv3 .nv2Final h2{font-size:clamp(30px,3.5vw,46px);line-height:1.15}
+.nv3 .nv2SectionHead p,.nv3 .nv4About p{font-size:clamp(16px,1.5vw,18px);line-height:1.65}
+.nv3 .nv2Section .nv2Eyebrow,.nv3 .nv3ShowcaseHeading{font-size:13px;letter-spacing:.08em}
+.nv3 .nv2Steps{gap:20px}.nv3 .nv2Steps>div{min-width:0}
+.nv3 .nv2PriceGrid article{min-width:0;padding:clamp(20px,3vw,30px)}
+.nv3 .nv2Pricing,.nv3 .nv2Points{max-width:none;width:100%;padding-left:max(22px,calc((100vw - 1128px)/2));padding-right:max(22px,calc((100vw - 1128px)/2))}
+.nv3 .nv2PriceGrid li,.nv3 .nv2Faq details p{font-size:16px;line-height:1.55}
+.nv3 .nv2PriceGrid article>small,.nv3 .nv2Extras,.nv3 .nv2Footer details{font-size:13px;line-height:1.5}
+.nv3 .nv2Tabs button{min-width:0;gap:4px;padding:15px}.nv3 .nv2Tabs small{font-size:14px;line-height:1.45}
+.nv3 .nv4TapSteps{height:auto;align-items:stretch}.nv3 .nv4TapSteps div{height:auto;min-height:150px;gap:4px}.nv3 .nv4TapSteps small{font-size:13px;line-height:1.4}
+.nv3 .nv4BeforeCard{opacity:1}
+.nv3Showcase{width:min(100%,1080px)}
+.nv3 .nv4ShowcaseBody{height:auto;min-height:390px;gap:clamp(18px,4vw,52px);padding:24px clamp(18px,4vw,44px);overflow:hidden}
+.nv3 .nv4CardPhoto{flex:0 1 330px;width:min(43%,330px);max-width:330px;animation:none!important}
+.nv3 .nv4BrandCard{font-size:clamp(18px,2.3vw,29px)}
+.nv3 .nv4PhoneActual{flex:0 0 225px;width:225px;height:350px;margin:0;transform:none}
+.nv3 .nv4ShowcaseBody:after{display:none}
+@media(max-width:800px){
+  .nv3 .nv2Section{padding:52px 20px}
+  .nv3 .nv2Pricing,.nv3 .nv2Points{padding:52px 20px}
+  .nv3 .nv2TabDemo{padding:20px;gap:22px}
+  .nv3 .nv2Compare{gap:14px}
+  .nv3 .nv4TapSteps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .nv3 .nv4ShowcaseBody{min-height:310px;gap:12px}
+  .nv3 .nv4CardPhoto{position:relative;left:auto;width:min(46%,240px);flex:0 1 240px;max-width:240px;margin:0}
+  .nv3 .nv4PhoneActual{position:relative;right:auto;top:auto;flex:0 0 170px;width:170px;height:270px}
+}
+@media(max-width:540px){
+  .nv3 .nv2Section{padding:44px 18px}
+  .nv3 .nv2Pricing,.nv3 .nv2Points{padding:44px 18px}
+  .nv3Hero{padding:32px 18px 28px}
+  .nv3Hero h1{font-size:clamp(42px,11vw,58px);line-height:1.04}
+  .nv3Hero p{font-size:16px;line-height:1.6}
+  .nv3HeroActions{grid-template-columns:1fr;max-width:360px;margin:24px auto 14px}
+  .nv3HeroActions a{font-size:15px;min-height:48px}
+  .nv3Showcase{padding:0 14px}.nv3ShowcaseHeading{align-items:start;flex-wrap:wrap;text-align:left;line-height:1.4}
+  .nv3ShowcaseHeading span+span{max-width:none;text-align:left}
+  .nv3 .nv4ShowcaseBody{min-height:275px;padding:15px 8px;gap:5px}
+  .nv3 .nv4CardPhoto{width:45%;flex:0 1 45%;max-width:none}
+  .nv3 .nv4BrandCard{font-size:clamp(13px,3.5vw,18px)}
+  .nv3 .nv4PhoneActual{flex:0 0 min(43%,150px);width:min(43%,150px);height:240px;border-width:5px;border-radius:22px}
+  .nv3 .nv4PhoneViewport>div{width:300%;transform:scale(.33)}
+  .nv3 .nv4TapSteps{grid-template-columns:1fr}.nv3 .nv4TapSteps div{min-height:0;display:grid;grid-template-columns:28px 32px 1fr;align-items:center;text-align:left;gap:8px;padding:12px}
+  .nv3 .nv4TapSteps small{grid-column:3;margin:0}.nv3 .nv4TapSteps i{height:auto}
+  .nv3 .nv2Steps{grid-template-columns:1fr 1fr;gap:12px}
+  .nv3 .nv2TabDemo{padding:15px}
+  .nv3 .nv2Amount{font-size:clamp(30px,9vw,42px)}
+  .nv3 .nv4AboutCard{padding:24px}.nv3 .nv4AboutCard strong{font-size:27px;margin:22px 0 12px}
+}
+@media(max-width:360px){.nv3 .nv2Steps{grid-template-columns:1fr}.nv3 .nv4PhoneActual{height:205px}.nv3 .nv4ShowcaseBody{min-height:230px}}

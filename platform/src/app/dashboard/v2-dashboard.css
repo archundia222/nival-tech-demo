@@ -196,3 +196,48 @@
  .dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalPayAddCard{max-width:360px!important;min-height:0!important}
  .dashboardApp .landingEditForm{padding:18px!important}
 }
+
+/* Shared workspace rhythm: readable labels, fluid columns and uncut content. */
+.dashboardApp .dashboardContent{min-width:0!important}
+.dashboardApp .dashboardContent h1{font-size:clamp(28px,3.3vw,44px)!important;line-height:1.15!important;overflow-wrap:anywhere}
+.dashboardApp .dashboardContent h2{line-height:1.22!important;overflow-wrap:anywhere}
+.dashboardApp .dashboardContent p{line-height:1.55!important}
+.dashboardApp .dashboardContentTopbar,.dashboardApp .payHeading,.dashboardApp .profileDigitalHeading{min-width:0!important}
+.dashboardApp .nivalPayEditorShell,.dashboardApp .landingEditorGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(16px,2vw,26px)!important}
+.dashboardApp .nivalPayEditorPanel,.dashboardApp .nivalPayLivePreview,.dashboardApp .landingEditForm,.dashboardApp .landingEditorGrid .profileDashboardPreview{min-width:0!important;height:auto!important}
+.dashboardApp .nivalPayEditorPanel,.dashboardApp .landingEditForm{padding:clamp(18px,2vw,26px)!important}
+.dashboardApp .nivalPayPreviewPhone{overflow:visible!important;height:auto!important;max-height:none!important}
+.dashboardApp .nivalPayField,.dashboardApp .nivalPayFieldHeading,.dashboardApp .landingEditForm label{font-size:14px!important;line-height:1.45!important}
+.dashboardApp .nivalPayTextInput,.dashboardApp .nivalPayField input,.dashboardApp .landingEditForm input,.dashboardApp .landingEditForm textarea{min-width:0!important;max-width:100%!important;font-size:16px!important;line-height:1.4!important}
+.dashboardApp .nivalPayFileControl,.dashboardApp .landingEditForm input[type="file"]{min-width:0!important;max-width:100%!important;overflow:visible!important;color:#173c2c!important;font-size:14px!important}
+.dashboardApp .nivalPayFileControl input[type="file"]{max-width:100%!important;color:#173c2c!important;font-size:14px!important}
+.dashboardApp .landingEditForm input[type="file"]::file-selector-button{color:#145839!important;background:#eaf5ed!important}
+.dashboardApp .nivalPayCatalog{grid-template-columns:repeat(auto-fit,minmax(min(100%,265px),1fr))!important;justify-content:stretch!important;gap:20px!important}
+.dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalPayAddCard{min-width:0!important;min-height:0!important;display:flex!important;flex-direction:column!important}
+.dashboardApp .nivalPayCatalogCard h2,.dashboardApp .nivalPayAddCard h2{font-size:clamp(19px,2vw,23px)!important;line-height:1.25!important}
+.dashboardApp .nivalSingleEdit,.dashboardApp .nivalAdditionalActions button{font-size:14px!important;min-height:44px!important}
+.dashboardApp .nivalAddProductSeparate{grid-template-columns:minmax(160px,210px) minmax(0,1fr) minmax(230px,310px)!important;gap:20px!important}
+.dashboardApp .businessQrRefined{width:100%!important;max-width:820px!important}
+@media(max-width:1050px){
+ .dashboardApp .nivalAddProductSeparate{grid-template-columns:minmax(150px,210px) minmax(0,1fr)!important}
+ .dashboardApp .nivalAdditionalActions{grid-column:1/-1!important}
+}
+@media(max-width:900px){
+ .dashboardApp .nivalPayEditorShell,.dashboardApp .landingEditorGrid{grid-template-columns:minmax(0,1fr)!important;max-width:720px!important}
+ .dashboardApp .nivalPayEditorPanel,.dashboardApp .nivalPayLivePreview{grid-column:1!important;grid-row:auto!important}
+ .dashboardApp .nivalPayCatalog{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))!important}
+}
+@media(max-width:620px){
+ .dashboardApp .dashboardContent{padding-left:16px!important;padding-right:16px!important}
+ .dashboardApp .dashboardContent h1{font-size:clamp(27px,7vw,34px)!important}
+ .dashboardApp .payHeading,.dashboardApp .profileDigitalHeading{padding:20px!important}
+ .dashboardApp .nivalPayEditorShell{width:100%!important;gap:18px!important}
+ .dashboardApp .nivalPayEditorPanel,.dashboardApp .landingEditForm{padding:18px!important}
+ .dashboardApp .nivalPayLivePreview{width:100%!important}
+ .dashboardApp .nivalPayCatalog{grid-template-columns:minmax(0,1fr)!important;justify-items:stretch!important}
+ .dashboardApp .nivalPayCatalogCard,.dashboardApp .nivalPayAddCard{width:100%!important;max-width:none!important}
+ .dashboardApp .nivalAddProductSeparate{grid-template-columns:minmax(0,1fr)!important;padding:18px!important}
+ .dashboardApp .nivalAdditionalActions{grid-column:1!important}
+ .dashboardApp .nivalAddCardVisual{width:min(100%,280px)!important}
+ .dashboardApp .landingEditorGrid{width:100%!important;gap:18px!important}
+}
