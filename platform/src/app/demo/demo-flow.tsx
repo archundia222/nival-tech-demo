@@ -91,7 +91,8 @@ export function DemoFlow() {
       {step === "pay-about" && <div className="guidedCopy">
         <span>NIVAL PAY</span>
         <h1>Una forma más simple de compartir cómo pagarte.</h1>
-        <p>Configuras tus datos una vez. Después compartes el mismo acceso por QR, enlace o desde un punto físico de tu negocio.</p>
+        <p>Tu tarjeta Pay abre en el celular una página con tus datos de transferencia. El cliente acerca su teléfono, copia la CLABE y paga sin pedirte que se la dictes.</p>
+        <div className="guidedCardInstructions"><b>Cómo se usa</b><span>1. Configura tus datos.</span><span>2. El cliente acerca su teléfono.</span><span>3. Copia y paga.</span></div>
         <button onClick={next}>Continuar →</button>
       </div>}
 
@@ -114,11 +115,12 @@ export function DemoFlow() {
 
       {step === "pay-use" && <div className="guidedCopy">
         <span>PASO 2 · ÚSALO CON TUS CLIENTES</span>
-        <h1>Lo colocas donde ya cobras.</h1>
-        <div className="guidedUseGrid">
-          <article><b>1</b><strong>Comparte</strong><p>QR en mostrador, enlace por WhatsApp o acceso físico.</p></article>
-          <article><b>2</b><strong>Tu cliente abre</strong><p>Ve tus datos, copia y sabe qué hacer.</p></article>
-          <article><b>3</b><strong>Tú mantienes el control</strong><p>Si cambias banco o titular, editas Nival una sola vez.</p></article>
+        <h1>De “¿te dicto mi CLABE?” a acercar, copiar y listo.</h1>
+        <p className="guidedFlowLead">La tarjeta hace que compartir tus datos de pago sea una acción visual y rápida.</p>
+        <div className="guidedTapFlow">
+          <article className="guidedOldWay"><span>ANTES</span><div className="guidedChat left">“¿Me dictas tu CLABE?”</div><div className="guidedChat right">“Sí, espera…”</div><strong>Buscar. Dictar. Repetir.</strong></article>
+          <div className="guidedFlowArrow" aria-hidden="true">→</div>
+          <article className="guidedNewWay"><span>CON TU TARJETA</span><div className="guidedTapPhone"><small>Tu negocio</small><b>Acerca tu teléfono</b><i>)))</i><button type="button">Copiar CLABE</button><em>✓ Copiado</em></div><strong>Acerca. Copia. Listo.</strong></article>
         </div>
         <button onClick={next}>Siguiente: Nival Puntos →</button>
       </div>}
@@ -126,7 +128,8 @@ export function DemoFlow() {
       {step === "points-about" && <div className="guidedCopy">
         <span>NIVAL PUNTOS</span>
         <h1>Haz visible la razón para regresar.</h1>
-        <p>Tu cliente acumula puntos o visitas y ve en su celular cuánto le falta para su recompensa.</p>
+        <p>Tu tarjeta de Puntos abre el programa de lealtad del negocio. El cliente ve sus puntos, su progreso y la recompensa que puede conseguir.</p>
+        <div className="guidedCardInstructions"><b>Cómo se usa</b><span>1. El cliente se registra.</span><span>2. Registras cada visita.</span><span>3. Al llegar a la meta, canjea su premio.</span></div>
         <button onClick={next}>Continuar →</button>
       </div>}
 
@@ -179,7 +182,8 @@ export function DemoFlow() {
       {step === "reviews-about" && <div className="guidedCopy">
         <span>NIVAL RESEÑAS</span>
         <h1>Haz más fácil aprovechar una buena experiencia.</h1>
-        <p>Conectas tu enlace de Google y Nival crea un acceso simple para que el cliente llegue directo a dejar su reseña.</p>
+        <p>Tu tarjeta de Reseñas abre directamente las Reseñas de Google de tu negocio. Así el cliente no tiene que buscar tu perfil manualmente.</p>
+        <div className="guidedCardInstructions"><b>Cómo se usa</b><span>1. Conecta tus Reseñas de Google.</span><span>2. El cliente acerca su teléfono.</span><span>3. Llega directo a dejar su reseña.</span></div>
         <button onClick={next}>Ver cómo funciona →</button>
       </div>}
 
