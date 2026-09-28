@@ -1,3 +1,4 @@
+import './v2-dashboard.css';
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
@@ -85,7 +86,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const publicOrigin = (process.env.NIVAL_PUBLIC_ORIGIN || process.env.NEXT_PUBLIC_SITE_URL || 'https://nival-tech-platform.vercel.app').replace(/\/$/, '');
   const { data: business } = await supabase
     .from("businesses")
-    .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled")
+    .select("id, name, slug, phone, description, logo_url, brand_color, website_url, subscription_status, product_level, nival_pay_free_enabled, nival_pay_trial_started_at")
     .eq("id", businessId)
     .maybeSingle();
   if (!business) throw new Error("No se pudo cargar el negocio.");
@@ -166,6 +167,11 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const freeNivalPay = !paidNivalPay && Boolean(business?.nival_pay_free_enabled);
   const hasNivalPay = paidNivalPay || freeNivalPay;
   const workspaceActive = hasNivalPay || hasReviews || hasPoints || business?.subscription_status === 'active';
+  const trialEndsAt = business.nival_pay_trial_started_at ? new Date(business.nival_pay_trial_started_at).getTime() + 15 * 86400000 : null;
+  const payTrialDaysLeft = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt - Date.now()) / 86400000)) : null;
+  const payStatusLabel = paidNivalPay ? 'Pay activo' : freeNivalPay && payTrialDaysLeft !== null
+    ? payTrialDaysLeft > 0 ? `Prueba Pay · ${payTrialDaysLeft} días` : 'Prueba Pay en pausa'
+    : workspaceActive ? 'Productos activos' : 'Configuración pendiente';
   const canManageProgram = membership.role === "owner" || membership.role === "manager";
   const [{ data: teamMembers }, { data: pendingInvitations }] = canManageProgram && businessId
     ? await Promise.all([
@@ -238,7 +244,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
     <main className="dashboardApp">
       <DashboardNavigation businessName={business?.name ?? "Tu negocio"} active={currentSection} productLevel={productLevel} />
       <div className="dashboardContent">
-      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{workspaceActive ? 'Activo' : business?.subscription_status === 'trial' ? 'Configuración pendiente' : 'Acceso pausado'}</span></header>
+      <header className={`dashboardContentTopbar ${currentSection === "perfil-digital" ? "profileDigitalTopbar" : ""}`}><div><span>{sectionTitles[currentSection]}</span><b>{new Intl.DateTimeFormat("es-MX", { dateStyle: "long", timeZone: "America/Mexico_City" }).format(new Date())}</b></div><span className="ready">{payStatusLabel}</span></header>
       {params.error && <div className="formMessage errorMessage dashboardMessage dashboardMessageTop">{params.error}</div>}
       {params.message && <div className="formMessage successMessage dashboardMessage dashboardMessageTop">{params.message}</div>}
       {currentSection === "resumen" && <>
@@ -249,7 +255,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <p>Primero deja listo lo esencial. Después usa Nival para cobrar, conseguir reseñas y hacer que tus clientes regresen.</p>
         </div>
       </section>
-      {canManageProgram && <BusinessHealthCard items={businessHealthItems} />}
+      {canManageProgram && <><section className="v2HomeProgress" aria-label="Progreso de configuración"><strong>Tu negocio está al {Math.round(businessHealthItems.filter(item=>item.complete).length / businessHealthItems.length * 100)}%</strong><span>Completa lo esencial para compartir tu tarjeta.</span><div><span style={{width:`${Math.round(businessHealthItems.filter(item=>item.complete).length / businessHealthItems.length * 100)}%`}}/></div></section><BusinessHealthCard items={businessHealthItems} /></>}
       <section className="nivalTodayCard">
         <div><span>{homeNextAction.eyebrow}</span><h2>{homeNextAction.title}</h2><p>{homeNextAction.text}</p></div>
         <a href={homeNextAction.href}>{homeNextAction.cta} <b>→</b></a>
