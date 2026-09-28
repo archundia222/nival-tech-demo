@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import { LandingTabs } from './landing-tabs';
 import { pricingV2, previewMxn } from '@/lib/pricing';
 import './v2-landing.css';
+export const metadata = { title: 'Tocvia | Tarjeta NFC para tu negocio', description: 'Comparte tus datos de pago, tu enlace de reseñas y tu WiFi desde una tarjeta NFC. Mira la demo y empieza una prueba gratuita.' };
 
 const sora = localFont({ src: '../fonts/sora-latin-700.woff2', weight: '700', variable: '--nv2-font-title', display: 'swap' });
 const inter = localFont({ src: [{ path: '../fonts/inter-latin-400.woff2', weight: '400' }, { path: '../fonts/inter-latin-700.woff2', weight: '700' }], variable: '--nv2-font-body', display: 'swap' });
