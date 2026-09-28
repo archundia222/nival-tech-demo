@@ -58,7 +58,7 @@ export async function reconcileLatestMercadoPagoProductOrder(
       && payload.external_reference === order.id
       && payload.status === 'processed'
       && payload.status_detail === 'accredited'
-      && (!payload.currency_id || payload.currency_id === order.currency)
+      && payload.currency_id === 'MXN' && payload.currency_id === order.currency
       && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
       && Math.round(Number(payload.total_paid_amount) * 100) === order.amount_cents
       && order.amount_cents === expectedAmount
@@ -121,7 +121,7 @@ export async function cancelLatestTerminalMercadoPagoProductOrder(
   const terminalFailure = ['failed','cancelled','canceled','expired'].includes(providerStatus);
   const verified = payload.id === order.provider_preference_id
     && payload.external_reference === order.id
-    && (!payload.currency_id || payload.currency_id === order.currency)
+    && payload.currency_id === 'MXN' && payload.currency_id === order.currency
     && Math.round(Number(payload.total_amount) * 100) === order.amount_cents
     && order.amount_cents === expectedAmount;
 
