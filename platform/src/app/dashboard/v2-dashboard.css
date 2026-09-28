@@ -155,6 +155,19 @@
 }
 @media(max-width:420px){.businessQrActions{grid-template-columns:1fr!important}.businessQrUrlRow{grid-template-columns:minmax(0,1fr) 42px!important}.businessQrCopy{width:100%!important}.dashboardContentTopbar{font-size:12px!important}}
 
+/* Keep the mobile menu in the document flow so iOS Safari cannot clip its links. */
+@media(max-width:850px){
+  .dashboardApp .v2MobileMenu{background:#f1f8f3!important;color:#102a21!important;overflow:visible!important;max-height:none!important}
+  .dashboardApp .v2MobileMenu>summary{background:#f1f8f3!important;color:#102a21!important;border-bottom:1px solid #cfe5d5!important}
+  .dashboardApp .v2MobileMenu>summary>span:nth-child(2){color:#102a21!important}
+  .dashboardApp .v2MobileMenu>summary strong{color:#375b48!important}
+  .dashboardApp .v2MobileMenu .hamburgerIcon i{background:#176541!important}
+  .dashboardApp .v2MobileMenu:not([open])>nav{display:none!important}
+  .dashboardApp .v2MobileMenu[open]>nav{position:static!important;display:grid!important;max-height:calc(100dvh - 90px)!important;overflow-y:auto!important;margin:0!important;padding:10px 16px 18px!important;background:#f1f8f3!important;border:0!important;border-radius:0!important;box-shadow:0 14px 25px #102a211a!important}
+  .dashboardApp .v2MobileMenu>nav>a{color:#173c2c!important;border-color:#cfe5d5!important}
+  .dashboardApp .v2MobileMenu .mobileSignOut{position:static!important;background:#f1f8f3!important}
+}
+
 /* Nival workspace: balanced editor, complete preview and consistent light controls. */
 .dashboardApp .dashboardPayContent .payHeading,
 .dashboardApp .profileDigitalWorkspace .profileDigitalHeading{width:100%!important;max-width:1180px!important;margin:0 auto 18px!important}
