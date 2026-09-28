@@ -13,7 +13,7 @@ type ActiveItem =
   | 'inteligencia-campanas' | 'inteligencia-impacto' | 'inteligencia-datos' | 'puntos' | 'puntos-registro'
   | 'puntos-analitica' | 'puntos-clientes' | 'puntos-visitas' | 'puntos-canjes' | 'puntos-promociones'
   | 'puntos-compartir' | 'puntos-configuracion' | 'puntos-pro' | 'clientes' | 'nival-card' | 'nival-pay'
-  | 'agregar-tarjetas' | 'compartir-paginas' | 'reseñas-add' | 'reseñas-share' | 'wifi-add' | 'wifi-share' | 'perfil-digital' | 'web-ia' | 'reseñas' | 'wifi' | 'configuracion';
+  | 'agregar-tarjetas' | 'compartir-paginas' | 'analiticas' | 'reseñas-add' | 'reseñas-share' | 'wifi-add' | 'wifi-share' | 'perfil-digital' | 'web-ia' | 'reseñas' | 'wifi' | 'configuracion';
 
 const payItems: Array<{ id: ActiveItem; label: string; href: string }> = [
   { id: 'nival-pay', label: 'Mi tarjeta Pay', href: '/dashboard/pay' },
