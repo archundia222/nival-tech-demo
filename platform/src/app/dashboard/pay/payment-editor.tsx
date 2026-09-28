@@ -33,8 +33,8 @@ export function PaymentEditor({ businessId, businessName, businessLogo, business
   return <form ref={formRef} action={action} className="nivalPayEditorShell" onSubmit={()=>{lastSubmittedRevision.current=revision}}>
     <input type="hidden" name="businessId" value={businessId}/><input type="hidden" name="profileId" value={profile?.id??''}/><input type="hidden" name="displayName" value={displayName}/><input type="hidden" name="paymentUrl" value={trialMode?'':paymentUrl}/><input type="hidden" name="active" value={active?'on':''}/><input type="hidden" name="fieldVisibility" value={JSON.stringify(fieldVisibility)}/><input type="hidden" name="customSections" value={JSON.stringify(sections)}/><input type="hidden" name="removeImage" value={removeImage?'on':''}/>
 
-    <aside className="nivalPayLivePreview" aria-label="Vista previa en vivo de Nival Pay">
-      <div className="nivalPayPreviewLabel"><span>VISTA PREVIA EN VIVO</span><small>Así la verá tu cliente</small></div>
+    <aside id="vista-nival-pay" className="nivalPayLivePreview" aria-label="Vista previa en vivo de Nival Pay">
+      <div className="nivalPayPreviewLabel"><span>ESTÁS EDITANDO ESTA NIVAL PAY</span><small>Los cambios se reflejan aquí</small></div>
       <div className="nivalPayPreviewPhone">
         <PaymentPageView embedded profile={{business_name:businessName,logo_url:image,brand_color:businessBrandColor,account_holder:holder,bank_name:bank,clabe,concept,payment_url:paymentUrl,holder_visible:fieldVisibility.holder,bank_visible:fieldVisibility.bank,clabe_visible:fieldVisibility.clabe,concept_visible:fieldVisibility.concept,payment_url_visible:fieldVisibility.paymentUrl,custom_sections:sections}} editor={{holder,bank,clabe,concept,paymentUrl,trialMode,onHolder:change(setHolder),onBank:change(setBank),onClabe:change(setClabe),onConcept:change(setConcept),onPaymentUrl:change(setPaymentUrl)}}/>
       </div>
