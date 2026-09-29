@@ -1,0 +1,82 @@
+/* Home: status overview only. Buying stays exclusively in Agregar Nival Card. */
+.dashboardApp .nivalHomeHero{
+  max-width:1180px!important;
+  margin:0 auto 8px!important;
+  padding:24px 4px 18px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.dashboardApp .nivalHomeHero h1{font-size:clamp(30px,4vw,44px)!important}
+.dashboardApp .nivalHomeHero p{max-width:650px!important}
+
+.dashboardApp .nivalHomeSection{
+  max-width:1180px;
+  margin:0 auto;
+  padding:26px 0;
+  border-top:1px solid #d7e8dc;
+}
+.dashboardApp .nivalHomeSectionHead{display:block!important;margin-bottom:16px}
+.dashboardApp .nivalHomeSectionHead>div{max-width:760px}
+.dashboardApp .nivalHomeSectionHead>div>span{color:#18784c;font-size:10px;font-weight:900;letter-spacing:.14em}
+.dashboardApp .nivalHomeSectionHead h2{margin:7px 0 5px;font-size:clamp(25px,3vw,34px);letter-spacing:-.035em}
+.dashboardApp .nivalHomeSectionHead h2 small{display:inline-grid;place-items:center;min-width:30px;height:30px;margin-left:7px;border-radius:999px;background:#e5f2e9;color:#176541;font-size:14px;vertical-align:middle}
+.dashboardApp .nivalHomeSectionHead p{margin:0;color:#61776b;font-size:14px;line-height:1.5}
+
+/* Never sell or add from Inicio. */
+.dashboardApp .nivalHomeSection .nivalCardsAddLink{display:none!important}
+
+/* Active cards on Inicio are a compact inventory, not card previews. */
+.dashboardApp .nivalActiveCards{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:9px!important;
+  margin:0!important;
+}
+.dashboardApp .nivalActiveCard{
+  min-height:0!important;
+  width:auto!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+  padding:11px 14px!important;
+  border:1px solid #cfe3d5!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+.dashboardApp .nivalActiveCard>span{
+  margin:0!important;
+  color:#18784c!important;
+  font-size:9px!important;
+  font-weight:900!important;
+  letter-spacing:.1em!important;
+  text-transform:uppercase!important;
+}
+.dashboardApp .nivalActiveCard>strong{
+  margin:0!important;
+  color:#102a21!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+}
+.dashboardApp .nivalActiveCard>div,
+.dashboardApp .nivalActiveCard>a{display:none!important}
+.dashboardApp .nivalCardsEmpty{padding:16px 0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.dashboardApp .nivalCardsEmpty>span{display:none!important}
+.dashboardApp .nivalCardsEmpty strong{font-size:14px!important}
+.dashboardApp .nivalCardsEmpty p{margin:4px 0 0!important;font-size:12px!important}
+
+/* Keep the home informational and visually quieter. */
+.dashboardApp .nivalProductStatusGrid{gap:10px!important}
+.dashboardApp .nivalProductStatus{box-shadow:none!important}
+.dashboardApp .nivalLandingIncluded{max-width:1180px!important;margin:8px auto 0!important;box-shadow:none!important}
+
+@media(max-width:800px){
+  .dashboardApp .nivalHomeHero{margin:0!important;padding:20px 2px 14px!important}
+  .dashboardApp .nivalHomeSection{padding:22px 0}
+  .dashboardApp .nivalActiveCards{gap:8px!important}
+  .dashboardApp .nivalActiveCard{max-width:100%!important;padding:10px 12px!important}
+  .dashboardApp .nivalActiveCard>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dashboardApp .nivalLandingIncluded{margin-top:6px!important}
+}
