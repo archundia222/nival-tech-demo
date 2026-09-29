@@ -1,0 +1,5 @@
+import Link from 'next/link';
+
+export default function NotFound(){
+ return <main style={{minHeight:'100svh',display:'grid',placeItems:'center',padding:24,background:'#f4faf6',color:'#0d3528',fontFamily:'system-ui,sans-serif'}}><section style={{width:'min(620px,100%)',padding:'clamp(28px,6vw,56px)',border:'1px solid #cfe3d7',borderRadius:28,background:'#fff',boxShadow:'0 24px 70px rgba(15,72,48,.08)'}}><span style={{fontWeight:900,letterSpacing:'.16em',color:'#168653'}}>NIVAL TECH · 404</span><h1 style={{fontSize:'clamp(42px,9vw,72px)',lineHeight:.95,margin:'20px 0'}}>Esta página no existe.</h1><p style={{fontSize:18,lineHeight:1.6,color:'#557066'}}>Puede que el enlace haya cambiado. Vuelve al inicio o entra a tu panel para continuar.</p><div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:28}}><Link href="/" style={{padding:'14px 20px',borderRadius:14,background:'#147a4d',color:'#fff',fontWeight:900,textDecoration:'none'}}>Volver al inicio</Link><Link href="/auth" style={{padding:'14px 20px',borderRadius:14,border:'1px solid #b9d9c6',color:'#0d6742',fontWeight:900,textDecoration:'none'}}>Entrar al panel</Link></div></section></main>;
+}
