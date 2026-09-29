@@ -1,21 +1,3 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { isNivalAdmin } from '@/lib/admin';
-import { saveReviewCard } from './actions';
-
-export default async function ReviewCardsAdmin({searchParams}:{searchParams:Promise<{error?:string;saved?:string}>}) {
- const p=await searchParams; const s=await createClient(); const {data:{user}}=await s.auth.getUser();
- if(!user) redirect('/auth?next=%2Fadmin%2Freview-cards'); if(!isNivalAdmin(user.email)) redirect('/dashboard');
- const admin=createAdminClient(); const {data}=await admin.from('review_cards').select('code,target_url,active').order('code');
- const origin=(process.env.NIVAL_PUBLIC_ORIGIN||process.env.NEXT_PUBLIC_SITE_URL||'https://nival-tech-platform.vercel.app').replace(/\/$/,'');
- return <main style={{maxWidth:1000,margin:'0 auto',padding:'32px 20px',fontFamily:'Arial,sans-serif'}}>
-  <h1>Tarjetas Google Reseñas</h1><p>Los QR impresos nunca cambian. Aquí solo cambias el destino.</p>
-  {p.error&&<p style={{color:'#a00'}}>{p.error}</p>}{p.saved&&<p>Tarjeta {p.saved} guardada.</p>}
-  <div style={{display:'grid',gap:12}}>{(data??[]).map(c=><form action={saveReviewCard} key={c.code} style={{display:'grid',gridTemplateColumns:'70px minmax(220px,1fr) 110px',gap:10,alignItems:'center',border:'1px solid #ddd',borderRadius:12,padding:12}}>
-   <input type="hidden" name="code" value={c.code}/><strong>{c.code}</strong>
-   <div><input name="targetUrl" defaultValue={c.target_url??''} placeholder="Pega aquí el enlace de Google Reseñas" style={{width:'100%',padding:10,border:'1px solid #bbb',borderRadius:8}}/><small style={{display:'block',marginTop:4}}>{origin}/r/{c.code}</small></div>
-   <button type="submit" style={{padding:'10px 14px',borderRadius:8,border:0,cursor:'pointer'}}>Guardar</button>
-  </form>)}</div>
- </main>;
-}
+import { createClient } from '@/lib/supabase/server';import { createAdminClient } from '@/lib/supabase/admin';import { isNivalAdmin } from '@/lib/admin';import { saveReviewCard,createReviewBatch } from './actions';
+export default async function Page({searchParams}:{searchParams:Promise<{error?:string;saved?:string}>}){const p=await searchParams,s=await createClient();const {data:{user}}=await s.auth.getUser();if(!user)redirect('/auth?next=%2Fadmin%2Freview-cards');if(!isNivalAdmin(user.email))redirect('/dashboard');const a=createAdminClient();const [{data:cards},{data:batches}]=await Promise.all([a.from('review_cards').select('code,target_url,active').order('code'),a.from('review_card_batches').select('id,name,quantity,start_number,end_number,created_at').order('created_at',{ascending:false}).limit(20)]);return <main style={{maxWidth:1050,margin:'auto',padding:28,fontFamily:'Arial,sans-serif'}}><h1>Producción · Google Reseñas</h1><p>Crea un lote, genera sus identificadores y abre la plantilla lista para imprimir/PDF.</p>{p.error&&<p style={{color:'#a00'}}>{p.error}</p>}<section style={{padding:20,border:'1px solid #ddd',borderRadius:16,margin:'20px 0'}}><h2>Nuevo lote</h2><form action={createReviewBatch} style={{display:'grid',gridTemplateColumns:'2fr 1fr auto',gap:10}}><input name="name" required placeholder="Ej. Reseñas septiembre" style={{padding:12}}/><input name="quantity" type="number" min="1" max="500" defaultValue="20" style={{padding:12}}/><button>Crear lote y plantilla</button></form></section><h2>Lotes</h2><div style={{display:'grid',gap:8}}>{(batches??[]).map(b=><a key={b.id} href={'/admin/review-cards/print/'+b.id} style={{padding:12,border:'1px solid #ddd',borderRadius:10}}> {b.name} · {b.quantity} tarjetas · {String(b.start_number).padStart(3,'0')}–{String(b.end_number).padStart(3,'0')} · Abrir impresión →</a>)}</div><h2 style={{marginTop:28}}>Asignar destinos</h2><div style={{display:'grid',gap:8}}>{(cards??[]).map(c=><form action={saveReviewCard} key={c.code} style={{display:'grid',gridTemplateColumns:'60px 1fr 100px',gap:8}}><input type="hidden" name="code" value={c.code}/><b>{c.code}</b><input name="targetUrl" defaultValue={c.target_url??''} placeholder="Enlace de Google Reseñas"/><button>Guardar</button></form>)}</div></main>}
