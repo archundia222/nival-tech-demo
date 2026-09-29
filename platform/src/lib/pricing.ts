@@ -3,11 +3,11 @@ export const currentPricing = {
   trialDays: 15,
   pointsFreeCustomerLimit: 10,
   pointsProTrialDays: 7,
-  payCents: 19900,
+  payCents: 9900,
   pointsMonthlyCents: 49900,
   reviewsCents: 9900,
   wifiCents: 9900,
-  payRegularCents: 29900,
+  payRegularCents: 9900,
   pointsRegularCents: 49900,
   growthCents: 74900,
   additionalPayCents: 9900,
@@ -19,7 +19,7 @@ export const currentPricing = {
 } as const;
 export const pricingV2 = {
   cards: {
-    essential: { name: 'Esencial', priceCents: 9900, description: 'Elige Reseñas o WiFi.', features: ['Reseñas o WiFi a elegir', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
+    essential: { name: 'Esencial', priceCents: 9900, description: 'Elige Pay, Reseñas o WiFi.', features: ['Pay, Reseñas o WiFi a elegir', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
     complete: { name: 'Completa', priceCents: 19900, description: 'Las tres acciones en una tarjeta.', features: ['Pay + Reseñas + WiFi', 'Una tarjeta NFC física', 'Enlace y QR de respaldo'] },
     trialDays: 15,
     upgradeCents: 10000,
