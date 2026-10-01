@@ -34,6 +34,7 @@ export default function DiagnosticPage() {
   const [website, setWebsite] = useState("");
   const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [competitorReviews, setCompetitorReviews] = useState("");
   const [prospects, setProspects] = useState<DiagnosticProspect[]>(readProspects);
 
   const canRunManual = useMemo(() => businessName.trim().length > 1, [businessName]);
@@ -54,8 +55,23 @@ export default function DiagnosticPage() {
       phone: phone.trim() || null,
       categories: [],
     };
+    const competitors: PublicBusinessSnapshot[] = competitorReviews
+      .split(",")
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isFinite(value) && value >= 0)
+      .slice(0, 5)
+      .map((count, index) => ({
+        placeId: `manual-competitor-${index + 1}`,
+        name: `Comparable ${index + 1}`,
+        address: "",
+        rating: null,
+        reviewCount: count,
+        website: null,
+        phone: null,
+        categories: [],
+      }));
     setError("");
-    setResult(buildDiagnostic(business, []));
+    setResult(buildDiagnostic(business, competitors));
   }
 
   async function runDiagnostic() {
@@ -120,6 +136,8 @@ export default function DiagnosticPage() {
           </div>
           <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="Sitio web" style={{ padding: 12 }} />
           <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Teléfono" style={{ padding: 12 }} />
+          <input value={competitorReviews} onChange={(e) => setCompetitorReviews(e.target.value)} placeholder="Reseñas de comparables, separadas por coma (ej. 180, 240, 95)" style={{ padding: 12 }} />
+          <small>Opcional: captura hasta 5 negocios comparables para detectar una brecha real de volumen de reseñas.</small>
           <button disabled={!canRunManual} onClick={buildManualDiagnostic} style={{ padding: 12 }}>Generar diagnóstico</button>
         </section>
       ) : (
