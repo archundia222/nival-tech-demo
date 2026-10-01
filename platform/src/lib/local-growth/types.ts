@@ -25,3 +25,16 @@ export type LocalDiagnostic = {
   verdict: "oportunidad_clara" | "oportunidad_limitada" | "sin_evidencia_suficiente";
   disclaimer: string;
 };
+
+export type ProspectStatus = "nuevo" | "contactado" | "diagnostico" | "seguimiento" | "cliente" | "descartado";
+
+export type DiagnosticProspect = {
+  id: string;
+  businessName: string;
+  address: string;
+  phone: string;
+  website: string;
+  notes: string;
+  status: ProspectStatus;
+  createdAt: string;
+};
