@@ -16,6 +16,9 @@ Prospecto → negocio en Google → datos públicos → competidores comparables
 Variable de servidor: GOOGLE_PLACES_API_KEY.
 La clave debe restringirse a la API necesaria y no exponerse al navegador.
 
+## Modo sin Places API
+La captura manual permite introducir nombre, dirección, rating, reseñas, web y teléfono. También acepta hasta 5 volúmenes de reseñas de negocios comparables; así el diagnóstico puede detectar una brecha verificable aun sin Google Places.
+
 ## Próximas iteraciones
 1. Búsqueda por nombre/dirección y selector de negocio.
 2. Descubrimiento automático de competidores comparables.
