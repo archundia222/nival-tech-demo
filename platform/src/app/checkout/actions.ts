@@ -608,7 +608,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
     if (details.target_payment_profile_id) query = query.eq('id', details.target_payment_profile_id);
     const { data: profile } = await query.order('created_at', { ascending: true }).limit(1).maybeSingle();
     if (!profile?.public_token) redirect('/dashboard/pay/physical?error=Primero+configura+la+página+Nival+Pay+que+abrirá+esta+tarjeta.');
-    return { ...details, target_payment_profile_id: profile.id, target_url: `${siteUrl}/pay/${profile.public_token}` };
+    return { ...details, target_payment_profile_id: profile.id, target_url: `${siteUrl}/tap/${profile.public_token}` };
   }
 
   redirect('/dashboard/pay/physical?error=Selecciona+Nival+Pay.');

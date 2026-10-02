@@ -37,6 +37,9 @@ export default async function CookiesPage() {
         <h2>Cookies que utilizamos actualmente</h2>
         <p>Nival Tech utiliza cookies técnicas y de sesión necesarias para funciones como autenticación, mantenimiento de sesión, seguridad y operación del panel. Estas cookies son necesarias para prestar el servicio solicitado.</p>
 
+        <h2>Sesiones de Nival Pay</h2>
+        <p>Las páginas de cobro guardan un identificador aleatorio en el almacenamiento de sesión de la pestaña para evitar contar sus recargas como nuevas visitas. El enlace de entrada de la tarjeta o QR crea una sesión nueva; la página abierta conserva la misma. Este registro no guarda nombres, direcciones IP ni identifica a la persona que consulta los datos.</p>
+
         <h2>Analítica y publicidad</h2>
         <p>Al momento de esta actualización, Nival Tech no utiliza cookies publicitarias ni herramientas propias de seguimiento comercial en el sitio. Si incorporamos analítica, publicidad u otras tecnologías no esenciales, actualizaremos esta política y aplicaremos los mecanismos de consentimiento que correspondan antes de utilizarlas.</p>
 
