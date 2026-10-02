@@ -5,3 +5,6 @@ node_modules/
 npm-debug.log*
 
 supabase/.temp/
+
+# Incremental TypeScript build cache
+*.tsbuildinfo

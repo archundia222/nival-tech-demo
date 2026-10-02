@@ -12,13 +12,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const signup = params.mode === "signup";
   const next = params.next ?? "/dashboard";
-  const signupContext = next.includes("/dashboard/points")
-    ? { label: "NIVAL PUNTOS", title: "Crea tu programa de clientes frecuentes", text: "Después de confirmar tu correo, crea tu negocio y podrás compartir tu QR, registrar visitas y mostrar la tarjeta digital del cliente." }
-    : next.includes("/dashboard/intelligence")
-      ? { label: "NIVAL INTELLIGENCE", title: "Prepara Nival para entender a tus clientes", text: "Intelligence funciona sobre Nival Puntos. Si todavía no lo tienes activo, primero te guiaremos para crear tu programa de fidelización." }
-      : next.includes("/checkout") || next.includes("/dashboard/pay")
-        ? { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y podrás preparar tu página de cobro, QR y enlace." }
-        : { label: "NIVAL TECH", title: "Crea tu cuenta de Nival Tech", text: "Configura tu negocio y administra Pay, Reseñas de Google y WiFi desde un solo panel." };
+  const signupContext = { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y prepara tu página de cobro, QR y enlace." };
 
   return (
     <main className="authShell tokeAuth">

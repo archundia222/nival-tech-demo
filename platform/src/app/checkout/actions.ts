@@ -5,10 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_CARDS_BUNDLE_PRICE_CENTS, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_POINTS_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT, NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_POINTS_PRICE_CENTS, NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_REVIEWS_PRICE_CENTS, NIVAL_WIFI_PRODUCT, NIVAL_WIFI_PRICE_CENTS } from '@/lib/orders';
+import { NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_PAY_PRICE_CENTS, NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRICE_CENTS, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_INCLUDED_SECTIONS, NIVAL_PAY_EXTRA_SECTION_PRICE_CENTS, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { isValidClabe } from '@/lib/payment-profile';
 import { getActiveBusinessMembership } from '@/lib/active-business';
-import { reconcileLatestSubscription } from '@/lib/reconcile-subscription';
 import { reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 
 async function currentPurchaseContext() {
@@ -133,11 +132,6 @@ async function startMercadoPagoProductCheckout(product: CheckoutProduct): Promis
     const { data: purchased } = await admin.from('product_orders').select('id')
       .eq('business_id', businessId).in('product_code', product.productCode === NIVAL_PAY_PRODUCT ? [NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT] : [NIVAL_CARDS_BUNDLE_PRODUCT]).eq('status', 'paid').limit(1).maybeSingle();
     if (purchased) redirect(product.productCode === NIVAL_CARDS_BUNDLE_PRODUCT ? '/dashboard' : '/dashboard/pay?view=manage');
-  }
-  if ([NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT].includes(product.productCode)) {
-    const { data: purchased } = await admin.from('product_orders').select('id')
-      .eq('business_id', businessId).in('product_code', [product.productCode, NIVAL_CARDS_BUNDLE_PRODUCT]).eq('status', 'paid').limit(1).maybeSingle();
-    if (purchased) redirect(product.returnPath);
   }
   if (new Set([NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_PAY_EXTRA_SECTION_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT]).has(product.productCode)) {
     const { data: baseOrder } = await admin.from('product_orders').select('id')
@@ -317,53 +311,6 @@ export async function startMercadoPagoCheckout() {
     amountCents: NIVAL_PAY_PRICE_CENTS,
     description: 'Nival Pay Pro · QR permanente + tarjeta NFC incluida',
     returnPath: '/checkout',
-  });
-}
-
-export async function startNivalCardsBundleCheckout() {
-  return startMercadoPagoProductCheckout({
-    productCode: NIVAL_CARDS_BUNDLE_PRODUCT,
-    amountCents: NIVAL_CARDS_BUNDLE_PRICE_CENTS,
-    description: 'Nival Completa · Pay + Reseñas + WiFi · tarjeta NFC',
-    returnPath: '/dashboard/cards/add',
-  });
-}
-
-export async function startNivalReviewsCheckout() {
-  return startMercadoPagoProductCheckout({
-    productCode: NIVAL_REVIEWS_PRODUCT,
-    amountCents: NIVAL_REVIEWS_PRICE_CENTS,
-    description: 'Nival Reseñas Pro · acceso físico + QR',
-    returnPath: '/dashboard/reviews',
-  });
-}
-export async function requestNivalCardCashPayment(form: FormData) {
-  const productCode = String(form.get('productCode') ?? '');
-  const catalog: Record<string, { amount: number; path: string }> = {
-    [NIVAL_REVIEWS_PRODUCT]: { amount: NIVAL_REVIEWS_PRICE_CENTS, path: '/dashboard/reviews' },
-    [NIVAL_WIFI_PRODUCT]: { amount: NIVAL_WIFI_PRICE_CENTS, path: '/dashboard/wifi' },
-  };
-  const product = catalog[productCode];
-  if (!product) redirect('/dashboard');
-  const { businessId } = await currentPurchaseContext();
-  const admin = createAdminClient();
-  const { data: existing } = await admin.from('product_orders').select('status')
-    .eq('business_id', businessId).eq('product_code', productCode)
-    .in('status', ['paid','pending_cash_confirmation']).limit(1).maybeSingle();
-  if (existing) redirect(`${product.path}?message=${encodeURIComponent(existing.status === 'paid' ? 'Este producto ya está activo.' : 'Tu solicitud de efectivo está pendiente de validación.')}`);
-  const { error } = await admin.from('product_orders').insert({ business_id: businessId,
-    product_code: productCode, amount_cents: product.amount,
-    payment_method: 'cash', status: 'pending_cash_confirmation' });
-  if (error && error.code !== '23505') redirect(`${product.path}?error=No+pudimos+registrar+tu+solicitud.`);
-  redirect(`${product.path}?message=Efectivo+pendiente:+paga+en+tu+negocio+y+Nival+confirmara+tu+compra.`);
-}
-
-export async function startNivalWifiCheckout() {
-  return startMercadoPagoProductCheckout({
-    productCode: NIVAL_WIFI_PRODUCT,
-    amountCents: NIVAL_WIFI_PRICE_CENTS,
-    description: 'Nival WiFi Pro · QR permanente + tarjeta NFC incluida',
-    returnPath: '/dashboard/wifi',
   });
 }
 
@@ -556,207 +503,10 @@ export async function startExtraSectionCheckoutForProfile(paymentProfileId: stri
   return startExtraSectionCheckoutForId(paymentProfileId);
 }
 
-type SubscriptionProduct = {
-  productCode: typeof NIVAL_POINTS_PRODUCT | typeof NIVAL_INTELLIGENCE_PRODUCT | typeof NIVAL_POINTS_INTELLIGENCE_PRODUCT | typeof NIVAL_GROWTH_UPGRADE_PRODUCT;
-  amountCents: number;
-  reason: string;
-};
-
-async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  const { user, businessId } = await currentPurchaseContext();
-  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
-  if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
-  if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
-
-  const admin = createAdminClient();
-  const { data: subscriptionHistory } = await admin.from('product_subscriptions')
-    .select('id,status,checkout_url,created_at,current_period_end')
-    .eq('business_id', businessId)
-    .eq('product_code', product.productCode)
-    .in('status', ['pending','authorized','paused','cancelled'])
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  const nowMs = Date.now();
-  const authorizedSubscription = (subscriptionHistory ?? []).find((item) => item.status === 'authorized');
-  const remainingPaidSubscription = (subscriptionHistory ?? []).find((item) =>
-    ['paused','cancelled'].includes(item.status)
-    && Boolean(item.current_period_end)
-    && new Date(item.current_period_end as string).getTime() > nowMs
-  );
-  const pendingSubscription = (subscriptionHistory ?? []).find((item) => item.status === 'pending');
-
-  if (authorizedSubscription || remainingPaidSubscription) {
-    redirect(`${returnPath}?subscription=active`);
-  }
-  if (pendingSubscription) {
-    const ageMs = nowMs - new Date(pendingSubscription.created_at).getTime();
-    if (pendingSubscription.checkout_url && Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000) {
-      redirect(pendingSubscription.checkout_url);
-    }
-    await admin.from('product_subscriptions')
-      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', pendingSubscription.id)
-      .eq('status', 'pending');
-  }
-
-  const { data: subscription, error: insertError } = await admin.from('product_subscriptions').insert({
-    business_id: businessId,
-    product_code: product.productCode,
-    amount_cents: product.amountCents,
-    status: 'pending',
-  }).select('id').single();
-  if (insertError || !subscription) redirect(`${returnPath}?error=No+se+pudo+preparar+la+suscripción.`);
-
-  const origin = checkoutOrigin();
-  const response = await fetch('https://api.mercadopago.com/preapproval', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      reason: product.reason,
-      external_reference: subscription.id,
-      payer_email: user.email,
-      auto_recurring: {
-        frequency: 1,
-        frequency_type: 'months',
-        transaction_amount: product.amountCents / 100,
-        currency_id: 'MXN',
-      },
-      back_url: `${origin}${returnPath}?subscription=return`,
-      status: 'pending',
-    }),
-    cache: 'no-store',
-  });
-  const result = await response.json().catch(() => ({})) as { id?: string; init_point?: string; message?: string };
-  if (!response.ok || !result.id || !result.init_point) {
-    console.error('[subscriptions] Mercado Pago rejected subscription', { status: response.status, message: result.message ?? null });
-    await admin.from('product_subscriptions').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', subscription.id);
-    redirect(`${returnPath}?error=No+se+pudo+abrir+la+suscripción+de+Mercado+Pago.`);
-  }
-
-  await admin.from('product_subscriptions').update({
-    provider_subscription_id: result.id,
-    checkout_url: result.init_point,
-    updated_at: new Date().toISOString(),
-  }).eq('id', subscription.id);
-  redirect(result.init_point);
-}
-
-export async function startNivalPointsSubscription() {
-  const { businessId } = await currentPurchaseContext();
-  await reconcileLatestSubscription(businessId);
-  const admin = createAdminClient();
-  const { data: growthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code,status,checkout_url,current_period_end')
-    .eq('business_id', businessId)
-    .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .in('status', ['pending','authorized','paused','cancelled'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const growthPeriodEnd = growthSubscription?.current_period_end ? new Date(growthSubscription.current_period_end).getTime() : 0;
-  if (growthSubscription?.status === 'authorized'
-      || (['paused','cancelled'].includes(growthSubscription?.status ?? '') && growthPeriodEnd > Date.now())) {
-    redirect('/dashboard/points?subscription=active');
-  }
-  if (growthSubscription?.status === 'pending' && growthSubscription.checkout_url) redirect(growthSubscription.checkout_url);
-  if (growthSubscription?.status === 'pending') {
-    await admin.from('product_subscriptions')
-      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', growthSubscription.id)
-      .eq('status', 'pending');
-  }
-  return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_PRODUCT, amountCents: NIVAL_POINTS_PRICE_CENTS, reason: 'Nival Puntos · plan mensual' });
-}
-
-export async function startNivalGrowthSubscription() {
-  const { businessId } = await currentPurchaseContext();
-
-  // A customer may return from the Puntos checkout and immediately upgrade.
-  // Reconcile first so an already-authorized $199 subscription is never
-  // mistaken for Free/trial and charged the full $449 Growth amount.
-  await reconcileLatestSubscription(businessId);
-
-  const admin = createAdminClient();
-  const { data: existingGrowthSubscription } = await admin.from('product_subscriptions')
-    .select('id,product_code,status,checkout_url,current_period_end')
-    .eq('business_id', businessId)
-    .in('product_code', [NIVAL_POINTS_INTELLIGENCE_PRODUCT, NIVAL_GROWTH_UPGRADE_PRODUCT, NIVAL_INTELLIGENCE_PRODUCT])
-    .in('status', ['pending','authorized','paused','cancelled'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const existingGrowthPeriodEnd = existingGrowthSubscription?.current_period_end
-    ? new Date(existingGrowthSubscription.current_period_end).getTime()
-    : 0;
-  if (existingGrowthSubscription?.status === 'authorized'
-      || (['paused','cancelled'].includes(existingGrowthSubscription?.status ?? '') && existingGrowthPeriodEnd > Date.now())) {
-    redirect('/dashboard/intelligence?subscription=active');
-  }
-  if (existingGrowthSubscription?.status === 'pending' && existingGrowthSubscription.checkout_url) {
-    redirect(existingGrowthSubscription.checkout_url);
-  }
-  if (existingGrowthSubscription?.status === 'pending') {
-    await admin.from('product_subscriptions')
-      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', existingGrowthSubscription.id)
-      .eq('status', 'pending');
-  }
-
-  const [{ data: points }, { data: pointsSubscriptionHistory }] = await Promise.all([
-    admin.from('business_product_entitlements').select('status')
-      .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).maybeSingle(),
-    admin.from('product_subscriptions').select('id,status,checkout_url,current_period_end,created_at')
-      .eq('business_id', businessId)
-      .eq('product_code', NIVAL_POINTS_PRODUCT)
-      .in('status', ['pending','authorized','paused','cancelled'])
-      .order('created_at', { ascending: false })
-      .limit(20),
-  ]);
-
-  const paidPointsSubscription = (pointsSubscriptionHistory ?? []).find((item) => item.status === 'authorized') ?? null;
-  const pendingPointsSubscription = (pointsSubscriptionHistory ?? []).find((item) => item.status === 'pending') ?? null;
-  const gracePointsSubscription = (pointsSubscriptionHistory ?? []).find((item) =>
-    ['paused','cancelled'].includes(item.status)
-    && Boolean(item.current_period_end)
-    && new Date(item.current_period_end as string).getTime() > Date.now()
-  ) ?? null;
-
-  if (pendingPointsSubscription?.checkout_url) {
-    redirect(pendingPointsSubscription.checkout_url);
-  }
-  if (pendingPointsSubscription) {
-    await admin.from('product_subscriptions')
-      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-      .eq('id', pendingPointsSubscription.id)
-      .eq('status', 'pending');
-  }
-  if (gracePointsSubscription && !paidPointsSubscription) {
-    redirect('/dashboard/intelligence?error=Tu+plan+de+Puntos+está+cancelado+o+pausado,+pero+sigue+activo+hasta+el+fin+del+periodo+pagado.+Growth+se+puede+activar+cuando+Puntos+vuelva+a+tener+renovación+activa.');
-  }
-
-  if (!points || !['free', 'active'].includes(points.status)) {
-    redirect('/dashboard/points?error=Activa+Nival+Puntos+primero.+Growth+incluye+Puntos+e+Intelligence.');
-  }
-
-  return startMercadoPagoSubscription(paidPointsSubscription
-    ? {
-        productCode: NIVAL_GROWTH_UPGRADE_PRODUCT,
-        amountCents: NIVAL_GROWTH_UPGRADE_PRICE_CENTS,
-        reason: 'Nival Growth · complemento Intelligence para Nival Puntos Pro',
-      }
-    : {
-        productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT,
-        amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS,
-        reason: 'Nival Growth · Nival Puntos Pro + Intelligence',
-      });
-}
-
 type PhysicalCardInput = {
   design: 'black' | 'white' | 'custom';
   design_notes: string | null;
-  front_template: 'pay' | 'points' | 'reviews' | 'wifi' | 'profile';
+  front_template: 'pay';
   back_style: 'nival' | 'custom';
   back_design_notes: string | null;
   back_design_url: string | null;
@@ -799,7 +549,7 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
   const notes = String(form.get('designNotes') ?? '').trim();
   const requestedDate = String(form.get('requestedDeliveryDate') ?? '').trim();
   const targetPaymentProfileId = String(form.get('paymentProfileId') ?? '').trim() || null;
-  if (!['black','white','custom'].includes(design) || !['pay','points','reviews','wifi','profile'].includes(frontTemplate)
+  if (!['black','white','custom'].includes(design) || frontTemplate !== 'pay'
     || !['nival','custom'].includes(backStyle) || !['sunday_local','saturday_local','weekday_quote','shipping'].includes(delivery)
     || recipient.length < 2 || phone.length < 10 || address1.length < 5 || city.length < 2
     || state.length < 2 || !/^\d{5}$/.test(postalCode) || notes.length > 500 || backDesignNotes.length > 500) return null;
@@ -861,31 +611,7 @@ async function resolvePhysicalCardDestination(businessId: string, details: Physi
     return { ...details, target_payment_profile_id: profile.id, target_url: `${siteUrl}/pay/${profile.public_token}` };
   }
 
-  if (details.front_template === 'points') {
-    const [{ data: entitlement }, { data: program }] = await Promise.all([
-      admin.from('business_product_entitlements').select('status')
-        .eq('business_id', businessId).eq('product_code', NIVAL_POINTS_PRODUCT).in('status', ['active','free']).maybeSingle(),
-      admin.from('loyalty_programs').select('id')
-        .eq('business_id', businessId).eq('active', true).order('created_at', { ascending: true }).limit(1).maybeSingle(),
-    ]);
-    if (!entitlement) redirect('/dashboard/pay/physical?error=Activa+Nival+Puntos+antes+de+pedir+una+tarjeta+para+puntos.');
-    if (!program) redirect('/dashboard/pay/physical?error=Configura+primero+tu+programa+de+Nival+Puntos.');
-    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/b/${business.slug}?from=nfc` };
-  }
-
-  if (details.front_template === 'reviews') {
-    const { data: profile } = await admin.from('review_profiles').select('public_token,google_review_url').eq('business_id',businessId).maybeSingle();
-    if (!profile?.public_token || !profile.google_review_url) redirect('/dashboard/pay/physical?error=Configura+tu+enlace+de+Nival+Resenas+antes+de+pedir+la+tarjeta.');
-    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/reviews/${profile.public_token}` };
-  }
-
-  if (details.front_template === 'wifi') {
-    const { data: profile } = await admin.from('wifi_profiles').select('public_token,access_url').eq('business_id',businessId).maybeSingle();
-    if (!profile?.public_token || !profile.access_url) redirect('/dashboard/pay/physical?error=Configura+tu+red+Nival+WiFi+antes+de+pedir+la+tarjeta.');
-    return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/wifi/${profile.public_token}` };
-  }
-
-  return { ...details, target_payment_profile_id: null, target_url: `${siteUrl}/p/${business.slug}` };
+  redirect('/dashboard/pay/physical?error=Selecciona+Nival+Pay.');
 }
 
 export async function startPhysicalCardCheckout(form: FormData) {
@@ -935,7 +661,7 @@ export async function claimIncludedPhysicalCard(form: FormData) {
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', businessId)
-      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_REVIEWS_PRODUCT, NIVAL_WIFI_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, created_at, product_orders!physical_card_orders_product_order_id_fkey(status,created_at,checkout_url)').eq('business_id', businessId),

@@ -25,7 +25,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
 
   const { data: orders } = await admin.from('product_orders')
     .select('id, business_id, product_code, amount_cents, payment_method, status, created_at, paid_at, businesses(name, phone)')
-    .in('product_code', ['nival_pay','nival_pay_additional','nival_reviews','nival_wifi','nival_cards_bundle'])
+    .in('product_code', ['nival_pay','nival_pay_additional','nival_cards_bundle'])
     .in('status', ['paid', 'pending_cash_confirmation'])
     .order('created_at', { ascending: false })
     .limit(500);
@@ -108,7 +108,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
         })}</div> : <div className="adminEmpty"><span>▣</span><h2>Aún no hay pedidos físicos</h2><p>Los pedidos aparecerán aquí en cuanto un cliente solicite su tarjeta incluida o compre una adicional.</p></div>}
       </section>}
       {currentSection === 'configuracion' && <div className="adminSettingsGrid">
-        <article><span>PRECIOS ACTUALES</span><strong>Pay $199 · Reseñas / WiFi $99</strong><p>Pago único con tarjeta NFC incluida. Puntos Pro $499 al mes.</p></article>
+        <article><span>PRECIOS ACTUALES</span><strong>Nival Pay $99</strong><p>Pago único con primera tarjeta NFC incluida.</p></article>
         <article><span>MERCADO PAGO</span><strong>{process.env.MERCADO_PAGO_ACCESS_TOKEN ? 'Conectado' : 'Requiere configuración'}</strong><p>Estado de la integración de cobro.</p></article>
       </div>}
       {currentSection === 'inteligencia' && <section className="adminEmpty"><span>✦</span><h2>Disponible cuando tengas más clientes activos</h2><p>La inteligencia se habilitará cuando exista información suficiente para producir recomendaciones útiles.</p></section>}

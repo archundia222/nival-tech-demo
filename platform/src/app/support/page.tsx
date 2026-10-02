@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -35,7 +36,7 @@ export default async function SupportPage() {
         </ul>
 
         <h2>¿Estás evaluando Nival para tu negocio?</h2>
-        <p>Cuéntanos si te interesa Nival Pay, Nival Puntos, Nival Growth (Puntos + Intelligence), una página web con IA o una implementación para varias ubicaciones. Podemos empezar por una necesidad concreta.</p>
+        <p>Cuéntanos si necesitas ayuda para configurar Nival Pay, comprar una tarjeta NFC o compartir tus datos de cobro con QR y enlace.</p>
         <p>También puedes solicitar acceso, corrección o eliminación de tus datos personales por estos mismos medios.</p>
         <a className="textLink" href="/privacy">Consultar aviso de privacidad</a>
       </section>

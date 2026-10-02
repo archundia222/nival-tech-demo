@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -40,7 +41,7 @@ export default async function CookiesPage() {
         <p>Al momento de esta actualización, Nival Tech no utiliza cookies publicitarias ni herramientas propias de seguimiento comercial en el sitio. Si incorporamos analítica, publicidad u otras tecnologías no esenciales, actualizaremos esta política y aplicaremos los mecanismos de consentimiento que correspondan antes de utilizarlas.</p>
 
         <h2>Proveedores tecnológicos</h2>
-        <p>Algunas funciones pueden depender de proveedores externos como Supabase, Vercel, Mercado Pago o Google Wallet. Cuando visitas o utilizas servicios de terceros, esos proveedores pueden aplicar sus propias tecnologías y políticas de privacidad.</p>
+        <p>Algunas funciones pueden depender de proveedores externos como Supabase, Vercel, Mercado Pago. Cuando visitas o utilizas servicios de terceros, esos proveedores pueden aplicar sus propias tecnologías y políticas de privacidad.</p>
 
         <h2>Cómo controlar las cookies</h2>
         <p>Puedes controlar o eliminar cookies desde la configuración de tu navegador. Bloquear cookies técnicas puede impedir que puedas iniciar sesión o utilizar correctamente algunas funciones de Nival.</p>

@@ -17,7 +17,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   if (!user) redirect('/auth?mode=signup&next=%2Fcheckout');
   const membership = await getActiveBusinessMembership(user.id);
   if (!membership) redirect('/dashboard?next=%2Fdashboard%2Fpay');
-  if (membership.role === 'staff') redirect('/dashboard/points?view=visits');
+  if (membership.role === 'staff') redirect('/dashboard');
   const { data: business } = await supabase.from('businesses')
     .select('name, subscription_status').eq('id', membership.business_id).maybeSingle();
   if (!business) redirect('/dashboard');
@@ -75,7 +75,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
               <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>MXN · Sin mensualidad</small></div>
-              <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>Puntos de cobro ilimitados</li><li>Datos editables sin cambiar la tarjeta</li></ul>
+              <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>QR y enlace para compartir en tu negocio</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
               <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -41,13 +42,12 @@ export default async function PrivacyPage() {
         <ul>
           <li>Crear y mantener cuentas, perfiles y configuraciones de los productos Nival.</li>
           <li>Operar páginas de cobro informativas, registrar visitas, puntos, beneficios y actividad necesaria para las funciones contratadas.</li>
-          <li>Generar y actualizar pases de Google Wallet cuando lo solicites.</li>
           <li>Brindar soporte, prevenir abuso y mantener la seguridad del servicio.</li>
           <li>Enviar promociones únicamente cuando exista el consentimiento registrado para ello.</li>
         </ul>
 
         <h2>Proveedores y transferencias</h2>
-        <p>Utilizamos proveedores tecnológicos para alojamiento, base de datos, procesamiento de pagos y emisión de pases, incluyendo Vercel, Supabase, Mercado Pago y Google Wallet según la función utilizada. Compartimos únicamente la información necesaria para prestar esas funciones. No vendemos tus datos personales.</p>
+        <p>Utilizamos proveedores tecnológicos para alojamiento, base de datos, procesamiento de pagos, incluyendo Vercel, Supabase, Mercado Pago según la función utilizada. Compartimos únicamente la información necesaria para prestar esas funciones. No vendemos tus datos personales.</p>
 
         <h2>Conservación y seguridad</h2>
         <p>Conservamos la información durante el tiempo necesario para operar el programa, atender solicitudes y cumplir obligaciones aplicables. Aplicamos controles de acceso y medidas técnicas razonables para protegerla.</p>

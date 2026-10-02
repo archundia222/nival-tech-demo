@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -36,8 +37,6 @@ export default async function RefundsPage() {
         <h2>Pagos digitales y activaciones</h2>
         <p>Si existe un cobro duplicado, un pago acreditado que no activó correctamente el producto o un cargo que no corresponde con lo mostrado antes de confirmar la compra, contáctanos para revisarlo. Verificaremos el estado del pago y del servicio antes de resolver la solicitud.</p>
 
-        <h2>Suscripciones</h2>
-        <p>Puedes solicitar la cancelación de una suscripción para evitar cobros futuros. La cancelación y la vigencia restante dependen del estado reportado por el procesador de pagos y del periodo ya pagado. Los reembolsos de periodos ya iniciados se revisan caso por caso, considerando el uso del servicio y los derechos aplicables.</p>
 
         <h2>Tarjetas NFC y productos físicos</h2>
         <p>Si un pedido físico todavía no entra a producción, podremos revisar cambios o cancelación. Una vez iniciada la personalización, impresión o producción, la posibilidad de reembolso puede verse limitada por tratarse de un producto preparado para un negocio específico. Si recibes un producto incorrecto, defectuoso o distinto de lo confirmado, contáctanos para revisar reposición, corrección o reembolso según corresponda.</p>

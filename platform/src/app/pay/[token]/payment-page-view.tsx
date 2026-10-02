@@ -8,7 +8,7 @@ import styles from "./payment-page.module.css";
 
 export type PaymentPageSection = { id: string; title: string; content: string; public?: boolean };
 export type PaymentPageViewProfile = {
-  business_name: string; business_slug?: string | null; points_enabled?: boolean; logo_url?: string | null; brand_color?: string | null;
+  business_name: string; business_slug?: string | null; logo_url?: string | null; brand_color?: string | null;
   account_holder: string; bank_name: string; clabe: string; concept?: string | null; payment_url?: string | null;
   holder_visible?: boolean; bank_visible?: boolean; clabe_visible?: boolean; concept_visible?: boolean; payment_url_visible?: boolean;
   custom_sections?: PaymentPageSection[] | null;

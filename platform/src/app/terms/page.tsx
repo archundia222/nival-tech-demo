@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -34,7 +35,7 @@ export default async function TermsPage() {
         </div>
 
         <h2>Productos Nival</h2>
-        <p>Nival Tech puede ofrecer Nival Pay, Nival Puntos, Nival Growth —que integra Puntos e Intelligence—, perfiles digitales y otras herramientas relacionadas. Algunas funciones tienen plan gratis y otras requieren pago único o suscripción. El precio y alcance aplicable se muestran antes de confirmar una compra.</p>
+        <p>Nival Tech ofrece Nival Pay para compartir datos de cobro mediante una página pública, QR, enlace y tarjeta NFC. El precio y alcance aplicable se muestran antes de confirmar una compra.</p>
 
         <h2>Pruebas y planes gratuitos</h2>
         <p>Cuando se ofrezca una prueba temporal de funciones Pro, la duración se mostrará antes de activarla. Al terminar una prueba sin una suscripción vigente, ciertas funciones pueden volver al nivel gratuito disponible; los datos que el producto indique como conservables no se eliminan únicamente por terminar la prueba.</p>
@@ -43,16 +44,10 @@ export default async function TermsPage() {
         <p>Nival Pay facilita que un negocio publique datos para recibir una transferencia o comparta un enlace de pago. Nival Tech no es una institución financiera y no recibe, retiene ni transfiere el dinero de la operación bancaria entre el negocio y su cliente. El negocio es responsable de revisar que beneficiario, banco, CLABE y demás información publicada sean correctos.</p>
 
         <h2>Pagos de productos Nival</h2>
-        <p>Los pagos de productos o suscripciones Nival pueden procesarse mediante proveedores externos como Mercado Pago. El monto final se muestra antes de confirmar la operación. Una suscripción puede perder funciones Pro y volver al plan disponible cuando sea cancelada, pausada o deje de estar vigente conforme se sincronice su estado.</p>
+        <p>Los pagos de Nival Pay pueden procesarse mediante proveedores externos como Mercado Pago. El monto final se muestra antes de confirmar la operación.</p>
 
         <h2>Tarjetas físicas</h2>
         <p>Cuando una compra incluya o agregue una tarjeta NFC física, el usuario deberá proporcionar los datos necesarios de diseño y entrega. El frente puede usar plantillas de Nival según el objetivo de la tarjeta. El reverso estándar puede estar incluido y, cuando se ofrezca, el reverso personalizado tendrá el cargo adicional mostrado antes de confirmar la compra. Los tiempos de producción y entrega dependen del diseño, ubicación, disponibilidad y método elegido. Si un envío requiere un costo adicional, deberá informarse antes de confirmarlo.</p>
-
-        <h2>Ventas y datos operativos</h2>
-        <p>El negocio puede registrar ventas individuales, resúmenes diarios o importar archivos compatibles para alimentar sus métricas. Nival solo considera como venta registrada la información que el propio negocio proporciona; no debe interpretarse como conciliación bancaria ni como ingreso verificado por Nival.</p>
-
-        <h2>Clientes, campañas y consentimiento</h2>
-        <p>El negocio que usa Nival es responsable de contar con las autorizaciones necesarias para recopilar información de sus clientes y realizar comunicaciones comerciales. Las funciones de promociones e Intelligence utilizan el consentimiento registrado para limitar las audiencias de marketing dentro de las herramientas disponibles.</p>
 
         <h2>Uso adecuado y seguridad</h2>
         <p>No debes utilizar Nival para suplantar negocios, publicar información bancaria que no estés autorizado a compartir, intentar acceder a cuentas ajenas, abusar del servicio o realizar actividades ilícitas. Podemos limitar el acceso cuando sea necesario para proteger a usuarios, datos o la operación de la plataforma.</p>
@@ -61,7 +56,7 @@ export default async function TermsPage() {
         <p>Trabajamos para mantener Nival disponible y confiable, pero no garantizamos funcionamiento ininterrumpido. Podemos corregir errores, modificar funciones o actualizar estos términos conforme evolucione el producto. Evitaremos presentar como resultados confirmados aquello que solo sea una estimación.</p>
 
         <h2>Cancelaciones, incidencias y reembolsos</h2>
-        <p>Si quieres cancelar una suscripción o existe un problema con un cobro o pedido físico, contáctanos por el <Link href="/support">Centro de ayuda</Link>. Las solicitudes de reembolso se revisan según el estado de la compra, el servicio ya prestado, la producción iniciada y los derechos que correspondan conforme a la legislación aplicable.</p>
+        <p>Si existe un problema con un cobro o pedido físico, contáctanos por el <Link href="/support">Centro de ayuda</Link>. Las solicitudes de reembolso se revisan según el estado de la compra, el servicio ya prestado, la producción iniciada y los derechos que correspondan conforme a la legislación aplicable.</p>
 
         <h2>Privacidad</h2>
         <p>El tratamiento de datos personales se describe en nuestro <Link href="/privacy">Aviso de privacidad</Link>.</p>
