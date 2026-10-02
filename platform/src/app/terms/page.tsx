@@ -37,9 +37,6 @@ export default async function TermsPage() {
         <h2>Productos Nival</h2>
         <p>Nival Tech ofrece Nival Pay para compartir datos de cobro mediante una página pública, QR, enlace y tarjeta NFC. El precio y alcance aplicable se muestran antes de confirmar una compra.</p>
 
-        <h2>Pruebas y planes gratuitos</h2>
-        <p>Cuando se ofrezca una prueba temporal de funciones Pro, la duración se mostrará antes de activarla. Al terminar una prueba sin una suscripción vigente, ciertas funciones pueden volver al nivel gratuito disponible; los datos que el producto indique como conservables no se eliminan únicamente por terminar la prueba.</p>
-
         <h2>Nival Pay y transferencias</h2>
         <p>Nival Pay facilita que un negocio publique datos para recibir una transferencia o comparta un enlace de pago. Nival Tech no es una institución financiera y no recibe, retiene ni transfiere el dinero de la operación bancaria entre el negocio y su cliente. El negocio es responsable de revisar que beneficiario, banco, CLABE y demás información publicada sean correctos.</p>
 

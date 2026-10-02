@@ -47,8 +47,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   if (!existing) return { error: 'No encontramos esta página Nival Pay.' };
   const { data: paidOrder } = await supabase.from('product_orders').select('id')
     .eq('business_id', businessId).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle();
-  const trialMode = !paidOrder;
-  if (trialMode) customSections = customSections.slice(0, 1);
+  if (!paidOrder && user.app_metadata?.demo_access !== true) return { error: 'Compra tu Nival Pay para guardar los cambios.' };
   let imageUrl = form.get('removeImage') === 'on' ? null : existing?.image_url ?? null;
   let uploadedPath: string | null = null;
   const file = form.get('image');
@@ -67,7 +66,7 @@ export async function savePaymentProfile(_state: PaymentFormState, form: FormDat
   }
   const { data, error } = await supabase.from('payment_profiles').update({
     display_name: displayName, account_holder: holder, bank_name: bank, clabe,
-    concept: concept || null, payment_url: trialMode ? null : paymentUrl || null, image_url: imageUrl,
+    concept: concept || null, payment_url: paymentUrl || null, image_url: imageUrl,
     holder_visible: !!visibility.holder, bank_visible: !!visibility.bank, clabe_visible: !!visibility.clabe,
     concept_visible: !!visibility.concept, payment_url_visible: !!visibility.paymentUrl,
     custom_sections: customSections, active: form.get('active') === 'on', updated_at: new Date().toISOString(),
@@ -132,73 +131,4 @@ export async function createAdditionalPaymentProfile() {
 
   revalidatePath('/dashboard/pay');
   redirect(`/dashboard/pay?profile=${data.id}`);
-}
-
-
-export async function prepareFreeNivalPay() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
-
-  const membership = await getActiveBusinessMembership(user.id);
-  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
-
-  const [{ data: paidOrder }, { data: existing }] = await Promise.all([
-    supabase.from('product_orders').select('id')
-      .eq('business_id', membership.business_id).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle(),
-    supabase.from('payment_profiles').select('id')
-      .eq('business_id', membership.business_id).order('created_at').limit(1).maybeSingle(),
-  ]);
-  if (paidOrder) redirect('/dashboard/pay');
-  if (existing) redirect(`/dashboard/pay?profile=${existing.id}`);
-
-  const { data: profile, error } = await supabase.from('payment_profiles').insert({
-    business_id: membership.business_id,
-    display_name: 'Nival Pay',
-    account_holder: '',
-    bank_name: '',
-    clabe: '',
-    active: false,
-  }).select('id').single();
-
-  if (error || !profile) redirect('/dashboard/pay?error=No+pudimos+crear+tu+Nival+Pay+Gratis.');
-  revalidatePath('/dashboard/pay');
-  redirect(`/dashboard/pay?profile=${profile.id}&free=setup`);
-}
-
-export async function publishFreeNivalPay(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/auth?next=%2Fdashboard%2Fpay');
-
-  const profileId = String(formData.get('profileId') ?? '');
-  const membership = await getActiveBusinessMembership(user.id);
-  if (!membership || !['owner', 'manager'].includes(membership.role)) redirect('/dashboard/pay?error=No+tienes+permiso.');
-
-  const { data: paidOrder } = await supabase.from('product_orders').select('id')
-    .eq('business_id', membership.business_id).in('product_code', ['nival_pay','nival_cards_bundle']).eq('status', 'paid').limit(1).maybeSingle();
-  if (paidOrder) redirect('/dashboard/pay');
-
-  const { data: profile } = await supabase.from('payment_profiles')
-    .select('id,account_holder,bank_name,clabe')
-    .eq('id', profileId)
-    .eq('business_id', membership.business_id)
-    .maybeSingle();
-
-  if (!profile || profile.account_holder.trim().length < 2 || profile.bank_name.trim().length < 2 || !isValidClabe(profile.clabe.replace(/\s/g,''))) {
-    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=Completa+beneficiario,+banco+y+una+CLABE+válida+antes+de+publicar+tu+QR.`);
-  }
-
-  const { error: publishError } = await supabase.rpc('publish_free_nival_pay', {
-    p_business_id: membership.business_id,
-    p_profile_id: profile.id,
-  });
-
-  if (publishError) {
-    redirect(`/dashboard/pay?profile=${encodeURIComponent(profileId)}&error=No+pudimos+publicar+tu+Nival+Pay+Gratis.+Intenta+de+nuevo.`);
-  }
-
-  revalidatePath('/dashboard/pay');
-  revalidatePath('/dashboard');
-  redirect(`/dashboard/pay?view=share&profile=${encodeURIComponent(profile.id)}&free=started`);
 }

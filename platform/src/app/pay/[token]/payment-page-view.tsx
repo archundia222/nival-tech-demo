@@ -15,7 +15,7 @@ export type PaymentPageViewProfile = {
 };
 
 type InlineEditor = {
-  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; trialMode?: boolean; demo?: boolean;
+  holder: string; bank: string; clabe: string; concept: string; paymentUrl: string; demo?: boolean;
   onHolder: (value: string) => void; onBank: (value: string) => void; onClabe: (value: string) => void;
   onConcept: (value: string) => void; onPaymentUrl: (value: string) => void;
 };
@@ -43,7 +43,7 @@ export function PaymentPageView({ profile, embedded = false, preview = false, tr
           {profile.bank_visible && editField('Banco', editor.bank, editor.onBank)}
           {profile.clabe_visible && editField('CLABE interbancaria', editor.clabe, (value) => editor.onClabe(value.replace(/[^0-9 ]/g, '').slice(0, 23)))}
           {profile.concept_visible && editField('Concepto', editor.concept, editor.onConcept, 'Opcional')}
-          {!editor.trialMode && profile.payment_url_visible && editField('Enlace de pago', editor.paymentUrl, editor.onPaymentUrl, 'https://...')}
+          {profile.payment_url_visible && editField('Enlace de pago', editor.paymentUrl, editor.onPaymentUrl, 'https://...')}
         </> : <>
           {profile.holder_visible && <CopyField label="Beneficiario" value={profile.account_holder} variant="detail" />}
           {profile.bank_visible && <CopyField label="Banco" value={profile.bank_name} variant="bank" />}
