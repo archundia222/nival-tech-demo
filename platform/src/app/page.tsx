@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import localFont from 'next/font/local';
-import { PayDemo } from './pay-demo';
+import { PaymentPageView } from './pay/[token]/payment-page-view';
 import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 import './pay-landing.css';
 
@@ -21,14 +21,14 @@ export default function Home(){
         <p>Tu cliente acerca el celular, ve tus datos bancarios y transfiere.</p>
         <div className="payLandingActions">
           <Link className="payLandingPrimary" href="/checkout">Quiero mi Nival Pay <b>→</b></Link>
-          <Link className="payLandingSecondary" href="#demo">Ver cómo se usa ↓</Link>
+          <Link className="payLandingSecondary" href="/demo">Ver cómo se usa →</Link>
         </div>
         <div className="heroMeta"><strong>{money(NIVAL_PAY_PRICE_CENTS)} MXN</strong><span>pago único</span><i/> <span>tarjeta NFC incluida</span></div>
       </div>
       <div className="heroVisual" aria-label="Vista previa de Nival Pay">
         <div className="tapHalo halo3"/><div className="tapHalo halo2"/><div className="tapHalo halo1"/>
         <div className="nfcCard"><div className="cardTop"><b>NIVAL</b><span>PAY</span></div><div className="nfcMark">)))</div><small>ACERCA TU CELULAR</small></div>
-        <div className="phoneMock"><div className="phoneIsland"/><PayDemo/></div>
+        <div className="phoneMock"><div className="phoneIsland"/><PaymentPageView embedded preview profile={{business_name:"Nival Pay Demo",brand_color:"#18784c",account_holder:"Rodrigo Archundia",bank_name:"Banco de ejemplo",clabe:"000000000000000000",concept:"Pago de consumo",holder_visible:true,bank_visible:true,clabe_visible:true,concept_visible:true,payment_url_visible:false,custom_sections:[]}}/></div>
         <div className="floatingTag tagOne">✓ CLABE copiada</div>
         <div className="floatingTag tagTwo">Sin app</div>
       </div>
@@ -47,7 +47,7 @@ export default function Home(){
 
     <section className="productStage">
       <div className="productCopy"><span>EJEMPLO REAL</span><h2>Imagina que acabas de pedir la cuenta.</h2><p>El negocio te acerca su Nival Pay. Tú la tocas con el celular, se abre esta pantalla, copias la CLABE y haces la transferencia. Eso es todo.</p><Link href="/demo">Probar la pantalla del cliente →</Link></div>
-      <div className="productDemo"><PayDemo/></div>
+      <div className="productDemo"><PaymentPageView embedded preview profile={{business_name:"Nival Pay Demo",brand_color:"#18784c",account_holder:"Rodrigo Archundia",bank_name:"Banco de ejemplo",clabe:"000000000000000000",concept:"Pago de consumo",holder_visible:true,bank_visible:true,clabe_visible:true,concept_visible:true,payment_url_visible:false,custom_sections:[]}}/></div>
     </section>
 
     <section className="benefitStrip" aria-label="Beneficios"><div><strong>01</strong><span>Sin app</span></div><div><strong>02</strong><span>Editable</span></div><div><strong>03</strong><span>NFC + QR</span></div><div><strong>04</strong><span>Pago único</span></div></section>
