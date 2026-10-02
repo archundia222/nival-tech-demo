@@ -3,13 +3,57 @@ import localFont from 'next/font/local';
 import { PayDemo } from './pay-demo';
 import { money, NIVAL_PAY_PRICE_CENTS } from '@/lib/orders';
 import './pay-landing.css';
+
 const sora=localFont({src:'../fonts/sora-latin-700.woff2',variable:'--pay-title'});
 const inter=localFont({src:'../fonts/inter-latin-400.woff2',variable:'--pay-body'});
-export default function Home(){return <main className={`payLanding ${sora.variable} ${inter.variable}`}>
-<header className="payLandingNav"><Link className="payLandingBrand" href="/">NIVAL <small>tech</small></Link><nav aria-label="Navegación"><Link href="#como-funciona">Cómo funciona</Link><Link href="/support">Contacto</Link><Link href="/auth">Iniciar sesión</Link></nav></header>
-<section className="payLandingHero" id="nival-pay"><div><p className="payLandingEyebrow">NIVAL PAY · PARA TU NEGOCIO</p><h1>Un toque.<br/>Tus datos de pago, listos.</h1><p className="payLandingLead">Tu cliente acerca su celular a la tarjeta o escanea el QR. Abre tu página, copia tu CLABE y realiza la transferencia desde su aplicación bancaria.</p><div className="payLandingActions"><Link className="payLandingPrimary" href="/checkout">Obtener mi Nival Pay</Link><Link className="payLandingSecondary" href="/demo">Probar la demo →</Link></div><p className="payLandingPrice"><strong>{money(NIVAL_PAY_PRICE_CENTS)} MXN</strong> · Pago único · Tarjeta NFC incluida</p><small className="payLandingNote">NFC permite abrir el enlace al acercar un celular compatible. También puedes usar el QR o compartir el enlace.</small></div><div className="payLandingPreview"><PayDemo/><small>Demostración con datos de ejemplo.</small></div></section>
-<section className="payLandingSection" id="como-funciona"><p className="payLandingEyebrow">ASÍ DE SENCILLO</p><h2>Del «¿me dictas tu CLABE?» a un toque.</h2><div className="payLandingSteps"><article><span>01</span><h3>Configura tus datos</h3><p>Agrega titular, banco, CLABE y concepto desde tu panel.</p></article><article><span>02</span><h3>Comparte tu Nival Pay</h3><p>Con tu tarjeta NFC, código QR o enlace. El cliente elige cómo abrirla.</p></article><article><span>03</span><h3>Recibe la transferencia</h3><p>El cliente copia los datos y paga desde su banco. Tú verificas la recepción en tu cuenta.</p></article></div></section>
-<section className="payLandingSection payLandingOffer"><div><p className="payLandingEyebrow">TU PÁGINA DE COBRO</p><h2>Actualiza tus datos.<br/>Conserva tu tarjeta.</h2><p>Edita tu información desde el panel y comparte el mismo enlace y QR.</p></div><div><ul><li>Página personalizada con datos para transferencia</li><li>Botones para copiar CLABE, titular y concepto</li><li>Enlace y QR para compartir</li><li>Primera tarjeta NFC física incluida</li><li>Acceso permanente con pago único</li></ul><Link className="payLandingPrimary" href="/checkout">Obtener la mía · {money(NIVAL_PAY_PRICE_CENTS)} MXN</Link><p>Diseño y entrega se completan después de confirmar la compra.</p></div></section>
-<section className="payLandingSection"><h2>Preguntas frecuentes</h2><details><summary>¿Nival Pay cobra o mueve el dinero?</summary><p>Nival Pay comparte tus datos de cobro. La transferencia la realiza el cliente en su banco. Verifica siempre la recepción; abrir la página o copiar la CLABE no confirma un pago.</p></details><details><summary>¿Mi cliente tiene que instalar una aplicación?</summary><p>No necesita una aplicación de Nival. Tu página abre en su navegador. Para transferir utiliza su aplicación bancaria.</p></details><details><summary>¿Qué pasa si su celular no tiene NFC?</summary><p>Puede escanear el código QR o abrir el enlace de tu Nival Pay.</p></details><details><summary>¿Puedo probarla antes de comprar?</summary><p>Puedes crear tu cuenta y activar una prueba de 15 días con enlace y QR. La tarjeta física se incluye al comprar Nival Pay Pro.</p></details></section>
-<footer className="payLandingFooter"><Link className="payLandingBrand" href="/">NIVAL <small>tech</small></Link><p>Nival Pay · Datos de cobro en un toque.</p><nav aria-label="Información"><Link href="/support">Contacto</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/refunds">Reembolsos</Link><Link href="/cookies">Cookies</Link></nav></footer>
-</main>;}
+
+export default function Home(){
+  return <main className={`payLanding ${sora.variable} ${inter.variable}`}>
+    <header className="payLandingNav">
+      <Link className="payLandingBrand" href="/">NIVAL <small>PAY</small></Link>
+      <nav aria-label="Navegación"><Link href="#demo">Ver cómo funciona</Link><Link className="navBuy" href="/checkout">Comprar · {money(NIVAL_PAY_PRICE_CENTS)}</Link></nav>
+    </header>
+
+    <section className="payLandingHero">
+      <div className="heroCopy">
+        <div className="heroPill"><span/> NFC + QR</div>
+        <h1>Cobra sin<br/><em>dictar nada.</em></h1>
+        <p>Acercan. Copian. Transfieren.</p>
+        <div className="payLandingActions">
+          <Link className="payLandingPrimary" href="/checkout">Quiero mi Nival Pay <b>→</b></Link>
+          <Link className="payLandingSecondary" href="#demo">Verla en acción ↓</Link>
+        </div>
+        <div className="heroMeta"><strong>{money(NIVAL_PAY_PRICE_CENTS)} MXN</strong><span>pago único</span><i/> <span>tarjeta NFC incluida</span></div>
+      </div>
+      <div className="heroVisual" aria-label="Vista previa de Nival Pay">
+        <div className="tapHalo halo3"/><div className="tapHalo halo2"/><div className="tapHalo halo1"/>
+        <div className="nfcCard"><div className="cardTop"><b>NIVAL</b><span>PAY</span></div><div className="nfcMark">)))</div><small>ACERCA TU CELULAR</small></div>
+        <div className="phoneMock"><div className="phoneIsland"/><PayDemo/></div>
+        <div className="floatingTag tagOne">✓ CLABE copiada</div>
+        <div className="floatingTag tagTwo">Sin app</div>
+      </div>
+    </section>
+
+    <section className="visualFlow" id="demo">
+      <div className="sectionHead"><span>3 segundos para entenderlo</span><h2>Así se siente.</h2></div>
+      <div className="flowRail">
+        <article><div className="flowIcon">⌁</div><b>01</b><h3>Acerca</h3><p>El celular toca la tarjeta.</p></article>
+        <div className="flowArrow">→</div>
+        <article><div className="flowIcon">▣</div><b>02</b><h3>Abre</h3><p>Tus datos aparecen al instante.</p></article>
+        <div className="flowArrow">→</div>
+        <article><div className="flowIcon">✓</div><b>03</b><h3>Copia</h3><p>CLABE lista para transferir.</p></article>
+      </div>
+    </section>
+
+    <section className="productStage">
+      <div className="productCopy"><span>Tu Nival Pay</span><h2>Tu banco.<br/>Tu nombre.<br/>Tu concepto.</h2><p>Cámbialos cuando quieras. La tarjeta y el QR siguen siendo los mismos.</p><Link href="/demo">Explorar demo →</Link></div>
+      <div className="productDemo"><PayDemo/></div>
+    </section>
+
+    <section className="benefitStrip" aria-label="Beneficios"><div><strong>01</strong><span>Sin app</span></div><div><strong>02</strong><span>Editable</span></div><div><strong>03</strong><span>NFC + QR</span></div><div><strong>04</strong><span>Pago único</span></div></section>
+
+    <section className="finalCta"><div className="miniCard">NIVAL <span>PAY</span><i>)))</i></div><h2>Un toque.<br/>Y listo.</h2><p>{money(NIVAL_PAY_PRICE_CENTS)} MXN · tarjeta incluida</p><Link className="payLandingPrimary" href="/checkout">Obtener la mía <b>→</b></Link></section>
+
+    <footer className="payLandingFooter"><Link className="payLandingBrand" href="/">NIVAL <small>PAY</small></Link><nav><Link href="/support">Contacto</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></nav></footer>
+  </main>;
+}
