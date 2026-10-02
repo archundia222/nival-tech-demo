@@ -70,12 +70,12 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               <Link className="checkoutSecondaryLink" href="/dashboard/pay">Volver a Nival Pay</Link>
             </section>
           : <>
-          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único incluye una tarjeta NFC y acceso permanente.</p></section>
+          <section className="checkoutIntro"><p className="checkoutKicker">NIVAL PAY PRO</p><h1>Lleva tu Nival Pay del QR a una experiencia completa.</h1><p>Conserva tu misma página y QR. El pago único de $99 incluye una tarjeta NFC; si necesitas envío por paquetería, se cobra aparte.</p></section>
           <section className="checkoutSteps" aria-label="Proceso de activación"><div className="current"><span>1</span><b>Activa Pro</b><small>Pago único</small></div><div><span>2</span><b>Conserva</b><small>Mismo QR y página</small></div><div><span>3</span><b>Llévalo al negocio</b><small>NFC + QR + enlace</small></div></section>
           <div className="checkoutCommerce">
             <article className="checkoutProduct">
               <div><span>Nival Pay Pro · pago único</span><strong>{money(payPriceCents)}</strong><small>MXN · Sin mensualidad</small></div>
-              <ul><li>Primera tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>QR y enlace para compartir en tu negocio</li><li>Datos editables sin cambiar la tarjeta</li></ul>
+              <ul><li>Una tarjeta NFC física incluida</li><li>Página de cobro personalizada</li><li>Enlace y código QR permanentes</li><li>QR y enlace para compartir en tu negocio</li><li>Datos editables sin cambiar la tarjeta</li></ul>
             </article>
             <section className="checkoutMethods" aria-label="Métodos de pago">
               <article className="checkoutMethodPrimary"><div className="checkoutMethodHeading"><span className="mercadoPagoMark">MP</span><div><small>RECOMENDADO</small><h2>Mercado Pago</h2></div></div><p>Pago seguro con tarjeta, saldo o los métodos disponibles en Mercado Pago.</p>
@@ -86,7 +86,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
               </article>
             </section>
           </div>
-          <footer className="checkoutTrust"><span>Pago en línea procesado por Mercado Pago; Nival confirma el estado antes de activar Pro.</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad para Nival Pay Pro · tarjeta NFC física incluida</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link></footer>
+          <footer className="checkoutTrust"><span>Pago en línea procesado por Mercado Pago; Nival confirma el estado antes de activar Pro.</span><span>Tu QR y enlace se conservan</span><span>Sin mensualidad · tarjeta NFC incluida · envío por paquetería se cobra aparte</span><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link><Link href="/cookies">Cookies</Link></footer>
         </>}
     </div>
   </main>;
