@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardNavigation } from '../../dashboard-navigation';
 import { claimIncludedPhysicalCard, requestPhysicalCardCashPayment, startPhysicalCardCheckout } from '@/app/checkout/actions';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
+import { NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_PRODUCT, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRICE_CENTS, NIVAL_PAY_PHYSICAL_CARD_CUSTOM_PRODUCT, NIVAL_PAY_CARD_CUSTOMIZATION_PRICE_CENTS, NIVAL_PAY_CARD_CUSTOMIZATION_PRODUCT } from '@/lib/orders';
 import { cancelLatestTerminalMercadoPagoProductOrder, reconcileLatestMercadoPagoProductOrder } from '@/lib/reconcile-mercado-pago-order';
 import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
 import { PaymentStatusPoller } from '@/app/checkout/payment-status-poller';
@@ -45,7 +45,7 @@ export default async function PhysicalCardOrderPage({ searchParams }: {
     admin.from('product_orders')
       .select('id, provider_preference_id')
       .eq('business_id', membership.business_id)
-      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
+      .in('product_code', [NIVAL_PAY_PRODUCT, NIVAL_PAY_ADDITIONAL_PRODUCT, NIVAL_CARDS_BUNDLE_PRODUCT])
       .eq('status', 'paid')
       .order('paid_at', { ascending: true }),
     admin.from('physical_card_orders').select('product_order_id, included_base_order_id, product_orders!physical_card_orders_product_order_id_fkey(status)').eq('business_id', membership.business_id),
