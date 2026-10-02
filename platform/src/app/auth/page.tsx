@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requestPasswordReset, resendConfirmation, signIn, signUp } from "./actions";
 import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
 
@@ -10,7 +11,8 @@ interface AuthPageProps {
 
 export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
-  const signup = params.mode === "signup";
+  if (params.mode === "signup") redirect("/negocio");
+  const signup = false;
   const next = params.next ?? "/dashboard";
   const signupContext = { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y prepara tu página de cobro, QR y enlace." };
 
@@ -20,12 +22,12 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <span className="tokeAuthMark">⌁</span>Nival Tech
       </Link>
       <section className="authCard">
-        <p className="eyebrow">{signup ? signupContext.label : "ACCESO PARA NEGOCIOS"}</p>
+        <p className="eyebrow">{signup ? signupContext.label : "ACCESO DE ADMINISTRADORES"}</p>
         <h1>{signup ? signupContext.title : "Entra a Nival"}</h1>
         <p className="authIntro">
           {signup
             ? signupContext.text
-            : "Entra al panel de Nival Tech para administrar los accesos de tu negocio."}
+            : "Entra a tu panel para registrar negocios y controlar sus tarjetas."}
         </p>
         {signup && <>
 
@@ -68,10 +70,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           </details>
         </>}
 
-        <p className="authSwitch">
-          {signup ? "¿Ya tienes cuenta?" : "¿Aún no tienes cuenta?"}{" "}
-          <Link href={signup ? `/auth?next=${encodeURIComponent(next)}` : `/auth?mode=signup&next=${encodeURIComponent(next)}`}>{signup ? "Inicia sesión" : "Regístrate"}</Link>
-        </p>
+        <p className="authSwitch">¿Tienes un código de negocio? <Link href="/negocio">Entra aquí</Link></p>
       </section>
     </main>
   );

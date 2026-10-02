@@ -38,6 +38,7 @@ export default async function CookiesPage() {
         <p>Nival Tech utiliza cookies técnicas y de sesión necesarias para funciones como autenticación, mantenimiento de sesión, seguridad y operación del panel. Estas cookies son necesarias para prestar el servicio solicitado.</p>
 
         <h2>Sesiones de Nival Pay</h2>
+        <p>El acceso por código del negocio utiliza una cookie técnica privada con una duración máxima de 7 días. Al cerrar sesión o reemplazar el código, se revoca ese acceso. Para limitar intentos de entrada, conservamos temporalmente identificadores cifrados mediante hash del código y del origen de la solicitud, sin guardar la dirección IP en texto.</p>
         <p>Las páginas de cobro guardan un identificador aleatorio en el almacenamiento de sesión de la pestaña para evitar contar sus recargas como nuevas visitas. El enlace de entrada de la tarjeta o QR crea una sesión nueva; la página abierta conserva la misma. Este registro no guarda nombres, direcciones IP ni identifica a la persona que consulta los datos.</p>
 
         <h2>Analítica y publicidad</h2>

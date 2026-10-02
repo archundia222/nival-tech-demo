@@ -15,7 +15,7 @@ export default function Demo(){
     <div style={{maxWidth:1080,margin:"0 auto"}}>
       <header style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,marginBottom:24}}>
         <Link href="/" style={{color:"#18784c",fontWeight:900,textDecoration:"none"}}>← Nival Pay</Link>
-        <Link href="/auth?mode=signup&next=%2Fdashboard%2Fpay" style={{background:"#18784c",color:"#fff",padding:"12px 18px",borderRadius:999,textDecoration:"none",fontWeight:900}}>Probar con mi cuenta</Link>
+        <Link href="/negocio" style={{background:"#18784c",color:"#fff",padding:"12px 18px",borderRadius:999,textDecoration:"none",fontWeight:900}}>Entrar con mi código</Link>
       </header>
       <section style={{display:"grid",gridTemplateColumns:"minmax(0,1fr)",gap:18}}>
         <div>

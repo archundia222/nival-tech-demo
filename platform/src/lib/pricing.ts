@@ -1,4 +1,5 @@
 /** Existing charged prices and proposed V2 prices are intentionally separate. */
+export const managedUsagePricing = { rateCents: 100, periodDays: 30, onlineCheckout: false } as const;
 export const currentPricing = {
   trialDays: 15,
   pointsFreeCustomerLimit: 10,

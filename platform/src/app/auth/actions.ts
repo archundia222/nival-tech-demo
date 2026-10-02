@@ -93,6 +93,7 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
+  if (!process.env.NIVAL_ADMIN_PROVISIONING) redirect("/negocio");
   const next = safeNext(formData);
   const origin = await authRedirectOrigin();
   const email = value(formData, "email");

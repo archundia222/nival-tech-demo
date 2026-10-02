@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { PROFILE_UUID, VISIT_UUID, isAutomatedVisit, signVisit, verifyVisit } from '@/lib/pay-visit';
+import { getBusinessSession } from '@/lib/managed-business';
 
 export async function POST(request: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -24,8 +25,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
   if (profileError) return NextResponse.json({ ok: false }, { status: 503 });
   if (!profile) return NextResponse.json({ ok: false }, { status: 404 });
 
+  const businessSession = await getBusinessSession();
+  if (businessSession?.business_id === profile.business_id) return NextResponse.json({ ok: true, counted: false, reason: 'business_owner' });
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (user?.app_metadata.nival_admin === true) return NextResponse.json({ ok: true, counted: false, reason: 'administrator' });
   if (user) {
     const { data: member, error } = await admin.from('business_members').select('user_id').eq('business_id', profile.business_id).eq('user_id', user.id).maybeSingle();
     if (error) return NextResponse.json({ ok: false }, { status: 503 });
