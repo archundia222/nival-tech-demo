@@ -70,6 +70,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           </details>
         </>}
 
+        <p className="authSwitch">¿Vas a crear tu administrador? <Link href="/admin/registro">Regístrate con tu código privado</Link></p>
         <p className="authSwitch">¿Tienes un código de negocio? <Link href="/negocio">Entra aquí</Link></p>
       </section>
     </main>
