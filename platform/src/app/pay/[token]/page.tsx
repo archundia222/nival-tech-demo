@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PaymentPageView } from "./payment-page-view";
 import { VisitTracker } from "./visit-tracker";
+import { nivalWhatsApp } from "@/lib/managed-business";
+import { publicSiteUrl } from "@/lib/payment-profile";
 import styles from "./payment-page.module.css";
 import '../../managed.css';
 
@@ -27,9 +29,11 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
     return <main className="managedLogin"><section className="managedPublicStatus"><span className="managedBrand">NIVAL PAY</span><h1>Tarjeta no disponible</h1><p>Consulta con el negocio para recibir sus datos de pago.</p></section></main>;
   }
   const { visit } = await searchParams;
+  const publicUrl = `${publicSiteUrl()}/pay/${token}`;
+  const contact = await nivalWhatsApp(`Hola, vi Nival Pay en ${data[0].business_name}. Me interesa para mi negocio. Página: ${publicUrl} · Ref: ${data[0].business_slug ?? token.slice(0,8)}`);
 
   return <main className={`${styles.pageShell} ${dmSans.variable} ${manrope.variable}`}>
     <VisitTracker token={token} entryVisit={typeof visit === 'string' ? visit : undefined} />
-    <PaymentPageView profile={data[0]} trackingToken={token} />
+    <PaymentPageView profile={data[0]} trackingToken={token} contactUrl={contact ?? undefined} />
   </main>;
 }
