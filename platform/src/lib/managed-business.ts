@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createAdminClient } from './supabase/admin';
 import { createClient } from './supabase/server';
-import { BUSINESS_COOKIE, businessSecretHash } from './business-code';
+import { BUSINESS_COOKIE, businessSecretHash, decryptBusinessCode } from './business-code';
 
 export interface ManagedCard {
   id: string; public_token: string; display_name: string; account_holder: string; bank_name: string; clabe: string; concept: string | null;
@@ -14,7 +14,7 @@ export interface UsagePeriod {
   id: string; starts_at: string; ends_at: string; rate_cents: number; paid_at: string | null; payment_reference: string | null;
   views: number; billable_views: number; included_views: number; amount_cents: number; card_totals: { id: string; name: string; views: number }[] | null;
 }
-export interface ManagedBusiness { id: string; name: string; phone: string | null; suspended: boolean; created_at: string; cards: ManagedCard[]; periods: UsagePeriod[]; }
+export interface ManagedBusiness { id: string; name: string; phone: string | null; suspended: boolean; created_at: string; access_code?: string | null; cards: ManagedCard[]; periods: UsagePeriod[]; }
 
 export async function getManagedAdmin() {
   const supabase = await createClient();
@@ -40,9 +40,17 @@ export async function managedBusinesses(businessId?: string): Promise<ManagedBus
   return (data ?? []) as ManagedBusiness[];
 }
 export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]> {
-  const { data, error } = await createAdminClient().rpc('nival_workspace_snapshot', { p_creator: user.app_metadata.nival_admin === true ? null : user.id });
+  const admin = createAdminClient();
+  const { data, error } = await admin.rpc('nival_workspace_snapshot', { p_creator: user.app_metadata.nival_admin === true ? null : user.id });
   if (error) throw new Error('Could not load workspace');
-  return (data ?? []) as ManagedBusiness[];
+  const businesses = (data ?? []) as ManagedBusiness[];
+  if (!businesses.length) return businesses;
+  let query = admin.from('nival_managed_businesses').select('business_id,code_ciphertext').in('business_id', businesses.map(b => b.id));
+  if (user.app_metadata.nival_admin !== true) query = query.eq('created_by', user.id);
+  const { data: secrets, error: secretError } = await query;
+  if (secretError) throw new Error('Could not load business access codes');
+  const codes = new Map((secrets ?? []).map(row => [row.business_id, decryptBusinessCode(row.code_ciphertext)]));
+  return businesses.map(business => ({ ...business, access_code: codes.get(business.id) ?? null }));
 }
 export function currentPeriod(business: ManagedBusiness) { return business.periods.find(p => !p.paid_at); }
 export function isBusinessActive(business: ManagedBusiness) {
