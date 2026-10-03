@@ -1,4 +1,3 @@
-import { createClient as signupClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { businessSecretHash } from '@/lib/business-code';
@@ -16,18 +15,20 @@ export async function POST(request: Request) {
   const { data: allowed, error: rateError } = await createAdminClient().rpc('nival_consume_code_attempt', { p_key: businessSecretHash(`profile-register:${ip}`, 'attempt') });
   if (rateError) return jsonResponse({ error: 'Intenta nuevamente en un momento.' }, 503);
   if (!allowed) return jsonResponse({ error: 'Demasiados intentos. Espera 15 minutos.' }, 429);
-  const client = signupClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, { auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
-  const origin = new URL(request.url).origin;
-  const { data, error } = await client.auth.signUp({ email, password, options: { data: { full_name: name }, emailRedirectTo: `${origin}/auth/complete-signup?next=%2Fdashboard` } });
+  const admin = createAdminClient();
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: name },
+  });
   if (error) {
-    const limited = /rate limit|security purposes/i.test(error.message) || error.code === 'over_email_send_rate_limit';
-    return jsonResponse({ error: limited ? 'El servicio de correo alcanzó su límite temporal. Espera unos minutos y vuelve a intentar.' : 'No pudimos crear tu cuenta. Revisa tus datos o inicia sesión si ya tienes una.' }, limited ? 429 : 400);
+    const duplicate = /already|registered|exists/i.test(error.message);
+    return jsonResponse({ error: duplicate ? 'Ese correo ya tiene una cuenta. Inicia sesión.' : 'No pudimos crear tu cuenta. Revisa tus datos e inténtalo nuevamente.' }, duplicate ? 409 : 400);
   }
-  if (data.session) {
-    const server = await createClient();
-    const { error: sessionError } = await server.auth.setSession(data.session);
-    return jsonResponse({ ok: true, next: sessionError ? '/auth' : '/dashboard' });
-  }
-  const message = data.user?.identities?.length === 0 ? 'Si ya tienes cuenta, inicia sesión. Si falta confirmar tu correo, usa Reenviar confirmación.' : `Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Después podrás entrar a tu panel.`;
-  return jsonResponse({ ok: true, next: `/auth?next=%2Fdashboard&message=${encodeURIComponent(message)}` });
+  if (!data.user) return jsonResponse({ error: 'No pudimos crear tu cuenta.' }, 500);
+  const server = await createClient();
+  const { data: signedIn, error: signInError } = await server.auth.signInWithPassword({ email, password });
+  if (signInError || !signedIn.session) return jsonResponse({ ok: true, next: '/auth?next=%2Fdashboard&message=Cuenta creada. Inicia sesión para continuar.' });
+  return jsonResponse({ ok: true, next: '/dashboard' });
 }
