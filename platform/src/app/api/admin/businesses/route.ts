@@ -36,7 +36,8 @@ export async function POST(request: Request) {
   const periodId = String(body.periodId ?? '');
   if (['remove','restore'].includes(action) && !PROFILE_UUID.test(profileId) || action === 'settle' && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
   const code = ['create','rotate'].includes(action) ? newBusinessCode() : null;
-  if (action === 'add' && body.cardPaymentConfirmed !== true) return jsonResponse({ error: 'Confirma que ya recibiste el pago de $20 por cada tarjeta antes de agregarla.' }, 400);\n  const { data, error } = await createAdminClient().rpc('nival_manage_business', {
+  if (action === 'add' && body.cardPaymentConfirmed !== true) return jsonResponse({ error: 'Confirma que ya recibiste el pago de $20 por cada tarjeta antes de agregarla.' }, 400);
+  const { data, error } = await createAdminClient().rpc('nival_manage_business', {
     p_action: action, p_actor: user.id, p_business: businessId || null, p_name: name || null, p_phone: phone || null,
     p_code_hash: code ? businessSecretHash(normalizeBusinessCode(code), 'code') : null, p_quantity: quantity,
     p_profile: profileId || null, p_period: periodId || null, p_reference: String(body.reference ?? '').trim().slice(0,200) || null, p_rate_cents: rateCents,
