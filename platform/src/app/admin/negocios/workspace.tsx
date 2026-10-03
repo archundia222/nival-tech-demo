@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { CustomerShare } from '@/app/customer-share';
 import { useRouter } from 'next/navigation';
 import type { ManagedBusiness } from '@/lib/managed-business';
-import { PeriodHistory } from '@/app/managed-shared';
 
 export function ManagedAdminWorkspace({ businesses, siteUrl, activeBusinessIds }: { businesses: ManagedBusiness[]; siteUrl: string; activeBusinessIds: string[] }) {
   const router = useRouter();
@@ -43,7 +42,6 @@ export function ManagedAdminWorkspace({ businesses, siteUrl, activeBusinessIds }
         <details className="managedBusinessDetails"><summary>Nival Pay y administración</summary><div className="managedAdminCards">{b.cards.map(c => <div className={`managedAdminCard ${c.managed_removed_at ? 'removed' : ''}`} key={c.id}><section><strong>{c.display_name}</strong><span>{c.managed_removed_at ? 'Retirado' : c.managed_ready ? 'Configurado' : 'Pendiente de datos bancarios'}</span><small>{c.view_count} aperturas acumuladas · acceso sin límite</small><code>{siteUrl}/tap/{c.public_token}</code>{c.managed_ready && !c.managed_removed_at && <a href={`/pay/${c.public_token}`} target="_blank" rel="noreferrer">Ver página</a>}{enabled && c.managed_ready && c.active && !c.managed_removed_at && <CustomerShare cardId={c.id} />}</section><button className="managedOutline" disabled={busy} onClick={() => void command({ action: c.managed_removed_at ? 'restore' : 'remove', businessId: b.id, profileId: c.id })}>{c.managed_removed_at ? 'Restaurar' : 'Retirar'}</button></div>)}</div>
           <div className="managedAdminOperations"><form className="managedForm" onSubmit={e => { e.preventDefault(); const values=Object.fromEntries(new FormData(e.currentTarget)); if (!window.confirm('Confirma que este Nival Pay ya está pagado.')) return; void command({ ...values, action:'add', businessId:b.id, cardPaymentConfirmed:true }); }}><label>Agregar Nival Pay<input name="quantity" type="number" min={1} max={100} defaultValue={1} required /></label><p>Sin recargas ni saldo de aperturas.</p><button disabled={busy}>Agregar</button></form><div className="managedOperationButtons"><details><summary>Opciones administrativas</summary><p>La suspensión es únicamente manual; el sistema no debe suspender por número de aperturas.</p><button className="managedOutline" disabled={busy} onClick={() => void command({ action: b.suspended ? 'resume' : 'suspend', businessId: b.id })}>{b.suspended ? 'Reactivar' : 'Suspender manualmente'}</button></details></div></div>
         </details>
-        <PeriodHistory business={b} />
       </article>;
     })}</div>
     {!businesses.length && <p className="managedEmpty">Agrega tu primer negocio. El sistema genera su código de acceso.</p>}
