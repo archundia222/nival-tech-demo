@@ -65,3 +65,4 @@
   .compactPreview .brandRow{min-width:0;flex-wrap:wrap}
   .compactPreview .profile>*{max-width:100%;min-width:0;overflow-wrap:anywhere}
 }
+.copyFeedback{position:absolute;bottom:4px;right:18px;font-size:10px;color:#18784c;font-weight:600}.value,.bankValue{overflow-wrap:anywhere}

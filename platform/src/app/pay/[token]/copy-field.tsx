@@ -10,17 +10,21 @@ async function write(value:string){
     field.value=value; field.setAttribute("readonly","");
     field.style.position="fixed"; field.style.opacity="0";
     document.body.appendChild(field); field.select();
-    document.execCommand("copy"); field.remove();
+    const success=document.execCommand("copy"); field.remove();
+    if(!success) throw new Error('Copy unavailable');
   }
 }
 
 export function CopyField({label,value,variant="detail",headingId="payment-title",trackingToken}:{label:string;value:string;variant?:"name"|"bank"|"clabe"|"detail";headingId?:string|null;trackingToken?:string}){
  const [copied,setCopied]=useState(false);
- async function copy(){try{await write(value);if(variant==="clabe"&&trackingToken){void fetch(`/api/public/pay/${trackingToken}/copy`,{method:"POST",keepalive:true}).catch(()=>undefined)}setCopied(true);setTimeout(()=>setCopied(false),1600)}catch{}}
+ const [failed,setFailed]=useState(false);
+ async function copy(){setFailed(false);try{await write(value);if(variant==="clabe"&&trackingToken){void fetch(`/api/public/pay/${trackingToken}/copy`,{method:"POST",keepalive:true}).catch(()=>undefined)}setCopied(true);setTimeout(()=>setCopied(false),2400)}catch{setFailed(true)}}
  if(variant==="name") return <div className={styles.nameLine}><h1 id={headingId ?? undefined}>{value}</h1><button className={styles.nameCopy} type="button" onClick={copy} aria-label="Copiar nombre completo"><CopyIcon/></button>{copied&&<span className={styles.inlineCopied}>Copiado</span>}</div>;
  return <button className={styles.detailRow} type="button" onClick={copy} aria-label={`Copiar ${label}`}>
    <span><span className={styles.label}>{label}</span><span className={variant==="clabe"?styles.clabeValue:variant==="bank"?styles.bankValue:styles.value}>{value}</span></span>
-   {variant==="bank"?<span className={styles.bankBadge}>{value}</span>:<span className={styles.copyIcon}><CopyIcon/></span>}
+   {variant==="bank"?<span className={styles.bankBadge}>{copied?'Copiado':value}</span>:<span className={styles.copyIcon}>{copied?'✓':<CopyIcon/>}</span>}
+   {copied&&<span className={styles.copyFeedback} role="status">Copiado</span>}
+   {failed&&<span className={styles.copyFeedback} role="alert">Selecciona el dato para copiarlo</span>}
    <span className={styles.srOnly}>{copied?"Copiado":"Toca para copiar"}</span>
  </button>;
 }
