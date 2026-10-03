@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   if (!user) return jsonResponse({ error: 'Acceso restringido.' }, 401);
   const body = await smallBody(request);
   const action = String(body?.action ?? '');
-  if (!body || !['create','add','remove','restore','rotate','suspend','resume','settle'].includes(action)) return jsonResponse({ error: 'Acción inválida.' }, 400);
+  if (!body || !['create','add','remove','restore','rotate','suspend','resume','settle','settle_card'].includes(action)) return jsonResponse({ error: 'Acción inválida.' }, 400);
   const businessId = String(body.businessId ?? '');
   if (action !== 'create' && !PROFILE_UUID.test(businessId)) return jsonResponse({ error: 'Negocio inválido.' }, 400);
   if (action !== 'create' && user.app_metadata.nival_admin !== true) {
@@ -34,8 +34,13 @@ export async function POST(request: Request) {
   }
   const profileId = String(body.profileId ?? '');
   const periodId = String(body.periodId ?? '');
-  if (['remove','restore'].includes(action) && !PROFILE_UUID.test(profileId) || action === 'settle' && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
+  if (['remove','restore','settle_card'].includes(action) && !PROFILE_UUID.test(profileId) || ['settle','settle_card'].includes(action) && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
   const code = ['create','rotate'].includes(action) ? newBusinessCode() : null;
+  if (action === 'settle_card') {
+    const { data, error } = await createAdminClient().rpc('nival_settle_card_period', { p_actor: user.id, p_business: businessId, p_profile: profileId, p_period: periodId, p_reference: String(body.reference ?? '').trim().slice(0,200) || null, p_rate_cents: rateCents });
+    if (error) return jsonResponse({ error: 'No se registró el pago de esta tarjeta. Actualiza el panel antes de volver a intentar.' }, 409);
+    return jsonResponse({ ok: true, businessId: data.business_id, profileId: data.profile_id });
+  }
   const { data, error } = await createAdminClient().rpc('nival_manage_business', {
     p_action: action, p_actor: user.id, p_business: businessId || null, p_name: name || null, p_phone: phone || null,
     p_code_hash: code ? businessSecretHash(normalizeBusinessCode(code), 'code') : null, p_quantity: quantity,
