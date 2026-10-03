@@ -28,7 +28,10 @@ export async function POST(request: Request) {
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100 || !Number.isFinite(rateCents) || rateCents < 0 || rateCents > 100000) return jsonResponse({ error: 'Revisa la cantidad y la tarifa.' }, 400);
   const name = String(body.name ?? '').trim();
   const phone = String(body.phone ?? '').trim();
-  if (action === 'create' && (name.length < 2 || name.length > 120 || phone.length > 30)) return jsonResponse({ error: 'Revisa los datos del negocio.' }, 400);
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (action === 'create' && (name.length < 2 || name.length > 120 || phone.length > 30 || phoneDigits.length < 8 || phoneDigits.length > 15)) {
+    return jsonResponse({ error: 'Ingresa nombre, número de contacto válido y cantidad de tarjetas.' }, 400);
+  }
   const profileId = String(body.profileId ?? '');
   const periodId = String(body.periodId ?? '');
   if (['remove','restore'].includes(action) && !PROFILE_UUID.test(profileId) || action === 'settle' && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
