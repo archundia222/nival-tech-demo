@@ -92,59 +92,7 @@ export async function signIn(formData: FormData) {
   redirect(next);
 }
 
-export async function signUp(formData: FormData) {
-  if (!process.env.NIVAL_ADMIN_PROVISIONING) redirect("/negocio");
-  const next = safeNext(formData);
-  const origin = await authRedirectOrigin();
-  const email = value(formData, "email");
-
-  // Use an implicit confirmation link so the email can be opened on ANY device.
-  // PKCE confirmation ties the link to the browser that started signup, which
-  // breaks when a user registers on one phone and opens email on another.
-  const signupClient = createSupabaseJsClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      auth: {
-        flowType: "implicit",
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-    },
-  );
-  const { data, error } = await signupClient.auth.signUp({
-    email,
-    password: value(formData, "password"),
-    options: {
-      data: { full_name: value(formData, "fullName") },
-      emailRedirectTo: `${origin}/auth/complete-signup?next=${encodeURIComponent(next)}`,
-    },
-  });
-
-  // Confirmed duplicate signups may return an obfuscated user instead of an error.
-  // Use only the signup response; do not query the private user directory.
-  const alreadyRegistered = error?.code === "user_already_exists"
-    || error?.code === "email_exists"
-    || (!error && !data.session && data.user?.identities?.length === 0);
-  if (alreadyRegistered) {
-    redirect(`/auth?message=${encodeURIComponent("Ya tenemos una cuenta registrada con este correo. Inicia sesión con tu contraseña; no necesitas registrarte de nuevo.")}&next=${encodeURIComponent(next)}`);
-  }
-  if (error) {
-    const rateLimited =
-      error.code === "over_email_send_rate_limit" ||
-      /rate limit|security purposes/i.test(error.message ?? "");
-
-    const message = rateLimited
-      ? "No pudimos enviar el correo de confirmación porque el servicio de correo alcanzó temporalmente su límite. Espera unos minutos e inténtalo de nuevo."
-      : "No pudimos crear tu cuenta en este momento. Revisa tus datos e inténtalo otra vez.";
-
-    console.warn("[auth] Signup failed", { code: error.code ?? null });
-    redirect(`/auth?mode=signup&error=${encodeURIComponent(message)}&next=${encodeURIComponent(next)}`);
-  }
-  if (data.session) redirect(next);
-  redirect(`/auth?message=${encodeURIComponent(`Revisa ${email} y la carpeta de spam para confirmar tu cuenta. Si el enlace falla, usa “Reenviar confirmación” en esta pantalla.`)}&next=${encodeURIComponent(next)}`);
-}
+export async function signUp() { redirect('/registro'); }
 
 export async function resendConfirmation(formData: FormData) {
   const next = safeNext(formData);

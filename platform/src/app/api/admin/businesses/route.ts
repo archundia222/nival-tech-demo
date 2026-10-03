@@ -1,12 +1,13 @@
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getManagedAdmin, managedBusinesses } from '@/lib/managed-business';
+import { getManagedAdmin, workspaceBusinesses } from '@/lib/managed-business';
 import { newBusinessCode, normalizeBusinessCode, businessSecretHash } from '@/lib/business-code';
 import { PROFILE_UUID } from '@/lib/pay-visit';
 import { jsonResponse, sameOrigin, smallBody } from '@/lib/managed-http';
 
 export async function GET() {
-  if (!await getManagedAdmin()) return jsonResponse({ error: 'Acceso restringido.' }, 401);
-  return jsonResponse({ businesses: await managedBusinesses() });
+  const user = await getManagedAdmin();
+  if (!user) return jsonResponse({ error: 'Acceso restringido.' }, 401);
+  return jsonResponse({ businesses: await workspaceBusinesses(user) });
 }
 export async function POST(request: Request) {
   if (!sameOrigin(request)) return jsonResponse({ error: 'Solicitud inválida.' }, 403);
@@ -17,6 +18,11 @@ export async function POST(request: Request) {
   if (!body || !['create','add','remove','restore','rotate','suspend','resume','settle'].includes(action)) return jsonResponse({ error: 'Acción inválida.' }, 400);
   const businessId = String(body.businessId ?? '');
   if (action !== 'create' && !PROFILE_UUID.test(businessId)) return jsonResponse({ error: 'Negocio inválido.' }, 400);
+  if (action !== 'create' && user.app_metadata.nival_admin !== true) {
+    const { data: owned, error } = await createAdminClient().from('nival_managed_businesses').select('business_id').eq('business_id', businessId).eq('created_by', user.id).maybeSingle();
+    if (error) return jsonResponse({ error: 'No se pudo verificar el acceso.' }, 503);
+    if (!owned) return jsonResponse({ error: 'Negocio no disponible.' }, 404);
+  }
   const quantity = Number(body.quantity ?? 1);
   const rateCents = Math.round(Number(body.rate ?? 1) * 100);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100 || !Number.isFinite(rateCents) || rateCents < 0 || rateCents > 100000) return jsonResponse({ error: 'Revisa la cantidad y la tarifa.' }, 400);

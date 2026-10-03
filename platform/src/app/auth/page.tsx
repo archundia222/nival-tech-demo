@@ -11,7 +11,7 @@ interface AuthPageProps {
 
 export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
-  if (params.mode === "signup") redirect("/negocio");
+  if (params.mode === "signup") redirect("/registro");
   const signup = false;
   const next = params.next ?? "/dashboard";
   const signupContext = { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y prepara tu página de cobro, QR y enlace." };
@@ -22,7 +22,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         <span className="tokeAuthMark">⌁</span>Nival Tech
       </Link>
       <section className="authCard">
-        <p className="eyebrow">{signup ? signupContext.label : "ACCESO DE ADMINISTRADORES"}</p>
+        <p className="eyebrow">{signup ? signupContext.label : "ACCESO A TU PERFIL"}</p>
         <h1>{signup ? signupContext.title : "Entra a Nival"}</h1>
         <p className="authIntro">
           {signup
@@ -70,7 +70,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
           </details>
         </>}
 
-        <p className="authSwitch">¿Vas a crear tu administrador? <Link href="/admin/registro">Regístrate con tu código privado</Link></p>
+        <p className="authSwitch">¿Aún no tienes cuenta? <Link href="/registro">Crea tu perfil</Link></p>
         <p className="authSwitch">¿Tienes un código de negocio? <Link href="/negocio">Entra aquí</Link></p>
       </section>
     </main>

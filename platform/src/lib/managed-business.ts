@@ -1,4 +1,5 @@
 import 'server-only';
+import type { User } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createAdminClient } from './supabase/admin';
@@ -18,7 +19,7 @@ export interface ManagedBusiness { id: string; name: string; phone: string | nul
 export async function getManagedAdmin() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  return user?.app_metadata.nival_admin === true ? user : null;
+  return user?.email_confirmed_at ? user : null;
 }
 export async function requireManagedAdmin() {
   const user = await getManagedAdmin();
@@ -36,6 +37,11 @@ export async function getBusinessSession() {
 export async function managedBusinesses(businessId?: string): Promise<ManagedBusiness[]> {
   const { data, error } = await createAdminClient().rpc('nival_business_snapshot', { p_business: businessId ?? null });
   if (error) throw new Error('Could not load businesses');
+  return (data ?? []) as ManagedBusiness[];
+}
+export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]> {
+  const { data, error } = await createAdminClient().rpc('nival_workspace_snapshot', { p_creator: user.app_metadata.nival_admin === true ? null : user.id });
+  if (error) throw new Error('Could not load workspace');
   return (data ?? []) as ManagedBusiness[];
 }
 export function currentPeriod(business: ManagedBusiness) { return business.periods.find(p => !p.paid_at); }

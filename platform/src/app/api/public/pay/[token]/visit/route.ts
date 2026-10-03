@@ -32,6 +32,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
   const { data: { user } } = await supabase.auth.getUser();
   if (user?.app_metadata.nival_admin === true) return NextResponse.json({ ok: true, counted: false, reason: 'administrator' });
   if (user) {
+    const { data: manager, error: managerError } = await admin.from('nival_managed_businesses').select('business_id').eq('business_id', profile.business_id).eq('created_by', user.id).maybeSingle();
+    if (managerError) return NextResponse.json({ ok: false }, { status: 503 });
+    if (manager) return NextResponse.json({ ok: true, counted: false, reason: 'business_owner' });
     const { data: member, error } = await admin.from('business_members').select('user_id').eq('business_id', profile.business_id).eq('user_id', user.id).maybeSingle();
     if (error) return NextResponse.json({ ok: false }, { status: 503 });
     if (member) return NextResponse.json({ ok: true, counted: false, reason: 'business_member' });

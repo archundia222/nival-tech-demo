@@ -15,7 +15,7 @@ export default async function Home(){
   return <main className={`payLanding ${sora.variable} ${inter.variable}`}>
     <header className="payLandingNav">
       <Link className="payLandingBrand" href="/">NIVAL <small>PAY</small></Link>
-      <nav aria-label="Navegación"><Link href="#demo">Cómo funciona</Link><Link className="navBuy" href="/negocio">Entrar con mi código</Link></nav>
+      <nav aria-label="Navegación"><Link href="#demo">Cómo funciona</Link><Link href="/auth">Iniciar sesión</Link><Link className="navBuy" href="/registro">Crear mi perfil</Link></nav>
     </header>
 
     <section className="payLandingHero">
@@ -58,6 +58,6 @@ export default async function Home(){
 
     <section className="finalCta"><div className="miniCard">NIVAL <span>PAY</span><i>)))</i></div><h2>Un toque.<br/>Y listo.</h2><p>Tarjeta sin costo · cortes cada 30 días · pago directo con Nival.</p><a className="payLandingPrimary" href={contact ?? '/support'}>Solicitar la mía</a><p>Las recargas de una misma sesión no suman otra apertura. Las aperturas desde NFC, QR o enlace no confirman una transferencia. Al vencer el periodo, el servicio se suspende hasta registrar tu pago.</p></section>
 
-    <footer className="payLandingFooter"><Link className="payLandingBrand" href="/">NIVAL <small>PAY</small></Link><nav><Link href="/auth?next=%2Fadmin%2Fnegocios">Administración</Link><Link href="/support">Contacto</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></nav></footer>
+    <footer className="payLandingFooter"><Link className="payLandingBrand" href="/">NIVAL <small>PAY</small></Link><nav><Link href="/registro">Crear mi perfil</Link><Link href="/negocio">Entrar con mi código</Link><Link href="/support">Contacto</Link><Link href="/terms">Términos</Link><Link href="/privacy">Privacidad</Link></nav></footer>
   </main>;
 }
