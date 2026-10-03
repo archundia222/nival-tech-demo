@@ -9,6 +9,7 @@ import { BUSINESS_COOKIE, businessSecretHash, decryptBusinessCode } from './busi
 export interface ManagedCard {
   id: string; public_token: string; display_name: string; account_holder: string; bank_name: string; clabe: string; concept: string | null;
   active: boolean; managed_ready: boolean; managed_removed_at: string | null; period_views: number; view_count: number; included_views_remaining: number;
+  current_period?: UsagePeriod | null; billing_history?: UsagePeriod[];
 }
 export interface UsagePeriod {
   id: string; starts_at: string; ends_at: string; rate_cents: number; paid_at: string | null; payment_reference: string | null;
@@ -35,9 +36,14 @@ export async function getBusinessSession() {
   return data;
 }
 export async function managedBusinesses(businessId?: string): Promise<ManagedBusiness[]> {
-  const { data, error } = await createAdminClient().rpc('nival_business_snapshot', { p_business: businessId ?? null });
-  if (error) throw new Error('Could not load businesses');
-  return (data ?? []) as ManagedBusiness[];
+  const admin = createAdminClient();
+  const [{ data, error }, { data: billing, error: billingError }] = await Promise.all([
+    admin.rpc('nival_business_snapshot', { p_business: businessId ?? null }),
+    admin.rpc('nival_card_billing_snapshot', { p_business: businessId ?? null }),
+  ]);
+  if (error || billingError) throw new Error('Could not load businesses');
+  const byCard = new Map((billing ?? []).map((row: { id: string; current_period: UsagePeriod | null; history: UsagePeriod[] }) => [row.id, row]));
+  return ((data ?? []) as ManagedBusiness[]).map(b => ({ ...b, cards: b.cards.map(card => { const bill = byCard.get(card.id); return { ...card, current_period: bill?.current_period ?? null, billing_history: bill?.history ?? [] }; }) }));
 }
 export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]> {
   const admin = createAdminClient();
@@ -50,7 +56,10 @@ export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]
   const { data: secrets, error: secretError } = await query;
   if (secretError) throw new Error('Could not load business access codes');
   const codes = new Map((secrets ?? []).map(row => [row.business_id, decryptBusinessCode(row.code_ciphertext)]));
-  return businesses.map(business => ({ ...business, access_code: codes.get(business.id) ?? null }));
+  const { data: billing, error: billingError } = await admin.rpc('nival_card_billing_snapshot', { p_business: null });
+  if (billingError) throw new Error('Could not load card billing');
+  const byCard = new Map((billing ?? []).map((row: { id: string; current_period: UsagePeriod | null; history: UsagePeriod[] }) => [row.id, row]));
+  return businesses.map(business => ({ ...business, access_code: codes.get(business.id) ?? null, cards: business.cards.map(card => { const bill = byCard.get(card.id); return { ...card, current_period: bill?.current_period ?? null, billing_history: bill?.history ?? [] }; }) }));
 }
 export function currentPeriod(business: ManagedBusiness) { return business.periods.find(p => !p.paid_at); }
 export function isBusinessActive(business: ManagedBusiness) {
