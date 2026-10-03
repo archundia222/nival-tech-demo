@@ -1,78 +1,12 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { requestPasswordReset, resendConfirmation, signIn, signUp } from "./actions";
-import { CheckoutSubmitButton } from "@/app/checkout/submit-button";
-
-export const metadata = { robots: { index: false, follow: false } };
-
-interface AuthPageProps {
-  searchParams: Promise<{ mode?: string; error?: string; message?: string; next?: string }>;
-}
-
-export default async function AuthPage({ searchParams }: AuthPageProps) {
-  const params = await searchParams;
-  if (params.mode === "signup") redirect("/registro");
-  const signup = false;
-  const next = params.next ?? "/dashboard";
-  const signupContext = { label: "NIVAL PAY", title: "Crea tu Nival Pay", text: "Después de confirmar tu correo, crea tu negocio y prepara tu página de cobro, QR y enlace." };
-
-  return (
-    <main className="authShell tokeAuth">
-      <Link className="brand" href="/">
-        <span className="tokeAuthMark">⌁</span>Nival Tech
-      </Link>
-      <section className="authCard">
-        <p className="eyebrow">{signup ? signupContext.label : "ACCESO A TU PERFIL"}</p>
-        <h1>{signup ? signupContext.title : "Entra a Nival"}</h1>
-        <p className="authIntro">
-          {signup
-            ? signupContext.text
-            : "Entra a tu panel para registrar negocios y controlar sus tarjetas."}
-        </p>
-        {signup && <>
-
-          <div className="authPath"><span><b>1</b> Crea tu acceso</span><span><b>2</b> Confirma tu correo</span><span><b>3</b> Configura tu negocio</span></div>
-        </>}
-        {params.error && <div className="formMessage errorMessage">{params.error}</div>}
-        {params.message && <div className="formMessage successMessage">{params.message}</div>}
-        <form action={signup ? signUp : signIn} className="authForm">
-          <input type="hidden" name="next" value={next} />
-          {signup && (
-            <label>Nombre completo<input name="fullName" required minLength={2} autoComplete="name" /></label>
-          )}
-          <label>Correo<input type="email" name="email" required autoComplete="email" /></label>
-          <label>Contraseña<input type="password" name="password" required minLength={8} autoComplete={signup ? "new-password" : "current-password"} /></label>
-          <CheckoutSubmitButton className="primaryButton" pendingLabel={signup ? "Creando tu cuenta…" : "Entrando…"}>{signup ? "Continuar" : "Entrar"}</CheckoutSubmitButton>
-        </form>
-        {signup && <p className="authLegal">Al continuar, aceptas los <Link href="/terms">Términos de servicio</Link> y el <Link href="/privacy">Aviso de privacidad</Link>. Usamos cookies técnicas para mantener tu sesión; conoce la <Link href="/cookies">política de cookies</Link>.</p>}
-
-        {!signup && <>
-          <details className="authHelp">
-            <summary>¿Olvidaste tu contraseña?</summary>
-            <form action={requestPasswordReset} className="authForm">
-              <label>
-                Correo de tu cuenta
-                <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
-              </label>
-              <CheckoutSubmitButton className="primaryButton" pendingLabel="Enviando enlace…">Enviar enlace de recuperación</CheckoutSubmitButton>
-            </form>
-          </details>
-          <details className="authHelp">
-            <summary>¿No pudiste confirmar tu correo?</summary>
-            <form action={resendConfirmation} className="authForm">
-              <input type="hidden" name="next" value={next} />
-              <label>
-                Escribe el correo de tu cuenta
-                <input type="email" name="email" required autoComplete="email" placeholder="tu@correo.com" />
-              </label>
-              <CheckoutSubmitButton className="primaryButton" pendingLabel="Reenviando…">Reenviar confirmación</CheckoutSubmitButton>
-            </form>
-          </details>
-        </>}
-
-        <p className="authSwitch">¿Aún no tienes cuenta? <Link href="/registro">Crea tu perfil</Link></p>
-        <p className="authSwitch">¿Tienes un código de negocio? <Link href="/negocio">Entra aquí</Link></p>
-      </section>
-    </main>
-  );
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { requestPasswordReset, resendConfirmation, signIn } from './actions';
+import { CheckoutSubmitButton } from '@/app/checkout/submit-button';
+import '../managed.css';
+export const metadata = { title:'Cuenta de administrador', robots:{index:false,follow:false} };
+export default async function AuthPage({searchParams}:{searchParams:Promise<{mode?:string;error?:string;message?:string;next?:string}>}){
+  const params=await searchParams;
+  if(params.mode==='signup') redirect('/registro');
+  const next=params.next??'/dashboard';
+  return <main className="managedLogin"><Link href="/" className="managedBrand">NIVAL <span>PAY</span></Link><section className="managedLoginCard"><span className="managedEyebrow">CUENTA DE ADMINISTRADOR</span><h1>Tu panel.<br/>Todos tus negocios.</h1><p>Registra negocios y administra sus tarjetas.</p>{params.error&&<p className="managedError managedLoginMessage" role="alert">{params.error}</p>}{params.message&&<p className="managedSuccess managedLoginMessage" role="status">{params.message}</p>}<form action={signIn} className="managedForm"><input type="hidden" name="next" value={next}/><label>Correo<input name="email" type="email" autoComplete="email" required/></label><label>Contraseña<input name="password" type="password" autoComplete="current-password" required/></label><CheckoutSubmitButton className="managedSubmit" pendingLabel="Entrando…">Entrar a mi panel</CheckoutSubmitButton></form><Link href="/registro" className="managedRegisterLink">Crear mi cuenta <span>↗</span></Link><details className="managedLoginHelp"><summary>¿Olvidaste tu contraseña?</summary><form action={requestPasswordReset} className="managedForm"><label>Correo de tu cuenta<input name="email" type="email" autoComplete="email" required/></label><CheckoutSubmitButton className="managedSubmit" pendingLabel="Enviando…">Enviar enlace de recuperación</CheckoutSubmitButton></form></details><details className="managedLoginHelp"><summary>¿Falta confirmar tu correo?</summary><form action={resendConfirmation} className="managedForm"><input type="hidden" name="next" value={next}/><label>Correo de tu cuenta<input name="email" type="email" autoComplete="email" required/></label><CheckoutSubmitButton className="managedSubmit" pendingLabel="Enviando…">Reenviar confirmación</CheckoutSubmitButton></form></details></section><Link href="/negocio" className="managedAdminLink">Tengo un código de negocio →</Link><Link href="/" className="managedAdminLink">← Volver al inicio</Link></main>;
 }
