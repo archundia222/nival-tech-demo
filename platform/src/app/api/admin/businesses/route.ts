@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getManagedAdmin, workspaceBusinesses } from '@/lib/managed-business';
-import { newBusinessCode, normalizeBusinessCode, businessSecretHash } from '@/lib/business-code';
+import { newBusinessCode, normalizeBusinessCode, businessSecretHash, encryptBusinessCode } from '@/lib/business-code';
 import { PROFILE_UUID } from '@/lib/pay-visit';
 import { jsonResponse, sameOrigin, smallBody } from '@/lib/managed-http';
 
@@ -41,6 +41,13 @@ export async function POST(request: Request) {
     p_code_hash: code ? businessSecretHash(normalizeBusinessCode(code), 'code') : null, p_quantity: quantity,
     p_profile: profileId || null, p_period: periodId || null, p_reference: String(body.reference ?? '').trim().slice(0,200) || null, p_rate_cents: rateCents,
   });
+  if (!error && code && data?.business_id) {
+    const { error: codeStoreError } = await createAdminClient().from('nival_managed_businesses').update({ code_ciphertext: encryptBusinessCode(code) }).eq('business_id', data.business_id);
+    if (codeStoreError) {
+      console.error('[managed-business] code storage failed', { action, code: codeStoreError.code });
+      return jsonResponse({ error: 'El negocio se guardó, pero no se pudo guardar el código visible. Genera uno nuevo antes de entregarlo.' }, 503);
+    }
+  }
   if (error) {
     console.error('[managed-business] command failed', { action, code: error.code });
     return jsonResponse({ error: action === 'settle' ? 'No se registró el pago. Actualiza el panel para revisar si el periodo ya fue cerrado.' : 'No se pudo completar el cambio.' }, 409);
