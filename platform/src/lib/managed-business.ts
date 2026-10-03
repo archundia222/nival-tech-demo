@@ -49,7 +49,7 @@ export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]
   return businesses.map(business => ({ ...business, access_code: codes.get(business.id) ?? null }));
 }
 export function currentPeriod(business: ManagedBusiness) { return business.periods.find(p => !p.paid_at); }
-export function isBusinessActive(business: ManagedBusiness) { const p = currentPeriod(business); return !business.suspended && !!p && Date.parse(p.starts_at) <= Date.now() && Date.parse(p.ends_at) > Date.now(); }
+export function isBusinessActive(business: ManagedBusiness) { return !business.suspended; }
 export async function nivalWhatsApp(message: string) {
   const { data } = await createAdminClient().from('site_legal_settings').select('phone').eq('id', 'default').maybeSingle();
   const raw = String(data?.phone ?? '').replace(/\D/g, ''); const phone = raw.length === 10 ? `52${raw}` : raw;
