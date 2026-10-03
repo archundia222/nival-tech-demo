@@ -8,11 +8,11 @@ import { BUSINESS_COOKIE, businessSecretHash } from './business-code';
 
 export interface ManagedCard {
   id: string; public_token: string; display_name: string; account_holder: string; bank_name: string; clabe: string; concept: string | null;
-  active: boolean; managed_ready: boolean; managed_removed_at: string | null; period_views: number; view_count: number;
+  active: boolean; managed_ready: boolean; managed_removed_at: string | null; period_views: number; view_count: number; included_views_remaining: number;
 }
 export interface UsagePeriod {
   id: string; starts_at: string; ends_at: string; rate_cents: number; paid_at: string | null; payment_reference: string | null;
-  views: number; amount_cents: number; card_totals: { id: string; name: string; views: number }[] | null;
+  views: number; billable_views: number; included_views: number; amount_cents: number; card_totals: { id: string; name: string; views: number }[] | null;
 }
 export interface ManagedBusiness { id: string; name: string; phone: string | null; suspended: boolean; created_at: string; cards: ManagedCard[]; periods: UsagePeriod[]; }
 

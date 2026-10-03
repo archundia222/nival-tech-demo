@@ -15,7 +15,7 @@ function CardEditor({ card, siteUrl }: { card: ManagedCard; siteUrl: string }) {
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
   const url = `${siteUrl}/tap/${card.public_token}`;
-  return <article className="managedCard"><header><div><span className="managedEyebrow">{card.managed_ready ? 'LISTA PARA COMPARTIR' : 'PENDIENTE DE CONFIGURAR'}</span><h3>{card.display_name}</h3></div><div className="managedCardCount"><strong>{card.period_views}</strong><span>aperturas este periodo</span></div></header>
+  return <article className="managedCard"><header><div><span className="managedEyebrow">{card.managed_ready ? 'LISTA PARA COMPARTIR' : 'PENDIENTE DE CONFIGURAR'}</span><h3>{card.display_name}</h3></div><div className="managedCardCount"><strong>{card.period_views}</strong><span>aperturas este periodo</span><span>{card.included_views_remaining ?? 0} aperturas incluidas restantes</span></div></header>
     <form className="managedForm managedBankForm" onSubmit={async e => {
       e.preventDefault(); const values = Object.fromEntries(new FormData(e.currentTarget)); setBusy(true); setMessage('');
       try {

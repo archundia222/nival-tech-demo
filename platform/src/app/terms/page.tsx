@@ -23,7 +23,7 @@ export default async function TermsPage() {
     <main className="legalShell">
       <Link className="brand" href="/"><span className="brandmark">N</span>NIVAL tech</Link>
       <section className="legalCard">
-        <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 24 DE SEPTIEMBRE DE 2026</p>
+        <p className="eyebrow">ÚLTIMA ACTUALIZACIÓN: 2 DE OCTUBRE DE 2026</p>
         <h1>Términos de servicio</h1>
         <p>Estos términos describen las reglas generales para usar Nival Tech y sus productos. Al crear una cuenta o contratar una función de pago, aceptas utilizar el servicio de forma lícita y proporcionar información correcta.</p>
 
@@ -41,7 +41,7 @@ export default async function TermsPage() {
         <p>Nival Pay facilita que un negocio publique datos para recibir una transferencia o comparta un enlace de pago. Nival Tech no es una institución financiera y no recibe, retiene ni transfiere el dinero de la operación bancaria entre el negocio y su cliente. El negocio es responsable de revisar que beneficiario, banco, CLABE y demás información publicada sean correctos.</p>
 
         <h2>Servicio por aperturas</h2>
-        <p>En el modelo administrado, Nival asigna las tarjetas y entrega un código privado al negocio. El negocio configura y revisa sus datos bancarios. El consumo se calcula por aperturas registradas de las páginas de sus tarjetas, incluyendo accesos mediante NFC, QR y enlace. Una apertura no acredita una transferencia. Las recargas de una misma sesión, las consultas del dueño con sesión iniciada y los accesos automatizados identificados no suman aperturas.</p>
+        <p>En el modelo administrado, Nival asigna las tarjetas y entrega un código privado al negocio. El negocio configura y revisa sus datos bancarios. Cada tarjeta física cuesta $20 MXN e incluye sus primeras 5 aperturas registradas, una sola vez por tarjeta. A partir de la sexta apertura, se cobra $1 MXN por apertura registrada. Las aperturas incluidas pendientes se conservan entre periodos; pagar, suspender o restaurar la misma tarjeta no renueva esas 5 aperturas. El consumo se calcula por aperturas registradas de las páginas de sus tarjetas, incluyendo accesos mediante NFC, QR y enlace. Una apertura no acredita una transferencia. Las recargas de una misma sesión, las consultas del dueño con sesión iniciada y los accesos automatizados identificados no suman aperturas.</p>
         <h2>Periodos y pagos manuales</h2>
         <p>La tarifa de cada periodo se muestra en el panel del negocio. Los periodos duran 30 días desde el alta o la reactivación. Los pagos se coordinan directamente con Nival y no se realizan en esta página. Al vencer el periodo, las páginas públicas de las tarjetas se suspenden; el negocio conserva acceso a su panel e historial. Cuando el administrador registra el pago recibido, comienza un nuevo periodo de 30 días. Los cargos y condiciones de periodos pagados se conservan en el historial.</p>
 

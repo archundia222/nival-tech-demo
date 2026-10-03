@@ -1,6 +1,8 @@
--- Run against a migrated database with an existing Auth user. All fixtures roll back.
+-- Run against a migrated database. All fixtures roll back.
 begin;
-select set_config('nival.test_actor',(select id::text from auth.users limit 1),true);
+insert into auth.users(id,instance_id,aud,role,email,created_at,updated_at)
+values(gen_random_uuid(),'00000000-0000-0000-0000-000000000000','authenticated','authenticated','managed-regression-'||gen_random_uuid()||'@example.invalid',now(),now());
+select set_config('nival.test_actor',(select id::text from auth.users where email like 'managed-regression-%@example.invalid' order by created_at desc limit 1),true);
 set local role service_role;
 do $$
 declare bid uuid; pid uuid; tok uuid; per uuid; new_per uuid; sid uuid:=gen_random_uuid(); actor uuid:=current_setting('nival.test_actor')::uuid;
@@ -19,7 +21,7 @@ begin
   update public.nival_usage_periods set starts_at=now()-interval '31 days',ends_at=now()-interval '1 day' where id=per;
   if exists(select 1 from public.get_public_payment_profile_v4(tok)) or public.record_nival_pay_visit(tok,gen_random_uuid(),'card') then raise exception 'Expired card still available'; end if;
   new_per:=(public.nival_manage_business('settle',actor,bid,p_period=>per,p_reference=>'Regression only')->>'period_id')::uuid;
-  if (select settled_views<>1 or settled_amount_cents<>100 from public.nival_usage_periods where id=per) then raise exception 'Incorrect invoice snapshot'; end if;
+  if (select settled_views<>1 or settled_amount_cents<>0 from public.nival_usage_periods where id=per) then raise exception 'Incorrect invoice snapshot'; end if;
   if not exists(select 1 from public.get_public_payment_profile_v4(tok)) then raise exception 'Reactivation failed'; end if;
   begin
     perform public.nival_manage_business('settle',actor,bid,p_period=>per);
