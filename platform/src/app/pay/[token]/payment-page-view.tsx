@@ -24,7 +24,7 @@ const editFieldStyle: CSSProperties = { width: '100%', border: 0, outline: 0, ba
 const editBoxStyle: CSSProperties = { display: 'grid', gap: 7, padding: '17px 18px', border: '1px solid rgba(25,27,31,.12)', borderRadius: 18, background: 'rgba(255,255,255,.78)' };
 const editLabelStyle: CSSProperties = { fontSize: 12, fontWeight: 800, letterSpacing: '.02em', color: '#74736f' };
 
-export function PaymentPageView({ profile, embedded = false, preview = false, trackingToken, editor }: { profile: PaymentPageViewProfile; embedded?: boolean; preview?: boolean; trackingToken?: string; editor?: InlineEditor }) {
+export function PaymentPageView({ profile, embedded = false, preview = false, trackingToken, editor, contactUrl }: { profile: PaymentPageViewProfile; embedded?: boolean; preview?: boolean; trackingToken?: string; editor?: InlineEditor; contactUrl?: string }) {
   const initials = profile.business_name.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
   const publicSections = Array.isArray(profile.custom_sections) ? profile.custom_sections.filter((section) => section.public !== false && section.content.trim().length > 0) : [];
   const editField = (label: string, value: string, onChange: (value: string) => void, placeholder = '') => <label style={editBoxStyle}><span style={editLabelStyle}>✎ {label} · editar</span><input className="nivalPayPreviewInput" style={editFieldStyle} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} /></label>;
@@ -53,7 +53,7 @@ export function PaymentPageView({ profile, embedded = false, preview = false, tr
         {publicSections.map((section) => { const label = section.title.trim() || "Información"; const value = section.content.trim(); const isHttpsLink = /^https:\/\//i.test(value); return isHttpsLink ? <a key={section.id} className={styles.customSectionLink} href={value} target="_blank" rel="noreferrer"><span><small>{label}</small><strong>Abrir enlace</strong></span><b aria-hidden="true">↗</b></a> : <CopyField key={section.id} label={label} value={value} variant="detail" />; })}
       </div>
     </section>
-    {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech"><div><span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span><strong>Tu negocio también puede cobrar así.</strong><p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p></div><Link href="/?from=nival-pay">Conocer Nival Tech <b>→</b></Link></aside>}
+    {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech"><div><span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span><strong>Tu negocio también puede cobrar así.</strong><p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p></div>{contactUrl ? <a href={contactUrl} target="_blank" rel="noreferrer">Contactar por WhatsApp <b>→</b></a> : <Link href="/?from=nival-pay">Conocer Nival Tech <b>→</b></Link>}</aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <Link href="/?from=nival-pay">Nival Tech</Link>}</footer>
   </>;
   if (embedded) return <div className={`${styles.pageShell} ${styles.embeddedShell}${preview ? ` ${styles.compactPreview}` : ''}`}>{content}</div>;
