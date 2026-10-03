@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { CustomerShare } from '@/app/customer-share';
 import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import type { ManagedCard } from '@/lib/managed-business';
@@ -24,7 +25,8 @@ function CardEditor({ card, siteUrl }: { card: ManagedCard; siteUrl: string }) {
       } catch { setError(true); setMessage('No pudimos conectar. Intenta nuevamente.'); }
       finally { setBusy(false); }
     }}><label>Nombre de la tarjeta<input name="displayName" required minLength={2} maxLength={80} defaultValue={card.display_name} /></label><label>Beneficiario<input name="holder" required minLength={2} maxLength={120} defaultValue={card.account_holder} autoComplete="off" /></label><label>Banco<input name="bank" required minLength={2} maxLength={80} defaultValue={card.bank_name} /></label><label>CLABE interbancaria<input name="clabe" required inputMode="numeric" pattern="[0-9]{18}" maxLength={18} defaultValue={card.clabe} autoComplete="off" /></label><label>Concepto (opcional)<input name="concept" maxLength={120} defaultValue={card.concept ?? ''} /></label><div className="managedSave"><button disabled={busy}>{busy ? 'Guardando…' : 'Guardar datos'}</button>{message && <p role="status" className={error ? 'managedError' : 'managedSuccess'}>{message}</p>}</div></form>
-    <details className="managedShare"><summary>Enlace y QR de esta tarjeta</summary><div><QRCodeSVG value={url} size={150} /><section><p>Este es el enlace que se graba en tu tarjeta NFC.</p><code>{url}</code><button className="managedOutline" onClick={async () => { try { await navigator.clipboard.writeText(url); setError(false); setMessage('Enlace copiado.'); } catch { setError(true); setMessage('Selecciona el enlace para copiarlo.'); } }}>Copiar enlace</button>{card.managed_ready && <a href={`/pay/${card.public_token}`} target="_blank" rel="noreferrer">Ver página de mi tarjeta</a>}</section></div></details>
+    {card.managed_ready && card.active && <CustomerShare cardId={card.id} />}
+    <details className="managedShare"><summary>Enlace y QR de esta tarjeta</summary><div><QRCodeSVG value={url} size={150} /><section><p>Este es el enlace que se graba en tu tarjeta NFC.</p><code>{url}</code><button className="managedOutline" onClick={async () => { try { await navigator.clipboard.writeText(url); setError(false); setMessage('Enlace copiado.'); } catch { setError(true); setMessage('Selecciona el enlace para copiarlo.'); } }}>Copiar enlace NFC / QR</button>{card.managed_ready && <a href={`/pay/${card.public_token}`} target="_blank" rel="noreferrer">Ver página de mi tarjeta</a>}</section></div></details>
   </article>;
 }
 export function BusinessCards({ cards, siteUrl }: { cards: ManagedCard[]; siteUrl: string }) {

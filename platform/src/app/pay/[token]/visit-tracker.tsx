@@ -14,7 +14,7 @@ export function VisitTracker({ token, entryVisit }: { token: string; entryVisit?
         getItem: (key: string) => window.sessionStorage.getItem(key),
         setItem: (key: string, value: string) => window.sessionStorage.setItem(key, value),
       };
-      const session = getPayVisitSession(token, entryVisit, storage, () => crypto.randomUUID());
+      const session = getPayVisitSession(token, entryVisit, storage);
       if (!session) return;
       void fetch(`/api/public/pay/${token}/visit`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },

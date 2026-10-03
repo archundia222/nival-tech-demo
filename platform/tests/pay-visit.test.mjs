@@ -20,27 +20,34 @@ test('a signed card entry is bound to its card and session', () => {
   assert.equal(verifyVisit(card, visit + '.extra', secret), null);
 });
 
-test('reloads and next-day tab restoration reuse a direct session', () => {
+test('direct pages never create billable sessions, including empty or cleared storage', () => {
   const store = storage();
-  assert.equal(getPayVisitSession(card, undefined, store, () => first).sessionId, first);
-  // A new component execution, with no timer or midnight expiry.
-  assert.equal(getPayVisitSession(card, undefined, store, () => second).sessionId, first);
+  assert.equal(getPayVisitSession(card, undefined, store), null);
+  getPayVisitSession(card, signVisit(card, first, 'card', secret), store);
+  assert.equal(getPayVisitSession(card, undefined, store), null);
+  assert.equal(getPayVisitSession(card, undefined, storage()), null);
+});
+
+test('a restored signed URL keeps its ID without any browser storage', () => {
+  const visit = signVisit(card, first, 'card', secret);
+  assert.equal(getPayVisitSession(card, visit, storage()).sessionId, first);
+  assert.equal(getPayVisitSession(card, visit, storage()).sessionId, first);
 });
 
 test('a fresh card entry starts a session while reload keeps the current one', () => {
   const store = storage();
   const visit1 = signVisit(card, first, 'card', secret);
   const visit2 = signVisit(card, second, 'card', secret);
-  assert.equal(getPayVisitSession(card, visit1, store, () => second).sessionId, first);
-  assert.equal(getPayVisitSession(card, visit1, store, () => second).sessionId, first);
-  assert.equal(getPayVisitSession(card, visit2, store, () => first).sessionId, second);
-  assert.equal(getPayVisitSession(card, undefined, store, () => first).sessionId, second);
+  assert.equal(getPayVisitSession(card, visit1, store).sessionId, first);
+  assert.equal(getPayVisitSession(card, visit1, store).sessionId, first);
+  assert.equal(getPayVisitSession(card, visit2, store).sessionId, second);
+  assert.equal(getPayVisitSession(card, undefined, store), null);
 });
 
 test('blocked storage does not manufacture visits on every legacy reload', () => {
   const blocked = { getItem() { throw new Error('blocked'); }, setItem() { throw new Error('blocked'); } };
-  assert.equal(getPayVisitSession(card, undefined, blocked, () => first), null);
-  assert.equal(getPayVisitSession(card, signVisit(card, first, 'card', secret), blocked, () => second).sessionId, first);
+  assert.equal(getPayVisitSession(card, undefined, blocked), null);
+  assert.equal(getPayVisitSession(card, signVisit(card, first, 'card', secret), blocked).sessionId, first);
 });
 
 test('known bots and prefetch requests are ignored', () => {

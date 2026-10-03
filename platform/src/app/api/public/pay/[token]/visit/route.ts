@@ -19,6 +19,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
   if (!body || typeof body.sessionId !== 'string' || !VISIT_UUID.test(body.sessionId)) return NextResponse.json({ ok: false }, { status: 400 });
   const entry = typeof body.visit === 'string' ? verifyVisit(token, body.visit) : null;
   if (body.visit !== undefined && (!entry || entry.sessionId !== body.sessionId)) return NextResponse.json({ ok: false }, { status: 400 });
+  if (!entry || entry.source !== 'card') return NextResponse.json({ ok: true, counted: false, reason: 'no_card_entry' }, { headers: { 'Cache-Control': 'private, no-store' } });
 
   const admin = createAdminClient();
   const { data: profile, error: profileError } = await admin.from('payment_profiles').select('id,business_id').eq('public_token', token).eq('active', true).maybeSingle();
@@ -40,7 +41,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tok
     if (member) return NextResponse.json({ ok: true, counted: false, reason: 'business_member' });
   }
 
-  const source = entry?.source ?? 'direct';
+  const source = entry.source;
   const { data, error } = await admin.rpc('record_nival_pay_visit', { profile_token: token, visit_session: body.sessionId, visit_source: source });
   if (error) {
     console.error('[public-pay] visit analytics failed', { code: error.code });
