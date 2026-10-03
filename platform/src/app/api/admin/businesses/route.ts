@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   if (!user) return jsonResponse({ error: 'Acceso restringido.' }, 401);
   const body = await smallBody(request);
   const action = String(body?.action ?? '');
-  if (!body || !['create','add','remove','restore','rotate','suspend','resume','settle'].includes(action)) return jsonResponse({ error: 'Acción inválida.' }, 400);
+  if (!body || !['create','add','remove','restore','rotate','suspend','resume','settle','recharge'].includes(action)) return jsonResponse({ error: 'Acción inválida.' }, 400);
   const businessId = String(body.businessId ?? '');
   if (action !== 'create' && !PROFILE_UUID.test(businessId)) return jsonResponse({ error: 'Negocio inválido.' }, 400);
   if (action !== 'create' && user.app_metadata.nival_admin !== true) {
@@ -34,9 +34,19 @@ export async function POST(request: Request) {
   }
   const profileId = String(body.profileId ?? '');
   const periodId = String(body.periodId ?? '');
-  if (['remove','restore'].includes(action) && !PROFILE_UUID.test(profileId) || action === 'settle' && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
+  if (['remove','restore','recharge'].includes(action) && !PROFILE_UUID.test(profileId) || action === 'settle' && !PROFILE_UUID.test(periodId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
+  if (action === 'recharge') {
+    const openings = Number(body.openings ?? 0);
+    if (!Number.isInteger(openings) || openings < 1 || openings > 10000) return jsonResponse({ error: 'Ingresa una cantidad válida de aperturas.' }, 400);
+    const admin = createAdminClient();
+    const { data: card, error: cardError } = await admin.from('payment_profiles').select('id,included_views_remaining,managed_ready,managed_removed_at').eq('id', profileId).eq('business_id', businessId).maybeSingle();
+    if (cardError || !card || card.managed_removed_at) return jsonResponse({ error: 'Tarjeta no disponible.' }, 404);
+    const { error: rechargeError } = await admin.from('payment_profiles').update({ included_views_remaining: Number(card.included_views_remaining ?? 0) + openings, active: Boolean(card.managed_ready) }).eq('id', profileId).eq('business_id', businessId);
+    if (rechargeError) return jsonResponse({ error: 'No se pudo registrar la recarga.' }, 409);
+    return jsonResponse({ ok: true, businessId, recharged: openings });
+  }
   const code = ['create','rotate'].includes(action) ? newBusinessCode() : null;
-  if (action === 'add' && body.cardPaymentConfirmed !== true) return jsonResponse({ error: 'Confirma que ya recibiste el pago de $20 por cada tarjeta antes de agregarla.' }, 400);
+  if (action === 'add' && body.cardPaymentConfirmed !== true) return jsonResponse({ error: 'Confirma que ya recibiste el pago inicial de $50 por cada Nival Pay antes de agregarla.' }, 400);
   const { data, error } = await createAdminClient().rpc('nival_manage_business', {
     p_action: action, p_actor: user.id, p_business: businessId || null, p_name: name || null, p_phone: phone || null,
     p_code_hash: code ? businessSecretHash(normalizeBusinessCode(code), 'code') : null, p_quantity: quantity,
