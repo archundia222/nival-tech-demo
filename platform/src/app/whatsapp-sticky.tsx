@@ -8,7 +8,6 @@ const WHATSAPP_URL =
 export function WhatsAppSticky() {
   const pathname = usePathname();
   const visible =
-    pathname === "/" ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/negocio") ||
     pathname.startsWith("/business");
