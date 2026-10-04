@@ -29,6 +29,8 @@ export async function POST(request: Request) {
   const phone = String(body.phone ?? '').trim();
   const phoneDigits = phone.replace(/\D/g, '');
   if (action === 'create' && (name.length < 2 || name.length > 120 || phone.length > 30 || phoneDigits.length < 8 || phoneDigits.length > 15)) return jsonResponse({ error: 'Ingresa nombre, número de contacto válido y cantidad de Nival Pay.' }, 400);
+  const billingMode = String(body.billingMode ?? 'lifetime');
+  if (action === 'create' && !['lifetime','usage'].includes(billingMode)) return jsonResponse({ error: 'Modalidad de cobro inválida.' }, 400);
   const profileId = String(body.profileId ?? '');
   if (['remove','restore'].includes(action) && !PROFILE_UUID.test(profileId)) return jsonResponse({ error: 'Referencia inválida.' }, 400);
   const code = ['create','rotate'].includes(action) ? newBusinessCode() : null;
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
     p_profile: profileId || null, p_period: null, p_reference: null, p_rate_cents: 0,
   });
   if (!error && code && data?.business_id) {
-    const { error: codeStoreError } = await createAdminClient().from('nival_managed_businesses').update({ code_ciphertext: encryptBusinessCode(code) }).eq('business_id', data.business_id);
+    const { error: codeStoreError } = await createAdminClient().from('nival_managed_businesses').update({ code_ciphertext: encryptBusinessCode(code), billing_mode: billingMode }).eq('business_id', data.business_id);
     if (codeStoreError) return jsonResponse({ error: 'El negocio se guardó, pero no se pudo guardar el código visible. Genera uno nuevo antes de entregarlo.' }, 503);
   }
   if (error) return jsonResponse({ error: 'No se pudo completar el cambio.' }, 409);
