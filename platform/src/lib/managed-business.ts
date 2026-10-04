@@ -15,7 +15,7 @@ export interface UsagePeriod {
   views: number; billable_views: number; included_views: number; amount_cents: number;
   card_totals: { id: string; name: string; views: number; billable_views?: number; included_views?: number; amount_cents?: number }[] | null;
 }
-export interface ManagedBusiness { id: string; name: string; phone: string | null; suspended: boolean; created_at: string; access_code?: string | null; cards: ManagedCard[]; periods: UsagePeriod[]; }
+export interface ManagedBusiness { id: string; name: string; phone: string | null; suspended: boolean; created_at: string; billing_mode?: 'lifetime' | 'usage'; access_code?: string | null; cards: ManagedCard[]; periods: UsagePeriod[]; }
 
 export async function getManagedAdmin() {
   const supabase = await createClient();
@@ -41,12 +41,13 @@ export async function workspaceBusinesses(user: User): Promise<ManagedBusiness[]
   if (error) throw new Error('Could not load workspace');
   const businesses = (data ?? []) as ManagedBusiness[];
   if (!businesses.length) return businesses;
-  let query = admin.from('nival_managed_businesses').select('business_id,code_ciphertext').in('business_id', businesses.map(b => b.id));
+  let query = admin.from('nival_managed_businesses').select('business_id,code_ciphertext,billing_mode').in('business_id', businesses.map(b => b.id));
   if (user.app_metadata.nival_admin !== true) query = query.eq('created_by', user.id);
   const { data: secrets, error: secretError } = await query;
   if (secretError) throw new Error('Could not load business access codes');
   const codes = new Map((secrets ?? []).map(row => [row.business_id, decryptBusinessCode(row.code_ciphertext)]));
-  return businesses.map(business => ({ ...business, access_code: codes.get(business.id) ?? null }));
+  const modes = new Map((secrets ?? []).map(row => [row.business_id, row.billing_mode as 'lifetime' | 'usage']));
+  return businesses.map(business => ({ ...business, billing_mode: modes.get(business.id) ?? 'lifetime', access_code: codes.get(business.id) ?? null }));
 }
 export function currentPeriod(business: ManagedBusiness) { return business.periods.find(p => !p.paid_at); }
 export function isBusinessActive(business: ManagedBusiness) { return !business.suspended; }
