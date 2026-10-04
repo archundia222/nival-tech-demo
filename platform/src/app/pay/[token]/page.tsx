@@ -28,12 +28,15 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
     if (!managed) notFound();
     return <main className="managedLogin"><section className="managedPublicStatus"><span className="managedBrand">NIVAL PAY</span><h1>Tarjeta no disponible</h1><p>Consulta con el negocio para recibir sus datos de pago.</p></section></main>;
   }
+  const admin = createAdminClient();
+  const { data: cardDisplay } = await admin.from('payment_profiles').select('display_name').eq('public_token', token).maybeSingle();
+  const profile = { ...data[0], display_name: cardDisplay?.display_name ?? data[0].business_name };
   const { visit } = await searchParams;
   const publicUrl = `${publicSiteUrl()}/pay/${token}`;
   const contact = await nivalWhatsApp(`Hola, vi Nival Pay en ${data[0].business_name}. Me interesa para mi negocio. Página: ${publicUrl} · Ref: ${data[0].business_slug ?? token.slice(0,8)}`);
 
   return <main className={`${styles.pageShell} ${dmSans.variable} ${manrope.variable}`}>
     <VisitTracker token={token} entryVisit={typeof visit === 'string' ? visit : undefined} />
-    <PaymentPageView profile={data[0]} trackingToken={token} contactUrl={contact ?? undefined} />
+    <PaymentPageView profile={profile} trackingToken={token} contactUrl={contact ?? undefined} />
   </main>;
 }
