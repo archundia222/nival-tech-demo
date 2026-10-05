@@ -53,7 +53,7 @@ export function PaymentPageView({ profile, embedded = false, preview = false, tr
         {publicSections.map((section) => { const label = section.title.trim() || "Información"; const value = section.content.trim(); const isHttpsLink = /^https:\/\//i.test(value); return isHttpsLink ? <a key={section.id} className={styles.customSectionLink} href={value} target="_blank" rel="noreferrer"><span><small>{label}</small><strong>Abrir enlace</strong></span><b aria-hidden="true">↗</b></a> : <CopyField key={section.id} label={label} value={value} variant="detail" />; })}
       </div>
     </section>
-    {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech"><div><span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span><strong>Tu negocio también puede cobrar así.</strong><p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p></div>{contactUrl ? <a href={contactUrl} target="_blank" rel="noreferrer">Contactar por WhatsApp <b>→</b></a> : <Link href="/?from=nival-pay">Conocer Nival Tech <b>→</b></Link>}</aside>}
+    {!embedded && <aside className={styles.nivalPromo} aria-label="Conoce Nival Tech"><div><span>¿TÚ TAMBIÉN TIENES UN NEGOCIO?</span><strong>Tu negocio también puede cobrar así.</strong><p>Una forma simple de compartir tus datos de cobro con QR, NFC y una página siempre actualizada.</p></div><Link href="/?from=nival-pay">Conocer Nival Pay <b>→</b></Link></aside>}
     <footer className={styles.footer}><span>Experiencia creada con <strong>Nival Pay</strong></span>{!embedded && <Link href="/?from=nival-pay">Nival Tech</Link>}</footer>
   </>;
   if (embedded) return <div className={`${styles.pageShell} ${styles.embeddedShell}${preview ? ` ${styles.compactPreview}` : ''}`}>{content}</div>;
