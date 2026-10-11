@@ -20,5 +20,5 @@ export const NIVAL_POINTS_PRODUCT = 'nival_points';
 export const NIVAL_INTELLIGENCE_PRODUCT = 'nival_intelligence';
 export const NIVAL_POINTS_INTELLIGENCE_PRODUCT = 'nival_points_intelligence';
 export const NIVAL_POINTS_PRICE_CENTS = 29900;
-export const NIVAL_INTELLIGENCE_PRICE_CENTS = 49900;
+export const NIVAL_INTELLIGENCE_PRICE_CENTS = 39900;
 export const NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS = 54900;
