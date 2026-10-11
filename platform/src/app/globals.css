@@ -3751,3 +3751,19 @@ button,a,summary{ -webkit-tap-highlight-color:transparent }
 .nivalDashboard .pointsCustomerQr{margin-top:14px}.nivalDashboard .pointsQrHeading b{color:var(--nv-accent,#C8A65A)}.nivalDashboard .pointsQrCanvas{display:grid;place-items:center;padding:18px;background:#fff;border-radius:16px}.nivalDashboard .pointsCustomerQr>p,.nivalDashboard .pointsPrivacyNote{color:var(--nv-text-secondary,#B8B8C0);font-size:12px;line-height:1.5}
 @media(max-width:760px){.nivalDashboard .pointsV1Hero{align-items:stretch;flex-direction:column}.nivalDashboard .pointsMetricGrid{grid-template-columns:repeat(2,1fr)}.nivalDashboard .pointsAdminGrid{grid-template-columns:1fr}.nivalDashboard .pointsFormGrid{grid-template-columns:1fr}.nivalDashboard .pointsSectionHeading{display:grid}.nivalDashboard .pointsCashActions{display:grid}.nivalDashboard .pointsManualScan{grid-template-columns:1fr}.nivalDashboard .pointsHistoryList article{align-items:flex-start}.nivalDashboard .pointsHistoryList article>div:last-child{min-width:96px}}
 @media(prefers-reduced-motion:reduce){.nivalDashboard .pointsProgress i{transition:none}}
+
+
+/* Staff scanner visual refresh to match the Nival business console */
+.employeePanelCard{background:#fff!important;border:1px solid #E3DFD4!important;border-radius:18px!important;color:#10241F!important;box-shadow:0 12px 32px rgba(16,36,31,.06)}
+.employeePanelCard .pointsSectionHeading span,.employeePanelCard .pointsScannedCustomer span{color:#0E7C66!important}
+.employeePanelCard .pointsSectionHeading h2,.employeePanelCard .pointsScannedCustomer h3{color:#10241F!important}
+.employeePanelCard .pointsSectionHeading p,.employeePanelCard .pointsScannedCustomer p{color:#66736d!important}
+.employeePanelCard .pointsManualScan input{background:#F4F2EC!important;border:1px solid #E3DFD4!important;border-radius:10px;color:#10241F}
+.employeePanelCard .nvPrimaryButton{background:#0E7C66!important;border-color:#0E7C66!important;color:#fff!important;border-radius:10px}
+.employeePanelCard .nvSecondaryButton{background:#fff!important;border:1px solid #0E7C66!important;color:#0E7C66!important;border-radius:10px}
+.employeePanelCard .nvTertiaryButton{color:#10241F!important}
+.employeePanelCard .pointsCamera{border-radius:14px;overflow:hidden}
+.employeePanelCard .pointsCamera video{border:2px solid #0E7C66;border-radius:14px}
+.employeePanelCard .pointsStatus{color:#0E7C66}
+.employeePanelCard .pointsStatusError{color:#a33b31}
+@media(max-width:760px){.employeePanelCard{padding:18px!important}.employeePanelCard .pointsCashActions{display:grid;grid-template-columns:1fr}}

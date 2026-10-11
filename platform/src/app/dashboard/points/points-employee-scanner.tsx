@@ -80,7 +80,7 @@ export function PointsEmployeeScanner() {
     });
   }
 
-  return <section className="pointsScannerCard">
+  return <section className="pointsScannerCard employeePanelCard">
     <div className="pointsSectionHeading"><div><span>CAJA</span><h2>Escanear cliente</h2></div><p>El QR dura 45 segundos y solo puede reclamarse una vez.</p></div>
     {!customer && <>
       <button className="nvPrimaryButton pointsScanButton" type="button" onClick={() => setCameraOn(value => !value)}>{cameraOn ? "Cerrar cámara" : "Abrir cámara"}</button>

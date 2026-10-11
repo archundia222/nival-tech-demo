@@ -1,0 +1,1 @@
+create index if not exists business_review_qr_cards_business_id_idx on public.business_review_qr_cards(business_id);
