@@ -366,7 +366,7 @@ type SubscriptionProduct = {
 async function startMercadoPagoSubscription(product: SubscriptionProduct): Promise<never> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const { user, businessId } = await currentPurchaseContext();
-  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard/intelligence';
+  const returnPath = product.productCode === NIVAL_POINTS_PRODUCT ? '/dashboard/points' : '/dashboard';
   if (!token) redirect(`${returnPath}?error=Mercado+Pago+aún+no+está+configurado.`);
   if (!user.email) redirect(`${returnPath}?error=Tu+cuenta+necesita+un+correo+para+crear+la+suscripción.`);
 
@@ -470,6 +470,10 @@ function readPhysicalCardInput(form: FormData): PhysicalCardInput | null {
     city: city.slice(0,100), state: state.slice(0,100), postal_code: postalCode,
     requested_delivery_date: delivery === 'sunday_local' ? requestedDate || null : null,
   };
+}
+
+export async function startNivalPlusSubscription() {
+  return startMercadoPagoSubscription({ productCode: NIVAL_POINTS_INTELLIGENCE_PRODUCT, amountCents: NIVAL_POINTS_INTELLIGENCE_PRICE_CENTS, reason: 'Nival Plus · plan mensual' });
 }
 
 export async function startPhysicalCardCheckout(form: FormData) {

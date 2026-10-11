@@ -1,0 +1,21 @@
+'use server';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { isNivalAdmin } from '@/lib/admin';
+async function adminContext(){const db=await createClient(),{data:{user}}=await db.auth.getUser();if(!user)redirect('/auth');if(!isNivalAdmin(user.email))redirect('/dashboard');return createAdminClient();}
+export async function completeTask(form:FormData){const db=await adminContext();await db.from('business_admin_tasks').update({completed_at:new Date().toISOString()}).eq('id',String(form.get('task_id')));revalidatePath('/admin/operaciones');}
+export async function saveReviewSummary(form:FormData){const db=await adminContext();await db.from('google_review_period_summaries').upsert({business_id:String(form.get('business_id')),period_start:await cycleStart(db,String(form.get('business_id'))),summary:String(form.get('summary')||'')},{onConflict:'business_id,period_start'});revalidatePath('/admin/operaciones');}
+export async function saveZoneComparison(form:FormData){const db=await adminContext();await db.from('business_zone_comparisons').upsert({business_id:String(form.get('business_id')),period_start:await cycleStart(db,String(form.get('business_id'))),business_rating:Number(form.get('business_rating')),business_review_count:Number(form.get('business_review_count')),area_rating:Number(form.get('area_rating')),area_review_count:Number(form.get('area_review_count'))},{onConflict:'business_id,period_start'});revalidatePath('/admin/operaciones');}
+
+export async function saveReviewReply(form:FormData){const db=await adminContext(),businessId=String(form.get('business_id')),reviewId=String(form.get('review_id')),reply=String(form.get('response_text')||'').trim();if(!reply||reply.length>4000)return;
+const {data:sub}=await db.from('product_subscriptions').select('amount_cents').eq('business_id',businessId).eq('status','authorized').order('created_at',{ascending:false}).limit(1).maybeSingle();const cap=sub?.amount_cents===54900?100:sub?.amount_cents===39900?30:0;if(!cap)return;
+const period=await cycleStart(db,businessId);const {count}=await db.from('google_reviews').select('id',{count:'exact',head:true}).eq('business_id',businessId).not('response_text','is',null).gte('responded_at',new Date(period).toISOString());if((count||0)>=cap)return;
+await db.from('google_reviews').update({response_text:reply,responded_at:new Date().toISOString()}).eq('id',reviewId).eq('business_id',businessId).is('response_text',null);revalidatePath('/admin/operaciones');}
+
+async function cycleStart(db:any,businessId:string){const {data}=await db.from('product_subscriptions').select('current_period_end,created_at').eq('business_id',businessId).eq('status','authorized').order('created_at',{ascending:false}).limit(1).maybeSingle();const anchor=data?.current_period_end?new Date(data.current_period_end):new Date(new Date(data?.created_at||Date.now()).getTime()+30*86400000);return new Date(anchor.getTime()-30*86400000).toISOString().slice(0,10);}
+export async function addGoogleReview(form:FormData){const db=await adminContext(),businessId=String(form.get('business_id')),period=await cycleStart(db,businessId),reviewer=String(form.get('reviewer_name')||'').slice(0,120),text=String(form.get('review_text')||'').slice(0,5000),rating=Number(form.get('rating'));if(!text||rating<1||rating>5)return;
+const {data:sub}=await db.from('product_subscriptions').select('amount_cents').eq('business_id',businessId).eq('status','authorized').maybeSingle();if(![39900,54900].includes(sub?.amount_cents))return;
+await db.from('google_reviews').insert({business_id:businessId,reviewer_name:reviewer,rating,review_text:text,review_date:String(form.get('review_date')||new Date().toISOString().slice(0,10)),period_start:period});
+await db.from('business_admin_tasks').insert({business_id:businessId,task_type:'reply_reviews',period_start:period,due_at:new Date().toISOString().slice(0,10)});revalidatePath('/admin/operaciones');}

@@ -15,6 +15,7 @@ export default async function SalesAdmin({ searchParams }: { searchParams: Promi
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/auth?next=%2Fadmin%2Fventas');
   if (!isNivalAdmin(user.email)) redirect('/dashboard');
+  if (!params.section) redirect('/admin/operaciones');
 
   const admin = createAdminClient();
   const { data: orders } = await admin.from('product_orders')

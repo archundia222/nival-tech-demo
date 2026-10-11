@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./nival-redesign.css";
 
 export const metadata: Metadata = {
   title: "Nival Tech | Cobra con un toque",

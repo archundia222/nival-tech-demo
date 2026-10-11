@@ -72,6 +72,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
 
   const business = Array.isArray(membership.businesses) ? membership.businesses[0] : membership.businesses;
   const businessId = business?.id;
+  if (!params.section) redirect("/dashboard/console");
   const productLevel: 'pay' | 'intelligence' = business?.product_level === 'intelligence' ? 'intelligence' : 'pay';
   const { data: entitlementRows } = businessId ? await supabase.from('business_product_entitlements')
     .select('product_code').eq('business_id', businessId).eq('status', 'active') : { data: [] };
