@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const plans = [
   { name: "Puntos", price: 299, id: "puntos", intro: "Lealtad que vuelve.", items: ["Tarjeta NFC", "Clientes ilimitados", "Hasta 10 promociones simultáneas", "Hasta 10 sucursales", "Soporte prioritario", "Estadísticas de impacto y lealtad", "Ticket, nombre y teléfono del cliente"] },
-  { name: "Esencial", price: 499, id: "esencial", intro: "Puntos y reputación.", items: ["Todo lo de Puntos", "30 respuestas a reseñas por periodo", "Estadísticas avanzadas de reseñas", "Impacto y resumen de reseñas", "Estado de la ficha de Google"] },
+  { name: "Esencial", price: 399, id: "esencial", intro: "Puntos y reputación.", items: ["Todo lo de Puntos", "30 respuestas a reseñas por periodo", "Estadísticas avanzadas de reseñas", "Impacto y resumen de reseñas", "Estado de la ficha de Google"] },
   { name: "Plus", price: 549, id: "plus", intro: "Una visión completa de tu zona.", items: ["Todo lo de Esencial", "100 respuestas a reseñas por periodo", "Comparación con negocios parecidos de tu zona", "Calificación y número de reseñas"] },
 ];
 
